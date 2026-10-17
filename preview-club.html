@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>/* Day Play / Night Play. Runs in <head> so the page never flashes the wrong theme.
+   Auto (default) follows Central Time: Day Play 7:00 am–6:59 pm, Night Play 7:00 pm–6:59 am, switching live.
+   A visitor can pin Day or Night; the choice is kept on this device. The Joker Lobby is always Night Play. */
+(function () {
+  var KEY = "sf.play", root = document.documentElement, pinned = null;
+  var nightOnly = /joker-lobby/.test(location.pathname);
+  try { pinned = localStorage.getItem(KEY); } catch (e) { }
+  if (pinned !== "day" && pinned !== "night") pinned = null;
+  function centralHour() {
+    try { return +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: "America/Chicago" }).format(new Date()); }
+    catch (e) { return new Date().getHours(); }
+  }
+  function auto() { var h = centralHour(); return h >= 7 && h < 19 ? "day" : "night"; }
+  function current() { return nightOnly ? "night" : pinned || auto(); }
+  function apply() {
+    var p = current();
+    if (root.getAttribute("data-play") !== p) {
+      root.setAttribute("data-play", p);
+      var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute("content", p === "day" ? "#FBF6EC" : "#17151B");
+      try { document.dispatchEvent(new CustomEvent("sf:play", { detail: { play: p } })); } catch (e) { }
+    }
+    root.setAttribute("data-play-mode", pinned || "auto");
+    label();
+  }
+  var pill = null, menu = null;
+  function label() {
+    if (!pill) return;
+    var p = current();
+    pill.innerHTML = '<span aria-hidden="true">' + (p === "day" ? "☀️" : "🌙") + '</span><span class="t">' + (p === "day" ? "Day Play" : "Night Play") + "</span> <small>" + (pinned ? "· chosen" : "· auto") + "</small>";
+    pill.setAttribute("aria-label", (p === "day" ? "Day Play" : "Night Play") + (pinned ? ", chosen by you" : ", automatic") + ". Change theme");
+    if (menu) Array.prototype.forEach.call(menu.querySelectorAll("button"), function (b) { b.setAttribute("aria-checked", String((b.getAttribute("data-v") === "auto" && !pinned) || b.getAttribute("data-v") === pinned)); });
+  }
+  function set(v) {
+    pinned = v === "day" || v === "night" ? v : null;
+    try { if (pinned) localStorage.setItem(KEY, pinned); else localStorage.removeItem(KEY); } catch (e) { }
+    root.classList.add("sf-play-fade"); apply();
+  }
+  function build() {
+    if (nightOnly || document.querySelector(".sf-play")) return;
+    var wrap = document.createElement("div"); wrap.className = "sf-play";
+    wrap.innerHTML = '<button type="button" class="sf-play-pill" aria-haspopup="true" aria-expanded="false"></button>' +
+      '<div class="sf-play-menu" role="menu" hidden>' +
+      '<button type="button" role="menuitemradio" data-v="auto"><span aria-hidden="true">🕖</span>Automatic<small>Day 7 am · Night 7 pm (Central)</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="day"><span aria-hidden="true">☀️</span>Day Play<small>Bright and easy on the eyes outdoors</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="night"><span aria-hidden="true">🌙</span>Night Play<small>The card room after dark</small></button></div>';
+    document.body.appendChild(wrap);
+    pill = wrap.firstChild; menu = wrap.lastChild;
+    function close() { menu.hidden = true; pill.setAttribute("aria-expanded", "false"); }
+    pill.addEventListener("click", function () { var o = menu.hidden; menu.hidden = !o; pill.setAttribute("aria-expanded", String(o)); if (o) { var c = menu.querySelector('[aria-checked="true"]') || menu.firstChild; c.focus(); } });
+    menu.addEventListener("click", function (e) { var b = e.target.closest("button[data-v]"); if (!b) return; set(b.getAttribute("data-v")); close(); pill.focus(); });
+    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) { close(); pill.focus(); } });
+    label();
+  }
+  apply();
+  setInterval(function () { if (!pinned) apply(); }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) apply(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build); else build();
+  window.SFPlay = { set: set, play: current, mode: function () { return pinned || "auto"; } };
+})();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>SuiteFace · Design preview</title>
+<meta name="description" content="Private design preview of the SuiteFace homepage.">
+<meta name="theme-color" content="#0F2A20">
+<link rel="icon" href="assets/brand/suiteface-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* SuiteFace club preview. One idea: a private card room. Baize at night, sage linen by day.
+   Brass is the only accent; oxblood belongs to hearts and diamonds. Cards are the only decoration. */
+:root{
+  --ground:#0F2A20; --ground-2:#12332A; --surface:#163A2E; --line:rgba(236,230,214,.12);
+  --text:#F2ECDD; --text-2:#BFC9BE; --text-3:#8FA197;
+  --brass:#C9A55A; --brass-ink:#1E1606; --brass-hi:#E2C47E;
+  --oxblood:#8E2230; --card:#F7F2E7; --card-ink:#23202A;
+  --shadow:0 30px 60px -30px rgba(3,14,10,.75);
+  --r-lg:28px; --r-md:18px; --r-sm:12px;
+  --font:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+html[data-play="day"]{
+  --ground:#EDF0E8; --ground-2:#E4E9DF; --surface:#FFFFFF; --line:rgba(18,56,43,.12);
+  --text:#12382B; --text-2:#3F5A4E; --text-3:#6C8278;
+  --brass:#A9823A; --brass-ink:#FFFFFF; --brass-hi:#8E6A26;
+  --shadow:0 30px 60px -34px rgba(18,56,43,.45);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html[data-play] body.c-page,body.c-page{margin:0;background:var(--ground);color:var(--text);font:400 17px/1.6 var(--font);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+a{color:inherit}
+img,svg{display:block}
+:focus-visible{outline:2px solid var(--brass-hi);outline-offset:3px;border-radius:8px}
+.wrap{width:min(1160px,100% - 40px);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Type scale (1.25 ratio, 17px base) */
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.025em;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(2.6rem,6vw,4.6rem);letter-spacing:-.035em}
+h2{font-size:clamp(2rem,4vw,3rem)}
+h3{font-size:1.25rem;letter-spacing:-.01em;line-height:1.25}
+p{margin:0}
+.lead{font-size:clamp(1.1rem,1.6vw,1.3rem);color:var(--text-2);max-width:34ch;line-height:1.5}
+.body{color:var(--text-2);max-width:60ch}
+
+/* Buttons: one primary per screen */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:52px;padding:0 1.6rem;border-radius:999px;font:700 1rem/1 var(--font);text-decoration:none;cursor:pointer;border:0;transition:transform .15s ease,background-color .2s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--brass);color:var(--brass-ink)}
+.btn-primary:hover{background:var(--brass-hi)}
+html[data-play="night"] .btn-primary:hover{color:var(--brass-ink)}
+.btn-quiet{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-quiet:hover{box-shadow:inset 0 0 0 1.5px var(--text-3)}
+.textlink{font-weight:700;color:var(--text);text-decoration:underline;text-decoration-color:var(--brass);text-underline-offset:5px;text-decoration-thickness:2px}
+
+/* Header */
+.c-top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--ground) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.c-top .wrap{display:flex;align-items:center;gap:28px;height:68px}
+.c-brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+.c-brand img{width:34px;height:34px}
+.c-brand sup{font-size:.55em;font-weight:600;color:var(--text-3);margin-left:1px}
+.c-nav{display:flex;gap:4px;margin-left:auto}
+.c-nav a{padding:.55rem .85rem;border-radius:999px;text-decoration:none;font-weight:600;font-size:.95rem;color:var(--text-2)}
+.c-nav a:hover{color:var(--text);background:var(--line)}
+.c-top .btn{min-height:42px;padding:0 1.2rem;font-size:.95rem}
+@media (max-width:900px){.c-nav{display:none}.c-top .wrap{justify-content:space-between}}
+
+/* Hero */
+.c-hero{position:relative;overflow:hidden;padding:clamp(48px,8vw,104px) 0 clamp(56px,8vw,112px)}
+.c-hero::before{content:"";position:absolute;inset:-20% -10% auto 30%;height:120%;background:radial-gradient(closest-side,color-mix(in srgb,var(--brass) 18%,transparent),transparent);pointer-events:none}
+html[data-play="night"] .c-hero{background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+  radial-gradient(120% 90% at 70% 10%,#17402F,var(--ground) 65%)}
+.c-hero .wrap{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.c-hero .copy{display:grid;gap:26px;justify-items:start}
+.c-hero .actions{display:flex;flex-wrap:wrap;align-items:center;gap:22px;margin-top:6px}
+.c-hero .fine{font-size:.92rem;color:var(--text-3)}
+.c-hero .fine b{color:var(--text-2);font-weight:700}
+@media (max-width:900px){.c-hero .wrap{grid-template-columns:1fr;gap:40px}.c-hero .stage{order:2}}
+
+/* The stage: phone + three dealt cards */
+.stage{position:relative;height:clamp(460px,52vw,600px);display:grid;place-items:center}
+.pcard{position:absolute;width:clamp(140px,15vw,184px);aspect-ratio:5/7;border-radius:16px;background:linear-gradient(160deg,#FFFDF8,var(--card) 55%,#EDE5D3);color:var(--card-ink);box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 24px 40px -20px rgba(3,14,10,.6),0 0 0 1px rgba(35,32,42,.08);padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between}
+.pcard .idx{display:grid;justify-items:center;width:max-content;font-weight:800;line-height:.95}
+.pcard .idx b{font-size:1.6rem;letter-spacing:-.04em}
+.pcard .idx svg{width:16px;height:16px;margin-top:3px}
+.pcard .idx.bot{align-self:flex-end;transform:rotate(180deg)}
+.pcard .pip{position:absolute;inset:0;display:grid;place-items:center}
+.pcard .pip svg{width:46%;height:auto;opacity:.95}
+.pcard.red{color:var(--oxblood)}
+.c1{transform:translate(-88%,2%) rotate(-16deg)}
+.c2{transform:translate(86%,-8%) rotate(12deg)}
+.c3{transform:translate(74%,30%) rotate(24deg)}
+.phone{position:relative;z-index:2;width:clamp(240px,24vw,290px);aspect-ratio:9/19;border-radius:44px;background:#0B1612;padding:11px;box-shadow:0 0 0 1.5px rgba(255,255,255,.08),0 50px 90px -40px rgba(3,14,10,.9),0 0 0 9px #1B2A24 inset}
+html[data-play="day"] .phone{box-shadow:0 0 0 1.5px rgba(18,56,43,.25),0 50px 90px -40px rgba(18,56,43,.6)}
+.screen{height:100%;border-radius:34px;overflow:hidden;background:#F5F1E7;color:#1F2A25;display:flex;flex-direction:column;font-size:11px;position:relative}
+.screen .notch{position:absolute;top:8px;left:50%;width:84px;height:24px;margin-left:-42px;border-radius:999px;background:#0B1612}
+.screen .sbar{display:flex;justify-content:space-between;padding:12px 20px 0;font-weight:700;font-size:11px}
+.screen .apphd{padding:22px 16px 10px;display:flex;justify-content:space-between;align-items:end}
+.screen .apphd b{font-size:22px;letter-spacing:-.03em;font-weight:800}
+.screen .apphd span{color:#5E6D66;font-weight:600}
+.screen .seg{margin:0 16px;display:grid;grid-template-columns:repeat(4,1fr);background:#E7E1D3;border-radius:10px;padding:3px}
+.screen .seg i{font-style:normal;text-align:center;padding:5px 0;border-radius:8px;font-weight:700;display:flex;justify-content:center;align-items:center;gap:3px}
+.screen .seg i svg{width:10px;height:10px}
+.screen .seg i.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.screen .ace{margin:12px 16px 8px;border-radius:16px;background:linear-gradient(150deg,#1D4A39,#12382B);color:#F2ECDD;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
+.screen .avatar{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;background:linear-gradient(140deg,#B4505E,#8E2230)}
+.screen .ace small{display:block;color:#BFC9BE;font-weight:600}
+.screen .ace b{font-size:15px;font-weight:800}
+.screen .ace .tag{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:999px;background:rgba(201,165,90,.25);color:#E2C47E;font-weight:700;font-size:9.5px}
+.screen .grid{flex:1;min-height:0;overflow:hidden;align-content:start;padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.screen .mc{background:#fff;border-radius:10px;padding:6px;box-shadow:0 1px 2px rgba(0,0,0,.06);display:grid;gap:4px}
+.screen .mc .ph{aspect-ratio:1;border-radius:7px}
+.screen .mc b{font-size:10px;display:flex;justify-content:space-between}
+.screen .mc b em{font-style:normal;color:#8E2230}
+.screen .mc span{color:#6C7A73;font-size:9px}
+.screen .tabbar{margin-top:auto;display:flex;justify-content:space-around;padding:10px 0 16px;border-top:1px solid #E4DED0;color:#7C8A83}
+.screen .tabbar svg{width:18px;height:18px}
+.screen .tabbar .on{color:#12382B}
+
+/* The one moment: cards deal in on load */
+@media (prefers-reduced-motion:no-preference){
+  .deal .pcard{animation:deal .9s cubic-bezier(.2,.8,.2,1) both}
+  .deal .c1{--to:translate(-88%,2%) rotate(-16deg);animation-delay:.25s}
+  .deal .c2{--to:translate(86%,-8%) rotate(12deg);animation-delay:.4s}
+  .deal .c3{--to:translate(74%,30%) rotate(24deg);animation-delay:.55s}
+  .deal .phone{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes deal{from{opacity:0;transform:translate(0,-30%) rotate(0) scale(.9)}to{opacity:1;transform:var(--to)}}
+  @keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+}
+
+/* Sections */
+section{padding:clamp(72px,10vw,128px) 0}
+.sec-head{display:grid;gap:16px;margin-bottom:clamp(36px,5vw,56px);max-width:720px}
+.band{background:var(--ground-2)}
+
+/* How it plays: a true sequence */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+.steps li{padding:28px 28px 32px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:44px 1fr;gap:4px 16px;align-content:start}
+.steps li:nth-child(3n+2),.steps li:nth-child(3n){padding-left:28px;border-left:1px solid var(--line)}
+.steps .ic{grid-row:span 2;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--brass) 16%,transparent);color:var(--brass-hi)}
+.steps .ic svg{width:22px;height:22px}
+.steps h3{display:flex;gap:10px;align-items:baseline}
+.steps h3 small{font-size:.85rem;font-weight:700;color:var(--text-3)}
+.steps p{color:var(--text-2);font-size:.98rem}
+@media (max-width:860px){.steps{grid-template-columns:1fr}.steps li,.steps li:nth-child(3n+2),.steps li:nth-child(3n){padding:22px 0;border-left:0}}
+
+/* Suits as real cards */
+.suits{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.suit{position:relative;aspect-ratio:5/7;border-radius:var(--r-md);background:linear-gradient(165deg,#FFFDF8,var(--card) 60%,#EEE6D4);color:var(--card-ink);padding:18px;display:flex;flex-direction:column;box-shadow:var(--shadow),0 0 0 1px rgba(35,32,42,.06);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.suit:hover{transform:translateY(-6px) rotate(-1deg)}
+.suit.red{--pc:var(--oxblood)}.suit{--pc:#23202A}
+.suit .corner{display:flex;align-items:center;gap:8px;color:var(--pc);font-weight:800}
+.suit .corner svg{width:20px;height:20px}
+.suit .big{margin:auto 0;display:grid;place-items:center;color:var(--pc)}
+.suit .big svg{width:42%;height:auto}
+.suit h3{font-size:1.15rem}
+.suit p{font-size:.92rem;color:#4F4A57;line-height:1.45;margin-top:4px}
+@media (max-width:960px){.suits{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.suits{grid-template-columns:1fr 1fr;gap:12px}.suit{padding:12px}.suit p{display:none}}
+
+/* Private Tables */
+.tables{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
+.tables .art{border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);background:#141217}
+.tables ul{list-style:none;margin:22px 0 30px;padding:0;display:grid;gap:14px}
+.tables li{display:grid;grid-template-columns:24px 1fr;gap:12px;color:var(--text-2)}
+.tables li svg{width:22px;height:22px;color:var(--brass-hi);margin-top:2px}
+.tables .price{display:flex;gap:28px;margin-top:8px}
+.tables .price b{display:block;font-size:2rem;letter-spacing:-.03em}
+.tables .price span{font-size:.9rem;color:var(--text-3)}
+@media (max-width:900px){.tables{grid-template-columns:1fr}}
+
+/* Safety */
+.safety{display:grid;grid-template-columns:repeat(3,1fr);gap:36px 40px}
+.safety div{display:grid;gap:8px}
+.safety svg{width:28px;height:28px;color:var(--brass-hi);margin-bottom:6px}
+.safety p{color:var(--text-2);font-size:.98rem}
+@media (max-width:860px){.safety{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.safety{grid-template-columns:1fr}}
+
+/* Membership */
+.member{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.plan{background:var(--surface);border-radius:var(--r-lg);padding:clamp(28px,4vw,44px);box-shadow:var(--shadow);border:1px solid var(--line);display:grid;gap:22px}
+.plan .amt{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.plan .amt b{font-size:clamp(3rem,6vw,4.2rem);letter-spacing:-.045em;line-height:1}
+.plan .amt s{color:var(--text-3);font-size:1.4rem;font-weight:700}
+.plan .amt span{color:var(--text-2);font-weight:600}
+.plan .offer{border-radius:var(--r-sm);padding:14px 16px;background:color-mix(in srgb,var(--brass) 14%,transparent);color:var(--text);font-size:.95rem}
+.plan .offer b{color:var(--brass-hi)}
+.plan ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.plan li{display:grid;grid-template-columns:22px 1fr;gap:10px;color:var(--text-2)}
+.plan li svg{width:20px;height:20px;color:var(--brass-hi);margin-top:3px}
+.plan .btn{width:100%}
+.plan .fine{font-size:.85rem;color:var(--text-3)}
+@media (max-width:900px){.member{grid-template-columns:1fr}}
+
+/* Footer */
+.c-foot{border-top:1px solid var(--line);padding:48px 0 calc(90px + env(safe-area-inset-bottom,0px));color:var(--text-3);font-size:.9rem;background:transparent}
+html[data-play] .c-foot{background:transparent;color:var(--text-3)}
+.c-foot .wrap{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:32px}
+.c-foot h4{margin:0 0 10px;color:var(--text);font-size:.95rem}
+.c-foot ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.c-foot a{text-decoration:none;color:var(--text-2)}
+.c-foot a:hover{color:var(--text)}
+@media (max-width:760px){.c-foot .wrap{grid-template-columns:1fr 1fr}.c-foot .wrap>div:first-child{grid-column:1/-1}}
+
+/* Preview ribbon */
+.ribbon{position:fixed;right:16px;top:80px;z-index:30;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:.85rem;box-shadow:var(--shadow);max-width:260px}
+.ribbon b{display:block}
+.ribbon button{all:unset;cursor:pointer;position:absolute;top:6px;right:10px;font-size:1.1rem;color:var(--text-3)}
+.ribbon a{color:var(--brass-hi);font-weight:700}
+@media (max-width:700px){.ribbon{top:auto;bottom:16px;right:12px;left:auto;max-width:220px;padding-right:30px}}
+</style>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792242710">
+<link rel="canonical" href="https://suiteface.com/preview-club.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SuiteFace">
+<meta property="og:title" content="SuiteFace · Design preview">
+<meta property="og:description" content="Private design preview of the SuiteFace homepage.">
+<meta property="og:url" content="https://suiteface.com/preview-club.html">
+<meta property="og:image" content="https://suiteface.com/assets/brand/suiteface-vegas-sign-heart-1600w.png">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body class="c-page">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="s-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.6 5c2.1 0 3.6 1.1 5.4 3.2C13.8 6.1 15.3 5 17.4 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></symbol>
+    <symbol id="s-diamond" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5 20 12l-8 9.5L4 12z"/></symbol>
+    <symbol id="s-club" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3.2a4.2 4.2 0 0 1 3.9 5.8 4.2 4.2 0 1 1-2.6 7.3c.3 1.9 1.1 3.3 2.4 4.5H8.3c1.3-1.2 2.1-2.6 2.4-4.5A4.2 4.2 0 1 1 8.1 9 4.2 4.2 0 0 1 12 3.2z"/></symbol>
+    <symbol id="s-spade" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5s8.6 6.3 8.6 11.2a4.3 4.3 0 0 1-7.3 3.1c.3 1.7 1 3 2.2 4.2H8.5c1.2-1.2 1.9-2.5 2.2-4.2a4.3 4.3 0 0 1-7.3-3.1C3.4 8.8 12 2.5 12 2.5z"/></symbol>
+    <!-- line icons: 1.6 stroke, round caps -->
+    <symbol id="i-quiz" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6"/><path d="M12 16.8h.01"/></g></symbol>
+    <symbol id="i-face" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10" r="2.6"/><path d="M8.2 16.6a4.3 4.3 0 0 1 7.6 0"/></g></symbol>
+    <symbol id="i-rank" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h4V10H4zM10 18h4V5h-4zM16 18h4v-6h-4z"/></g></symbol>
+    <symbol id="i-deck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="4" width="12" height="16" rx="2"/><path d="M4.5 7.5v10A2.5 2.5 0 0 0 7 20"/></g></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7"/></g></symbol>
+    <symbol id="i-pair" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h7A2.5 2.5 0 0 1 16 6.5v4a2.5 2.5 0 0 1-2.5 2.5H9l-3.5 3v-3"/><path d="M19 10v4.5A2.5 2.5 0 0 1 16.5 17H15v3l-3-3"/></g></symbol>
+    <symbol id="i-age" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8.3 7.5 9.5 4.3-1.2 7.5-5 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></g></symbol>
+    <symbol id="i-seal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.5"/><path d="m9 13.6-1.5 7.4 4.5-2.4 4.5 2.4-1.5-7.4"/></g></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2.5 3"/><circle cx="12" cy="12" r="2.2"/></g></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></g></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></g></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 1 3.3 6.5L4 19.5l1-3.4A8 8 0 0 1 4 12z"/></g></symbol>
+    <symbol id="i-chair" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v8H7zM6 12h12v3H6zM8 15v5M16 15v5"/></g></symbol>
+    <symbol id="i-group" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M14.5 15.3A4.3 4.3 0 0 1 21 19"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></g></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4 11 8-6.5 8 6.5V20H4z"/></g></symbol>
+    <symbol id="i-cards" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="10" height="14" rx="2" transform="rotate(-8 9 12)"/><rect x="10" y="5" width="10" height="14" rx="2" transform="rotate(8 15 12)"/></g></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></g></symbol>
+  </defs>
+</svg>
+
+<header class="c-top">
+  <div class="wrap">
+    <a class="c-brand" href="./" aria-label="SuiteFace home">
+      <img src="assets/brand/suiteface-joker-icon-cream-180.png" alt="" width="34" height="34" style="border-radius:9px">
+      SuiteFace<sup>™</sup>
+    </a>
+    <nav class="c-nav" aria-label="Main">
+      <a href="#how">How it plays</a><a href="#suits">Your suit</a><a href="#tables">Private Tables</a><a href="#safety">Safety</a><a href="#member">Membership</a>
+    </nav>
+    <a class="btn btn-quiet" href="./?login=1">Log in</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="c-hero" aria-labelledby="h1">
+    <div class="wrap">
+      <div class="copy">
+        <h1 id="h1">Your 52 best matches, dealt.</h1>
+        <p class="lead">No endless scroll. SuiteFace deals you a real deck: 13 people in each suit who fit what you asked for, ranked Ace to 2.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="./#membership">Get dealt in</a>
+          <a class="textlink" href="#how">See how it plays</a>
+        </div>
+        <p class="fine"><b>Launch offer:</b> join for $2.10 a month. The $21 buy-in is waived through October 31.</p>
+      </div>
+      <div class="stage deal" aria-hidden="true">
+        <div class="pcard red c1"><span class="idx"><b>A</b><svg><use href="#s-heart"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-heart"/></svg></span><span class="idx bot"><b>A</b><svg><use href="#s-heart"/></svg></span></div>
+        <div class="pcard c2"><span class="idx"><b>K</b><svg><use href="#s-spade"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-spade"/></svg></span><span class="idx bot"><b>K</b><svg><use href="#s-spade"/></svg></span></div>
+        <div class="pcard red c3"><span class="idx"><b>Q</b><svg><use href="#s-diamond"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-diamond"/></svg></span><span class="idx bot"><b>Q</b><svg><use href="#s-diamond"/></svg></span></div>
+        <div class="phone">
+          <div class="screen">
+            <span class="notch"></span>
+            <div class="sbar"><span>9:41</span><span>●●●</span></div>
+            <div class="apphd"><b>Your 52</b><span>Dealt today</span></div>
+            <div class="seg"><i class="on"><svg style="color:#8E2230"><use href="#s-heart"/></svg>13</i><i><svg style="color:#8E2230"><use href="#s-diamond"/></svg>13</i><i><svg><use href="#s-club"/></svg>13</i><i><svg><use href="#s-spade"/></svg>13</i></div>
+            <div class="ace"><span class="avatar">M</span><span><small>Ace of Hearts</small><b>Maya, 31</b><br><span class="tag">ID verified</span></span></div>
+            <div class="grid">
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#5B7F70,#2E5446)"></span><b>Jordan<em>K</em></b><span>4 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#C9A55A,#8C6A2B)"></span><b>Priya<em>Q</em></b><span>2 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#7C6A8E,#4C3F5C)"></span><b>Sam<em>J</em></b><span>7 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#B4505E,#7A2433)"></span><b>Leah<em>10</em></b><span>3 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#4E7A8A,#2F4E5A)"></span><b>Chris<em>9</em></b><span>9 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#8A9A6A,#566540)"></span><b>Ana<em>8</em></b><span>5 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#A07A5A,#6B4C33)"></span><b>Theo<em>7</em></b><span>6 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#6A6F9A,#40446A)"></span><b>Nia<em>6</em></b><span>8 miles</span></div>
+              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#B07A8A,#7A4A5A)"></span><b>Ellis<em>5</em></b><span>4 miles</span></div>
+            </div>
+            <div class="tabbar"><svg class="on"><use href="#i-cards"/></svg><svg><use href="#i-msg"/></svg><svg><use href="#i-chair"/></svg><svg><use href="#i-user"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="band" aria-labelledby="howT">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="howT">Six moves from stranger to pair</h2>
+        <p class="body">Every card in your deck passed your dealbreakers and fits what you're looking for. You decide who stays in your hand.</p>
+      </div>
+      <ol class="steps">
+        <li><span class="ic"><svg><use href="#i-quiz"/></svg></span><h3><small>1</small>Find your suit</h3><p>A two-minute quiz about how you show up in love. It decides which suit you play.</p></li>
+        <li><span class="ic"><svg><use href="#i-face"/></svg></span><h3><small>2</small>Set your Face</h3><p>Your photo and answers. Each one stays face up or face down, your call.</p></li>
+        <li><span class="ic"><svg><use href="#i-rank"/></svg></span><h3><small>3</small>Call trumps</h3><p>Rank the four suits by who you click with. Your favorite leads your deck.</p></li>
+        <li><span class="ic"><svg><use href="#i-deck"/></svg></span><h3><small>4</small>Get your 52</h3><p>Thirteen people in each suit, Ace to 2. Only ID-verified members can be an Ace, King, Queen or Jack.</p></li>
+        <li><span class="ic"><svg><use href="#i-play"/></svg></span><h3><small>5</small>Burn or play</h3><p>Burn a card and it's gone for good. Play a card to say you're interested.</p></li>
+        <li><span class="ic"><svg><use href="#i-pair"/></svg></span><h3><small>6</small>Make a pair</h3><p>When you both play each other's card, the Side Table opens and you can talk.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="suits" aria-labelledby="suitT">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="suitT">Which suit are you?</h2>
+        <p class="body">A playful read on how you love, not a personality test. You can always pick a different suit yourself.</p>
+      </div>
+      <div class="suits">
+        <article class="suit red"><span class="corner"><svg><use href="#s-diamond"/></svg>Diamond</span><span class="big"><svg viewBox="0 0 24 24"><use href="#s-diamond"/></svg></span><h3>Makes it happen</h3><p>Direct and decisive. Plans the date and books the table.</p></article>
+        <article class="suit"><span class="corner"><svg><use href="#s-club"/></svg>Club</span><span class="big"><svg viewBox="0 0 24 24"><use href="#s-club"/></svg></span><h3>Brings the fun</h3><p>Outgoing and playful. The life of the table.</p></article>
+        <article class="suit red"><span class="corner"><svg><use href="#s-heart"/></svg>Heart</span><span class="big"><svg viewBox="0 0 24 24"><use href="#s-heart"/></svg></span><h3>Always there</h3><p>Steady and warm. A loyal, patient listener.</p></article>
+        <article class="suit"><span class="corner"><svg><use href="#s-spade"/></svg>Spade</span><span class="big"><svg viewBox="0 0 24 24"><use href="#s-spade"/></svg></span><h3>Quietly all in</h3><p>Thoughtful and careful. Love shown through follow-through.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section id="tables" class="band" aria-labelledby="tabT">
+    <div class="wrap tables">
+      <div class="art" id="tableArt" role="img" aria-label="A Private Table with twelve seats, seven taken"></div>
+      <div>
+        <h2 id="tabT">Not here to date? Pull up a chair.</h2>
+        <p class="body" style="margin-top:16px">Host a Private Table for your people: a prayer group, a game night, your chapter or your alumni crew. Members on the Friendship-only Table are never dealt into anyone's dating deck.</p>
+        <ul>
+          <li><svg><use href="#i-chair"/></svg><span>Set the seats. When they're full, the table is full.</span></li>
+          <li><svg><use href="#i-group"/></svg><span>You approve every request and host as many games as you like.</span></li>
+          <li><svg><use href="#i-msg"/></svg><span>Chat with your table, members only.</span></li>
+        </ul>
+        <div class="price"><div><b>$21</b><span>once, with 12 seats</span></div><div><b>$2.10</b><span>per extra seat</span></div></div>
+        <p style="margin-top:28px"><a class="textlink" href="./#private-tables">Host a table</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="safety" aria-labelledby="safeT">
+    <div class="wrap">
+      <div class="sec-head"><h2 id="safeT">Safe at every table</h2></div>
+      <div class="safety">
+        <div><svg><use href="#i-age"/></svg><h3>Adults only</h3><p>Every member confirms they're 18 or older when they sign up.</p></div>
+        <div><svg><use href="#i-lock"/></svg><h3>Pairs before talk</h3><p>No cold messages. Chat opens only when you both play each other's card.</p></div>
+        <div><svg><use href="#i-seal"/></svg><h3>Verified faces</h3><p>An ID check earns a Seal, so you know the face on the card is real.</p></div>
+        <div><svg><use href="#i-pin"/></svg><h3>Distance, never addresses</h3><p>We show "about 4 miles." Never where someone lives or where they are right now.</p></div>
+        <div><svg><use href="#i-flag"/></svg><h3>Report and block on every card</h3><p>One tap, plain words. Every report is reviewed by a person.</p></div>
+        <div><svg><use href="#i-cards"/></svg><h3>Burns stay private</h3><p>No one ever learns you burned their card.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="member" class="band" aria-labelledby="memT">
+    <div class="wrap member">
+      <div class="sec-head" style="margin:0">
+        <h2 id="memT">One buy-in. Then pocket change.</h2>
+        <p class="body">Your full deck, re-dealt as people join. Cancel any time. If we can't deal you at least 12 cards within 10 days, you can have your buy-in back.</p>
+      </div>
+      <div class="plan">
+        <div class="amt"><b>$2.10</b><span>a month</span><s>$21 buy-in</s></div>
+        <p class="offer"><b>Launch offer</b> through October 31: the $21 buy-in is waived. You pay $2.10 today, then $2.10 a month.</p>
+        <ul>
+          <li><svg><use href="#i-check"/></svg>Your deck of 52, re-dealt as people join</li>
+          <li><svg><use href="#i-check"/></svg>Unlimited burns, plays and pairs</li>
+          <li><svg><use href="#i-check"/></svg>Side Table chat with every pair</li>
+          <li><svg><use href="#i-check"/></svg>One pause every 210 days, up to 21 days</li>
+        </ul>
+        <a class="btn btn-primary" href="./#membership">Get dealt in for $2.10</a>
+        <p class="fine">Payments are handled by Stripe. SuiteFace never sees your card number.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="c-foot">
+  <div class="wrap">
+    <div>
+      <a class="c-brand" href="./" style="color:var(--text)"><img src="assets/brand/suiteface-joker-icon-cream-180.png" alt="" width="34" height="34" style="border-radius:9px">SuiteFace<sup>™</sup></a>
+      <p style="margin-top:14px;max-width:36ch">No Jokers Needed. © 2026 SuiteFace Inc., a Florida corporation. Patent pending.</p>
+    </div>
+    <div><h4>Play</h4><ul><li><a href="#how">How it plays</a></li><li><a href="#suits">Your suit</a></li><li><a href="#tables">Private Tables</a></li><li><a href="#member">Membership</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="terms.html">Terms</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="safety.html">Safety Guide</a></li><li><a href="mailto:help@suiteface.com">help@suiteface.com</a></li></ul></div>
+  </div>
+</footer>
+
+<aside class="ribbon" aria-label="About this page"><button type="button" aria-label="Hide this note" onclick="this.parentNode.remove()">×</button><b>Design preview</b>Private draft of the new look. Not linked from the site. <a href="./">Back to the live site</a></aside>
+
+<script src="assets/js/casino-scene.js?v=1792242710"></script>
+<script>
+(function () {
+  var el = document.getElementById("tableArt");
+  function draw() { if (window.SFCasino && el) el.innerHTML = window.SFCasino.svg({ name: "Tuesday Prayer Brothers", kind: "faith", seats: 12, seated: 7, style: { felt: "emerald", rail: "walnut", tagline: "Iron sharpens iron" } }); }
+  draw();
+})();
+</script>
+<script src="assets/js/gate.js?v=1792242710"></script>
+<script src="assets/js/fx.js?v=1792242710"></script>
+</body>
+</html>
