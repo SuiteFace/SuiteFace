@@ -401,13 +401,32 @@
     qw.self.concat(qw.others).forEach(function (w) { var k = suitOf(w, WORDS); if (k) c[k] += 0.5; });
     var fk = suitOf(qw.fault, FAULTS); if (fk) c[fk] += 0.5;
     var tot = ORDER.reduce(function (a, k) { return a + c[k]; }, 0) || 1;
-    var top = ORDER.slice().sort(function (a, b) { return c[b] - c[a]; })[0];
     var both = qw.self.filter(function (w) { return qw.others.indexOf(w) > -1; });
+    /* House rule: there is always one clear suit. Ties break in this order, and the result says which one decided it. */
+    var TIE = [
+      ["the words you and the people who know you both picked", function (s) { return both.filter(function (w) { return suitOf(w, WORDS) === s; }).length; }],
+      ["how your friends and family see you", function (s) { return qw.others.filter(function (w) { return suitOf(w, WORDS) === s; }).length; }],
+      ["your most recent answers", function (s) { for (var i = qa.length - 1; i >= 0; i--) if (qa[i] === s) return i + 1; return 0; }],
+      ["your honest fault", function (s) { return fk === s ? 1 : 0; }]
+    ];
+    var lead = ORDER.filter(function (s) { return c[s] === Math.max.apply(null, ORDER.map(function (k) { return c[k]; })); }), tieNote = "";
+    if (lead.length > 1) {
+      var was = lead.slice();
+      for (var t = 0; t < TIE.length && lead.length > 1; t++) {
+        var sc = {}; lead.forEach(function (s) { sc[s] = TIE[t][1](s); });
+        var hi = Math.max.apply(null, lead.map(function (s) { return sc[s]; }));
+        var next = lead.filter(function (s) { return sc[s] === hi; });
+        if (next.length < lead.length) { lead = next; if (lead.length === 1) tieNote = was.map(function (s) { return SUIT[s].name; }).join(" and ") + " were even. The tie went to " + SUIT[lead[0]].name + " on " + TIE[t][0] + "."; }
+      }
+      if (lead.length > 1) { lead = [lead[0]]; tieNote = was.map(function (s) { return SUIT[s].name; }).join(" and ") + " were dead even, so the house order decided it. Tap \"I'm more…\" if that's not you."; }
+      c[lead[0]] += 0.01; /* the winner always shows the highest bar */
+    }
+    var top = lead[0];
     $("#quizBox").hidden = true; var R = $("#quizResult"); R.hidden = false;
     R.innerHTML = '<span class="big" style="color:' + suitColor(top) + '">' + pip(top, "big") + '</span><div class="form-grid" style="gap:10px"><p class="eyebrow">Your suit</p><h3 style="font-size:2.4rem">' +
       SUIT[top].sym + " You're a " + SUIT[top].name + "</h3><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
-      ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); return '<div class="bar"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") +
-      '</div><div class="selfwords"><p><b>You see yourself as:</b> ' + esc(qw.self.join(", ")) + '</p><p><b>Friends and family say:</b> ' + esc(qw.others.join(", ")) + "</p>" +
+      ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); if (s === top) pct = Math.max(pct, 1 + Math.max.apply(null, ORDER.filter(function (k) { return k !== top; }).map(function (k) { return Math.round(c[k] / tot * 100); }))); return '<div class="bar' + (s === top ? " win" : "") + '"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") +
+      '</div>' + (tieNote ? '<p class="hint tie">⚖ ' + esc(tieNote) + "</p>" : "") + '<div class="selfwords"><p><b>You see yourself as:</b> ' + esc(qw.self.join(", ")) + '</p><p><b>Friends and family say:</b> ' + esc(qw.others.join(", ")) + "</p>" +
       (both.length ? '<p class="hint">You and the people who know you best agree on <b>' + esc(both.join(", ")) + "</b>. That's the real you.</p>" : '<p class="hint">You and the people who know you see different sides of you. Both belong on your card.</p>') +
       '<p><b>Your honest fault:</b> ' + esc(qw.fault) + ' <span class="hint">· Face Down (private). Owning it is a strong play.</span></p></div>' +
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
