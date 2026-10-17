@@ -2589,7 +2589,7 @@
         '<span class="casmeta">' + esc(kindLabel(c.kind)) + " · " + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "Host approves") + "</span>" +
         (c.about ? '<span class="casabout">' + esc(c.about) + "</span>" : "") +
         '<span class="castables">' + t.slice(0, 3).map(function (x) { return "<em>" + esc(x.name) + (x.meets ? " · " + esc(x.meets) : "") + "</em>"; }).join("") + (t.length > 3 ? "<em>+" + (t.length - 3) + " more</em>" : "") + "</span>" +
-        '<span class="casfoot">Host @' + esc(c.host_handle || "host") + " · " + (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s") + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span></button>";
+        '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : "Hosted by a member") + " · " + (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s") + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span></button>";
     }
     function show(list, note) {
       lastList = list;
@@ -2621,7 +2621,7 @@
     function openCasino(c, example) {
       var host = c.my_status === "host";
       var m = modal((SC ? '<div id="cjScene"></div>' : '<div class="casign big" aria-hidden="true"><span>' + esc(kindLabel(c.kind)) + "</span><b>" + esc(c.name) + "</b><span>Host @" + esc(c.host_handle || "host") + "</span></div>") +
-        '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · Host @" + esc(c.host_handle || "host") + (example ? ' · <a href="casino.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="casino.html?c=' + encodeURIComponent(c.id) + '">Walk in to the Casino ›</a>') + "</p>" +
+        '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · " + (c.host_handle ? "Host @" + esc(c.host_handle) : "Hosted by a member") + (example ? ' · <a href="casino.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="casino.html?c=' + encodeURIComponent(c.id) + '">Walk in to the Casino ›</a>') + "</p>" +
         (c.about ? '<p class="lede" style="margin:12px 0 6px">' + esc(c.about) + "</p>" : "") +
         '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "The Host approves each request") + " · " + (c.members || 1) + " members · ZIP " + esc((c.zips || []).slice(0, 7).join(", ")) + ((c.zips || []).length > 7 ? " +" + ((c.zips || []).length - 7) : "") + "</p>" +
         '<h4 style="margin:14px 0 6px">Game Tables</h4><ul class="castbl">' + (c.tables || []).map(function (t) { return "<li><b>" + esc(t.name) + "</b>" + (t.meets ? "<span>" + esc(t.meets) + "</span>" : "") + "</li>"; }).join("") + "</ul>" +
