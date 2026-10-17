@@ -1684,6 +1684,20 @@
   }
   $("#mainForm").addEventListener("submit", function (e) { e.preventDefault(); submitForm(e.target, e.target.getAttribute("data-type")); });
 
+  // Help + Feedback dock: minimize to a small "?" tab; remembered on this device.
+  (function () {
+    var dock = $("#fabDock"), b = $("#fabMin"); if (!dock || !b) return;
+    function setMin(on, save) {
+      dock.classList.toggle("min", on);
+      b.setAttribute("aria-expanded", String(!on));
+      b.setAttribute("aria-label", on ? "Show Help and Feedback" : "Hide Help and Feedback");
+      b.title = on ? "Help & Feedback" : "Hide";
+      b.innerHTML = on ? '<span aria-hidden="true">?</span> Help' : '<span aria-hidden="true">–</span>';
+      if (save) S.set("fabMin", on);
+    }
+    setMin(!!S.get("fabMin", false), false);
+    b.addEventListener("click", function () { setMin(!dock.classList.contains("min"), true); });
+  })();
   // feedback popup
   $("#fbBtn").addEventListener("click", function () {
     var m = modal('<h3 style="font-size:2rem">How\'s the table?</h3><p class="lede" style="margin:6px 0 14px">Tap a suit, add a note if you like. It goes straight to the SuiteFace team.</p>' +

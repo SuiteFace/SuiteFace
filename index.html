@@ -79,8 +79,8 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792241761">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792241761">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792241928">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792241928">
 </head>
 <body>
 <header class="top">
@@ -661,16 +661,21 @@
   </div>
 </footer>
 
-<button class="btn gold fab helpfab" id="helpBtn" type="button" aria-haspopup="dialog">Help</button>
-<button class="btn felt fab" id="fbBtn" type="button">Feedback</button>
+<div class="fabdock" id="fabDock">
+  <button class="fabmin" id="fabMin" type="button" aria-expanded="true" aria-controls="fabBtns" aria-label="Hide Help and Feedback" title="Hide"><span aria-hidden="true">–</span></button>
+  <div class="fabbtns" id="fabBtns">
+    <button class="btn gold fab helpfab" id="helpBtn" type="button" aria-haspopup="dialog">Help</button>
+    <button class="btn felt fab" id="fbBtn" type="button">Feedback</button>
+  </div>
+</div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792241761"></script>
-<script src="/assets/js/sign.js?v=1792241761"></script>
-<script src="/assets/js/live.js?v=1792241761"></script>
-<script src="/assets/js/gate.js?v=1792241761"></script>
-<script src="/assets/js/fx.js?v=1792241761"></script>
-<script src="/assets/js/casino-scene.js?v=1792241761"></script>
-<script src="/assets/js/app.js?v=1792241761"></script>
+<script src="/assets/js/config.js?v=1792241928"></script>
+<script src="/assets/js/sign.js?v=1792241928"></script>
+<script src="/assets/js/live.js?v=1792241928"></script>
+<script src="/assets/js/gate.js?v=1792241928"></script>
+<script src="/assets/js/fx.js?v=1792241928"></script>
+<script src="/assets/js/casino-scene.js?v=1792241928"></script>
+<script src="/assets/js/app.js?v=1792241928"></script>
 </body>
 </html>
