@@ -149,6 +149,8 @@ Prices are in US dollars, plus any tax that applies. Payments are processed by S
 
 **4.8 Failed payments.** If a monthly payment fails, Stripe will retry. Contact and deck access pause until payment succeeds.
 
+**4.10 The High Roller Room.** The High Roller Room is an optional Room for members with the ✓ ID Seal who either (a) **verify at least $1,000,000** in combined bank or brokerage balances, by linking accounts through Stripe (balance only) or by uploading statements dated within 60 days for staff review, or (b) pay the **one-time $5,000.00 High Roller Buy-In**. Verified members show **💎 High Roller ✓ Verified**, renewed every 12 months; Buy-In members show **💎 High Roller**. SuiteFace never shows anyone your balance, erases balance figures once a decision is made, and deletes uploaded statements after review. The High Roller Buy-In is **non-refundable** except where the law requires otherwise. Membership in the Room says nothing about a person's character or intentions; never send money to anyone you meet. **Masked play:** a High Roller may play masked: other members see an alias, a 3-year age range that includes their real age, and a blurred photo, while every other part of their card stays truthful. Their real name, age, @username and photo are shown to a member only after the two check in together in person through Play Hand. Using an alias to deceive, harass or evade a Joker is a breach of these Terms.
+
 **4.9 Ask the Dealer and The Raise.** **Ask the Dealer** is a free AI help desk. **The Raise** is an optional one-time purchase of **$2.10** per Raise: AI-generated date suggestions based on what is shown on your card and the other member's card. Both are produced by artificial intelligence and may be wrong or out of date. Place suggestions are ideas, not endorsements. A venue that pays SuiteFace to be featured is always labeled **Sponsored**, and partner deals ("Comps") are offered by the venue, not SuiteFace: **check hours, details and safety yourself, always meet in a public place, and call 911 in an emergency.** The Dealer is not a lawyer, counselor or safety service. A Raise is used when you submit it. If the Dealer can't finish, that Raise is returned to you. You may **Fold** once within 7 days of a Raise for one free set of new suggestions. A used Raise is non-refundable except where the law requires otherwise.
 
 ## 5. House rules: member conduct
@@ -317,6 +319,7 @@ This agreement is between **SuiteFace Inc., a Florida corporation**, and the bus
 
 1. **What you're buying.**
    - **House Partner:** a one-time **$210.00 Partner Buy-In**, then **$21.00 a month**, plus **$2.10 for each Comp redeemed** by a SuiteFace pair, billed monthly. The Partner Buy-In covers 12 months of partnership. To continue after 12 months, a new $210.00 Partner Buy-In is due.
+   - **High Roller Sponsor:** **$2,100.00 a year** for access, plus **$210.00 a week**, plus **$21.00 for each offer accepted** by a High Roller Room member, billed monthly. Offers show only to High Roller Room members.
    - **ZIP Sponsor:** **$210.00 every 30 days** per package of up to **7 ZIP codes**, renewing automatically every 30 days from your payment date until you cancel.
 2. **One sponsor per ZIP.** Each ZIP code has one live sponsor at a time. If a ZIP you want is taken, you may join its **On Deck** line, which holds up to **3 businesses** in the order they joined.
 3. **On Deck automatic payment.** By joining On Deck, you save a card and **authorize SuiteFace to charge it $210.00 (per package) automatically when one of your ZIP codes opens**, for example because the current sponsor cancels, doesn't renew, or its payment fails after Stripe's retries. Your sign goes live once you're charged and your sign is approved, and your 30-day cycle starts on the charge date. You can leave On Deck anytime before you're charged by emailing help@suiteface.com.
@@ -330,6 +333,16 @@ This agreement is between **SuiteFace Inc., a Florida corporation**, and the bus
 11. **Liability.** SuiteFace's total liability under this agreement is limited to the fees you paid in the 3 months before the claim.
 12. **Changes and ending.** SuiteFace may change prices with 30 days' notice. Either side may end this agreement at the end of a paid period. SuiteFace may end it right away for a breach.
 13. **Law.** Florida law applies, and disputes are handled under Section 9 of these Terms. Notices: help@suiteface.com.
+
+
+### G. High Roller Room Agreement (signed before verifying or buying in)
+
+1. I have the ✓ ID Seal and I'm applying to join the High Roller Room.
+2. **If I verify:** I authorize SuiteFace and its partner Stripe to read the balances of the accounts I link, once, or SuiteFace staff to review the statements I upload. Every account and statement is mine (or jointly mine), and everything I submit is genuine and unaltered.
+3. I understand SuiteFace uses this **only** to check the $1,000,000 total, never shows my balance to anyone, erases the figures once decided, and deletes my statements after review. Verification lasts 12 months.
+4. **If I buy in:** I authorize a one-time charge of **$5,000.00**, which is **non-refundable** except where the law requires.
+5. False or altered information means removal from the Room and possibly SuiteFace, with no refund.
+6. I'll never ask another member for money or financial details, and I'll report anyone who asks me.
 
 
 
@@ -358,6 +371,7 @@ This policy explains what SuiteFace collects, why, who we share it with, and the
 - **Activity at the table:** cards dealt, burned and played; Pairs; check-ins; Play Hand results; Jokers you make or receive; challenges; reports and blocks.
 - **Messages** you send through SuiteFace chat.
 - **Payments:** handled by Stripe. We receive your purchase history and the last four digits and brand of your card, never the full card number.
+- **High Roller verification (optional):** if you link accounts, Stripe shares each account's institution name, last 4 digits and balance with us once. If you upload statements, staff review them privately. We keep only the result (verified, and when). Balances are erased once decided, statements are deleted after review, and none of it is shown to other members or used for anything else.
 - **Sponsor signs:** if you tap a Sponsored sign and choose to send your details, that business receives your name, email, and any phone number and message you add. You check a box first, every time. Businesses may use them only to reply to you.
 - **Ask the Dealer and The Raise:** the questions you type. Help-desk questions aren't tied to your account; we keep only a scrambled daily counter to limit abuse. For a Raise we keep a record that it was used.
 - **Identity verification (optional):** handled by Stripe Identity. We receive the result (verified or not), your legal first name and date of birth, never the images of your ID or selfie.

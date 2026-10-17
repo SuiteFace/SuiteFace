@@ -16,6 +16,8 @@ window.SUITEFACE_CONFIG = {
   stripeRaiseLink: "https://buy.stripe.com/test_7sY7sL0Q32Yj2RQbpU14404",
   dealerUrl: "https://huiuztyvqzxfvqnjdswl.supabase.co/functions/v1/ask-dealer",
   stripePartnerLink: "https://buy.stripe.com/test_14A3cvaqD0QbfECgKe14406",
+  stripeHighRollerLink: "https://buy.stripe.com/test_5kQdR99mzbuP3VU0Lg14409",
+  stripeHrSponsorLink: "https://buy.stripe.com/test_eVq14nbuH42n3VU8dI1440a",
   supabaseUrl: "https://huiuztyvqzxfvqnjdswl.supabase.co",
   supabaseKey: "sb_publishable_jIViI02IuEYNwK5ZsjvFYQ_7mIavgMV",
   siteUrl: "https://suiteface.com/",

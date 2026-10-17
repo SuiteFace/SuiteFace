@@ -426,6 +426,44 @@
     if (q === "welcome") toast("You're in. SuiteFace will approve your sign within 1 business day.");
     if (q === "ondeck") toast("You're On Deck. We'll charge your card only when your ZIP opens."); })();
 
+  /* ---------- The High Roller Room: ID Seal + verified $1M+ (accounts can add up) or the $5,000 High Roller Buy-In ---------- */
+  function openHighRoller() {
+    var m = modal('<p class="eyebrow">VIP floor · ID Seal required</p><h3 style="font-size:2.2rem">💎 The High Roller Room</h3>' +
+      '<p class="lede" style="margin:6px 0 10px">A private deck of High Rollers only, the gold high-limit table, and VIP offers from High Roller Sponsors.</p>' +
+      '<div class="hrpaths"><div class="hrpath"><b>Verify $1M+</b><span>Show at least <b>$1,000,000</b> across your bank or brokerage accounts. Several accounts can add up.</span>' +
+        '<button class="btn gold sm" type="button" data-hr="bank">Link accounts with Stripe</button><label class="btn ghost sm hrup">Upload statements<input type="file" id="hrFile" accept="application/pdf,image/png,image/jpeg" multiple hidden></label>' +
+        '<small>Bank links share a balance only, read once. Statements (dated within 60 days) are reviewed by SuiteFace staff and deleted after review. Your balance is never shown to anyone and is erased once you\'re verified. Badge: <b>💎 High Roller ✓ Verified</b>, renewed yearly.</small></div>' +
+      '<div class="hrpath"><b>High Roller Buy-In · $5,000</b><span>Skip the financial check with a one-time $5,000 Buy-In.</span><button class="btn ghost sm" type="button" data-hr="buyin">Buy in for $5,000</button>' +
+        '<small>One time, non-refundable except where the law requires. Badge: <b>💎 High Roller</b>.</small></div></div>' +
+      '<div class="notice bad" style="margin-top:12px"><b>High Rollers are targets for romance scams.</b> Never send money, gift cards, crypto or account details to anyone you meet here, no matter the story.</div>' +
+      '<p class="hint" id="hrOut" role="status" style="margin-top:8px"></p>');
+    var out = $("#hrOut", m), live = window.SF_LIVE && window.SF_LIVE.session && window.SF_LIVE.session();
+    function signed(next) { closeModal(); window.SFSign.require("highroller", next, { about: "High Roller Room" }); }
+    function demo(kind) { P.highRoller = kind; if (P.rooms.indexOf("highroller") < 0) P.rooms.push("highroller"); P.room = "highroller"; saveP(); renderRooms(); deckDirty = true; buildDeck(); renderTable(false); onChange(); jackpot(3000);
+      toast("💎 Welcome to the High Roller Room (preview). " + DECK.length + " High Roller cards dealt."); location.hash = "table"; }
+    $$("[data-hr]", m).forEach(function (b) { b.addEventListener("click", function () { var kind = b.getAttribute("data-hr");
+      signed(function () {
+        if (!live) { demo(kind === "buyin" ? "buyin" : "verified"); return; }
+        if (kind === "buyin") { location.href = CFG.stripeHighRollerLink + "?client_reference_id=" + encodeURIComponent(window.SF_LIVE.memberId()) + "&prefilled_email=" + encodeURIComponent(window.SF_LIVE.email() || ""); return; }
+        fetch(CFG.supabaseUrl + "/functions/v1/high-roller", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ action: "bank" }) })
+          .then(function (r) { return r.json(); }).then(function (j) { if (j.url) location.href = j.url; else toast(j.error || "Couldn't open bank linking."); });
+      }); }); });
+    $("#hrFile", m).addEventListener("change", function () { var files = Array.prototype.slice.call(this.files || []);
+      if (!files.length) return; if (files.some(function (f) { return f.size > 10485760; })) { out.textContent = "Each file must be under 10 MB."; return; }
+      signed(function () {
+        if (!live) { toast("Preview: on suiteface.com your " + files.length + " statement(s) go to private review. Approval usually takes 1 business day."); return; }
+        Promise.all(files.map(function (f) { return window.SF_LIVE.uploadStatement(f).then(function (path) { return window.SF_rpc("start_hr_check", { p_method: "statement", p_statement_path: path }); }); }))
+          .then(function () { toast("Statements sent for private review. We'll email you when you're verified."); }).catch(function (e) { toast(e.message); });
+      }); });
+  }
+  window.SF_openHighRoller = openHighRoller;
+  document.addEventListener("click", function (e) { if (e.target.closest("[data-highroller]")) { e.preventDefault(); openHighRoller(); } });
+  document.addEventListener("click", function (e) { if (!e.target.closest("[data-hr-sponsor]")) return; e.preventDefault();
+    window.SFSign.require("sponsor", function () { location.href = CFG.stripeHrSponsorLink; }, { about: "High Roller Sponsor" }); });
+  (function () { var q = new URLSearchParams(location.search).get("highroller");
+    if (q === "welcome") toast("💎 Welcome, High Roller. Your Room opens on your next deal.");
+    if (q === "linked") toast("Account linked. We're checking the balance now; this takes a few minutes."); })();
+
   /* ---------- quiz ---------- */
   var Q = [
     ["First date, you'd rather…", { diamond: "Pick the place and book it", club: "Something lively, like trivia night", heart: "A long walk and real conversation", spade: "A spot I've researched with great reviews" }],
@@ -891,6 +929,7 @@
      Main Floor = everyone. A Room deals only players who joined it, and you can only join a Room your own answers fit. ---------- */
   var ROOMS = [
     ["main", "Main Floor", "🎰", null, null, "Everyone at your table"],
+    ["highroller", "High Roller Room", "💎", "__hr", null],
     ["christian", "Christian Room", "✝️", "religion", ["Christian"]], ["jewish", "Jewish Room", "✡️", "religion", ["Jewish"]],
     ["muslim", "Muslim Room", "☪️", "religion", ["Muslim"]], ["hindu", "Hindu Room", "🕉️", "religion", ["Hindu"]],
     ["buddhist", "Buddhist Room", "☸️", "religion", ["Buddhist"]], ["spiritual", "Spiritual Room", "✨", "religion", ["Spiritual, not religious"]],
@@ -901,19 +940,28 @@
   ];
   var ROOM = {}; ROOMS.forEach(function (r) { ROOM[r[0]] = r; });
   P.rooms = (P.rooms || []).filter(function (id) { return ROOM[id] && id !== "main"; }); P.room = ROOM[P.room] ? P.room : "main";
-  function roomFits(r, o) { if (!r || !r[3]) return true; var v = asList((o || {})[r[3]]); return v.some(function (x) { return r[4].indexOf(x) > -1; }); }
-  function canJoin(r) { return roomFits(r, P.id || {}); }
-  function inRoom(p) { var r = ROOM[P.room]; return !r || !r[3] || roomFits(r, p.id_); }
+  function roomFits(r, o) { if (!r || !r[3]) return true; if (r[0] === "highroller") return false; var v = asList((o || {})[r[3]]); return v.some(function (x) { return r[4].indexOf(x) > -1; }); }
+  function canJoin(r) { return r[0] === "highroller" ? !!P.highRoller : roomFits(r, P.id || {}); }
+  function inRoom(p) { var r = ROOM[P.room]; if (r && r[0] === "highroller") return !!p.hr; return !r || !r[3] || roomFits(r, p.id_); }
   function renderRooms() {
     var box = $("#roomChips"); if (box) box.innerHTML = ROOMS.slice(1).map(function (r) { var ok = canJoin(r), on = P.rooms.indexOf(r[0]) > -1 && ok;
-      return '<button type="button" class="chip room" data-room="' + r[0] + '" aria-pressed="' + on + '"' + (ok ? "" : ' aria-disabled="true" title="Answer ' + esc((IDX[r[3]] || [0, r[3]])[1]) + ' in About me to join"') + ">" + r[2] + " " + esc(r[1]) + (ok ? "" : " 🔒") + "</button>"; }).join("");
+      return '<button type="button" class="chip room" data-room="' + r[0] + '" aria-pressed="' + on + '"' + (ok ? "" : r[0] === "highroller" ? ' aria-disabled="true" title="Verify $1M+ or take the High Roller Buy-In"' : ' aria-disabled="true" title="Answer ' + esc((IDX[r[3]] || [0, r[3]])[1]) + ' in About me to join"') + ">" + r[2] + " " + esc(r[1]) + (ok ? "" : " 🔒") + "</button>"; }).join("");
+    var mb = $("#maskBox"); if (mb) { mb.hidden = !P.highRoller;
+      if (P.highRoller) mb.innerHTML = '<label class="check"><input type="checkbox" id="maskOn"' + (P.masked ? " checked" : "") + '> <span><b>🎭 Play masked.</b> Other members see an alias, a 3-year age range and a blurred photo. Everything else on your card stays true. Your real name, age and photo are shown only after you check in together in person.</span></label>' +
+        '<div class="field" style="margin-top:6px"><label for="maskAlias">Your alias</label><input id="maskAlias" maxlength="40" placeholder="The Velvet Ace" value="' + esc(P.maskName || "") + '"></div>'; }
     var bar = $("#roomBar"); if (bar) { var mine = ["main"].concat(P.rooms.filter(function (id) { return canJoin(ROOM[id]); }));
       if (mine.indexOf(P.room) < 0) P.room = "main";
+      document.body.classList.toggle("hr-mode", P.room === "highroller");
       bar.innerHTML = '<span class="rb-l">Playing in</span>' + mine.map(function (id) { var r = ROOM[id]; return '<button type="button" class="chip room" data-play-room="' + id + '" aria-pressed="' + (P.room === id) + '">' + r[2] + " " + esc(r[1]) + "</button>"; }).join("") +
         (mine.length < 2 ? '<a class="rb-add" href="#face">Join a Room ›</a>' : ""); }
   }
+  document.addEventListener("change", function (e) {
+    if (e.target.id === "maskOn") { P.masked = e.target.checked; if (P.masked && !P.maskName) P.maskName = "The Velvet Ace"; saveP(); renderRooms(); onChange(); toast(P.masked ? "🎭 You're masked as " + P.maskName + "." : "Unmasked: members see your real name and age."); }
+  });
+  document.addEventListener("input", function (e) { if (e.target.id === "maskAlias") { P.maskName = e.target.value.replace(/https?:\/\/|@/g, "").slice(0, 40); saveP(); onChange(); } });
   document.addEventListener("click", function (e) {
     var j = e.target.closest("[data-room]"), pl = e.target.closest("[data-play-room]");
+    if (j && j.getAttribute("data-room") === "highroller" && !P.highRoller) { openHighRoller(); return; }
     if (j) { var r = ROOM[j.getAttribute("data-room")]; if (!canJoin(r)) { toast("Rooms are for members whose own answers fit. Answer " + ((IDX[r[3]] || [0, r[3]])[1]) + " under About me to join."); return; }
       var i = P.rooms.indexOf(r[0]); if (i > -1) P.rooms.splice(i, 1); else P.rooms.push(r[0]); saveP(); renderRooms(); toast((i > -1 ? "Left the " : "Joined the ") + r[1] + "."); }
     if (pl) { P.room = pl.getAttribute("data-play-room"); saveP(); renderRooms(); deckDirty = true; buildDeck(); renderTable(false);
@@ -923,11 +971,11 @@
   function renderCard() {
     var s = P.mySuit || P.trumps[0], col = SUIT[s].red ? "var(--red)" : "#2B2730";
     var h = P.handle.trim() ? "@" + P.handle.trim().replace(/^@/, "") : "@yourname";
-    $("#myCard").style.setProperty("--felt-c", P.felt);
+    $("#myCard").style.setProperty("--felt-c", P.felt); $("#myCard").classList.toggle("hr", !!P.highRoller);
     var thm = THEME[P.theme] || THEME.private; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +
-      '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") +
+      '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") + (P.highRoller ? '<div class="hrb mine">💎 High Roller' + (P.highRoller === "verified" ? " ✓ Verified" : "") + "</div>" + (P.masked ? '<div class="maskline">🎭 Others see: ' + esc(P.maskName || "Masked High Roller") + (parseInt(P.age, 10) ? ", " + (parseInt(P.age, 10) - 1) + "–" + (parseInt(P.age, 10) + 1) : "") + "</div>" : "") : "") +
       '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" +
       '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="stk-' + k[2] + '">' + k[1] + "</span>" : ""; }).join("") + "</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
@@ -991,11 +1039,11 @@
     var mid = (P.ageMin + P.ageMax) / 2, span = Math.max(4, (P.ageMax - P.ageMin) / 2);
     var pm = prefScore(p);
     var f = 28 * Math.min(1, shared.length / Math.max(1, Math.min(4, P.interests.length || 3))) + 16 * lookMatch +
-      16 * (1 - Math.min(1, p.dist / Math.max(2, P.dist))) + 10 * (1 - Math.min(1, Math.abs(p.age - mid) / span)) + 20 * pm.score + 10 * p.noise;
+      16 * (1 - Math.min(1, p.dist / Math.max(2, P.dist))) + 10 * (1 - Math.min(1, Math.abs((p.realAge || p.age) - mid) / span)) + 20 * pm.score + 10 * p.noise;
     return { score: Math.round(f), shared: shared, prefHits: pm.hits };
   }
   function eligible(p) {
-    return passesDealbreakers(p) && p.age >= P.ageMin && p.age <= P.ageMax && p.dist <= P.dist && (G.jokered || []).indexOf(p.id) < 0;
+    return passesDealbreakers(p) && (p.realAge || p.age) >= P.ageMin && (p.realAge || p.age) <= P.ageMax && p.dist <= P.dist && (G.jokered || []).indexOf(p.id) < 0;
   }
 
   /* ---------- ZIP database (42k US ZIP codes) ---------- */
@@ -1037,7 +1085,7 @@
   var DECK = [], BY = {}, G = Object.assign({ dealt: [], burned: [], played: [], pairs: [], hands: {}, jokered: [], clock: 0 }, S.get("game", {}));
   function saveG() { S.set("game", G); }
   function buildDeck() {
-    var el = POOL.filter(eligible).filter(inRoom).map(function (p) { var f = fitOf(p); return Object.assign({}, p, { fit: f.score, shared: f.shared }); });
+    var el = POOL.filter(eligible).filter(inRoom).map(function (p) { var f = fitOf(p), c = Object.assign({}, p, { fit: f.score, shared: f.shared }); if (p.masked) { c.realName = p.realName; c.realAge = p.realAge; defineMask(c); } return c; });
     el.sort(function (a, b) { return b.fit - a.fit || a.dist - b.dist; });
     DECK = []; BY = {};
     ORDER.forEach(function (s) {
@@ -1060,6 +1108,7 @@
   function ordinal(n) { return n + (["th", "st", "nd", "rd"][(n % 100 > 10 && n % 100 < 14) ? 0 : n % 10] || "th"); }
   function avatar(p, extra) {
     var bg = "hsl(" + p.hue + " 35% 34%)";
+    if (isMasked(p)) extra = (extra || "") + "filter:blur(5px) saturate(.7);";
     return '<div class="avatar" style="' + (extra || "") + 'background:radial-gradient(circle at 30% 25%,hsl(' + p.hue + ' 45% 52%),' + bg + ')">' + esc(initials(p.name)) + "</div>";
   }
   function jmeter(p, big) {
@@ -1074,9 +1123,9 @@
     return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="' + esc(p.name) + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + '. Press to flip."><div class="flip">' +
       (p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + '</div></div><span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
-      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + jmeter(p) + "</div>" +
+      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + (p.hr && P.room === "highroller" ? '<div class="hrb">' + (isMasked(p) ? "🎭 Masked " : "💎 ") + "High Roller" + (p.hr === "verified" ? " ✓" : "") + "</div>" : "") + jmeter(p) + "</div>" +
       '<span class="idx br">' + p.rank + pip(p.suit) + "</span>" + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>") +
-      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " confirmed dates in the last 180 days were marked disasters. Judges reviewed it.</span>" : "") + jmeter(p, true) + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
+      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
       '</div></div><div class="card-actions"><button class="btn ghost" type="button" data-burn>Burn</button><button class="btn red" type="button" data-play>Play</button></div></div>';
   }
   function renderTable(redeal) {
@@ -1322,8 +1371,8 @@
     var f = FORMS[type], el = $("#mainForm");
     el.setAttribute("data-type", type);
     el.innerHTML = "<h3>" + f.title + "</h3>" + (type === "PAUSE" ? '<p class="hint">Pauses last up to 21 days and stop your $2.10 billing. If you don\'t resume within 21 days, your membership ends and returning needs a new $21.00 Buy-In.</p>' : "") + (type === "PARTNER" ? '<div class="partners"><p class="hint" style="margin:0 0 8px">Every SuiteFace date ends with two people checking in, together, somewhere real. Be that place.</p>' +
-      [["🌟", "ZIP Sponsor", "Your own Vegas-style sign in up to 7 ZIP codes, with a pop-up that sends interested people to you. $210 every 30 days. <a href=\"#\" data-sponsor-signup>Sponsor ZIP codes ›</a>"], ["🎟️", "Comp Table", "Offer a deal to pairs who check in at your venue for Play Hand. Members see your Comp on the map and in their hand."], ["✋", "Featured in the Raise", "When it fits the pair, the Dealer can suggest your venue, always labeled Sponsored."], ["🎉", "Party Table nights", "Host double dates and group meetups for local members."], ["🎁", "Giveaways & card backs", "Sponsor merch drops, sticker packs or a branded card back."]]
-        .map(function (p) { return '<div class="pt"><b>' + p[0] + " " + p[1] + "</b><span>" + (p[0] === "🌟" ? p[2] : esc(p[2])) + "</span></div>"; }).join("") +
+      [["💎", "High Roller Sponsor", "Reach members of the High Roller Room only, with VIP offers. $2,100 a year + $210 a week + $21 each time a High Roller accepts your offer. <a href=\"#\" data-hr-sponsor>Become a High Roller Sponsor ›</a>"], ["🌟", "ZIP Sponsor", "Your own Vegas-style sign in up to 7 ZIP codes, with a pop-up that sends interested people to you. $210 every 30 days. <a href=\"#\" data-sponsor-signup>Sponsor ZIP codes ›</a>"], ["🎟️", "Comp Table", "Offer a deal to pairs who check in at your venue for Play Hand. Members see your Comp on the map and in their hand."], ["✋", "Featured in the Raise", "When it fits the pair, the Dealer can suggest your venue, always labeled Sponsored."], ["🎉", "Party Table nights", "Host double dates and group meetups for local members."], ["🎁", "Giveaways & card backs", "Sponsor merch drops, sticker packs or a branded card back."]]
+        .map(function (p) { return '<div class="pt"><b>' + p[0] + " " + p[1] + "</b><span>" + (p[0] === "🌟" || p[0] === "💎" ? p[2] : esc(p[2])) + "</span></div>"; }).join("") +
       '<div class="pt price"><b>House Partner pricing</b><span><b>$210.00</b> one-time Partner Buy-In · <b>$21.00</b> a month · <b>$2.10</b> each time a pair redeems your Comp, billed monthly. Cancel the monthly anytime.</span>' +
       (CFG.stripePartnerLink ? '<button class="btn gold sm" type="button" style="justify-self:start;margin-top:6px" data-partner-join>Become a House Partner</button>' : "") + "</div></div>" : "") + f.fields.map(function (x) { return fieldHTML(x, "m"); }).join("") + HONEY +
       '<button class="btn gold" type="submit">' + f.btn + '</button><div class="out" aria-live="polite"></div>';
@@ -1477,7 +1526,20 @@
     ["zodiac", "Zodiac sign", "one", ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"], 0, 0, "Lifestyle"]
   ];
   var IDX = {}; IDF.forEach(function (f) { IDX[f[0]] = f; });
-  POOL.forEach(function (p) { p.id_ = sampleIdentity(p); });
+  POOL.forEach(function (p) { p.id_ = sampleIdentity(p); p.hr = hash(p.id + "hr") % 100 < 9 ? (hash(p.id + "hrk") % 3 ? "verified" : "buyin") : null; });
+  /* Masked High Rollers: alias + 3-year age range + blurred photo until you check in together in person. */
+  var ALIASES = ["The Velvet Ace", "Midnight King", "The Silent Queen", "Lucky Seven", "The Gold Jack", "High Card", "The Late Dealer", "Red Velvet", "The Quiet Raise", "Diamond Lane"];
+  function revealedTo(p) { var h = (G.hands || {})[p.id]; return !!(h && h.dates > 0); }
+  function isMasked(p) { return !!(p.masked && !revealedTo(p)); }
+  POOL.forEach(function (p) {
+    p.realName = p.name; p.realAge = p.age; p.masked = !!(p.hr && hash(p.id + "mask") % 2 === 0);
+    if (!p.masked) return;
+    p.alias = ALIASES[hash(p.id + "al") % ALIASES.length]; p.ageOff = hash(p.id + "off") % 3; defineMask(p);
+  });
+  function defineMask(p) {
+    Object.defineProperty(p, "name", { get: function () { return isMasked(p) ? p.alias : p.realName; }, set: function (v) { p.realName = v; }, configurable: true, enumerable: true });
+    Object.defineProperty(p, "age", { get: function () { return isMasked(p) ? (p.realAge - p.ageOff) + "–" + (p.realAge - p.ageOff + 2) : p.realAge; }, set: function (v) { p.realAge = v; }, configurable: true, enumerable: true });
+  }
   function prefOpts(f) { return f[0] === "height" ? HBANDS : f[3]; }
   function asList(v) { return v == null || v === "" ? [] : Array.isArray(v) ? v : [v]; }
   function prefValue(f, v) { return f[0] === "height" ? asList(hband(v)) : asList(v); }
@@ -1763,7 +1825,7 @@
       if (oc) {
         var v = oc.getAttribute("data-oc");
         if (v === "win") { h.stage = "win"; toast("Win! Second date on the table.", p.suit); jackpot(2500); burstAt(oc, 50); }
-        if (v === "push") { h.stage = "push"; h.pushAt = now(); toast("Push. If there's no answer in 7 days, it becomes a Loss."); }
+        if (v === "push") { h.stage = "push"; h.pushAt = now(); toast("Push. If you don't both say Win within 24 hours, it becomes a Loss."); }
         if (v === "loss") { h.stage = "loss-choose"; }
         saveG(); renderPairs(); renderHand(m, p); return;
       }
