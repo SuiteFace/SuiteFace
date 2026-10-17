@@ -399,3 +399,10 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .pcard .face .bump svg{width:11px;height:11px}
 .pcard .face .bump svg.bflag{width:30px;height:18px}
 .mycard .bumpers{margin:8px 0 2px}
+/* Phone mock: room for the miles line and the header on small screens */
+.c-stage .screen .apphd{gap:8px}
+.c-stage .screen .apphd>span:last-child{white-space:nowrap;font-size:12px}
+.c-stage .screen .mc{aspect-ratio:auto}
+.c-stage .screen .mc span{white-space:nowrap}
+@media (max-width:480px){.c-stage .screen .apphd b{font-size:19px}.c-stage .screen .apphd>span:last-child{font-size:10.5px}}
+.c-stage .screen .grid{grid-auto-rows:max-content!important}
