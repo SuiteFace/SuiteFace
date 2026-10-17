@@ -1018,7 +1018,7 @@
   /* I identify as + Looking for (check all that apply): always a gate, so the deck only holds people you want to see. */
   var IAM = ["Woman", "Man", "Trans woman", "Trans man", "Nonbinary", "Genderfluid", "Agender", "Two-Spirit", "Another identity"];
   var SEEKS = [["Women", ["Woman"]], ["Men", ["Man"]], ["Trans women", ["Trans woman"]], ["Trans men", ["Trans man"]], ["Nonbinary & gender-diverse", ["Nonbinary", "Genderfluid", "Agender", "Two-Spirit", "Another identity"]], ["Everyone", null]];
-  function seekPicked() { var pr = (P.prefs || {}).gender; if (!pr || !pr.sel || !pr.sel.length || pr.sel.indexOf(OPEN) > -1) return pr && pr.sel && pr.sel.indexOf(OPEN) > -1 ? ["Everyone"] : [];
+  function seekPicked() { var pr = (P.prefs || {}).gender; if (!pr || !pr.sel || !pr.sel.length || pr.sel.indexOf(OPEN) > -1) return [];
     return SEEKS.filter(function (s) { return s[1] && s[1].every(function (v) { return pr.sel.indexOf(v) > -1; }); }).map(function (s) { return s[0]; }); }
   function seekLine() { var me = (P.id || {}).gender, sk = seekPicked(); if (!me && !sk.length) return "";
     return (me && me !== PNTS ? me : "") + (sk.length ? (me && me !== PNTS ? " · seeking " : "Seeking ") + sk.join(", ") : ""); }
@@ -1645,15 +1645,17 @@
   });
 
   /* ---------- welcome slide-in ---------- */
-  var params = new URLSearchParams(location.search), inv = params.get("invite"), seat = params.get("seat");
+  var params = new URLSearchParams(location.search), inv = params.get("ref") || params.get("invite"), seat = params.get("seat");
   if (inv || !S.get("welcomed", false)) {
     setTimeout(function () {
+      if (window.SF_LIVE || SIGNED) return; // members never see the guest welcome
       var w = document.createElement("div"); w.className = "welcome"; w.setAttribute("role", "dialog"); w.setAttribute("aria-label", "Welcome");
       w.innerHTML = "<h3>" + (inv ? (seat ? esc(seat) + ", " : "") + "@" + esc(inv.replace(/^@/, "")) + " saved you a seat" : "Welcome to the Table") + "</h3><p class=\"hint\">" +
         (inv ? "Watch the demo, find your suit, then buy in to get your 52." : "Watch a demo hand, find your suit in two minutes, then buy in to play. No Jokers Needed.") +
         '</p><div class="row"><a class="btn gold sm" href="#demo">Watch the demo</a><a class="btn ghost sm" href="#quiz">Find my suit</a><button class="btn ghost sm" type="button">Close</button></div>';
       document.body.appendChild(w);
       var close = function () { w.remove(); S.set("welcomed", true); };
+      document.addEventListener("sf:live", function () { if (window.SF_LIVE && document.body.contains(w)) w.remove(); });
       $$("a,button", w).forEach(function (b) { b.addEventListener("click", close); });
     }, 1600);
   }
@@ -2748,7 +2750,9 @@
     ]).then(function (res) {
       var m = res[0].data; if (!m) return;
       if (S.get("liveFor", "") !== mid) { // first time on this device for this account: the account is the source of truth
-        P = Object.assign({ id: {}, prefs: {}, vis: {}, trumps: ORDER.slice(), ageMin: 25, ageMax: 40, dist: 25, interests: [], rooms: [] }, { name: "", handle: "", bio: "", zip: "", photo: "" });
+        // keep this device's look (theme, stickers, owned items) but take every answer from the account
+        P = Object.assign({}, P, { id: {}, prefs: {}, vis: {}, trumps: ORDER.slice(), ageMin: 25, ageMax: 40, dist: 25, interests: [], rooms: [], name: "", handle: "", bio: "", zip: "", photo: "", dob: "", age: "" });
+        P.stickers = P.stickers || []; P.owned = P.owned || []; P.theme = P.theme || "private";
         S.set("liveFor", mid);
       }
       if (m.face_name) P.name = m.face_name; if (m.handle) P.handle = m.handle; if (m.bio) P.bio = m.bio; if (m.home_zip) P.zip = m.home_zip;
