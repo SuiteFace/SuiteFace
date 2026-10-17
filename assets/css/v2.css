@@ -477,3 +477,17 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .cpneg{margin:2px 0 8px}.cpneg summary{cursor:pointer;font-weight:700;padding:6px 0}
 .cp.neg[aria-pressed=true]{box-shadow:0 0 0 2px #9C4A7A,0 3px 0 #9C4A7A;background:#F8EEF4}
 .headsup .hulist .cmrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.embwrap{display:block;margin:0 0 6px}.embwrap.sm{display:flex;justify-content:center}
+/* The $21 chip spins whenever the Buy-In is in play (it rests, greyed, only while the launch waiver applies). */
+.sfchip.mc21:not(.waived) .sfchip-svg .rimg{animation:sfchipspin 16s linear infinite}
+@media (prefers-reduced-motion:reduce){.sfchip.mc21 .sfchip-svg .rimg{animation:none}}
+/* First 1,000 option with its badge */
+.lopt.f1kopt{grid-template-columns:92px 1fr;grid-template-areas:"badge title" "desc desc" "left left";column-gap:14px;row-gap:8px;align-items:center}
+.lopt.f1kopt .f1kbadge{grid-area:badge}.lopt.f1kopt .f1kt{grid-area:title;display:grid;gap:2px}.lopt.f1kopt .f1kt small{font:700 .78rem/1.2 var(--body);letter-spacing:.1em;text-transform:uppercase;color:#E3C77E}
+.lopt.f1kopt .f1kd{grid-area:desc}.lopt.f1kopt #f1kLeft{grid-area:left}
+.f1kbadge .emb.founder{filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
+.f1kline{display:inline-flex;align-items:center;gap:6px}
+
+.pcard .face .ficons .f1kmini{display:inline-flex}.pcard .face .ficons .f1kmini .emb{filter:none}
+.pcard .back .f1kback{display:inline-flex;align-items:center;gap:6px;color:#8F6410}
+.lopt.f1kopt .f1kd strong{color:#FFE7A3;font-weight:700}
