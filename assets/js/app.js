@@ -833,7 +833,7 @@
     }
     wrap.addEventListener("click", function (e) {
       var b = e.target.closest("[data-prov]"); if (!b) return; var k = b.getAttribute("data-prov"), pv = PROV[k];
-      if (window.SF_LIVE && window.SF_LIVE.linkIdentity) { window.SF_LIVE.linkIdentity(k); return; }
+      if (window.SF_LIVE && window.SF_LIVE.linkIdentity) { window.SF_LIVE.linkIdentity(k).catch(function (x) { toast((x && x.message) || "Couldn't link that account."); }); return; }
       var sm = pv.sample;
       var fields = [["photo", "Profile photo", !!sm.color], ["name", "Face Name: " + sm.name, true], ["handle", sm.handle ? "Calling Card: @" + sm.handle : "", !!sm.handle], ["bio", sm.bio ? "Face Value: “" + sm.bio + "”" : "", !!sm.bio]].filter(function (f) { return f[2] && f[1]; });
       var m = modal('<h3 style="font-size:1.8rem">Build from ' + esc(pv.name) + '</h3><p class="lede" style="margin:6px 0">' + esc(pv.name) + ' can share: <b>' + esc(pv.gets.join(", ")) + '</b>. Choose what to use:</p>' +
@@ -1293,6 +1293,7 @@
   function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."; $("#agree").focus(); return false; }
   $("#payBtn").addEventListener("click", function (e) {
     e.preventDefault(); if (!needAgree()) return;
+    if (CFG.stripePaymentLink && window.SF_AUTH && (PUBLIC_SITE || window.SF_LIVE)) { liveBuyIn(); return; }
     if (CFG.stripePaymentLink) { var comp = (S.get("comp", "") || "").trim(); var go = function () { window.location.href = CFG.stripePaymentLink + (comp ? (CFG.stripePaymentLink.indexOf("?") < 0 ? "?" : "&") + "prefilled_promo_code=" + encodeURIComponent(comp) : ""); }; if (window.SFSign) window.SFSign.require("buyin", go); else go(); return; }
     modal('<h3 style="font-size:1.8rem">Checkout preview</h3><div class="pricing" style="margin:12px 0"><div><span class="big">$21.00</span><span class="hint">today</span></div><div class="plus">+</div><div><span class="big">$2.10</span><span class="hint">monthly after</span></div></div><div class="notice pv"><b>Preview mode.</b> Stripe checkout isn\'t connected yet, so no payment was taken. Site owner: paste your Stripe Payment Link into <code>assets/js/config.js</code>.</div><button class="btn gold sm" type="button" id="simBuy" style="margin-top:12px">Simulate a paid Buy-In (demo)</button>');
     $("#simBuy").addEventListener("click", function () { closeModal(); setRole("player"); toast("Buy-In complete (demo). Welcome to the table!"); jackpot(4000); burst(innerWidth / 2, innerHeight / 3, 120); location.hash = "face"; });
@@ -2011,8 +2012,36 @@
      appears in Claude's private preview or on a developer's own machine. */
   var PUBLIC_SITE = /(^|\.)suiteface\.com$/i.test(location.hostname);
   var ROLE = S.get("role", "guest"); if (!ROLE_INFO[ROLE]) ROLE = "guest";
-  if (PUBLIC_SITE) ROLE = (window.SF_LIVE && window.SF_LIVE.role && ROLE_INFO[window.SF_LIVE.role]) ? window.SF_LIVE.role : (ROLE === "player" ? "player" : "guest");
-  var CAN_SWITCH = !PUBLIC_SITE || ROLE === "owner";
+  if (PUBLIC_SITE) ROLE = "guest"; // the real role arrives from the server once the visitor's session loads
+  var CAN_SWITCH = !PUBLIC_SITE;
+  var SIGNED = false;
+  /* Live session: the server says who you are. An account that hasn't finished the Buy-In stays at the door. */
+  function liveRole() {
+    var L = window.SF_LIVE; SIGNED = !!L;
+    if (L) ROLE = ROLE_INFO[L.role] ? (L.role === "player" && !L.seated ? "guest" : L.role) : "guest";
+    else if (PUBLIC_SITE) ROLE = "guest";
+    CAN_SWITCH = !PUBLIC_SITE || ROLE === "owner";
+    if ($("#roleBtn")) $("#roleBtn").hidden = !CAN_SWITCH;
+    applyRole();
+  }
+  document.addEventListener("sf:live", function () {
+    liveRole();
+    var after = null; try { after = sessionStorage.getItem("sf.after"); sessionStorage.removeItem("sf.after"); } catch (e) { }
+    if (!window.SF_LIVE) return;
+    if (/[?&]signedin=1/.test(location.search) || after) toast("Signed in as " + (window.SF_LIVE.email() || "a member") + ".");
+    if (/[?&]linked=/.test(location.search)) toast("Account linked. Your details are ready to use on your Face.");
+    if (after === "buyin" && ROLE === "guest") setTimeout(liveBuyIn, 400);
+  });
+  document.addEventListener("sf:recovery", function () {
+    var m = modal('<h3 style="font-size:1.8rem">Choose a new password</h3><div class="field"><label for="npw">New password</label><input type="password" id="npw" autocomplete="new-password" minlength="10"></div><span class="err" id="npwErr"></span><div class="row"><button class="btn gold" type="button" id="npwGo">Save password</button></div>', { focus: "#npw" });
+    $("#npwGo", m).onclick = function () { var v = $("#npw", m).value; if (v.length < 10) { $("#npwErr", m).textContent = "Use at least 10 characters."; return; } window.SF_AUTH.newPassword(v).then(function () { closeModal(); toast("Password saved. You're signed in."); }, function (e) { $("#npwErr", m).textContent = e.message; }); };
+  });
+  function liveBuyIn() {
+    if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "buyin"); } catch (e) { } loginModal("create"); return; }
+    if (ROLE !== "guest") { toast("You're already seated. Welcome back!"); location.hash = "face"; return; }
+    var comp = (S.get("comp", "") || "").trim();
+    window.SF_AUTH.checkout(CFG.stripePaymentLink, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
+  }
   if (!CAN_SWITCH && $("#roleBtn")) $("#roleBtn").hidden = true;
   function allowed(need) {
     if (!need) return true;
@@ -2024,7 +2053,7 @@
   function applyRole() {
     $("#roleName").textContent = ROLE_INFO[ROLE][0];
     document.documentElement.setAttribute("data-role", ROLE);
-    $("#loginBtn").textContent = ROLE === "guest" ? "Log in" : "Log out";
+    $("#loginBtn").textContent = (ROLE === "guest" && !SIGNED) ? "Log in" : "Log out";
     $$("[data-only]").forEach(function (el) { el.hidden = ROLE !== el.getAttribute("data-only"); });
     $$("a[data-need]").forEach(function (a) { var n = a.getAttribute("data-need"); a.hidden = n !== "member" ? !allowed(n) : false; });
     $$("section[data-need]").forEach(function (sec) {
@@ -2032,10 +2061,11 @@
       if (need !== "member") { sec.hidden = !ok; if (ok) renderConsole(sec.id); return; }
       sec.hidden = false; if (wrap) wrap.hidden = !ok;
       var lock = sec.querySelector(":scope > .lockpanel");
+      if (lock && lock.getAttribute("data-s") !== String(SIGNED)) { lock.remove(); lock = null; }
       if (!ok && !lock) {
-        lock = document.createElement("div"); lock.className = "lockpanel wrap";
+        lock = document.createElement("div"); lock.className = "lockpanel wrap"; lock.setAttribute("data-s", String(SIGNED));
         var t = { face: "Build your Face", table: "Your 52", map: "The Table Map", invite: "Invite friends to the table" }[sec.id] || "Members only";
-        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Members only</p><h3>' + t + '</h3><p class="hint">Buy in to play: $21.00 once, then $2.10 a month. Already a member? Log in.</p><div class="row"><a class="btn gold sm" href="#membership">Buy in · $21</a><button class="btn ghost sm" type="button" data-login>Log in</button><a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
+        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Members only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month." : "Buy in to play: $21.00 once, then $2.10 a month. Already a member? Log in.") + '</p><div class="row"><a class="btn gold sm" href="#membership">Buy in · $21</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
         sec.appendChild(lock);
       }
       if (lock) lock.hidden = ok;
@@ -2047,7 +2077,70 @@
       Object.keys(ROLE_INFO).map(function (r) { return '<button type="button" class="rolecard' + (r === ROLE ? " on" : "") + '" data-r="' + r + '"><b>' + ROLE_INFO[r][0] + "</b><span>" + ROLE_INFO[r][1] + "</span></button>"; }).join("") + "</div>");
     $(".roles", m).addEventListener("click", function (e) { var b = e.target.closest("[data-r]"); if (!b) return; setRole(b.getAttribute("data-r")); closeModal(); toast("Now viewing as " + ROLE_INFO[ROLE][0] + "."); });
   });
-  function loginModal() {
+  var PROV_ICON = {
+    google: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></svg>',
+    apple: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9s-2-.9-3.4-.9c-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.8 1.2 1.8 2.6 3.1 2.5 1.3-.1 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.6-3.9zM13.9 4.9c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg>',
+    facebook: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7A10 10 0 0 0 22 12z"/></svg>'
+  };
+  function liveLogin(mode) {
+    var create = mode === "create";
+    var m = modal('<h3 style="font-size:1.8rem" id="lvT">' + (create ? "Create your account" : "Log in") + '</h3>' +
+      '<p class="lede" style="margin:4px 0 12px" id="lvL">' + (create ? "One account for your Face, your 52 and every hand you play. Your $21 Buy-In comes next." : "Welcome back to the table.") + '</p>' +
+      '<div class="authprov" id="lvProv"><span class="hint">Loading sign-in options…</span></div>' +
+      '<div class="author"><span>or use email</span></div>' +
+      '<form class="form-grid" id="lvForm" novalidate>' +
+      '<div class="field"><label for="lvEmail">Email</label><input type="email" id="lvEmail" autocomplete="username" placeholder="you@example.com"></div>' +
+      '<div class="field"><label for="lvPass">Password</label><div class="pw"><input type="password" id="lvPass" autocomplete="' + (create ? "new-password" : "current-password") + '" placeholder="' + (create ? "At least 10 characters" : "") + '"><button type="button" class="btn ghost sm" id="lvShow">Show</button></div></div>' +
+      '<span class="err" id="lvErr" role="alert"></span><div class="ok" id="lvOk" role="status"></div>' +
+      '<div class="row"><button class="btn gold" type="submit" id="lvGo">' + (create ? "Create account" : "Log in") + '</button><button class="btn ghost" type="button" id="lvMagic">Email me a sign-in link</button></div>' +
+      '<p class="hint"><span id="lvSwap">' + (create ? 'Already have an account? <a href="#" data-mode="login">Log in</a>' : 'New here? <a href="#" data-mode="create">Create an account</a>') + '</span> · <a href="#" id="lvForgot">Forgot password?</a></p>' +
+      '<p class="hint fine">By continuing you confirm you\'re 18 or older and agree to the <a href="terms.html" target="_blank" rel="noopener">Terms</a> and <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>. SuiteFace never posts to your accounts.</p></form>' +
+      (CAN_SWITCH ? '<div class="chips" style="margin-top:6px">' + ["player", "dealer", "pitboss", "owner"].map(function (r) { return '<button class="chip sm" type="button" data-demo="' + r + '">Preview: ' + ROLE_INFO[r][0] + "</button>"; }).join("") + "</div>" : ""), { focus: "#lvEmail" });
+    var err = $("#lvErr", m), ok = $("#lvOk", m);
+    function say(e, good) { err.textContent = good ? "" : e; ok.textContent = good ? e : ""; }
+    function friendly(e) {
+      var s = (e && e.message) || String(e);
+      if (/Invalid login/i.test(s)) return "That email and password don't match. Try again, or use “Email me a sign-in link”.";
+      if (/not confirmed/i.test(s)) return "Check your inbox and tap the confirmation link first.";
+      if (/already registered/i.test(s)) return "That email already has an account. Log in instead.";
+      if (/rate limit|too many/i.test(s)) return "Too many tries. Wait a minute and try again.";
+      if (/Failed to fetch|offline|NetworkError/i.test(s)) return "Can't reach SuiteFace right now. Check your connection.";
+      return s;
+    }
+    window.SF_AUTH.ready(function (bad) {
+      if (bad) { $("#lvProv", m).innerHTML = '<span class="hint">Sign-in is offline right now. Try again in a moment.</span>'; return; }
+      window.SF_AUTH.providers().then(function (list) {
+        $("#lvProv", m).innerHTML = list.length ? list.map(function (p) { return '<button type="button" class="btn provbtn prov-' + p[0] + '" data-oauth="' + p[0] + '">' + (PROV_ICON[p[0]] || "") + '<span>Continue with ' + esc(p[1]) + "</span></button>"; }).join("") : '<span class="hint">Google, Apple and Facebook sign-in open soon. Use email for now.</span>';
+      });
+    });
+    $("#lvProv", m).addEventListener("click", function (e) {
+      var b = e.target.closest("[data-oauth]"); if (!b) return; b.disabled = true; say("Opening " + b.textContent.replace("Continue with ", "") + "…", true);
+      window.SF_AUTH.oauth(b.getAttribute("data-oauth")).catch(function (x) { b.disabled = false; say(friendly(x)); });
+    });
+    $("#lvShow", m).addEventListener("click", function () { var i = $("#lvPass", m); i.type = i.type === "password" ? "text" : "password"; this.textContent = i.type === "password" ? "Show" : "Hide"; });
+    function email() { var v = $("#lvEmail", m).value.trim(); if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { say("Enter a valid email address."); $("#lvEmail", m).focus(); return null; } return v; }
+    $("#lvForm", m).addEventListener("submit", function (e) {
+      e.preventDefault(); var em = email(); if (!em) return; var pw = $("#lvPass", m).value;
+      if (create && pw.length < 10) { say("Use a password of at least 10 characters."); return; }
+      if (!pw) { say("Enter your password, or tap “Email me a sign-in link”."); return; }
+      $("#lvGo", m).disabled = true; say("");
+      (create ? window.SF_AUTH.signUp(em, pw) : window.SF_AUTH.password(em, pw)).then(function (r) {
+        $("#lvGo", m).disabled = false;
+        if (create && r && r.data && !r.data.session) { say("Almost there: we emailed " + em + ". Tap the link to confirm, and you'll come right back here.", true); return; }
+        closeModal();
+      }, function (x) { $("#lvGo", m).disabled = false; say(friendly(x)); });
+    });
+    $("#lvMagic", m).addEventListener("click", function () { var em = email(); if (!em) return; window.SF_AUTH.magic(em).then(function () { say("Sign-in link sent to " + em + ". Open it on this device.", true); }, function (x) { say(friendly(x)); }); });
+    $("#lvForgot", m).addEventListener("click", function (e) { e.preventDefault(); var em = email(); if (!em) return; window.SF_AUTH.reset(em).then(function () { say("Password reset link sent to " + em + ".", true); }, function (x) { say(friendly(x)); }); });
+    m.addEventListener("click", function (e) {
+      var a = e.target.closest("[data-mode]"); if (a) { e.preventDefault(); closeModal(); liveLogin(a.getAttribute("data-mode")); return; }
+      var d = e.target.closest("[data-demo]"); if (d) { setRole(d.getAttribute("data-demo")); closeModal(); toast("Previewing as " + ROLE_INFO[ROLE][0] + "."); }
+    });
+  }
+  function loginModal(mode) {
+    if (SIGNED && window.SF_AUTH) { window.SF_AUTH.signOut().then(function () { toast("Logged out. See you at the table."); }); return; }
+    if (window.SF_AUTH && (PUBLIC_SITE || mode === "create" || mode === "login")) { liveLogin(typeof mode === "string" ? mode : "login"); return; }
+    if (window.SF_AUTH && !PUBLIC_SITE) { liveLogin("login"); return; }
     if (ROLE !== "guest") { setRole("guest"); toast("Logged out. You're browsing as a guest."); return; }
     var m = modal('<h3 style="font-size:1.8rem">Log in</h3><form class="form-grid" id="loginForm" novalidate style="margin-top:10px">' +
       '<div class="field"><label for="lgEmail">Email</label><input type="email" id="lgEmail" autocomplete="username" placeholder="you@example.com"></div>' +
