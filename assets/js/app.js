@@ -1060,7 +1060,9 @@
   $("#faceForm").addEventListener("submit", function (e) {
     e.preventDefault();
     if (!validate(true)) { toast("A few things need a look before saving."); var f = $("#faceForm .err:not(:empty)"); if (f) f.previousElementSibling.focus(); return; }
-    saveP(); placePool(); buildDeck(); renderTable(true); mapT0 = performance.now(); renderMap();
+    saveP();
+    if (liveOn()) { toast("Saving your Face…"); pushFace().then(function () { toast("Face saved. Dealing your 52 from real members…", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80); return liveDeck(true); }, function (x) { toast((x && x.message) || "Couldn't save. Try again."); }); return; }
+    placePool(); buildDeck(); renderTable(true); mapT0 = performance.now(); renderMap();
     toast("Face saved. Your 52 have been re-dealt.", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80);
   });
   $("#faceForm").addEventListener("input", function () { if ($("#faceForm .err:not(:empty)")) validate(true); });
@@ -1153,8 +1155,9 @@
 
   /* ---------- deck + deal state ---------- */
   var DECK = [], BY = {}, G = Object.assign({ dealt: [], burned: [], played: [], pairs: [], hands: {}, jokered: [], clock: 0 }, S.get("game", {}));
-  function saveG() { S.set("game", G); }
+  function saveG() { if (liveOn() && LIVE_ROWS) { liveSaveG(); return; } S.set("game", G); }
   function buildDeck() {
+    if (liveOn() && LIVE_ROWS) { liveBuild(); return; }
     var el = POOL.filter(eligible).filter(inRoom).map(function (p) { var f = fitOf(p), c = Object.assign({}, p, { fit: f.score, shared: f.shared }); if (p.masked) { c.realName = p.realName; c.realAge = p.realAge; defineMask(c); } return c; });
     el.sort(function (a, b) { return b.fit - a.fit || a.dist - b.dist; });
     DECK = []; BY = {};
@@ -1202,7 +1205,7 @@
     if (deckDirty || !DECK.length) buildDeck();
     var hand = G.dealt.map(function (id) { return BY[id]; }).filter(Boolean).sort(handOrder);
     $("#dealt").innerHTML = hand.length ? hand.map(cardHTML).join("") :
-      '<p class="lede" style="align-self:center">' + (DECK.length ? "Your deck is shuffled and waiting. Deal your Hand." : "No one in the sample deck passes your gates. Widen your age range or distance in My Face.") + "</p>";
+      '<p class="lede" style="align-self:center">' + (DECK.length ? "Your deck is shuffled and waiting. Deal your Hand." : liveOn() ? "No real members fit your gates yet. SuiteFace is brand new in many areas: widen your distance or age range, invite friends, and remember your 12-Card Deck Guarantee." : "No one in the sample deck passes your gates. Widen your age range or distance in My Face.") + "</p>";
     $("#leftCount").textContent = remaining().length; $("#burnCount").textContent = G.burned.length; $("#playCount").textContent = G.played.length;
     $("#trumpHint").innerHTML = "Trumps: " + P.trumps.map(function (s) { return '<span style="color:' + suitColor(s) + '">' + SUIT[s].sym + "</span>"; }).join(" › ");
     $("#suitKey").innerHTML = ORDER.map(function (s) { return '<span><span style="color:' + suitColor(s) + '">' + pip(s) + "</span>" + SUIT[s].name + ": " + SUIT[s].line + "</span>"; }).join("");
@@ -1229,11 +1232,27 @@
   }
   $("#dealBtn").addEventListener("click", function () { if (!G.dealt.length) { deal(); } else deal(); });
   $("#shuffleBtn").addEventListener("click", function () {
+    if (liveOn() && LIVE_ROWS) { toast("Fresh Shuffle: re-dealing your 52…"); G.dealt = []; liveDeck(true).then(function () { setTimeout(deal, 150); }); return; }
     G = { dealt: [], burned: [], played: [], pairs: G.pairs, hands: G.hands || {}, jokered: G.jokered || [], clock: G.clock || 0 }; buildDeck(); saveG(); renderTable(false);
     toast("Fresh Shuffle. Burned and played cards are back in your deck."); setTimeout(deal, 150);
   });
   $("#dealt").addEventListener("click", function (e) {
     var slot = e.target.closest(".slot"); if (!slot) return; var id = slot.getAttribute("data-id"), p = BY[id];
+    if (liveOn() && LIVE_ROWS && p) {
+      var nm0 = p.name.split(" ")[0];
+      if (e.target.closest("[data-report]")) { e.stopPropagation(); if (!confirm("Report and block " + nm0 + "? Our safety team reviews every report.")) return; lrpc("block_member", { target: id, is_report: true }).then(function () { remove(id, "burned", slot); toast("Reported and blocked. Thank you for telling us."); }, function (x) { toast(x.message); }); return; }
+      if (e.target.closest("[data-block]")) { e.stopPropagation(); lrpc("block_member", { target: id, is_report: false }).then(function () { remove(id, "burned", slot); toast(nm0 + " is blocked and won't be dealt again."); }, function (x) { toast(x.message); }); return; }
+      if (e.target.closest("[data-burn]")) { lrpc("burn_card", { target: id }).then(function () { remove(id, "burned", slot); toast("Burned. " + nm0 + " won't be dealt to you again."); }, function (x) { toast(x.message); }); return; }
+      if (e.target.closest("[data-play]")) {
+        slot.querySelector(".pcard").classList.add("played");
+        lrpc("play_card", { target: id }).then(function (r) {
+          remove(id, "played", slot);
+          if (r === "pair") { jackpot(5000); burst(innerWidth / 2, innerHeight / 3, 110); liveTable().then(function () { var h = LIVE_HANDS.filter(function (x) { return x.other_id === id; })[0]; if (h) livePair(h); }); }
+          else toast("You played " + nm0 + "'s card. If they play yours too, it's a Pair.", p.suit);
+        }, function (x) { slot.querySelector(".pcard").classList.remove("played"); toast(x.message); });
+        return;
+      }
+    }
     if (e.target.closest("[data-report]")) { e.stopPropagation(); toast("Report sent to the Judges (demo only)."); return; }
     if (e.target.closest("[data-block]")) { e.stopPropagation(); remove(id, "burned", slot); toast(p.name.split(" ")[0] + " is blocked and won't be dealt again."); return; }
     if (e.target.closest("[data-burn]")) { remove(id, "burned", slot); toast("Burned. " + p.name.split(" ")[0] + " won't be dealt to you again."); return; }
@@ -1259,6 +1278,7 @@
     }, REDUCED ? 300 : 1400);
   }
   function renderPairs() {
+    if (liveOn() && LIVE_ROWS) { liveRenderPairs(); return; }
     var el = $("#pairs"); var ps = G.pairs.map(function (id) { return POOL.filter(function (x) { return x.id === id; })[0]; }).filter(Boolean);
     settleHands();
     el.innerHTML = ps.length ? ps.map(function (p) { var h = handOf(p.id); return '<button type="button" class="keeper" data-pair="' + p.id + '" style="border:0;cursor:pointer"><span style="color:' + (SUIT[p.suit].red ? "var(--red)" : "var(--night)") + '">' + pip(p.suit) + "</span>" + esc(p.name.split(" ")[0]) + '<span class="stage s-' + h.stage + '">' + STAGE_LABEL[h.stage] + "</span></button>"; }).join("") : '<span class="hint">No Pairs yet. Play a few cards.</span>';
@@ -2488,6 +2508,193 @@
     if (q) { setTimeout(function () { toast({ built: "Paid! Your Casino is in for its name check. It opens on the floor as soon as it's approved.", zips: "Paid! Your new ZIP codes are being added.", cancelled: "Checkout cancelled. Your Casino is saved; finish payment anytime." }[q[1]] || ""); }, 900); history.replaceState(null, "", location.pathname + location.hash); }
     find();
   })();
+
+  /* =====================================================================
+     LIVE MEMBER AREA. When a seated member is signed in:
+     My Face saves to their account, Your 52 is dealt by the server from real members only,
+     Burn / Play / Block / Report and Play Hand run on real hands, and the Side Table chat is real.
+     ===================================================================== */
+  var LIVE_ROWS = null, LIVE_HANDS = [], CITYZ = null;
+  function liveOn() { return !!(window.SF_LIVE && ROLE !== "guest"); }
+  function lrpc(n, a) { return window.SF_LIVE.rpc(n, a || {}).then(function (r) { if (r.error) throw r.error; return r.data; }); }
+  function genderCode() { var g = (P.id || {}).gender; if (!g) return null; if (/^(Woman|Trans woman)$/.test(g)) return "woman"; if (/^(Man|Trans man)$/.test(g)) return "man"; return "nonbinary"; }
+  function cityZip(city, st) {
+    if (!zipReady) return null;
+    if (!CITYZ) { CITYZ = {}; ZLIST.forEach(function (z) { var k = (z.city + "|" + z.st).toLowerCase(); if (!CITYZ[k] || z.pop > CITYZ[k].pop) CITYZ[k] = z; }); }
+    return CITYZ[((city || "") + "|" + (st || "")).toLowerCase()] || null;
+  }
+  function liveCard(r) {
+    var id_ = {}; Object.keys(r.face_up || {}).forEach(function (k) { var a = r.face_up[k] || []; id_[k] = IDX[k] && IDX[k][2] === "one" ? a[0] : a; });
+    var shared = (r.interests || []).filter(function (x) { return (P.interests || []).indexOf(x) > -1; });
+    var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
+    var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
+      dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null };
+    if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
+    if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
+    return c;
+  }
+  function liveDeck(redeal) {
+    var go = redeal ? lrpc("deal_deck").then(function () { return lrpc("my_deck"); }) : lrpc("my_deck").then(function (rows) { return rows && rows.length ? rows : lrpc("deal_deck").then(function () { return lrpc("my_deck"); }); });
+    return go.then(function (rows) {
+      LIVE_ROWS = rows || [];
+      var mid = window.SF_LIVE.memberId(), saved = S.get("live:" + mid, { dealt: [] });
+      G = { dealt: saved.dealt || [], burned: [], played: [], pairs: [], hands: {}, jokered: [], clock: 0 };
+      LIVE_ROWS.forEach(function (r) { if (r.my_move) G.played.push(r.member_id); });
+      deckDirty = true; buildDeck(); renderTable(!!redeal); mapT0 = performance.now(); renderMap(); liveTable();
+    }, function (e) { toast(e.message || "Your deck couldn't load."); $("#dealt").innerHTML = '<p class="lede" style="align-self:center">' + esc(e.message || "Your deck couldn't load. Try again.") + "</p>"; });
+  }
+  function liveSaveG() { if (window.SF_LIVE) S.set("live:" + window.SF_LIVE.memberId(), { dealt: G.dealt }); }
+  function liveBuild() {
+    DECK = []; BY = {};
+    (LIVE_ROWS || []).map(liveCard).forEach(function (c) { DECK.push(c); BY[c.id] = c; });
+    G.dealt = G.dealt.filter(function (id) { return BY[id] && G.played.indexOf(id) < 0; });
+    deckDirty = false; liveSaveG();
+  }
+  function pushFace() {
+    var L = window.SF_LIVE, db = L.client, mid = L.memberId(), by = (/^\d{4}/.exec(P.dob || "") || [])[0];
+    var row = { face_name: (P.name || "").trim().slice(0, 40) || null, bio: (P.bio || "").slice(0, 500) || null, home_zip: /^\d{5}$/.test(P.zip || "") ? P.zip : null,
+      style_suit: SUIT[P.mySuit] ? P.mySuit : null, looking_for: TABLE[P.looking] ? P.looking : "longterm", interests: P.interests || [], gender: genderCode(), birth_year: by ? +by : null };
+    if (/^[a-z0-9._]{3,24}$/.test(P.handle || "")) row.handle = P.handle;
+    var ids = IDF.map(function (f) { return { member_id: mid, question: f[0], answers: asList(P.id[f[0]]).filter(Boolean), face_up: P.vis[f[0]] === undefined ? !f[5] : !!P.vis[f[0]] }; }).filter(function (r) { return r.answers.length; });
+    var prefs = Object.keys(P.prefs || {}).map(function (k) { var pr = P.prefs[k] || {}; return { member_id: mid, question: k, wanted: (pr.sel || []).filter(function (x) { return x !== OPEN; }), dealbreaker: !!pr.deal }; }).filter(function (r) { return r.wanted.length; });
+    function chk(r) { if (r && r.error) throw r.error; return r; }
+    return db.from("members").update(row).eq("id", mid).then(chk)
+      .then(function () { return db.from("strategies").upsert({ member_id: mid, trump_order: P.trumps, show_me: P.show || "everyone", age_min: P.ageMin, age_max: P.ageMax, radius_miles: P.dist }).then(chk); })
+      .then(function () { return ids.length ? db.from("member_identity").upsert(ids).then(chk) : null; })
+      .then(function () { return db.from("member_preferences").delete().eq("member_id", mid).then(chk); })
+      .then(function () { return prefs.length ? db.from("member_preferences").insert(prefs).then(chk) : null; })
+      .then(function () { return lrpc("set_my_rooms", { p_rooms: (P.rooms || []).filter(function (r) { return r !== "highroller"; }) }).catch(function () { }); })
+      .then(function () {
+        if (!/^data:image\//.test(P.photo || "")) return;
+        return fetch(P.photo).then(function (r) { return r.blob(); }).then(function (b) {
+          var path = mid + "/face-" + Date.now() + ".jpg";
+          return db.storage.from("faces").upload(path, b, { contentType: b.type || "image/jpeg", upsert: true }).then(chk).then(function () {
+            var url = db.storage.from("faces").getPublicUrl(path).data.publicUrl;
+            return lrpc("set_my_photo", { p_url: url, p_source: P.photoLive ? "live" : "upload", p_pose: P.photoLive || null }).then(function () { P.photo = url; saveP(); });
+          });
+        });
+      });
+  }
+  function pullFace() {
+    var L = window.SF_LIVE, db = L.client, mid = L.memberId();
+    return Promise.all([
+      db.from("members").select("face_name,handle,bio,home_zip,style_suit,looking_for,interests,gender,birth_date,photo_url,photo_source,rooms").eq("id", mid).single(),
+      db.from("strategies").select("*").eq("member_id", mid).maybeSingle(),
+      db.from("member_identity").select("question,answers,face_up").eq("member_id", mid),
+      db.from("member_preferences").select("question,wanted,dealbreaker").eq("member_id", mid)
+    ]).then(function (res) {
+      var m = res[0].data; if (!m) return;
+      if (S.get("liveFor", "") !== mid) { // first time on this device for this account: the account is the source of truth
+        P = Object.assign({ id: {}, prefs: {}, vis: {}, trumps: ORDER.slice(), ageMin: 25, ageMax: 40, dist: 25, interests: [], rooms: [] }, { name: "", handle: "", bio: "", zip: "", photo: "" });
+        S.set("liveFor", mid);
+      }
+      if (m.face_name) P.name = m.face_name; if (m.handle) P.handle = m.handle; if (m.bio) P.bio = m.bio; if (m.home_zip) P.zip = m.home_zip;
+      if (m.style_suit) P.mySuit = m.style_suit; if (m.looking_for) P.looking = m.looking_for; if (m.interests && m.interests.length) P.interests = m.interests;
+      if (m.birth_date) { P.dob = m.birth_date; var a = ageFrom(m.birth_date); if (!isNaN(a)) P.age = String(a); }
+      if (m.photo_url) { P.photo = m.photo_url; P.photoLive = m.photo_source === "live" ? (P.photoLive || "live") : null; }
+      if (m.rooms) P.rooms = m.rooms;
+      var st = res[1].data; if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
+      (res[2].data || []).forEach(function (r) { if (!IDX[r.question]) return; P.id[r.question] = IDX[r.question][2] === "one" ? r.answers[0] : r.answers; P.vis[r.question] = r.face_up; });
+      (res[3].data || []).forEach(function (r) { P.prefs[r.question] = { sel: r.wanted, deal: r.dealbreaker }; });
+      saveP();
+      F.name.value = P.name || ""; F.handle.value = P.handle || ""; F.zip.value = P.zip || ""; F.bio.value = P.bio || "";
+      try { renderStyles(); renderInterests(); renderRank(); renderIam(); renderRooms(); renderIdentity(); syncRanges(); } catch (e) { }
+      renderCard(); updateMeter(); zipHint();
+    });
+  }
+  /* Pairs and Play Hand on real hands */
+  function liveTable() {
+    return lrpc("my_table").then(function (rows) {
+      LIVE_HANDS = rows || []; G.pairs = LIVE_HANDS.map(function (h) { return h.other_id; }); renderPairs();
+    }, function () { });
+  }
+  function liveRenderPairs() {
+    var el = $("#pairs");
+    el.innerHTML = LIVE_HANDS.length ? LIVE_HANDS.map(function (h) {
+      var p = BY[h.other_id], suit = p ? p.suit : "heart", stage = h.outcome && h.outcome !== "open" ? h.outcome : h.play_hand_id ? "inplay" : "paired";
+      return '<button type="button" class="keeper" data-lhand="' + h.hand_id + '" style="border:0;cursor:pointer"><span style="color:' + (SUIT[suit].red ? "var(--red)" : "var(--night)") + '">' + pip(suit) + "</span>" + esc((h.other_name || "Player").split(" ")[0]) + '<span class="stage s-' + esc(stage) + '">' + esc(STAGE_LABEL[stage] || stage) + "</span></button>";
+    }).join("") : '<span class="hint">No Pairs yet. Play a few cards. When someone plays yours too, it\'s a Pair.</span>';
+  }
+  $("#pairs").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-lhand]"); if (!b) return; e.stopImmediatePropagation();
+    var h = LIVE_HANDS.filter(function (x) { return x.hand_id === b.getAttribute("data-lhand"); })[0]; if (h) livePair(h);
+  }, true);
+  function livePair(h) {
+    var nm = esc((h.other_name || "Player").split(" ")[0]), p = BY[h.other_id];
+    var m = modal('<p class="pairtitle">' + (h.status === "won" ? "Still winning" : "It's a Pair!") + '</p>' +
+      '<div class="ranks"><span>You hold ' + nm + " as <b>" + esc(h.i_hold || "?") + "</b></span><span>" + nm + " holds you as <b>" + esc(h.they_hold || "?") + "</b></span></div>" +
+      (p ? '<p class="jm-line">' + nm + "'s " + jmeter(p, true) + "</p>" : "") +
+      '<div class="hand-box" id="handBox"></div>' +
+      '<details class="sidetable" open><summary>Side Table chat</summary><div class="chat" id="chat"><p class="hint">Loading…</p></div>' +
+      '<form id="chatForm" style="display:flex;gap:8px;margin-top:10px"><label class="sr" for="chatIn">Message</label><input type="text" id="chatIn" maxlength="1000" placeholder="Say hi, pick a public place…" autocomplete="off"><button class="btn felt sm" type="submit">Send</button></form>' +
+      '<p class="hint">Keep it on SuiteFace until you\'ve met. Never send money. Always meet in public.</p></details>');
+    var last = 0;
+    function pull() {
+      lrpc("side_table", { p_hand: h.hand_id, p_after: last }).then(function (rows) {
+        var c = $("#chat", m); if (!c) return; if (!last) c.innerHTML = "";
+        (rows || []).forEach(function (r) { last = Math.max(last, r.id); c.insertAdjacentHTML("beforeend", '<div class="msg ' + (r.mine ? "me" : "them") + '">' + esc(r.body) + "</div>"); });
+        if (!last && !c.children.length) c.innerHTML = '<p class="hint">No messages yet. Say hi and suggest a public place to meet.</p>';
+        c.scrollTop = c.scrollHeight;
+      }, function () { });
+    }
+    pull(); clearInterval(window.__sideTick); window.__sideTick = setInterval(function () { if (!$("#modal")) { clearInterval(window.__sideTick); return; } pull(); }, 6000);
+    $("#chatForm", m).addEventListener("submit", function (e) {
+      e.preventDefault(); var v = $("#chatIn", m).value.trim(); if (!v) return; $("#chatIn", m).value = "";
+      lrpc("send_side_table", { p_hand: h.hand_id, p_body: v }).then(pull, function (x) { toast(x.message); });
+    });
+    renderLiveHand(m, h);
+  }
+  function renderLiveHand(m, h) {
+    var box = $("#handBox", m); if (!box) return; var nm = esc((h.other_name || "Player").split(" ")[0]), html = "";
+    var safety = '<p class="hint">Felt unsafe, harassed or threatened? That\'s never just a Loss. <button type="button" class="linkish" data-lreport>Report and block ' + nm + "</button>. In an emergency, call 911.</p>";
+    var open = h.play_hand_id && (!h.outcome || h.outcome === "open" || h.outcome === "push");
+    if (!h.play_hand_id || h.outcome === "win") {
+      html = "<h3>" + (h.outcome === "win" ? "Win! Check in for date #" + ((h.date_number || 1) + 1) : "Meeting " + nm + "?") + '</h3><p class="hint">When you\'re together in person, you both tap <b>Check in</b>. Your phones confirm you\'re at the same table (within about 200 feet, location used for that moment only), or swap a 4-digit Table Code.</p>' +
+        '<div class="row"><button class="btn gold" type="button" data-lcheck>Check in: we\'re together</button><button class="btn ghost sm" type="button" data-lcode>Use a Table Code</button></div><p class="hint" id="lcOut"></p>';
+    } else if (open) {
+      html = '<h3 class="inplay">Hand in play with ' + nm + '</h3><p class="hint">Played ' + fmtDate(new Date(h.play_at).getTime()) + (h.my_call ? ". You called <b>" + esc(h.my_call.replace("_", " ")) + "</b>." : ". When the date ends, call it:") + "</p>" +
+        '<div class="outcomes"><button class="oc win" type="button" data-lcall="win"><b>Win</b><span>Second date</span></button><button class="oc push" type="button" data-lcall="push"><b>Push</b><span>Unsure, waiting on a response</span></button><button class="oc loss" type="button" data-lcall="loss_burn"><b>Loss</b><span>Burn the card</span></button>' +
+        (h.joker_window_open ? '<button class="oc joker" type="button" data-lcall="loss_joker"><b>Make a Joker</b><span>A disaster date. Window closes ' + fmtDate(new Date(h.joker_closes_at).getTime()) + "</span></button>" : "") + "</div>" +
+        (h.push_deadline ? '<p class="hint">A Win needs both of you. If not by ' + fmtDate(new Date(h.push_deadline).getTime()) + ", it becomes an automatic Loss.</p>" : "");
+    } else {
+      html = "<h3>" + esc(STAGE_LABEL[h.outcome] || "Settled") + '</h3><p class="hint">This hand is settled.</p>';
+    }
+    box.innerHTML = html + safety;
+    box.onclick = function (e) {
+      var t = e.target, out = $("#lcOut", m);
+      function refresh() { liveTable().then(function () { var n = LIVE_HANDS.filter(function (x) { return x.hand_id === h.hand_id; })[0]; if (n) { h = n; renderLiveHand(m, h); } }); }
+      function checked(r) {
+        if (r.status === "play_hand") { toast("Hand in play! Have a great time.", "heart"); jackpot(3000); refresh(); return; }
+        if (out) out.innerHTML = "Checked in. Your Table Code is <b>" + esc(r.table_code) + "</b>. Ask " + nm + " to check in now (within 15 minutes), or to enter your code.";
+      }
+      if (t.closest("[data-lcheck]")) {
+        if (!navigator.geolocation) { toast("Location isn't available. Use a Table Code."); return; }
+        navigator.geolocation.getCurrentPosition(function (pos) { lrpc("check_in", { hand: h.hand_id, lat: pos.coords.latitude, lon: pos.coords.longitude }).then(checked, function (x) { toast(x.message); }); },
+          function () { toast("Location was blocked. Use a Table Code instead."); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+      }
+      if (t.closest("[data-lcode]")) {
+        var code = prompt("Enter " + nm + "'s 4-digit Table Code (or leave empty to get yours):", "");
+        if (code === null) return;
+        lrpc("check_in", { hand: h.hand_id, code: /^\d{4}$/.test(code.trim()) ? code.trim() : null }).then(checked, function (x) { toast(x.message); });
+      }
+      var c = t.closest("[data-lcall]");
+      if (c) {
+        var res = c.getAttribute("data-lcall");
+        if (res === "loss_joker" && !confirm("Make " + nm + " a Joker? Only for a genuinely disastrous date. You'll be asked to attest it's first-hand.")) return;
+        var send = function () { lrpc("call_hand", { play_hand: h.play_hand_id, result: res }).then(function (r) { toast("Called: " + String(r || res).replace("_", " ") + "."); refresh(); }, function (x) { toast(x.message); }); };
+        if (res === "loss_joker" && window.SFSign) window.SFSign.require("attest", send, { about: h.other_name }); else send();
+      }
+      if (t.closest("[data-lreport]")) {
+        if (!confirm("Report and block " + nm + "? Our safety team reviews every report. You won't be dealt each other again.")) return;
+        lrpc("block_member", { target: h.other_id, is_report: true }).then(function () { closeModal(); toast("Reported and blocked. Thank you for telling us."); liveDeck(false); }, function (x) { toast(x.message); });
+      }
+    };
+  }
+  document.addEventListener("sf:live", function () {
+    if (!liveOn()) { LIVE_ROWS = null; return; }
+    pullFace().then(function () { return liveDeck(false); }, function () { return liveDeck(false); });
+  });
 
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();
