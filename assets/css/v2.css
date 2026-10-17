@@ -221,3 +221,105 @@ html[data-play="day"] .hero.c-hero{background:none}
 .guarantee{background:var(--ink-2)!important;border:1px solid var(--line)!important;color:var(--cream)!important;border-radius:16px!important;box-shadow:none!important}
 .gbadge{background:var(--gold)!important;color:#fff!important;border:0!important;box-shadow:none!important}
 html[data-play="night"] .gbadge{color:#1E1606!important;background:#C9A55A!important}
+
+/* =====================================================================
+   v2.1 pages: one body, many pages. Each section shows only on its page.
+   ===================================================================== */
+body[data-page="home"] section[data-pg]:not([data-pg="home"]),
+body[data-page="how"] section[data-pg]:not([data-pg="how"]),
+body[data-page="suit"] section[data-pg]:not([data-pg="suit"]),
+body[data-page="tables"] section[data-pg]:not([data-pg="tables"]),
+body[data-page="membership"] section[data-pg]:not([data-pg="membership"]),
+body[data-page="club"] section[data-pg]:not([data-pg="club"]),
+body[data-page="contact"] section[data-pg]:not([data-pg="contact"]){display:none!important}
+body:not([data-page="home"]) main > section:first-of-type{padding-top:clamp(40px,6vw,72px)}
+.nav a[aria-current="page"]{color:var(--cream);background:var(--line)}
+
+/* Launch promo: the first thing on every page */
+.promo{position:relative;z-index:51;background:#8E2230;color:#FBEFEF}
+.promo-in{display:flex;align-items:center;justify-content:center;gap:12px;min-height:44px;padding-block:6px;text-align:center}
+.promo p{font-size:.93rem;line-height:1.35}
+.promo b{color:#fff}
+.promo .sfchip-svg{filter:none}
+.promo-cta{flex:none;color:#1E1606;background:#E2C47E;font-weight:800;font-size:.88rem;text-decoration:none;padding:.45rem .9rem;border-radius:999px;white-space:nowrap}
+.promo-cta:hover{background:#F0D597}
+@media (max-width:640px){.promo-in{justify-content:space-between;text-align:left}.promo .sfchip{display:none}.promo p{font-size:.84rem}}
+
+/* Home: three moves */
+.h3up{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.h3up li{display:grid;gap:10px;align-content:start;padding:26px;border-radius:20px;background:var(--ink);border:1px solid var(--line)}
+.h3up .ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold-hi)}
+.h3up .ic svg{width:24px;height:24px}
+.h3up p{color:var(--cream-dim)}
+.h-more{margin-top:24px}
+@media (max-width:820px){.h3up{grid-template-columns:1fr}}
+
+/* Home: chips + price */
+.h-price{background:var(--ink-2)}
+.h-price-in{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.h-chips{position:relative;height:260px;display:grid;place-items:center}
+.h-chips .h-c21{position:absolute;transform:translate(-38%,10%) rotate(-12deg)}
+.h-chips .h-c210{position:absolute;transform:translate(30%,-6%)}
+.h-price-copy{display:grid;gap:16px;justify-items:start}
+.h-guar{font-size:.98rem!important;color:var(--muted)!important}
+@media (max-width:820px){.h-price-in{grid-template-columns:1fr;gap:20px}.h-chips{height:220px}}
+
+/* Home: suit teaser */
+.h-suit-in{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.h-suitcards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.hsc{aspect-ratio:5/7;border-radius:5%/3.57%;display:grid;place-items:center;background:linear-gradient(165deg,#FFFDF8,#F7F2E7 60%,#EEE6D4);color:#23202A;box-shadow:var(--v2-shadow),0 0 0 1px rgba(35,32,42,.06)}
+.hsc.red{color:#8E2230}
+.hsc svg{width:46%;height:46%}
+.hsc:nth-child(odd){transform:translateY(14px)}
+@media (max-width:820px){.h-suit-in{grid-template-columns:1fr;gap:28px}}
+
+/* Home: final call */
+.h-final{background:var(--ink-2)}
+.h-final-in{display:grid;gap:18px;justify-items:center;text-align:center}
+.h-final-in .row{justify-content:center;align-items:center;gap:22px}
+
+/* Membership chips */
+.memchips{display:flex!important;align-items:flex-end;justify-content:center;gap:18px;min-height:260px}
+.memchips .mc21{margin-bottom:10px}
+
+/* Launch popup */
+.offerpop{display:grid;gap:16px;justify-items:center;text-align:center;padding:6px 4px 4px}
+.offerpop h3{font-size:clamp(1.7rem,4vw,2.3rem)}
+.offerpop .row{justify-content:center;align-items:center;gap:20px}
+.offerchips{display:flex;align-items:flex-end;gap:14px;margin-top:4px}
+
+/* Suit quiz gate and result CTA */
+.suitgate{max-width:520px}
+.gatepip svg{width:100%;height:100%;color:var(--gold-hi)}
+.suitcta{margin-top:18px;padding:20px;border-radius:18px;background:color-mix(in srgb,var(--gold) 12%,transparent);border:1px solid rgba(201,165,90,.45);display:grid;gap:8px}
+.suitcta h4{margin:0;font-size:1.15rem}
+
+/* Find-your-suit: a slide deck, one card at a time */
+body[data-page="suit"] #styleCards{display:none}
+body[data-page="suit"] #quiz .sec-head{margin-inline:auto;text-align:center;justify-items:center}
+#quizBox{max-width:820px;margin-inline:auto;min-height:440px;display:grid;align-content:start;gap:14px;padding:clamp(22px,4vw,40px)!important}
+#quizBox .quiz-top{display:flex;align-items:center;gap:14px}
+#quizBox .qcount{font:700 .9rem var(--body)!important;color:#E2C47E!important;white-space:nowrap}
+#quizBox .meter{height:8px;border-radius:999px;background:rgba(242,236,221,.14);overflow:hidden}
+#quizBox .meter b{height:100%;border-radius:999px;background:linear-gradient(90deg,#C9A55A,#E2C47E);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.qcheer{margin:6px 0 0;font:700 1rem/1.4 var(--body);color:#E2C47E;min-height:1.4em}
+#quizBox .qtext{font:800 clamp(1.5rem,3.2vw,2.1rem)/1.15 var(--body)!important;letter-spacing:-.02em;color:#F2ECDD;margin:0}
+#quizBox .answers{display:grid;gap:10px}
+#quizBox .ans:not(.word){font:600 1.02rem/1.4 var(--body);text-align:left;padding:16px 18px;border-radius:14px}
+#quizBox .ans:not(.word):hover{transform:translateX(4px)}
+@media (prefers-reduced-motion:no-preference){
+  #quizBox.slide .qcheer,#quizBox.slide .qtext,#quizBox.slide .answers{animation:qslide .45s cubic-bezier(.2,.8,.2,1) both}
+  #quizBox.slide .qtext{animation-delay:.04s}#quizBox.slide .answers{animation-delay:.09s}
+  @keyframes qslide{from{opacity:0;transform:translateX(36px)}to{opacity:1;transform:none}}
+}
+#quizResult{max-width:820px;margin-inline:auto}
+input[type=tel],input[type=number],input[type=password]{width:100%;font:inherit;color:var(--cream);background:var(--night);border:1.5px solid var(--line);border-radius:12px;padding:.7rem .85rem;-webkit-appearance:none;appearance:none}
+input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outline:none;border-color:var(--gold-hi);box-shadow:0 0 0 4px rgba(201,165,90,.2)}
+.chiplegend{margin-top:clamp(40px,6vw,64px);padding-top:32px;border-top:1px solid var(--line);display:grid;gap:8px}
+.chiplegend ul{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+.chiplegend li{display:grid;justify-items:center;text-align:center;gap:6px}
+.chiplegend li b{font-size:1.1rem}
+.chiplegend li span:not(.sfchip){font-size:.86rem;color:var(--cream-dim);line-height:1.35}
+@media (max-width:760px){.chiplegend ul{grid-template-columns:repeat(2,1fr)}}
+.chipprice>div{display:grid;justify-items:center;gap:6px;text-align:center}
+@media (max-width:560px){.memchips{gap:10px;min-height:0}.memchips .mc21 svg{width:120px;height:120px}.memchips .mc210 svg{width:140px;height:140px}.h-chips .h-c21 svg{width:120px;height:120px}.h-chips .h-c210 svg{width:140px;height:140px}}

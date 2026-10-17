@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta charset="utf-8">
 <script>/* Day Play / Night Play. Runs in <head> so the page never flashes the wrong theme.
    Auto (default) follows Central Time: Day Play 7:00 am–6:59 pm, Night Play 7:00 pm–6:59 am, switching live.
    A visitor can pin Day or Night; the choice is kept on this device. The Joker Lobby is always Night Play. */
@@ -62,7 +63,6 @@
   window.SFPlay = { set: set, play: current, mode: function () { return pinned || "auto"; } };
 })();
 </script>
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SuiteFace: Dating App That Deals Your 52 Best Matches | No Jokers Needed</title>
 <meta name="description" content="SuiteFace is the dating app that deals you a real deck: your 52 best-fit singles nearby, ranked Ace to 2. ID-verified face cards, free to join. No Jokers Needed.">
@@ -79,11 +79,11 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792244078">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792244078">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792244078">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792250617">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792250617">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792250617">
 </head>
-<body>
+<body data-page="home">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="s-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.6 5c2.1 0 3.6 1.1 5.4 3.2C13.8 6.1 15.3 5 17.4 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></symbol>
@@ -111,9 +111,16 @@
     <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></g></symbol>
   </defs>
 </svg>
+<div class="promo" id="promoBar" role="region" aria-label="Launch offer">
+  <div class="wrap promo-in">
+    <span class="sfchip" data-chip="2.10" data-size="30"></span>
+    <p><b>Launch offer:</b> the $21 buy-in is waived. Join for <b>$2.10 a month</b> through <span id="promoEnds">October 31</span>.</p>
+    <a class="promo-cta" href="membership.html">Claim my seat</a>
+  </div>
+</div>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="SuiteFace home"><span class="hat"><svg xmlns="http://www.w3.org/2000/svg" viewBox="60 200 904 640" aria-hidden="true"><g transform="translate(512 560) scale(1.05) translate(-512 -540)">
+    <a class="brand" href="./" aria-label="SuiteFace home"><span class="hat"><svg xmlns="http://www.w3.org/2000/svg" viewBox="60 200 904 640" aria-hidden="true"><g transform="translate(512 560) scale(1.05) translate(-512 -540)">
 <path d="M392 690 C380 560 350 400 300 300 C380 300 460 360 490 450 C510 520 515 610 512 680 Z" fill="#C8102E" stroke="#2B2730" stroke-width="10" stroke-linejoin="round"/>
 <path d="M632.0 690 C644.0 560 674.0 400 724.0 300 C644.0 300 564.0 360 534.0 450 C514.0 520 509.0 610 512.0 680 Z" fill="#FAF7F0" stroke="#2B2730" stroke-width="10" stroke-linejoin="round"/>
 <path d="M300 700 C270 600 220 500 130 470 C170 430 250 430 300 470 C360 520 400 610 410 690 Z" fill="#FAF7F0" stroke="#2B2730" stroke-width="10" stroke-linejoin="round"/>
@@ -142,21 +149,14 @@
 <path d="M392.1875 134.0H416.015625V89.3125H463.59375V69.859375H416.015625V37.359375H468.75V17.59375H392.1875Z M505.921875 135.71875C518.8125 135.71875 527.25 130.015625 531.46875 121.890625H532.25V134.0H554.4375V75.171875C554.4375 54.0 536.15625 45.5625 517.40625 45.5625C497.875 45.5625 483.8125 54.234375 479.359375 69.390625L500.84375 72.984375C502.71875 67.359375 508.265625 62.90625 517.328125 62.90625C526.078125 62.90625 531.0 67.125 531.0 74.546875V74.9375C531.0 80.640625 524.828125 81.265625 509.828125 82.75C492.640625 84.390625 476.859375 90.015625 476.859375 109.546875C476.859375 126.8125 489.28125 135.71875 505.921875 135.71875ZM512.5625 119.234375C504.828125 119.234375 499.359375 115.71875 499.359375 108.921875C499.359375 101.890625 505.140625 98.53125 513.8125 97.28125C518.96875 96.578125 528.265625 95.328125 531.15625 93.296875V102.75C531.15625 111.96875 523.5 119.234375 512.5625 119.234375Z M609.5 135.71875C630.4375 135.71875 645.203125 124.390625 648.484375 106.03125L626.6875 102.046875C624.8125 111.5 618.796875 117.28125 609.734375 117.28125C597.234375 117.28125 590.671875 106.265625 590.671875 90.640625C590.671875 74.859375 597.234375 64.0 609.734375 64.0C618.796875 64.0 624.578125 69.625 626.53125 78.6875L648.328125 74.625C645.046875 56.65625 630.203125 45.5625 609.5 45.5625C583.171875 45.5625 566.765625 63.6875 566.765625 90.71875C566.765625 117.59375 583.171875 135.71875 609.5 135.71875Z M700.03125 135.71875C720.34375 135.71875 734.25 126.265625 738.546875 111.734375L717.296875 107.75C714.796875 114.46875 708.625 118.0625 700.421875 118.0625C688.625 118.0625 680.65625 110.71875 680.109375 96.421875H739.875V89.859375C739.875 60.015625 721.671875 45.5625 698.859375 45.5625C673.3125 45.5625 656.90625 63.84375 656.90625 90.796875C656.90625 118.375 673.3125 135.71875 700.03125 135.71875ZM680.265625 81.734375C681.203125 70.953125 687.921875 63.21875 699.09375 63.21875C709.953125 63.21875 716.125 70.328125 717.296875 81.734375Z" fill="#E5505E"/></svg></span><sup class="tm" aria-label="trademark">™</sup></a>
     <button class="btn ghost sm menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
     <nav class="nav" id="nav" aria-label="Main">
-      <a href="#how">How it plays</a>
-      <a href="how-cards-work.html">How cards are dealt</a>
-      <a href="#demo" data-only="guest">Demo</a>
-      <a href="#quiz">Your suit</a>
-      <a href="#face" data-need="member">My Face</a>
-      <a href="#table" data-need="member">Your 52</a>
-      <a href="#map" data-need="member">Map</a>
-      <a href="#private-tables">Private Tables</a>
-      <a href="#invite" data-need="member">Invite</a>
-      <a href="joker-lobby.html">🃏 Joker Lobby</a>
-      <a href="#membership" data-only="guest">Buy In</a>
-      <a href="#dealer" data-need="dealer">Dealer</a>
-      <a href="#pitboss" data-need="pitboss">Pit Boss</a>
-      <a href="#owner" data-need="owner">Owner</a>
-      <a href="#join">Contact</a>
+      <a href="how-it-works.html" data-pgnav="how">How it works</a>
+      <a href="find-your-suit.html" data-pgnav="suit">Find your suit</a>
+      <a href="tables.html" data-pgnav="tables">Private Tables</a>
+      <a href="membership.html" data-pgnav="membership">Membership</a>
+      <a href="my-table.html" data-pgnav="club" data-need="member">My table</a>
+      <a href="my-table.html#dealer" data-need="dealer">Dealer</a>
+      <a href="my-table.html#pitboss" data-need="pitboss">Pit Boss</a>
+      <a href="my-table.html#owner" data-need="owner">Owner</a>
     </nav>
     <div class="who">
       <button class="rolechip" type="button" id="roleBtn" aria-haspopup="dialog"><span class="dot"></span><span id="roleName">Guest</span></button>
@@ -167,15 +167,14 @@
 
 <main id="top">
   <!-- ============ HERO / MARQUEE ============ -->
-  <section class="hero c-hero" aria-labelledby="heroTitle">
+  <section data-pg="home" class="hero c-hero" aria-labelledby="heroTitle">
     <div class="wrap">
       <div class="copy">
         <h1 id="heroTitle">Your 52 best matches, dealt.</h1>
         <p class="c-lead">No endless scroll. SuiteFace deals you a real deck: 13 people in each suit who fit what you asked for, ranked Ace to 2.</p>
         <div class="actions">
-          <a class="btn gold" href="#membership">Get dealt in</a>
-          <a class="textlink" href="#quiz">Find my suit</a>
-          <a class="textlink" href="#demo" data-only="guest">Watch a hand</a>
+          <a class="btn gold" href="membership.html">Get dealt in</a>
+          <a class="textlink" href="find-your-suit.html">Find my suit</a>
         </div>
         <p class="fine" id="heroOffer"><b>Launch offer:</b> join for $2.10 a month. The $21 buy-in is waived through October 31.</p>
       </div>
@@ -208,8 +207,61 @@
     </div>
   </section>
 
+
+  <!-- ============ HOME: just enough to want in ============ -->
+  <section data-pg="home" class="h-steps" aria-labelledby="hStepsT">
+    <div class="wrap">
+      <h2 id="hStepsT">Three moves to your first pair</h2>
+      <ol class="h3up">
+        <li><span class="ic" aria-hidden="true"><svg><use href="#i-quiz"/></svg></span><h3>Find your suit</h3><p>Twelve quick questions tell you how you show up in love.</p></li>
+        <li><span class="ic" aria-hidden="true"><svg><use href="#i-deck"/></svg></span><h3>Get your 52</h3><p>The best fits near you, 13 in each suit, ranked Ace to 2.</p></li>
+        <li><span class="ic" aria-hidden="true"><svg><use href="#i-pair"/></svg></span><h3>Make a pair</h3><p>Play each other's card and the Side Table opens.</p></li>
+      </ol>
+      <p class="h-more"><a class="textlink" href="how-it-works.html">See how it works</a></p>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-price" aria-labelledby="hPriceT">
+    <div class="wrap h-price-in">
+      <div class="h-chips" aria-hidden="true">
+        <span class="sfchip h-c21" data-chip="21" data-size="150"></span>
+        <span class="sfchip h-c210" data-chip="2.10" data-size="170" data-spin></span>
+      </div>
+      <div class="h-price-copy">
+        <h2 id="hPriceT">One buy-in. Then pocket change.</h2>
+        <p class="lede" id="hPriceLine">The $21 buy-in is waived through October 31. Join for $2.10 a month and cancel any time.</p>
+        <p class="lede h-guar">If we can't deal you at least 12 cards within 10 days, you can have your buy-in back.</p>
+        <div class="row"><a class="btn gold" href="membership.html">Get dealt in</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-suit" aria-labelledby="hSuitT">
+    <div class="wrap h-suit-in">
+      <div>
+        <h2 id="hSuitT">Which suit are you?</h2>
+        <p class="lede">Diamond, Club, Heart or Spade. Two minutes, twelve questions, one honest answer about how you love.</p>
+        <div class="row" style="margin-top:22px"><a class="btn gold" href="find-your-suit.html">Find my suit</a></div>
+      </div>
+      <div class="h-suitcards" aria-hidden="true">
+        <span class="hsc red"><svg><use href="#s-diamond"/></svg></span>
+        <span class="hsc"><svg><use href="#s-club"/></svg></span>
+        <span class="hsc red"><svg><use href="#s-heart"/></svg></span>
+        <span class="hsc"><svg><use href="#s-spade"/></svg></span>
+      </div>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-final" aria-labelledby="hFinalT">
+    <div class="wrap h-final-in">
+      <h2 id="hFinalT">Your seat is waiting.</h2>
+      <p class="lede">Real people near you, verified faces at the top of your deck, and no endless scroll. No Jokers Needed.</p>
+      <div class="row"><a class="btn gold" href="membership.html">Get dealt in for $2.10</a><a class="textlink" href="tables.html">Not here to date? Host a Private Table</a></div>
+    </div>
+  </section>
+
   <!-- ============ HOW IT PLAYS ============ -->
-  <section id="how" aria-labelledby="howTitle">
+  <section data-pg="how" id="how" aria-labelledby="howTitle">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">How it plays</p>
@@ -229,7 +281,7 @@
 
 
   <!-- ============ DEMO (guests) ============ -->
-  <section id="demo" aria-labelledby="demoTitle" data-only="guest">
+  <section data-pg="how" id="demo" aria-labelledby="demoTitle" data-only="guest">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Demo table</p>
@@ -252,12 +304,12 @@
   </section>
 
   <!-- ============ QUIZ ============ -->
-  <section id="quiz" aria-labelledby="quizTitle">
+  <section data-pg="suit" id="quiz" aria-labelledby="quizTitle">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Your suit</p>
         <h2 id="quizTitle">Which suit are you?</h2>
-        <p class="lede">Twelve quick questions. Pick the answer that sounds most like you on a good day. It's a playful self-description, not a psychological test, and you can always choose a different suit yourself.</p>
+        <p class="lede">One question at a time, about two minutes. Pick the answer that sounds most like you on a good day. It's a playful read on how you love, not a test, and you can always choose a different suit yourself.</p>
       </div>
       <div class="suit-styles" id="styleCards"></div>
       <div class="feltbox quiz" id="quizBox" style="margin-top:22px">
@@ -265,6 +317,7 @@
           <span class="qcount" id="qCount">Step 1 of 15</span>
           <div class="meter" style="flex:1"><b id="qMeter"></b></div>
         </div>
+        <p class="qcheer" id="qCheer" aria-live="polite"></p>
         <p class="qtext" id="qText"></p>
         <div class="answers" id="qAnswers"></div>
         <div class="quiz-nav"><button class="btn ghost sm" id="qBack" disabled>Back</button><button class="btn ghost sm" id="qRestart">Start over</button></div>
@@ -274,7 +327,7 @@
   </section>
 
   <!-- ============ MY FACE ============ -->
-  <section id="face" data-need="member" aria-labelledby="faceTitle">
+  <section data-pg="club" id="face" data-need="member" aria-labelledby="faceTitle">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">My Face</p>
@@ -352,7 +405,7 @@
   </section>
 
   <!-- ============ THE TABLE ============ -->
-  <section id="table" data-need="member" aria-labelledby="tableTitle">
+  <section data-pg="club" id="table" data-need="member" aria-labelledby="tableTitle">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Your 52</p>
@@ -388,7 +441,7 @@
 
 
   <!-- ============ TABLE MAP ============ -->
-  <section id="map" data-need="member" aria-labelledby="mapTitle">
+  <section data-pg="club" id="map" data-need="member" aria-labelledby="mapTitle">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Table Map</p>
@@ -408,7 +461,7 @@
   </section>
 
   <!-- ============ PRIVATE TABLES (database: casinos) ============ -->
-  <section id="private-tables" aria-labelledby="casTitle">
+  <section data-pg="tables" id="private-tables" aria-labelledby="casTitle">
     <span id="casinos" class="anchor-alias" aria-hidden="true"></span>
     <div class="wrap">
       <div class="sec-head">
@@ -429,7 +482,7 @@
         <aside class="casbuild">
           <div class="casbuild-art" id="casArt" aria-hidden="true"></div>
           <h3>Host a Private Table</h3>
-          <div class="pricing"><div><span class="big">$21</span><span class="hint">once · 12 seats · 7 ZIPs</span></div><div class="plus">+</div><div><span class="big">$2.10</span><span class="hint">per extra seat or ZIP</span></div></div>
+          <div class="pricing chipprice"><div><span class="sfchip" data-chip="21" data-size="64"></span><span class="hint">once · 12 seats · 7 ZIPs</span></div><div class="plus">+</div><div><span class="sfchip" data-chip="2.10" data-size="64"></span><span class="hint">per extra seat or ZIP</span></div></div>
           <p class="hint" style="margin:0">Up to 52 seats. Go wider: <b>$210 per state</b> or <b>$2,100 nationwide</b>. Great for alumni, Greek life, clubs and faith groups.</p>
           <ul class="ticks">
             <li>Your name on the felt. You hold the naming rights while it's open.</li>
@@ -448,7 +501,7 @@
   </section>
 
   <!-- ============ SAFETY ============ -->
-  <section id="safety" aria-labelledby="safeTitle">
+  <section data-pg="how" id="safety" aria-labelledby="safeTitle">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">House Rules</p>
@@ -467,25 +520,17 @@
 
 
   <!-- ============ MEMBERSHIP ============ -->
-  <section id="membership" aria-labelledby="memTitle">
+  <section data-pg="membership" id="membership" aria-labelledby="memTitle">
     <div class="wrap">
       <div class="sec-head">
         <p class="eyebrow">Membership</p>
         <h2 id="memTitle">One Buy-In. Then pocket change.</h2>
       </div>
       <div class="member">
-        <div class="chipwrap" aria-hidden="true"><svg class="pchip" viewBox="0 0 200 200">
-          <defs><path id="rimPath" d="M100,100 m-73,0 a73,73 0 1,1 146,0 a73,73 0 1,1 -146,0"/></defs>
-          <g class="ring">
-            <circle cx="100" cy="100" r="97" fill="#C8102E"/>
-            <circle cx="100" cy="100" r="90" fill="none" stroke="#FAF7F0" stroke-width="6" stroke-dasharray="14 14.27"/>
-            <circle cx="100" cy="100" r="62" fill="none" stroke="#FAF7F0" stroke-width="1.5" opacity=".55"/>
-            <text class="rim"><textPath href="#rimPath" startOffset="0">BUY-IN ♦ BUY-IN ♣ BUY-IN ♥ BUY-IN ♠ </textPath></text>
-          </g>
-          <circle cx="100" cy="100" r="58" fill="#FAF7F0"/>
-          <circle cx="100" cy="100" r="52" fill="none" stroke="#C8102E" stroke-width="1.5" stroke-dasharray="3 4"/>
-          <text class="amt" x="100" y="117" text-anchor="middle">$21</text>
-        </svg></div>
+        <div class="chipwrap memchips" aria-hidden="true">
+          <span class="sfchip mc21" id="memChip21" data-chip="21" data-size="170" data-label="one-time buy-in"></span>
+          <span class="sfchip mc210" data-chip="2.10" data-size="190" data-spin data-label="a month"></span>
+        </div>
         <div class="panel form-grid price">
           <div class="pricing">
             <div><span class="big">$21.00</span><span class="hint">one-time Buy-In, today</span></div>
@@ -536,11 +581,22 @@
           </details>
         </div>
       </div>
+      <div class="chiplegend" aria-labelledby="chipT">
+        <h3 id="chipT">The house chips</h3>
+        <p class="hint">Every price at SuiteFace is one of five chips.</p>
+        <ul>
+          <li><span class="sfchip" data-chip="0.21" data-size="76"></span><b>21¢</b><span>Small fees</span></li>
+          <li><span class="sfchip" data-chip="2.10" data-size="76"></span><b>$2.10</b><span>Your month, The Raise, an extra seat or ZIP</span></li>
+          <li><span class="sfchip" data-chip="21" data-size="76"></span><b>$21</b><span>The buy-in, a Private Table</span></li>
+          <li><span class="sfchip" data-chip="210" data-size="76"></span><b>$210</b><span>Joker Lobby, a whole state, ZIP sponsors</span></li>
+          <li><span class="sfchip" data-chip="2100" data-size="76"></span><b>$2,100</b><span>Joker buy-out, nationwide, High Roller sponsors</span></li>
+        </ul>
+      </div>
     </div>
   </section>
 
   <!-- ============ INVITE ============ -->
-  <section id="invite" data-need="member" aria-labelledby="invTitle">
+  <section data-pg="club" id="invite" data-need="member" aria-labelledby="invTitle">
     <div class="wrap">
       <div class="invite">
         <div class="form-grid">
@@ -571,7 +627,7 @@
   </section>
 
   <!-- ============ JOIN / CONTACT ============ -->
-  <section id="join" aria-labelledby="joinTitle">
+  <section data-pg="contact" id="join" aria-labelledby="joinTitle">
     <div class="wrap">
       <div class="forms">
         <div class="form-grid">
@@ -594,7 +650,7 @@
   </section>
 
   <!-- ============ DEALER (staff) ============ -->
-  <section id="dealer" data-need="dealer" aria-labelledby="dealerTitle" hidden>
+  <section data-pg="club" id="dealer" data-need="dealer" aria-labelledby="dealerTitle" hidden>
     <div class="wrap">
       <div class="sec-head"><p class="eyebrow">Dealer console · staff</p><h2 id="dealerTitle">Run the tables</h2>
         <p class="lede">Safety first, then Jokers, appeals and pauses. Sample data in this preview.</p></div>
@@ -603,7 +659,7 @@
     </div>
   </section>
   <!-- ============ PIT BOSS (IT) ============ -->
-  <section id="pitboss" data-need="pitboss" aria-labelledby="pitTitle" hidden>
+  <section data-pg="club" id="pitboss" data-need="pitboss" aria-labelledby="pitTitle" hidden>
     <div class="wrap">
       <div class="sec-head"><p class="eyebrow">Pit Boss console · IT</p><h2 id="pitTitle">Keep the lights on</h2>
         <p class="lede">These checks run live in this browser, so they're useful for troubleshooting a member's device too.</p></div>
@@ -613,7 +669,7 @@
     </div>
   </section>
   <!-- ============ OWNER ============ -->
-  <section id="owner" data-need="owner" aria-labelledby="ownerTitle" hidden>
+  <section data-pg="club" id="owner" data-need="owner" aria-labelledby="ownerTitle" hidden>
     <div class="wrap">
       <div class="sec-head"><p class="eyebrow">Owner console</p><h2 id="ownerTitle">The house view</h2>
         <p class="lede">Sample data in this preview. The live version reads Stripe and the member database.</p></div>
@@ -651,8 +707,8 @@
       <div class="sf-badges"><span class="sf-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8.3 7.5 9.5 4.3-1.2 7.5-5 7.5-9.5V6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>U.S. patent pending (USPTO)</span><span class="sf-badge">Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener">GoFirehorseGo</a></span></div>
       <p class="hint copyright">© <span id="cpYear">2026</span> SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™, the SuiteFace Joker logo™, No Jokers Needed™, Your 52™, Play Hand™, Joker Lobby™, Ask the Dealer™, The Raise™, High Roller Room™ and SuiteFace Private Tables™ are trademarks of SuiteFace Inc. Patent pending.</p>
     </div>
-    <div><h4>Play</h4><ul><li><a href="#how">How it plays</a></li><li><a href="#quiz">Find your suit</a></li><li><a href="#table">Your 52</a></li><li><a href="#safety">House Rules</a></li><li><a href="#map">Table Map</a></li><li><a href="#private-tables">Private Tables</a></li></ul></div>
-    <div><h4>SuiteFace Inc.</h4><ul><li><a href="#membership">Membership · $21 + $2.10/mo</a></li><li><a href="guides.html">Dating guides</a></li><li><a href="christian-dating-app.html">Christian dating</a></li><li><a href="online-dating-safety.html">Dating safety tips</a></li><li><a href="legal.html">Legal center</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="safety.html">Safety Guide</a></li><li><a href="fit.html">House Fit Rules</a></li><li><a href="joker-lobby.html">Joker Maker Lobby</a></li><li><a href="#join">Contact</a></li><li><a href="#invite">Invite a friend</a></li><li>help@suiteface.com</li><li>© 2026 SuiteFace Inc.</li></ul></div>
+    <div><h4>Play</h4><ul><li><a href="how-it-works.html">How it works</a></li><li><a href="find-your-suit.html">Find your suit</a></li><li><a href="tables.html">Private Tables</a></li><li><a href="membership.html">Membership</a></li><li><a href="how-cards-work.html">How cards are dealt</a></li><li><a href="joker-lobby.html">Joker Lobby</a></li><li><a href="my-table.html">My table (members)</a></li></ul></div>
+    <div><h4>SuiteFace Inc.</h4><ul><li><a href="membership.html">Membership · $21 + $2.10/mo</a></li><li><a href="guides.html">Dating guides</a></li><li><a href="christian-dating-app.html">Christian dating</a></li><li><a href="online-dating-safety.html">Dating safety tips</a></li><li><a href="legal.html">Legal center</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="safety.html">Safety Guide</a></li><li><a href="fit.html">House Fit Rules</a></li><li><a href="joker-lobby.html">Joker Maker Lobby</a></li><li><a href="contact.html">Contact</a></li><li><a href="my-table.html#invite">Invite a friend</a></li><li>help@suiteface.com</li><li>© 2026 SuiteFace Inc.</li></ul></div>
   </div>
 </footer>
 
@@ -665,12 +721,13 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792244078"></script>
-<script src="/assets/js/sign.js?v=1792244078"></script>
-<script src="/assets/js/live.js?v=1792244078"></script>
-<script src="/assets/js/gate.js?v=1792244078"></script>
-<script src="/assets/js/fx.js?v=1792244078"></script>
-<script src="/assets/js/casino-scene.js?v=1792244078"></script>
-<script src="/assets/js/app.js?v=1792244078"></script>
+<script src="/assets/js/config.js?v=1792250617"></script>
+<script src="/assets/js/sign.js?v=1792250617"></script>
+<script src="/assets/js/live.js?v=1792250617"></script>
+<script src="/assets/js/gate.js?v=1792250617"></script>
+<script src="/assets/js/fx.js?v=1792250617"></script>
+<script src="/assets/js/casino-scene.js?v=1792250617"></script>
+<script src="/assets/js/chips.js?v=1792250617"></script>
+<script src="/assets/js/app.js?v=1792250617"></script>
 </body>
 </html>

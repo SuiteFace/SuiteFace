@@ -15,6 +15,27 @@
     set: function (k, v) { try { localStorage.setItem("sf." + k, JSON.stringify(v)); } catch (e) { } }
   };
 
+  /* ---------- pages: one site, several pages. Each section lives on one page; links to a section on another page go there. ---------- */
+  var PAGE = (document.body && document.body.getAttribute("data-page")) || "home";
+  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html" };
+  var SEC_PAGE = { how: "how", demo: "how", safety: "how", quiz: "suit", "private-tables": "tables", casinos: "tables", membership: "membership",
+    face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home" };
+  function pageFor(id) { return SEC_PAGE[id] || null; }
+  function goSection(id, keepSearch) {
+    var pg = pageFor(id); if (!pg || pg === PAGE) return false;
+    location.href = PAGE_FILE[pg] + (keepSearch ? location.search : "") + (id === "top" ? "" : "#" + id); return true;
+  }
+  (function () {
+    var h = location.hash.replace(/^#/, "");
+    if (h && !/=/.test(h) && pageFor(h) && pageFor(h) !== PAGE) { goSection(h, true); return; }
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]'); if (!a || e.defaultPrevented) return;
+      var id = a.getAttribute("href").slice(1); if (!id) return;
+      if (goSection(id, false)) e.preventDefault();
+    }, true);
+    $$("[data-pgnav]").forEach(function (a) { if (a.getAttribute("data-pgnav") === PAGE) a.setAttribute("aria-current", "page"); });
+  })();
+
   /* ---------- suits ---------- */
   var ORDER = ["diamond", "club", "heart", "spade"];
   var SUIT = {
@@ -612,7 +633,20 @@
   function renderQ() {
     if (qi >= STEPS_Q) { showResult(); return; }
     $("#quizBox").hidden = false; $("#quizResult").hidden = true;
-    $("#qCount").textContent = "Step " + (qi + 1) + " of " + STEPS_Q;
+    var left = STEPS_Q - qi - 1;
+    $("#qCount").textContent = "Question " + (qi + 1) + " of " + STEPS_Q + (left ? " · " + left + " to go" : " · last one");
+    var pct = qi / STEPS_Q, cheer =
+      qi === 0 ? "Let's deal you in. No wrong answers here, just honest ones." :
+      qi === 1 ? "Nice. Now think about how the people who love you would describe you." :
+      qi === 2 ? "Here come the quick ones. Go with your gut." :
+      qi === STEPS_Q - 1 ? "Last card. The honest one." :
+      left === 1 ? "Almost there! One more after this." :
+      pct >= .8 ? "Almost there. Your suit is nearly dealt." :
+      pct >= .62 ? "Getting closer. Just a few more hands." :
+      pct >= .45 ? "Halfway there. Your suit is taking shape." :
+      pct >= .3 ? "Great rhythm. Keep going." : "Good start. Keep it honest.";
+    var ch = $("#qCheer"); if (ch) ch.textContent = cheer;
+    var qb = $("#quizBox"); if (qb && !REDUCED) { qb.classList.remove("slide"); void qb.offsetWidth; qb.classList.add("slide"); }
     $("#qMeter").style.width = (qi / STEPS_Q * 100) + "%";
     $("#qBack").disabled = qi === 0;
     if (qi === 0) return wordStep("self", "Pick the words that describe you", "How do you see yourself? Choose 3 to 5.");
@@ -645,6 +679,37 @@
   });
   $("#qBack").addEventListener("click", function () { if (qi > 0) { qi--; renderQ(); } });
   $("#qRestart").addEventListener("click", resetQuiz);
+  function suitGate(R, top, c, tot) {
+    var saved = S.get("leadDraft", {});
+    R.innerHTML = '<span class="big gatepip" aria-hidden="true"><svg><use href="#s-spade"/></svg></span><form class="form-grid suitgate" id="suitGate" novalidate>' +
+      '<h3 style="font-size:2rem">Your suit is ready.</h3><p class="lede">Tell us where to send it, and we\'ll show you your suit right now.</p>' +
+      '<div class="field"><label for="sgName">Your name</label><input type="text" id="sgName" autocomplete="name" maxlength="80" value="' + esc(saved.name || "") + '"><span class="err" id="sgNameErr"></span></div>' +
+      '<div class="field"><label for="sgEmail">Email</label><input type="email" id="sgEmail" autocomplete="email" inputmode="email" maxlength="120" value="' + esc(saved.email || "") + '"><span class="err" id="sgEmailErr"></span></div>' +
+      '<div class="field"><label for="sgPhone">Mobile phone</label><input type="tel" id="sgPhone" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="(205) 555-0123" value="' + esc(saved.phone || "") + '"><span class="err" id="sgPhoneErr"></span></div>' +
+      '<label class="agree"><input type="checkbox" id="sgSms"> <span>Text me about my suit and my seat. Message and data rates may apply; reply STOP to opt out. Optional.</span></label>' +
+      '<p class="hint">We\'ll email your result and news about SuiteFace. We never sell your details. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>' +
+      '<span class="err" id="sgErr" role="alert"></span><div class="row"><button class="btn gold" type="submit" id="sgGo">Show my suit</button><button class="btn ghost" type="button" id="sgBack">Back</button></div></form>';
+    var f = $("#suitGate", R);
+    f.addEventListener("input", function () { S.set("leadDraft", { name: $("#sgName", f).value, email: $("#sgEmail", f).value, phone: $("#sgPhone", f).value }); });
+    $("#sgBack", f).onclick = function () { qi = STEPS_Q - 1; renderQ(); };
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var nm = $("#sgName", f).value.trim(), em = $("#sgEmail", f).value.trim(), ph = $("#sgPhone", f).value.replace(/\D/g, ""), ok = true;
+      if (ph.length === 11 && ph[0] === "1") ph = ph.slice(1);
+      [["sgName", nm.length >= 2 ? "" : "Add your name."], ["sgEmail", /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em) ? "" : "Check your email, like name@example.com."], ["sgPhone", ph.length === 10 ? "" : "Add a 10-digit mobile number."]]
+        .forEach(function (x) { $("#" + x[0] + "Err", f).textContent = x[1]; $("#" + x[0], f).setAttribute("aria-invalid", String(!!x[1])); if (x[1]) ok = false; });
+      if (!ok) { var bad = f.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
+      var btn = $("#sgGo", f); btn.disabled = true; btn.textContent = "Dealing your suit…";
+      var scores = {}; ORDER.forEach(function (k) { scores[k] = Math.round(c[k] / tot * 100); });
+      var args = { p_name: nm, p_email: em, p_phone: ph, p_suit: top, p_scores: scores, p_self: qw.self.slice(0, 5), p_others: qw.others.slice(0, 5), p_sms_ok: $("#sgSms", f).checked, p_ref: (new URLSearchParams(location.search).get("ref") || S.get("ref", "") || null), p_page: location.pathname };
+      var done = function () { S.set("suitLead", { email: em, at: Date.now() }); S.set("leadDraft", null); showResult(); var r = $("#quizResult"); if (r) r.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); };
+      if (!CFG.supabaseUrl) { done(); return; }
+      fetch(CFG.supabaseUrl + "/rest/v1/rpc/submit_suit_lead", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(args) })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error((j && j.message) || "That didn't go through."); return j; }); })
+        .then(done, function (x) { btn.disabled = false; btn.textContent = "Show my suit"; $("#sgErr", f).textContent = x.message + " Try again, or email help@suiteface.com."; });
+    });
+    var first = $("#sgName", f); if (first && !first.value) setTimeout(function () { first.focus(); }, 50);
+  }
   function showResult() {
     var c = { diamond: 0, club: 0, heart: 0, spade: 0 };
     qa.forEach(function (s) { c[s] += 1; });
@@ -673,6 +738,8 @@
     }
     var top = lead[0];
     $("#quizBox").hidden = true; var R = $("#quizResult"); R.hidden = false;
+    /* The result is revealed after the player tells us where to send it: name, email and phone. */
+    if (!window.SF_LIVE && !S.get("suitLead", null)) { suitGate(R, top, c, tot); return; }
     R.innerHTML = '<span class="big" style="color:' + suitColor(top) + '">' + pip(top, "big") + '</span><div class="form-grid" style="gap:10px"><p class="eyebrow">Your suit</p><h3 style="font-size:2.4rem">' +
       SUIT[top].sym + " You're a " + SUIT[top].name + "</h3><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
       ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); if (s === top) pct = Math.max(pct, 1 + Math.max.apply(null, ORDER.filter(function (k) { return k !== top; }).map(function (k) { return Math.round(c[k] / tot * 100); }))); return '<div class="bar' + (s === top ? " win" : "") + '"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") +
@@ -681,7 +748,9 @@
       '<p><b>Your honest fault:</b> ' + esc(qw.fault) + ' <span class="hint">· Face Down (private). Owning it is a strong play.</span></p></div>' +
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
       ORDER.filter(function (s) { return s !== top; }).map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
-      '<button class="btn ghost sm" type="button" id="retake">Retake</button></div></div>';
+      '<button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
+      (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your 52.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
+      "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
     $$("#quizResult [data-use]").forEach(function (b) {
@@ -1412,11 +1481,18 @@
 
   /* ---------- Launch offer (15 days): Buy-In waived, or choose First 1,000 ---------- */
   var LAUNCH = { open: false, ends: "2026-11-01T05:00:00Z", left: 1000 }, PLAN = "launch";
+  function launchEndText() { return new Date(new Date(LAUNCH.ends).getTime() - 1).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/Chicago" }); }
+  function SIGNED_PAID() { return !!(window.SF_LIVE && window.SF_LIVE.seated); }
   function launchUI() {
     var box = $("#launchBox"); if (!box) return;
     LAUNCH.open = LAUNCH.open && new Date(LAUNCH.ends).getTime() > Date.now();
     box.hidden = !LAUNCH.open;
     var ho = $("#heroOffer"); if (ho) ho.hidden = !LAUNCH.open;
+    var pb = $("#promoBar"); if (pb) pb.hidden = !LAUNCH.open || SIGNED_PAID();
+    var pe = $("#promoEnds"); if (pe) pe.textContent = launchEndText();
+    var hp = $("#hPriceLine"); if (hp) hp.textContent = LAUNCH.open ? "The $21 buy-in is waived through " + launchEndText() + ". Join for $2.10 a month and cancel any time." : "$21 once to take your seat, then $2.10 a month. Cancel any time.";
+    var c21 = $("#memChip21"); if (c21) c21.classList.toggle("waived", LAUNCH.open && PLAN === "launch");
+    var hc = $(".h-c21"); if (hc) hc.classList.toggle("waived", LAUNCH.open);
     if (!LAUNCH.open) PLAN = "first";
     var first = $('[data-plan="first"]', box); if (first) first.hidden = LAUNCH.left <= 0;
     if (LAUNCH.left <= 0 && PLAN === "first" && LAUNCH.open) PLAN = "launch";
@@ -1431,7 +1507,7 @@
     ag.innerHTML = launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and SuiteFace charges <b>$2.10 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership (rejoining then requires the Buy-In). I agree to the <a href="terms.html">Terms of Service</a>.'
       : LAUNCH.open ? 'I choose the <b>First 1,000</b> Buy-In instead of the free launch seat. SuiteFace charges <b>$21.00 USD today, non-refundable</b> (the 12-Card Deck Guarantee doesn\'t apply to it), then <b>$2.10 USD every month</b> starting in 30 days until I cancel. I agree to the <a href="terms.html">Terms of Service</a>.'
       : 'I understand that SuiteFace charges <b>$21.00 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership. I agree to the <a href="terms.html">Terms of Service</a>.';
-    var amt = document.querySelector("#membership .amt"); if (amt) amt.textContent = launch ? "$0" : "$21";
+
   }
   $("#launchBox").addEventListener("click", function (e) { var b = e.target.closest("[data-plan]"); if (!b) return; PLAN = b.getAttribute("data-plan"); $("#agree").checked = false; launchUI(); });
   (function () {
@@ -1720,22 +1796,20 @@
     });
   });
 
-  /* ---------- welcome slide-in ---------- */
-  var params = new URLSearchParams(location.search), inv = params.get("ref") || params.get("invite"), seat = params.get("seat");
-  if (inv || !S.get("welcomed", false)) {
+  /* ---------- launch popup: the first thing a new visitor sees ---------- */
+  var params = new URLSearchParams(location.search), inv = params.get("ref") || params.get("invite");
+  var seenOffer = S.get("offerSeen", 0);
+  if (PAGE === "home" && !SIGNED && (inv || !seenOffer || Date.now() - seenOffer > 3 * 864e5)) {
     setTimeout(function () {
-      if (window.SF_LIVE || SIGNED) return; // members never see the guest welcome
-      var w = document.createElement("div"); w.className = "welcome"; w.setAttribute("role", "dialog"); w.setAttribute("aria-label", "Welcome");
-      w.innerHTML = "<h3>" + (inv ? (seat ? esc(seat) + ", " : "") + "@" + esc(inv.replace(/^@/, "")) + " saved you a seat" : "Welcome to the Table") + "</h3><p class=\"hint\">" +
-        (inv ? "Watch the demo, find your suit, then buy in to get your 52." : "Watch a demo hand, find your suit in two minutes, then buy in to play. No Jokers Needed.") +
-        '</p><div class="row"><a class="btn gold sm" href="#demo">Watch the demo</a><a class="btn ghost sm" href="#quiz">Find my suit</a><button class="btn ghost sm" type="button">Close</button></div>';
-      document.body.appendChild(w);
-      var close = function () { w.remove(); S.set("welcomed", true); };
-      document.addEventListener("sf:live", function () { if (window.SF_LIVE && document.body.contains(w)) w.remove(); });
-      $$("a,button", w).forEach(function (b) { b.addEventListener("click", close); });
-    }, 1600);
+      if (window.SF_LIVE || SIGNED || !LAUNCH.open || $("#modal")) return;
+      S.set("offerSeen", Date.now());
+      var m = modal('<div class="offerpop"><div class="offerchips" aria-hidden="true"><span class="sfchip waived" data-chip="21" data-size="104" data-label="$21 buy-in"></span><span class="sfchip" data-chip="2.10" data-size="132" data-spin data-label="a month"></span></div>' +
+        '<h3>' + (inv ? "A friend saved you a seat." : "Your seat is on the house.") + '</h3>' +
+        '<p class="lede">Launch offer: the $21 buy-in is waived through ' + esc(launchEndText()) + '. Join for $2.10 a month and cancel any time.</p>' +
+        '<div class="row"><a class="btn gold" href="membership.html" data-close>Claim my seat</a><a class="textlink" href="find-your-suit.html" data-close>Find my suit first</a></div></div>');
+      if (window.SFChips) window.SFChips.paint(m);
+    }, 1800);
   }
-
 
   /* =====================================================================
      IDENTITY & DATING PREFERENCES
