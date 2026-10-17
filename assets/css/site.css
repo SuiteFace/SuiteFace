@@ -920,3 +920,4 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 .cdes .ck input{accent-color:#B8862F}
 .cdes-colors{display:flex;gap:10px;margin-top:6px}.cdes-colors label{display:flex;gap:6px;align-items:center;font-size:.85rem}
 .cdes-colors input[type=color]{width:38px;height:28px;padding:0;border:1px solid rgba(250,247,240,.3);border-radius:6px;background:none}
+.socb.soon{opacity:.45;cursor:help}

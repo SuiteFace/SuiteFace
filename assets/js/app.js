@@ -855,6 +855,24 @@
     var linked = S.get("socialLinked", []);
     function mark() { $$(".socb", wrap).forEach(function (b) { b.classList.toggle("linked", linked.indexOf(b.getAttribute("data-prov")) > -1); });
       $("#socLinked").textContent = linked.length ? "Linked: " + linked.map(function (k) { return PROV[k].name; }).join(", ") + ". Interests, quiz and preferences always come from you." : ""; }
+    /* Live: what's linked comes from the account itself, and only switched-on providers can be linked. */
+    document.addEventListener("sf:live", function () {
+      if (!window.SF_LIVE) return;
+      var u = (window.SF_LIVE.session() || {}).user || {}, ids = u.identities || [];
+      linked = ids.map(function (i) { return i.provider === "twitter" ? "x" : i.provider; }).filter(function (k) { return PROV[k]; });
+      mark();
+      window.SF_AUTH.providers().then(function (on) {
+        var ok = on.map(function (p) { return p[0] === "twitter" ? "x" : p[0]; });
+        $$(".socb", wrap).forEach(function (b) { var k = b.getAttribute("data-prov"), avail = ok.indexOf(k) > -1 || linked.indexOf(k) > -1; b.classList.toggle("soon", !avail); b.title = avail ? "" : "Opens soon"; });
+        if (!ok.length && !linked.length) $("#socLinked").textContent = "Linking social accounts opens soon. Fill in your Face by hand for now.";
+      });
+      // Just came back from linking: offer the photo and name that account shared.
+      var m = location.search.match(/[?&]linked=(\w+)/);
+      if (m) { var idt = ids.filter(function (i) { return i.provider === m[1]; })[0], d = (idt && idt.identity_data) || {};
+        if (!P.name && (d.full_name || d.name)) { P.name = String(d.full_name || d.name).split(" ")[0].slice(0, 40); F.name.value = P.name; }
+        if (!P.photo && /^https:\/\//.test(d.avatar_url || d.picture || "")) P.photo = d.avatar_url || d.picture;
+        saveP(); renderCard(); onChange(); }
+    });
     function samplePhoto(letter, color) {
       var c = document.createElement("canvas"); c.width = c.height = 320; var x = c.getContext("2d");
       var g = x.createLinearGradient(0, 0, 320, 320); g.addColorStop(0, color); g.addColorStop(1, "#17151B"); x.fillStyle = g; x.fillRect(0, 0, 320, 320);
@@ -863,6 +881,7 @@
     }
     wrap.addEventListener("click", function (e) {
       var b = e.target.closest("[data-prov]"); if (!b) return; var k = b.getAttribute("data-prov"), pv = PROV[k];
+      if (window.SF_LIVE && b.classList.contains("soon")) { toast(pv.name + " linking opens soon. Fill in your Face by hand for now."); return; }
       if (window.SF_LIVE && window.SF_LIVE.linkIdentity) { window.SF_LIVE.linkIdentity(k).catch(function (x) { toast((x && x.message) || "Couldn't link that account."); }); return; }
       var sm = pv.sample;
       var fields = [["photo", "Profile photo", !!sm.color], ["name", "Face Name: " + sm.name, true], ["handle", sm.handle ? "Calling Card: @" + sm.handle : "", !!sm.handle], ["bio", sm.bio ? "Face Value: “" + sm.bio + "”" : "", !!sm.bio]].filter(function (f) { return f[2] && f[1]; });
