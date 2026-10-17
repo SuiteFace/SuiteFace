@@ -2,8 +2,8 @@
 // Secret needed: STRIPE_SECRET_KEY. The webhook (stripe-webhook) opens the Casino for Owner review once paid.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const PRICE_BUILD = "price_1URPZLHkxiL4jmc87fXCNnSm"; // $21.00 one-time (switch to the live price at launch)
-const PRICE_ZIP = "price_1URPZNHkxiL4jmc8HXu4CEaE";   // $2.10 per extra ZIP, one-time
+const PRICE_BUILD = "price_1URQw5QciI2PcM3qWOQHmHAx"; // $21.00 one-time (live)
+const PRICE_ZIP = "price_1URQw5QciI2PcM3qeAD5lKRc";   // $2.10 per extra ZIP, one-time
 const SITE = "https://suiteface.com";
 const URL_ = Deno.env.get("SUPABASE_URL")!, ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };

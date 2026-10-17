@@ -3,7 +3,7 @@
 // write access to Customers, Checkout Sessions, Subscriptions; read access to Setup Intents).
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const PRICE_30D = "price_1UROGNHkxiL4jmc8ZMAgbUNe"; // $210 every 30 days (switch to the live price at launch)
+const PRICE_30D = "price_1URQvGQciI2PcM3qqS8y48iL"; // $210 every 30 days (live)
 const SITE = "https://suiteface.com";
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { ...CORS, "Content-Type": "application/json" } });
