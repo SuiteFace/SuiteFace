@@ -138,7 +138,7 @@
     '@media (prefers-reduced-motion:reduce){.cs *{animation:none!important}}';
 
   /* ---------- First-person entrance, generated from the Casino's style ----------
-     Arrive (VIP road, ship's dock or lantern path) → walk the red carpet to the building → doors open → main lobby. */
+     Arrive (valet road, ship's dock or lantern path) → walk the red carpet to the building → doors open → main lobby. */
   var ARRIVE = { cruise: "dock", riverboat: "dock", outdoor: "path", beach_resort: "path", desert_oasis: "path", mountain_lodge: "path" };
   var DOORS = { vegas_new: "glass", highrise: "glass", macau: "glass", dubai: "glass", atlantic_city: "glass", monte_carlo: "palace", indoor: "palace", desert_oasis: "tent", beach_resort: "garden", outdoor: "garden", biloxi: "garden", cruise: "port" };
   var ECSS = '.fe{position:fixed;inset:0;z-index:10040;overflow:hidden;background:#17151B;font-family:Figtree,system-ui,sans-serif;color:#FAF7F0;perspective:700px}' +
@@ -175,8 +175,8 @@
     var arrive = ARRIVE[venue] || "road", door = DOORS[venue] || "wood";
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) { done && done(); return; }
     if (!document.getElementById("feCss")) { var x = document.createElement("style"); x.id = "feCss"; x.textContent = ECSS; document.head.appendChild(x); }
-    var signs = arrive === "dock" ? ["⚓ VIP BOARDING", "GANGWAY ▸"] : arrive === "path" ? ["✦ VIP ENTRANCE", "THIS WAY ▸"] : ["VIP PARKING", "VALET ▸"];
-    var cap = arrive === "dock" ? "Boarding · Welcome aboard, VIP" : arrive === "path" ? "Follow the lanterns · VIP entrance" : "Valet parking · Welcome, VIP";
+    var signs = arrive === "dock" ? ["⚓ ALL ABOARD", "GANGWAY ▸"] : arrive === "path" ? ["✦ ENTRANCE", "THIS WAY ▸"] : ["PLAYER PARKING", "VALET ▸"];
+    var cap = arrive === "dock" ? "Boarding · Welcome aboard" : arrive === "path" ? "Follow the lanterns to the door" : "Valet parking · Welcome to the table";
     var motifs = (st.themes || []).map(function (k) { return T[k] ? T[k][2] : ""; }).filter(Boolean).slice(0, 4).join(" ");
     var fe = document.createElement("div"); fe.className = "fe"; fe.setAttribute("role", "img"); fe.setAttribute("aria-label", "Entering " + (c.name || "the Casino"));
     fe.style.setProperty("--c1", c1); fe.style.setProperty("--c2", c2);
