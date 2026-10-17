@@ -167,7 +167,7 @@ html[data-play="day"] .phone{box-shadow:0 0 0 1.5px rgba(18,56,43,.25),0 50px 90
 .screen .apphd b{font-size:22px;letter-spacing:-.03em;font-weight:800}
 .screen .apphd .who{margin-right:auto;display:flex;align-items:center;gap:8px;color:#1F2A25}.screen .apphd .who b{font-size:19px}.screen .mc.back{padding:4px;display:block}.screen .mc.back i{display:block;height:100%;border-radius:4px;background:repeating-linear-gradient(45deg,#8E2230 0 5px,#7A1C28 5px 10px);box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 4px #C9A55A}.screen .apphd .me{width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:50% 30%;box-shadow:0 0 0 2px #C9A55A}
 .screen .apphd span{color:#5E6D66;font-weight:600}
-.screen .seg{margin:0 16px;display:grid;grid-template-columns:repeat(4,1fr);background:#E7E1D3;border-radius:10px;padding:3px}
+.screen .seg{margin:0 16px;display:grid;grid-template-columns:repeat(5,1fr);background:#E7E1D3;border-radius:10px;padding:3px}
 .screen .seg i{font-style:normal;text-align:center;padding:5px 0;border-radius:8px;font-weight:700;display:flex;justify-content:center;align-items:center;gap:3px}
 .screen .seg i svg{width:10px;height:10px}
 .screen .seg i.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -279,8 +279,26 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
 .ribbon button{all:unset;cursor:pointer;position:absolute;top:6px;right:10px;font-size:1.1rem;color:var(--text-3)}
 .ribbon a{color:var(--brass-hi);font-weight:700}
 @media (max-width:700px){.ribbon{top:auto;bottom:16px;right:12px;left:auto;max-width:220px;padding-right:30px}}
+/* Your Hand view: mixed suits, All tab */
+.screen .seg{grid-template-columns:1.3fr repeat(4,1fr)!important}
+.screen .seg i svg{width:11px;height:11px}
+.screen .mc b em{display:inline-flex;align-items:center;gap:1px}
+.screen .mc b em svg{width:9px;height:9px}
+.screen .mc b em.k{color:#23202A}
+.screen .mc b em.r{color:#8E2230}
+/* Callout: who is playing */
+.kcall{position:absolute;right:calc(100% - 26px);top:34px;width:210px;display:grid;justify-items:end;gap:2px;color:var(--brass-hi);z-index:3;pointer-events:none}
+.kcall span{font:600 .95rem/1.35 var(--body);color:var(--text);text-align:right;background:color-mix(in srgb,var(--ground) 82%,transparent);padding:8px 12px;border-radius:12px;border:1px solid rgba(201,165,90,.45);box-shadow:0 10px 24px -14px rgba(3,14,10,.5)}
+.kcall span b{color:var(--brass-hi)}
+.kcall .arr{width:96px;height:48px;margin-right:-8px}
+@media (max-width:900px){
+  .kcall{right:auto;left:-6px;top:-74px;width:auto;justify-items:start}
+  .kcall span{text-align:left;font-size:.85rem}
+  .kcall .arr{transform:rotate(55deg);width:60px;height:34px;margin:-2px 0 0 26px}
+}
+
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792264211">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792264362">
 <link rel="canonical" href="https://suiteface.com/preview-club.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SuiteFace">
@@ -347,24 +365,25 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
       <div class="stage deal" aria-hidden="true">
         <div class="pcard red c1"><span class="idx"><b>A</b><svg><use href="#s-heart"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-heart"/></svg></span><span class="idx bot"><b>A</b><svg><use href="#s-heart"/></svg></span></div>
         <div class="pcard c2"><span class="idx"><b>K</b><svg><use href="#s-spade"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-spade"/></svg></span><span class="idx bot"><b>K</b><svg><use href="#s-spade"/></svg></span></div>
-        <div class="pcard red c3"><span class="idx"><b>Q</b><svg><use href="#s-diamond"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-diamond"/></svg></span><span class="idx bot"><b>Q</b><svg><use href="#s-diamond"/></svg></span></div>
+        <div class="pcard c3"><span class="idx"><b>Q</b><svg><use href="#s-club"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-club"/></svg></span><span class="idx bot"><b>Q</b><svg><use href="#s-club"/></svg></span></div>
         <div class="phone">
+          <div class="kcall" aria-hidden="true"><span><b>Meet Kelly.</b> This is her hand, dealt today.</span><svg class="arr" viewBox="0 0 120 60"><path d="M4 12 C 46 6, 84 16, 108 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M96 42 L110 47 L108 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="screen">
             <span class="notch"></span>
             <div class="sbar"><span>9:41</span><span>●●●</span></div>
             <div class="apphd"><span class="who"><img class="me" src="assets/people/kelly.jpg" alt="Kelly"><b>Your Hand</b></span><span>Dealt today</span></div>
-            <div class="seg"><i class="on"><svg style="color:#8E2230"><use href="#s-heart"/></svg>13</i><i><svg style="color:#8E2230"><use href="#s-diamond"/></svg>13</i><i><svg><use href="#s-club"/></svg>13</i><i><svg><use href="#s-spade"/></svg>13</i></div>
+            <div class="seg"><i class="on">All</i><i><svg style="color:#8E2230"><use href="#s-heart"/></svg></i><i><svg style="color:#8E2230"><use href="#s-diamond"/></svg></i><i><svg><use href="#s-club"/></svg></i><i><svg><use href="#s-spade"/></svg></i></div>
             <div class="ace"><img class="avatar" src="assets/people/jordan.jpg" alt="Jordan" width="54" height="54" loading="eager"><span><small>Ace of Hearts</small><b>Jordan, 34</b><br><span class="tag">ID verified</span></span></div>
             <div class="grid">
-              <div class="mc"><img class="ph" src="assets/people/ellis.jpg" alt="" loading="lazy"><b>Ellis<em>K</em></b><span>3 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/ryan.jpg" alt="" loading="lazy"><b>Ryan<em>Q</em></b><span>2 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/matteo.jpg" alt="" loading="lazy"><b>Matteo<em>J</em></b><span>5 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/ben.jpg" alt="" loading="lazy"><b>Ben<em>10</em></b><span>4 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/chris.jpg" alt="" loading="lazy"><b>Chris<em>9</em></b><span>6 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/daniel.jpg" alt="" loading="lazy"><b>Daniel<em>8</em></b><span>8 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/luke.jpg" alt="" loading="lazy"><b>Luke<em>7</em></b><span>3 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/nikolai.jpg" alt="" loading="lazy"><b>Nikolai<em>6</em></b><span>9 miles</span></div>
-              <div class="mc"><img class="ph" src="assets/people/joe.jpg" alt="" loading="lazy"><b>Joe<em>5</em></b><span>7 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/ellis.jpg" alt="" loading="lazy"><b>Ellis<em class="k">K<svg><use href="#s-spade"/></svg></em></b><span>3 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/ryan.jpg" alt="" loading="lazy"><b>Ryan<em class="k">Q<svg><use href="#s-club"/></svg></em></b><span>2 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/matteo.jpg" alt="" loading="lazy"><b>Matteo<em class="r">J<svg><use href="#s-diamond"/></svg></em></b><span>5 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/ben.jpg" alt="" loading="lazy"><b>Ben<em class="r">10<svg><use href="#s-heart"/></svg></em></b><span>4 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/chris.jpg" alt="" loading="lazy"><b>Chris<em class="k">9<svg><use href="#s-spade"/></svg></em></b><span>6 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/daniel.jpg" alt="" loading="lazy"><b>Daniel<em class="k">8<svg><use href="#s-club"/></svg></em></b><span>8 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/luke.jpg" alt="" loading="lazy"><b>Luke<em class="r">7<svg><use href="#s-diamond"/></svg></em></b><span>3 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/nikolai.jpg" alt="" loading="lazy"><b>Nikolai<em class="r">6<svg><use href="#s-heart"/></svg></em></b><span>9 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/joe.jpg" alt="" loading="lazy"><b>Joe<em class="k">5<svg><use href="#s-club"/></svg></em></b><span>7 miles</span></div>
             </div>
             <div class="tabbar"><svg class="on"><use href="#i-cards"/></svg><svg><use href="#i-msg"/></svg><svg><use href="#i-chair"/></svg><svg><use href="#i-user"/></svg></div>
           </div>
@@ -471,7 +490,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
 
 <aside class="ribbon" aria-label="About this page"><button type="button" aria-label="Hide this note" onclick="this.parentNode.remove()">×</button><b>Design preview</b>Private draft of the new look. Not linked from the site. <a href="./">Back to the live site</a></aside>
 
-<script src="assets/js/casino-scene.js?v=1792264211"></script>
+<script src="assets/js/casino-scene.js?v=1792264362"></script>
 <script>
 (function () {
   var el = document.getElementById("tableArt");
@@ -479,7 +498,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
   draw();
 })();
 </script>
-<script src="assets/js/gate.js?v=1792264211"></script>
-<script src="assets/js/fx.js?v=1792264211"></script>
+<script src="assets/js/gate.js?v=1792264362"></script>
+<script src="assets/js/fx.js?v=1792264362"></script>
 </body>
 </html>

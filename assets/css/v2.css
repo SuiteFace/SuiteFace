@@ -354,3 +354,34 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .c-stage .screen .mc.back i{display:block;height:100%;border-radius:4px;background:repeating-linear-gradient(45deg,#8E2230 0 5px,#7A1C28 5px 10px);box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 4px #C9A55A}
 .c-stage .screen .mc.back{display:block}
 .c-stage .screen .apphd .who{margin-right:auto}
+/* Your Hand view: mixed suits, All tab */
+.c-stage .screen .seg{grid-template-columns:1.3fr repeat(4,1fr)!important}
+.c-stage .screen .seg i svg{width:11px;height:11px}
+.c-stage .screen .mc b em{display:inline-flex;align-items:center;gap:1px}
+.c-stage .screen .mc b em svg{width:9px;height:9px}
+.c-stage .screen .mc b em.k{color:#23202A}
+.c-stage .screen .mc b em.r{color:#8E2230}
+/* Callout: who is playing */
+.kcall{position:absolute;right:calc(100% - 26px);top:34px;width:210px;display:grid;justify-items:end;gap:2px;color:var(--gold-hi);z-index:3;pointer-events:none}
+.kcall span{font:600 .95rem/1.35 var(--body);color:var(--cream);text-align:right;background:color-mix(in srgb,var(--night) 82%,transparent);padding:8px 12px;border-radius:12px;border:1px solid rgba(201,165,90,.45);box-shadow:0 10px 24px -14px rgba(3,14,10,.5)}
+.kcall span b{color:var(--gold-hi)}
+.kcall .arr{width:96px;height:48px;margin-right:-8px}
+@media (max-width:900px){
+  .kcall{right:auto;left:-6px;top:-74px;width:auto;justify-items:start}
+  .kcall span{text-align:left;font-size:.85rem}
+  .kcall .arr{transform:rotate(55deg);width:60px;height:34px;margin:-2px 0 0 26px}
+}
+.kcall{top:-34px;right:calc(100% - 48px)}
+.c-stage .screen .mc b{gap:4px;white-space:nowrap}
+@media (max-width:900px){
+  .c-stage{margin-top:96px}
+  .kcall{top:-96px;left:-10px;right:auto}
+  .kcall .arr{transform:rotate(68deg);width:84px;height:42px;margin:10px 0 0 4px}
+}
+@media (max-width:480px){.c-stage .screen .mc b{font-size:9px}.c-stage .screen .mc b em svg{width:7px;height:7px}}
+@media (max-width:900px){
+  .c-stage{margin-top:84px}
+  .kcall{top:-84px;left:-14px}
+  .kcall .arr{transform:rotate(70deg);transform-origin:10% 20%;width:128px;height:56px;margin:2px 0 0 30px}
+}
+@media (max-width:900px){.kcall .arr{width:100px;height:48px;margin:-8px 0 0 34px}}
