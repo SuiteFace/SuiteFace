@@ -59,6 +59,7 @@
         else if (!$("sfsOk").checked) err = "Check the box to confirm.";
         $("sfsGo").disabled = !!err; if (show) $("sfsErr").textContent = err; return !err;
       }
+      if ($("sfsDob") && window.SF_getDob && window.SF_getDob()) $("sfsDob").value = window.SF_getDob();
       ["sfsName", "sfsDate", "sfsOk", "sfsDob"].forEach(function (id) { var el = $(id); if (el) { el.addEventListener("input", function () { valid(false); $("sfsErr").textContent = ""; }); el.addEventListener("change", function () { valid(true); }); el.addEventListener("blur", function () { valid(true); }); } });
       function close() { back.remove(); document.removeEventListener("keydown", onKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); }
       function onKey(e) { if (e.key === "Escape") close(); }

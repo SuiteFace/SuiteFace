@@ -244,13 +244,14 @@
               <div><b>Drop a photo or click to upload</b><p class="hint" id="photoHint">JPG, PNG or WebP. It's resized and kept in this browser only while SuiteFace is in preview.</p></div>
             </div>
             <input type="file" id="photo" accept="image/*" hidden>
+            <div class="camrow"><button class="btn gold sm" type="button" id="camBtn">📷 Take a photo now</button><span class="hint">Taken here, live = <b class="livebadge">📷 Live Photo</b> on your card. The <b class="sealbadge">✓ ID Seal</b> still needs a driver's license, state ID or passport.</span></div>
           </div>
           <div class="two">
             <div class="field"><label for="fName">Face Name</label><input type="text" id="fName" maxlength="40" placeholder="Jordan" autocomplete="given-name"><span class="err" id="fNameErr"></span></div>
             <div class="field"><label for="fHandle">Calling Card</label><input type="text" id="fHandle" maxlength="30" placeholder="@jordan.plays" autocomplete="off" spellcheck="false"><span class="err" id="fHandleErr"></span></div>
           </div>
           <div class="two">
-            <div class="field"><label for="fAge">Age</label><input type="text" id="fAge" inputmode="numeric" maxlength="2" placeholder="30"><span class="err" id="fAgeErr"></span></div>
+            <div class="field"><span class="flabel" id="dobLbl">Birthday <small class="hint">(only your age shows)</small></span><div class="dob" role="group" aria-labelledby="dobLbl"><select id="dobM" aria-label="Month"></select><select id="dobD" aria-label="Day"></select><select id="dobY" aria-label="Year"></select></div><span class="hint" id="dobAge"></span><span class="err" id="fAgeErr"></span></div>
             <div class="field"><label for="fZip">Where you are</label>
               <div class="locrow"><input type="text" id="fZip" inputmode="numeric" maxlength="5" placeholder="ZIP" autocomplete="postal-code" aria-label="ZIP code">
               <div class="ac"><input type="text" id="fCityLoc" maxlength="60" placeholder="or city: Mobile, AL" autocomplete="off" aria-label="City" role="combobox" aria-expanded="false"><ul class="aclist" hidden></ul></div></div>

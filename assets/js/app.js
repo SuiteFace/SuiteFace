@@ -148,8 +148,8 @@
 
   /* ---------- profile state ---------- */
   var P = Object.assign({ id: {}, prefs: {}, vis: {},
-    name: "", handle: "", age: "", zip: "", bio: "", photo: "", looking: "serious", show: "everyone",
-    ageMin: 25, ageMax: 40, dist: 25, trumps: ORDER.slice(), felt: "#1E6347", mySuit: "", interests: []
+    name: "", handle: "", age: "", dob: "", zip: "", bio: "", photo: "", looking: "serious", show: "everyone",
+    ageMin: 25, ageMax: 40, dist: 25, trumps: ORDER.slice(), felt: "#1E7A4C", mySuit: "", interests: []
   }, S.get("profile", {}));
   function saveP() { S.set("profile", P); }
 
@@ -444,14 +444,15 @@
 
   /* ---------- profile form ---------- */
   var TABLES = [
-    ["marriage", "Marriage-minded", "#7A1022", "Looking for my forever person"],
-    ["longterm", "Long-term", "#1E6347", "A real relationship that lasts"],
-    ["seeing", "Dating to see", "#8A5A1C", "Open to where it goes"],
-    ["friends", "Friends first", "#14544F", "Start as friends, see what grows"],
-    ["casual", "Casual", "#5B2E4F", "Fun, easygoing, no pressure"],
-    ["open", "Open / ENM", "#2B2730", "Ethically non-monogamous"]
+    ["marriage", "Marriage-minded", "#9B1B30", "Looking for my forever person"],
+    ["longterm", "Long-term", "#1E7A4C", "A real relationship that lasts"],
+    ["seeing", "Dating to see", "#C8961E", "Open to where it goes"],
+    ["friends", "Friends first", "#D2622A", "Start as friends, see what grows"],
+    ["casual", "Casual", "#6E3A9E", "Fun, easygoing, no pressure"],
+    ["open", "Open / ENM", "#C23B7A", "Ethically non-monogamous"]
   ];
   var TABLE = {}; TABLES.forEach(function (t) { TABLE[t[0]] = t; });
+  if (TABLE[P.looking]) P.felt = TABLE[P.looking][2]; /* felt always follows the table */
   var LOOK = TABLES.map(function (t) { return [t[0], t[1]]; });
   if (P.looking === "serious") P.looking = "longterm";
   if (!TABLE[P.looking]) P.looking = "longterm";
@@ -555,14 +556,37 @@
   renderStyle();
   /* Felt now follows the table you pick (what you're looking for). */
 
-  var F = { name: $("#fName"), handle: $("#fHandle"), age: $("#fAge"), zip: $("#fZip"), bio: $("#fBio") };
+  var F = { name: $("#fName"), handle: $("#fHandle"), zip: $("#fZip"), bio: $("#fBio") };
+  /* Birthday: month, day, year. Age is worked out fresh every time, so it goes up on the birthday itself. */
+  function ageFrom(dob) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob || ""); if (!m) return NaN; var t = new Date(), a = t.getFullYear() - +m[1];
+    if (t.getMonth() + 1 < +m[2] || (t.getMonth() + 1 === +m[2] && t.getDate() < +m[3])) a--; return a; }
+  window.SF_ageFrom = ageFrom; window.SF_getDob = function () { return P.dob || ""; };
+  (function () {
+    var MN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var sm = $("#dobM"), sd = $("#dobD"), sy = $("#dobY"), yNow = new Date().getFullYear();
+    sm.innerHTML = '<option value="">Month</option>' + MN.map(function (n, i) { return '<option value="' + (i + 1) + '">' + n + "</option>"; }).join("");
+    sy.innerHTML = '<option value="">Year</option>' + Array.apply(null, Array(83)).map(function (_, i) { var y = yNow - 18 - i; return '<option value="' + y + '">' + y + "</option>"; }).join("");
+    function days() { var mm = +sm.value || 1, yy = +sy.value || 2000, n = new Date(yy, mm, 0).getDate(), keep = sd.value;
+      sd.innerHTML = '<option value="">Day</option>' + Array.apply(null, Array(n)).map(function (_, i) { return '<option value="' + (i + 1) + '">' + (i + 1) + "</option>"; }).join("");
+      if (keep && +keep <= n) sd.value = keep; }
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function sync() { days();
+      P.dob = sm.value && sd.value && sy.value ? sy.value + "-" + pad(+sm.value) + "-" + pad(+sd.value) : "";
+      var a = ageFrom(P.dob); P.age = isNaN(a) ? "" : String(a);
+      $("#dobAge").textContent = isNaN(a) ? "" : "Your card shows " + a + ". It updates on your birthday.";
+      onChange(); }
+    var m0 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(P.dob || ""); days();
+    if (m0) { sy.value = String(+m0[1]); sm.value = String(+m0[2]); days(); sd.value = String(+m0[3]); var a0 = ageFrom(P.dob); P.age = String(a0); $("#dobAge").textContent = "Your card shows " + a0 + ". It updates on your birthday."; }
+    else P.age = "";
+    [sm, sd, sy].forEach(function (s) { s.addEventListener("change", sync); });
+  })();
   Object.keys(F).forEach(function (k) { F[k].value = P[k] || ""; F[k].addEventListener("input", function () { P[k] = F[k].value; if (k === "bio") $("#bioCount").textContent = F[k].value.length; onChange(); }); });
   $("#bioCount").textContent = (P.bio || "").length;
   /* ---------- Build my Face from a social account ---------- */
   (function () {
     var wrap = $("#socBtns"); if (!wrap) return;
     var PROV = {
-      facebook: { name: "Facebook", gets: ["Name", "Profile photo", "Email", "Birthday and hometown (after Meta approves SuiteFace)"], sample: { name: "Jordan", handle: "jordan.k", bio: "Weekend hiker, weeknight cook. Looking for my person to share both.", color: "#3b5bbf" } },
+      facebook: { name: "Facebook", gets: ["Name", "Profile photo", "Email", "Birthday and hometown (after Meta approves SuiteFace)"], sample: { name: "Jordan", handle: "jordan.k", bio: "Weekend hiker, weeknight cook. Looking for my person to share both.", color: "#8E2C3A" } },
       tiktok: { name: "TikTok", gets: ["Display name", "Profile photo", "@username", "Bio"], sample: { name: "Jordan", handle: "jordanmoves", bio: "Dance breaks in the kitchen. Coffee snob. Dog dad.", color: "#2B2730" } },
       snapchat: { name: "Snapchat", gets: ["Display name", "Bitmoji avatar"], sample: { name: "Jordan", handle: "jordsnaps", bio: "", color: "#E8C46A" } },
       x: { name: "X", gets: ["Name", "@username", "Profile photo", "Bio", "Location"], sample: { name: "Jordan", handle: "jordan_k", bio: "Birmingham. Live music, long walks, strong opinions about barbecue.", color: "#4A4552" } },
@@ -590,7 +614,7 @@
         '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="impGo">Use these on my Face</button><button class="btn ghost" type="button" data-close>Cancel</button></div>');
       $("#impGo", m).onclick = function () {
         $$("[data-f]", m).forEach(function (cb) { if (!cb.checked) return; var f = cb.getAttribute("data-f");
-          if (f === "photo") P.photo = samplePhoto(sm.name.charAt(0), sm.color);
+          if (f === "photo") { P.photo = samplePhoto(sm.name.charAt(0), sm.color); P.photoLive = null; }
           if (f === "name") { P.name = sm.name; F.name.value = sm.name; }
           if (f === "handle") { P.handle = "@" + sm.handle; F.handle.value = P.handle; }
           if (f === "bio") { P.bio = sm.bio; F.bio.value = sm.bio; $("#bioCount").textContent = sm.bio.length; } });
@@ -600,6 +624,41 @@
       };
     });
     mark();
+  })();
+  /* ---------- Live Photo: taken in the SuiteFace camera, never uploaded ---------- */
+  (function () {
+    var btn = $("#camBtn"); if (!btn) return;
+    var POSES = ["Give a thumbs up 👍", "Hold up two fingers ✌️", "Touch your ear 👂", "Wave at the camera 👋", "Point up ☝️", "Hand on your chin 🤔", "Big smile, eyes open 😁", "Make an OK sign 👌"];
+    btn.addEventListener("click", function () {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast("This browser can't open the camera. Try Safari or Chrome on your phone."); return; }
+      var pose = POSES[Math.floor(Math.random() * POSES.length)], stream = null, shot = null;
+      var m = modal('<p class="eyebrow">Live Photo</p><h3 style="font-size:2rem">Strike the pose</h3>' +
+        '<div class="cam"><video id="camV" playsinline autoplay muted></video><canvas id="camC" hidden></canvas><div class="camring"></div><div class="campose" id="camPose">' + esc(pose) + '</div><div class="camcount" id="camN" hidden></div></div>' +
+        '<p class="hint" id="camMsg">Good light, face the camera, and do the pose. A new pose is picked every time so the photo is taken right now, by you.</p>' +
+        '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="camShot" disabled>Take it (3 · 2 · 1)</button><button class="btn ghost" type="button" id="camUse" hidden>Use this photo</button><button class="btn ghost" type="button" id="camRe" hidden>Retake</button></div>' +
+        '<p class="hint" style="margin-top:8px">📷 Live Photo means it was taken in SuiteFace just now, not uploaded or edited. It is not ID verification: only the ✓ ID Seal (license, state ID or passport plus selfie, through Stripe Identity) verifies who you are and unlocks A, K, Q and J.</p>');
+      var v = $("#camV", m), c = $("#camC", m);
+      function stop() { if (stream) stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; }
+      var obs = new MutationObserver(function () { if (!document.body.contains(m)) { stop(); obs.disconnect(); } }); obs.observe(document.body, { childList: true, subtree: true });
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 960 }, height: { ideal: 960 } }, audio: false })
+        .then(function (s) { stream = s; v.srcObject = s; $("#camShot", m).disabled = false; })
+        .catch(function () { $("#camMsg", m).innerHTML = "<b>Camera blocked.</b> Allow camera access for suiteface.com in your browser settings, then try again. You can still upload a photo, but it won't get the Live Photo badge."; });
+      $("#camShot", m).addEventListener("click", function () {
+        var n = 3, el = $("#camN", m), b = this; b.disabled = true; el.hidden = false; el.textContent = n;
+        var t = setInterval(function () { n--; if (n > 0) { el.textContent = n; return; } clearInterval(t); el.hidden = true;
+          var sz = 480, w = v.videoWidth, h = v.videoHeight, mm = Math.min(w, h); c.width = c.height = sz; var x = c.getContext("2d");
+          x.translate(sz, 0); x.scale(-1, 1); x.drawImage(v, (w - mm) / 2, (h - mm) / 2, mm, mm, 0, 0, sz, sz);
+          shot = c.toDataURL("image/jpeg", .86); v.hidden = true; c.hidden = false;
+          $("#camUse", m).hidden = false; $("#camRe", m).hidden = false; b.hidden = true; }, REDUCED ? 300 : 800);
+      });
+      $("#camRe", m).addEventListener("click", function () { pose = POSES[Math.floor(Math.random() * POSES.length)]; $("#camPose", m).textContent = pose;
+        v.hidden = false; c.hidden = true; shot = null; this.hidden = true; $("#camUse", m).hidden = true; var s = $("#camShot", m); s.hidden = false; s.disabled = false; });
+      $("#camUse", m).addEventListener("click", function () {
+        if (!shot) return; P.photo = shot; P.photoLive = { at: new Date().toISOString(), pose: pose };
+        if (window.SF_LIVE && window.SF_LIVE.setPhoto) window.SF_LIVE.setPhoto(shot, "live", pose);
+        stop(); saveP(); onChange(); closeModal(); toast("📷 Live Photo added to your card.");
+      });
+    });
   })();
   var ageMin = $("#fAgeMin"), ageMax = $("#fAgeMax"), dist = $("#fDist");
   ageMin.value = P.ageMin; ageMax.value = P.ageMax; dist.value = P.dist;
@@ -650,7 +709,7 @@
       img.onload = function () {
         var c = document.createElement("canvas"), sz = 360; c.width = c.height = sz;
         var m = Math.min(img.width, img.height); c.getContext("2d").drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, sz, sz);
-        P.photo = c.toDataURL("image/jpeg", .84); onChange(); toast("Portrait added.");
+        P.photo = c.toDataURL("image/jpeg", .84); P.photoLive = null; onChange(); toast("Portrait added. Want the 📷 Live Photo badge? Use Take a photo now.");
       };
       img.onerror = function () { toast("Couldn't read that image. Try another file."); };
       img.src = r.result;
@@ -668,9 +727,9 @@
         /^\.|\.$|\.\./.test(h) ? "Dots can't start, end or repeat." :
           RESERVED.indexOf(h) > -1 ? "That Calling Card is reserved. Try another." : "";
     set("fHandleErr", hm);
-    var a = parseInt(P.age, 10);
+    var a = ageFrom(P.dob); P.age = isNaN(a) ? "" : String(a);
     set("fZipErr", !P.zip ? "Add your ZIP code so we can find people near you." : !/^\d{5}$/.test(P.zip) ? "Use a 5-digit ZIP code." : (zipReady && !ZIPS[P.zip]) ? "We couldn't find that ZIP code. Check it and try again." : "");
-    set("fAgeErr", !P.age ? "Add your age." : isNaN(a) ? "Use numbers only." : a < 18 ? "SuiteFace is for adults 18 and over." : a > 99 ? "Check your age." : "");
+    set("fAgeErr", !P.dob ? "Pick your month, day and year." : a < 18 ? "SuiteFace is for adults 18 and over." : a > 100 ? "Check your birthday." : "");
     return ok;
   }
   function strength() {
@@ -685,7 +744,7 @@
     $("#myCard").style.setProperty("--felt-c", P.felt);
     var thm = THEME[P.theme] || THEME.classic; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
-      '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + "</div>" +
+      '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +
       '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" +
       '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" +
       '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? "<span>" + k[1] + "</span>" : ""; }).join("") + "</div>";
@@ -706,7 +765,7 @@
   });
   $("#faceForm").addEventListener("input", function () { if ($("#faceForm .err:not(:empty)")) validate(true); });
   $("#faceReset").addEventListener("click", function () {
-    var keep = { trumps: ORDER.slice() }; P = Object.assign({ name: "", handle: "", age: "", zip: "", bio: "", photo: "", looking: "longterm", show: "everyone", ageMin: 25, ageMax: 40, dist: 25, felt: "#1E6347", mySuit: "", interests: [] }, keep);
+    var keep = { trumps: ORDER.slice() }; P = Object.assign({ name: "", handle: "", age: "", zip: "", bio: "", photo: "", looking: "longterm", show: "everyone", ageMin: 25, ageMax: 40, dist: 25, felt: "#1E7A4C", mySuit: "", interests: [] }, keep);
     saveP(); location.hash = "face"; location.reload();
   });
 
@@ -1563,16 +1622,27 @@
   }
   function geolocate(btn) {
     if (!zipReady) { toast("ZIP codes are still loading. Try again in a moment."); return; }
-    if (!navigator.geolocation) { toast("This browser can't share location. Enter your ZIP or city instead."); return; }
-    var old = btn.textContent; btn.disabled = true; btn.textContent = "Finding you…";
+    var inFrame = window.top !== window.self;
+    if (!navigator.geolocation || !window.isSecureContext) { locHelp(btn, "This page can't use location. Open suiteface.com in Safari or Chrome, or enter your ZIP or city."); return; }
+    var old = btn.textContent, done = false; btn.disabled = true; btn.textContent = "Finding you…";
+    function finish() { done = true; clearTimeout(dog); btn.disabled = false; btn.textContent = old; }
+    var dog = setTimeout(function () { if (done) return; finish();
+      locHelp(btn, inFrame ? "Location doesn't work inside this preview window. Open suiteface.com directly, or enter your ZIP or city."
+        : "Your browser didn't answer. Check that location is turned on for your device and allowed for suiteface.com, then try again. Or just enter your ZIP or city."); }, 12000);
     navigator.geolocation.getCurrentPosition(function (pos) {
-      btn.disabled = false; btn.textContent = old;
+      if (done) return; finish();
       var z = nearestZip(pos.coords.latitude, pos.coords.longitude);
-      if (z) setLocation(z, "Current location"); else toast("You look to be outside the US. Enter a US ZIP or city instead.");
+      if (z) setLocation(z, "Current location"); else locHelp(btn, "You look to be outside the US. Enter a US ZIP or city instead.");
     }, function (err) {
-      btn.disabled = false; btn.textContent = old;
-      toast(err && err.code === 1 ? "Location is blocked for this site. Allow it in your browser, or enter your ZIP or city." : "Couldn't get your location. Enter your ZIP or city instead.");
+      if (done) return; finish();
+      locHelp(btn, err && err.code === 1 ? (inFrame ? "Location is blocked inside this preview window. Open suiteface.com directly, or enter your ZIP or city."
+        : "Location is blocked for suiteface.com. Tap the lock or ⓘ next to the web address, set Location to Allow, then try again. Or enter your ZIP or city.")
+        : "Couldn't pin down your location. Turn on Location Services for your device, or enter your ZIP or city.");
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+  }
+  function locHelp(btn, msg) {
+    var h = btn.parentElement.querySelector(".lochelp"); if (!h) { h = document.createElement("p"); h.className = "lochelp"; h.setAttribute("role", "status"); btn.insertAdjacentElement("afterend", h); }
+    h.textContent = msg; toast(msg); var z = $("#fZip"); if (z && btn.closest("form, .field, .two")) z.focus();
   }
   function wireCityInput(inp, onPick) {
     var ul = inp.parentElement.querySelector(".aclist");
