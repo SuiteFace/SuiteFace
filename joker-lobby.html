@@ -185,7 +185,8 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
           <li><span>4</span><p><b>45 days.</b> A Joker you make shows on their card for 45 days.</p></li>
           <li><span>5</span><p><b>12 per account, ever.</b> One Joker per person. Spend them wisely.</p></li>
           <li><span>6</span><p><b>They can fight back.</b> A free challenge removes it if you two never had a hand together on SuiteFace.</p></li>
-          <li><span>7</span><p><b>Safety isn't a game.</b> Threats, assault or stalking go to <a href="./#join">Report a safety concern</a>, straight to staff.</p></li>
+          <li><span>7</span><p><b>You didn't build their Face.</b> You swear you didn't create their profile, don't know anyone who did, and found their card yourself.</p></li>
+          <li><span>8</span><p><b>Safety isn't a game.</b> Threats, assault or stalking go to <a href="./#join">Report a safety concern</a>, straight to staff.</p></li>
         </ol>
       </div>
       <div class="ticket">
@@ -234,7 +235,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
             <h3><i>3</i>Tell it straight</h3>
             <label class="sr" for="statement">Your statement</label>
             <textarea id="statement" placeholder="What happened, in your own words (at least 20 characters)."></textarea>
-            <label class="agree"><input type="checkbox" id="attest"> <span>I assert this is <b>true</b> and comes from my own <b>first-hand, direct experience</b> with this person.</span></label>
+            <label class="agree"><input type="checkbox" id="attest"> <span>I assert this is <b>true</b>, from my own <b>first-hand, direct experience</b>. I did not create this profile, and I don't know of anyone who created it to target this person. I found this card myself, in my deck or here in the lobby. (You'll sign the full Joker Attestation next.)</span></label>
             <label class="fine" style="display:block">Evidence (optional): <input type="file" id="evidence" multiple accept="image/*,.pdf"></label>
           </div>
           <div style="text-align:center">
@@ -283,7 +284,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
 
 <footer>
   <div class="wrap">
-    <p>SuiteFace Inc. · Lobby entries and removals are non-refundable. Jokers apply to SuiteFace members only and show for 45 days. Every Joker can be challenged. Safety concerns go to staff, never through the lobby.</p>
+    <p>SuiteFace Inc. · Lobby entries and removals are non-refundable. Jokers apply to SuiteFace members only and show for 45 days. Every Joker can be challenged. Safety concerns go to staff, never through the lobby. <a href="terms.html#6-jokers-and-the-joker-maker-lobby">Terms, Section 6</a>.</p>
     <p style="margin-top:8px"><a href="./">Back to the card room</a></p>
   </div>
 </footer>
@@ -292,6 +293,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="assets/js/config.js"></script>
+<script src="assets/js/sign.js"></script>
 <script>
 (function(){
   var C = window.SUITEFACE_CONFIG || {};
@@ -329,7 +331,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
   pay.addEventListener("click", function(e){
     e.preventDefault();
     if(!agree.checked){ toast("Tick the agreement first. The $210 entry is non-refundable."); return; }
-    location.href = withRef(LINKS.entry);
+    window.SFSign.require("lobby", function(){ location.href = withRef(LINKS.entry); });
   });
   $("#payRemoval").href = withRef(LINKS.removal);
   $("#payBuyout").href = withRef(LINKS.buyout);
@@ -370,12 +372,15 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
   ["#statement","#attest"].forEach(function(s){ $(s).addEventListener("input", check); $(s).addEventListener("change", check); });
   function check(){ $("#deal").disabled = !(picked && chosen.length && $("#statement").value.trim().length>=20 && $("#attest").checked && used<12); }
   $("#deal").onclick=function(){
+    window.SFSign.require("attest", reveal, { about: picked[0]+" (@"+picked[1]+")" });
+  };
+  function reveal(){
     $("#cardName").textContent=picked[0]; var st=$("#stage"); st.hidden=false; var card=$("#card"); card.classList.remove("flip");
     st.scrollIntoView({behavior:"smooth",block:"center"});
     setTimeout(function(){ card.classList.add("flip"); burst(); }, 500);
     used++; drawCounter(); check();
     toast("🃏 "+picked[0]+" is a Joker for 45 days (demo, not saved).");
-  };
+  }
   function burst(){ var c=$("#confetti"); var cols=["#C8102E","#E8C46A","#B7D35A","#7A3A92","#2F8A62"]; for(var i=0;i<70;i++){ var p=document.createElement("i"); p.style.left=(Math.random()*100)+"vw"; p.style.background=cols[i%cols.length]; p.style.animationDelay=(Math.random()*.6)+"s"; p.style.transform="rotate("+(Math.random()*360)+"deg)"; c.appendChild(p); setTimeout(function(el){ return function(){ el.remove(); }; }(p), 3400); } }
   $("#tour").onclick=function(){ $("#floor").hidden=false; $("#modePill").textContent="Demo tour"; $("#floor").scrollIntoView({behavior:"smooth"}); };
 })();

@@ -563,7 +563,7 @@
   /* ---------- your Joker status ---------- */
   function renderJokerStatus() {
     var el = $("#jokerStatus"); if (!el) return;
-    el.innerHTML = '<div class="jstat"><span class="jhat sm">' + BRAND.hat + '</span><div><b>Your Joker status is private</b><p class="hint">Members you meet can see a Joker meter on your card (0/10 up to 9/10) built from confirmed dates in the last 180 days. You won\'t see your own count. If it reaches 10, Judges review it before your card becomes a public Joker for 180 days. You\'ll be told then, and you can appeal or use the $2,100 buy-out. Safety reports are separate and can never be bought out.</p><button class="btn ghost sm" type="button" id="buyout">Joker buy-out · $2,100</button></div></div>';
+    el.innerHTML = '<div class="jstat"><span class="jhat sm">' + BRAND.hat + '</span><div><b>Your Joker status is private</b><p class="hint">Members you meet can see a Joker meter on your card (0/10 up to 9/10) built from confirmed dates. You won\'t see your own count. At 10, your card shows JOKER for 45 days; the first 15 days are probation, then you can clear it for $2,100 or wait it out. Any Joker can be challenged for free. Safety reports are separate and can never be bought out.</p><button class="btn ghost sm" type="button" id="buyout">Joker buy-out · $2,100</button></div></div>';
     $("#buyout").addEventListener("click", function () {
       if (CFG.stripeJokerBuyoutLink) { window.location.href = CFG.stripeJokerBuyoutLink; return; }
       modal('<h3 style="font-size:1.8rem">Joker buy-out</h3><p class="lede" style="margin:8px 0">This only applies once your card is a public Joker. Then this button opens a $2,100.00 Stripe checkout that resets it.</p><div class="notice pv"><b>Preview mode.</b> Checkout isn\'t connected yet. Site owner: add the Stripe link in <code>assets/js/config.js</code>.</div>');
@@ -574,7 +574,7 @@
   function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."; $("#agree").focus(); return false; }
   $("#payBtn").addEventListener("click", function (e) {
     e.preventDefault(); if (!needAgree()) return;
-    if (CFG.stripePaymentLink) { window.location.href = CFG.stripePaymentLink; return; }
+    if (CFG.stripePaymentLink) { var go = function () { window.location.href = CFG.stripePaymentLink; }; if (window.SFSign) window.SFSign.require("buyin", go); else go(); return; }
     modal('<h3 style="font-size:1.8rem">Checkout preview</h3><div class="pricing" style="margin:12px 0"><div><span class="big">$21.00</span><span class="hint">today</span></div><div class="plus">+</div><div><span class="big">$2.10</span><span class="hint">monthly after</span></div></div><div class="notice pv"><b>Preview mode.</b> Stripe checkout isn\'t connected yet, so no payment was taken. Site owner: paste your Stripe Payment Link into <code>assets/js/config.js</code>.</div><button class="btn gold sm" type="button" id="simBuy" style="margin-top:12px">Simulate a paid Buy-In (demo)</button>');
     $("#simBuy").addEventListener("click", function () { closeModal(); setRole("player"); toast("Buy-In complete (demo). Welcome to the table!"); jackpot(4000); burst(innerWidth / 2, innerHeight / 3, 120); location.hash = "face"; });
   });
