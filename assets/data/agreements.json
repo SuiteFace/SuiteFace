@@ -1,21 +1,36 @@
 {
  "signup": {
+  "letter": "A",
   "title": "Sign-up Agreement",
+  "when": "At sign-up",
   "version": "1.0",
   "html": "<p>I confirm that:</p>\n<ol>\n<li><strong>I am 18 years of age or older</strong>, and the date of birth I entered is true.</li>\n<li>I have read and agree to the <strong>SuiteFace Terms of Service</strong> and <strong>Privacy Policy</strong>, including <strong>individual arbitration and the class-action waiver</strong> (I may opt out within 30 days).</li>\n<li><strong>SuiteFace does not guarantee or promote any relationship, match or outcome.</strong> My membership is at will.</li>\n<li><strong>SuiteFace does not run criminal background checks</strong> on members.</li>\n<li><strong>Meeting strangers carries risk, and harm can happen.</strong> I accept that risk. I will meet in public places, tell someone where I am going, arrange my own transportation, never meet in a private place for a first date, and <strong>call 911 in an emergency</strong>.</li>\n<li>I have never been convicted of a violent or sexual crime and am not required to register as a sex offender.</li>\n<li>Everything I put on my profile is true, I created it myself, and I will keep only one account.</li>\n</ol>"
  },
  "buyin": {
+  "letter": "B",
   "title": "Buy-In and Membership Agreement",
+  "when": "Before the $21 Buy-In",
   "version": "1.0",
   "html": "<ol>\n<li>I authorize SuiteFace Inc. to charge <strong>$21.00 today</strong> for my Buy-In, which includes my first 30 days.</li>\n<li><strong>I authorize a recurring charge of $2.10 every month, starting 30 days from today, until I cancel.</strong> I can cancel anytime online in Settings.</li>\n<li>A pause longer than <strong>21 days</strong> ends my membership, and returning requires a new $21.00 Buy-In.</li>\n<li>Charges are <strong>non-refundable</strong> except where the law requires.</li>\n<li>Contact with other members requires an active paid membership.</li>\n</ol>"
  },
  "lobby": {
+  "letter": "C",
   "title": "Joker Maker Lobby Entry Agreement",
+  "when": "Before each $210 lobby entry",
   "version": "1.0",
   "html": "<ol>\n<li><strong>This $210.00 buys one entry to the Joker Maker Lobby. It is an access fee only.</strong></li>\n<li>It <strong>does not purchase, guarantee or influence any Joker</strong>, and it is <strong>non-refundable for any reason</strong>, including if I make no Joker or a Joker is challenged or removed.</li>\n<li>I may only make Jokers about SuiteFace members, from my own first-hand experience.</li>\n<li>Safety concerns belong in <strong>Report a safety concern</strong>, not the lobby.</li>\n</ol>"
  },
+ "release": {
+  "letter": "E",
+  "title": "Release, Waiver and Hold Harmless Agreement",
+  "when": "At sign-up",
+  "version": "1.0",
+  "html": "<p>In exchange for being allowed to use SuiteFace, I agree that:</p>\n<ol>\n<li><strong>I understand the risks.</strong> Meeting people I don't know, online or in person, can lead to emotional harm, financial loss, theft, physical injury, sexual assault or worse. <strong>I voluntarily assume all of these risks</strong>, known and unknown.</li>\n<li><strong>I am responsible for my own safety and choices</strong>, including whether, when, where and how I meet anyone, and what I share. In an emergency I will <strong>call 911</strong>.</li>\n<li><strong>I release SuiteFace Inc.</strong>, its owners, officers, employees, contractors and agents from all claims, demands, losses and damages arising from my use of SuiteFace or from the conduct of any member or other person I meet through it, to the fullest extent the law allows.</li>\n<li><strong>I will hold harmless, defend and indemnify SuiteFace Inc.</strong> against any claim, loss, cost or damages (including reasonable attorneys' fees) arising from my conduct, my content, any Joker or statement I make, or my breach of the Terms or the law.</li>\n<li><strong>I won't sue SuiteFace Inc.</strong> over another member's conduct, and any dispute I do have goes to individual arbitration as the Terms describe (unless I opt out within 30 days).</li>\n<li>This release doesn't cover anything the law in my state won't allow to be released, such as SuiteFace's own gross negligence or intentional misconduct where that protection applies. If any part can't be enforced, the rest still applies.</li>\n<li><strong>I have read this release, I understand I am giving up legal rights, and I sign it voluntarily.</strong></li>\n</ol>"
+ },
  "attest": {
+  "letter": "D",
   "title": "Joker Attestation",
+  "when": "For every Joker",
   "version": "1.0",
   "html": "<p>About the member named in my Joker, I swear that:</p>\n<ol>\n<li><strong>This Joker is true</strong> and comes from <strong>my own first-hand, direct experience</strong> with this member, not from rumor or anyone else's account.</li>\n<li><strong>I did not create this member's profile or account</strong>, I did not help anyone create it, and <strong>I have no knowledge of a friend or any other person creating it</strong> in order to target this member.</li>\n<li><strong>I discovered this member's card on SuiteFace on my own</strong>, while viewing my deck (my best hand) or while searching in the Joker Maker Lobby.</li>\n<li>I am not acting with, or on behalf of, anyone else, and this is not retaliation for a Joker or report made about me.</li>\n<li>The reasons I selected and my statement are accurate, and any evidence I upload is genuine and unaltered.</li>\n<li><strong>I take full ownership of this Joker and its claims.</strong> I understand I may be legally responsible if it is false, and I agree to defend and repay SuiteFace Inc. for any claim that results.</li>\n<li>If any of this is untrue, SuiteFace may remove the Joker, close my account and keep any fees I paid.</li>\n</ol>"
  }
