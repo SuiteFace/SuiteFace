@@ -165,6 +165,8 @@ h2{font-size:clamp(1.9rem,5vw,2.9rem);margin:.25rem 0 .7rem}
 .rope{height:16px;margin:16px -22px;background:repeating-linear-gradient(90deg,#8e1222 0 14px,#b4182f 14px 28px);border-radius:8px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.3)}
 .agree{display:flex;gap:10px;text-align:left;align-items:flex-start;font-size:.95rem;color:var(--cream-dim);margin:12px 0}
 .agree input{width:22px;height:22px;margin-top:2px;accent-color:var(--gold)}
+li.bf{border:1px solid rgba(229,80,94,.55);background:rgba(155,27,48,.16);border-radius:14px;padding:8px 10px}
+li.bf span{background:#9B1B30!important;color:#FFF4D6!important}
 .btn{appearance:none;border:0;cursor:pointer;font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:1.15rem;padding:.85rem 1.4rem;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none;transition:transform .15s,filter .15s}
 .btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
 .btn[aria-disabled="true"],.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
@@ -221,7 +223,7 @@ textarea{min-height:110px;resize:vertical}
 footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);border:1px solid var(--gold);color:var(--cream);padding:12px 18px;border-radius:12px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:min(92vw,520px)}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792270331">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792270856">
 <link rel="canonical" href="https://suiteface.com/joker-lobby.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SuiteFace">
@@ -267,6 +269,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
           <li><span>4</span><p><b>45 days.</b> A Joker you make shows on their card for 45 days.</p></li>
           <li><span>5</span><p><b>12 per account, ever.</b> One Joker per person. Spend them wisely.</p></li>
           <li><span>6</span><p><b>They can fight back.</b> A free challenge removes it if you two never had a hand together on SuiteFace.</p></li>
+          <li class="bf"><span>💥</span><p><b>Lie, and it backfires.</b> If your Joker is found false or unjustified, by our records or by the house, <b>you become the Joker for 45 days</b>. No challenge, no appeal, no buyout, no pause, no new hands, and <b>no refunds, ever</b>. The house's call is final.</p></li>
           <li><span>7</span><p><b>You didn't build their Face.</b> You swear you didn't create their profile, don't know anyone who did, and found their card yourself.</p></li>
           <li><span>8</span><p><b>Safety isn't a game.</b> Threats, assault or stalking go to <a href="./#join">Report a safety concern</a>, straight to staff.</p></li>
         </ol>
@@ -275,7 +278,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
         <div class="eyebrow">Admission</div>
         <div class="price">$210<small>One lobby entry</small></div>
         <div class="rope" aria-hidden="true"></div>
-        <label class="agree"><input type="checkbox" id="agree"> <span>I understand the $210 buys <b>one entry to the lobby only</b>. It does not guarantee any Joker and is <b>non-refundable for any reason</b>, including if no Joker is made or a Joker is later removed or challenged.</span></label>
+        <label class="agree"><input type="checkbox" id="agree"> <span>I understand the $210 buys <b>one entry to the lobby only</b>. It does not guarantee any Joker and is <b>non-refundable for any reason</b>, including if no Joker is made or a Joker is later removed or challenged. I agree that <b>a false or unjustified Joker backfires on me</b>: I become a Joker for 45 days with no way to clear it, and the house's decision is final (Terms 6.5b and 6.10).</span></label>
         <a class="btn gold" id="payEntry" href="#" aria-disabled="true">🎟️ Pay $210 &amp; enter</a>
         <p class="fine">Secure checkout by Stripe. Card, Apple Pay and Cash App Pay accepted.</p>
         <button class="btn ghost" id="tour" type="button" style="margin-top:12px">Take the demo tour</button>
@@ -325,7 +328,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
             <h3><i>3</i>Tell it straight</h3>
             <label class="sr" for="statement">Your statement</label>
             <textarea id="statement" placeholder="What happened, in your own words (at least 20 characters)."></textarea>
-            <label class="agree"><input type="checkbox" id="attest"> <span>I assert this is <b>true</b>, from my own <b>first-hand, direct experience</b>. I did not create this profile, and I don't know of anyone who created it to target this person. I found this card myself, in my deck or here in the lobby. (You'll sign the full Joker Attestation next.)</span></label>
+            <label class="agree"><input type="checkbox" id="attest"> <span>I assert this is <b>true</b>, from my own <b>first-hand, direct experience</b>. I did not create this profile, and I don't know of anyone who created it to target this person. I found this card myself, in my deck or here in the lobby. <b>If it's found false or unjustified, it backfires: I become the Joker for 45 days, final, with no refunds.</b> (You'll sign the full Joker Attestation next.)</span></label>
             <label class="fine" style="display:block">Evidence (optional): <input type="file" id="evidence" multiple accept="image/*,.pdf"></label>
           </div>
           <div style="text-align:center">
@@ -381,7 +384,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
           <label class="jkf"><span>Tell it straight <small>(optional)</small></span><textarea id="chalWhat" maxlength="1000" placeholder="Anything we should know."></textarea></label>
           <div class="sticks"><b>A lobby Joker sticks only if all six are true:</b>
             <ol><li>You and the maker had a direct connection on SuiteFace (a Play, a Pair or a Play Hand).</li><li>The maker signed the first-hand attestation.</li><li>You hadn't blocked or reported the maker before the Joker.</li><li>It isn't payback for your own Joker or report on them in the 14 days before.</li><li>You two never both called a date a Win.</li><li>The maker's account is open and they aren't currently a Joker.</li></ol>
-            <p><b>If any one isn't true, or your situation isn't listed, the challenge is accepted and the Joker comes off.</b></p></div>
+            <p><b>If any one isn't true, the challenge is accepted and the Joker comes off.</b> Chose "Something else"? The house reviews it, and if the Joker was false it comes off and backfires on its maker.</p></div>
           <button class="btn gold" type="button" id="chalGo">Submit challenge</button>
           <p class="fine" id="chalOut" role="status"></p>
         </div>
@@ -400,8 +403,8 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script src="assets/js/config.js?v=1792270331"></script>
-<script src="assets/js/sign.js?v=1792270331"></script>
+<script src="assets/js/config.js?v=1792270856"></script>
+<script src="assets/js/sign.js?v=1792270856"></script>
 <script>
 (function(){
   var C = window.SUITEFACE_CONFIG || {};
@@ -514,14 +517,14 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
     if(!live){ out.textContent="Preview: on suiteface.com SuiteFace checks its records right away. In this demo the reason \""+$("#chalWhy").selectedOptions[0].text+"\" doesn't meet all six ways a Joker sticks, so the challenge is accepted and the Joker comes off."; burst && burst(); return; }
     window.SF_LIVE.rpc("challenge_joker",{paid_joker:window.SF_LIVE.activeLobbyJoker(),p_reason:why,statement:what}).then(function(r){
       if(r.error){ out.textContent=r.error.message; return; }
-      out.textContent = r.data.result==="removed" ? "Challenge accepted: "+r.data.because+". The Joker is off your card." : r.data.next; });
+      out.textContent = r.data.result==="removed" ? "Challenge accepted: "+r.data.because+". The Joker is off your card."+(r.data.backfire?" It was false, so it backfired: the member who made it is now a Joker for 45 days.":"") : r.data.next; });
   };
   $("#tour").onclick=function(){ $("#floor").hidden=false; $("#modePill").textContent="Demo tour"; $("#floor").scrollIntoView({behavior:"smooth"}); };
 })();
 </script>
-<script src="assets/js/live.js?v=1792270331"></script>
-<script src="assets/js/gate.js?v=1792270331"></script>
-<script src="assets/js/fx.js?v=1792270331"></script>
+<script src="assets/js/live.js?v=1792270856"></script>
+<script src="assets/js/gate.js?v=1792270856"></script>
+<script src="assets/js/fx.js?v=1792270856"></script>
 <p class="sf-credit" style="margin:0;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));text-align:center;font:600 .85rem/1.5 Figtree,system-ui,sans-serif;color:var(--muted,#A69DB0)">U.S. patent pending (USPTO). Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--gold-hi,#E8C46A);text-decoration:none;font-weight:800">GoFirehorseGo</a>.</p>
 </body>
 </html>

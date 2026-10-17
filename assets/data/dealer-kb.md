@@ -223,9 +223,18 @@ SuiteFace checks the challenge **automatically** against its own records, with n
 5. You and the maker **never both called a date a Win**.
 6. The maker's **account is open** and the maker is **not currently a Joker**.
 
-**If any one of them is not true, or the situation isn't covered by this list, the challenge is accepted and the Joker is removed right away.** If the Joker sticks, you can still clear it for $210.00 (Section 6.6) or wait for it to end after 45 days. A challenge never affects safety reports, which staff handle separately.
+**If any one of them is not true, the challenge is accepted and the Joker is removed right away.** If you choose **Something else**, SuiteFace staff review your challenge and decide (Section 6.10). If the Joker sticks, you can still clear it for $210.00 (Section 6.6) or wait for it to end after 45 days. A challenge never affects safety reports, which staff handle separately.
 
 **6.5a Joker's entrance.** A member who currently has a Joker may enter the Joker Maker Lobby free, using their own @tag and the access code from their Joker notice, to see, challenge or clear their Joker. This entrance doesn't allow making Jokers. Making a Joker always requires a $210.00 lobby entry.
+
+**6.5b Backfire: a false Joker turns on its maker.** A lobby Joker **backfires** when it comes off because it was false or unjustified, meaning either (a) SuiteFace's records show you never played a hand together, the member had blocked or reported the maker first, it was payback, or you both called your date a Win; or (b) SuiteFace staff decide, after reviewing a challenge, that it was false or not justified under the house Joker reasons and these Terms. When a Joker backfires:
+
+- **the member who made it becomes a Joker for 45 days**, starting immediately, and their card shows JOKER;
+- a Backfire Joker **can't be challenged, appealed, bought out, cleared, paused or hidden**;
+- until it ends, the maker **can't be dealt new hands, make Jokers or pause their membership**; and
+- **nothing is refunded, ever**, including the lobby entry, membership charges or any other purchase, except where a law that can't be waived requires a refund.
+
+A Backfire is in addition to any other action under Section 5 and to the maker's own legal responsibility under Section 6.4.
 
 **6.6 Removing a lobby Joker.** A member may remove a lobby Joker immediately for **$210.00**. They are then protected from new lobby Jokers for **45 days**.
 
@@ -234,6 +243,8 @@ SuiteFace checks the challenge **automatically** against its own records, with n
 **6.8 Safety is separate.** Threats, violence, sexual misconduct, stalking or anything that made you feel unsafe must go to **Report a safety concern**, not the lobby. Safety outcomes can't be bought out.
 
 **6.9 Members only.** Jokers may only be made about SuiteFace members. Don't submit information about anyone who isn't a member.
+
+**6.10 House decisions are final.** Every decision about Jokers, challenges and Backfires is made by SuiteFace Inc. and the staff, contractors and affiliates it authorizes, **in their sole and absolute discretion, using their own subjective judgment**. These decisions are **final and binding** and aren't subject to further review, appeal or reversal within SuiteFace. They're judgment calls about our own community rules, not findings of fact, and SuiteFace isn't required to explain them beyond the outcome. **To the fullest extent the law allows, you waive any claim against SuiteFace Inc. and its staff, contractors and affiliates arising from a Joker, challenge or Backfire decision**, in any court or forum in any state or other jurisdiction of the United States. Any dispute you still have goes only to individual arbitration under Section 9, with no class or jury.
 
 ## 7. Privacy, location, messages and your account
 
@@ -330,6 +341,9 @@ I confirm that:
 2. It **does not purchase, guarantee or influence any Joker**, and it is **non-refundable for any reason**, including if I make no Joker or a Joker is challenged or removed.
 3. I may only make Jokers about SuiteFace members, from my own first-hand experience.
 4. Safety concerns belong in **Report a safety concern**, not the lobby.
+5. **If a Joker I make is found false or unjustified**, by SuiteFace's records or by its staff's review, **it backfires on me: I become a Joker for 45 days**, and I can't challenge, appeal, buy out, clear, pause or hide it, be dealt new hands, or make Jokers until it ends (Terms 6.5b).
+6. **No refunds, ever**, of my lobby entry, membership or any other purchase because of a Backfire, except where a law that can't be waived requires one.
+7. **SuiteFace's staff, contractors and authorized affiliates decide Jokers, challenges and Backfires in their sole, absolute and subjective discretion, and their decision is final.** To the fullest extent the law allows, I waive any claim over those decisions in any court or forum in the United States, and any dispute I still have goes only to individual arbitration (Terms 6.10 and 9).
 
 ### E. Release, Waiver and Hold Harmless Agreement (signed at sign-up)
 
@@ -354,6 +368,7 @@ About the member named in my Joker, I swear that:
 5. The reasons I selected and my statement are accurate, and any evidence I upload is genuine and unaltered.
 6. **I take full ownership of this Joker and its claims.** I understand I may be legally responsible if it is false, and I agree to defend and repay SuiteFace Inc. for any claim that results.
 7. If any of this is untrue, SuiteFace may remove the Joker, close my account and keep any fees I paid.
+8. **If this Joker is found false or unjustified, it backfires on me:** I become a Joker for 45 days with no challenge, appeal, buyout, pause or refund, and the house's decision is final (Terms 6.5b and 6.10).
 
 ### F. Business Partner and ZIP Sponsor Agreement (signed before any House Partner or ZIP Sponsor checkout)
 

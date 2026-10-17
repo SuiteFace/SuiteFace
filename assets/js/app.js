@@ -359,6 +359,15 @@
       };
       hl.onclick = function (e) { var b = e.target.closest("[data-clear]"); if (!b || !confirm("Clear this account to be dealt a deck?")) return; window.SF_LIVE.rpc("clear_review_hold", { p_member: b.getAttribute("data-clear") }).then(function (r) { if (r.error) toast(r.error.message); else { toast("Cleared."); loadHolds(); } }); };
       loadHolds();
+      var cl = $("#chalList"), loadChal = function () {
+        window.SF_LIVE.rpc("joker_challenge_queue").then(function (r) {
+          var rows = r.data || []; if (!cl) return;
+          cl.innerHTML = rows.length ? rows.map(function (x) { return '<div class="cmrow chalrow"><span><b>@' + esc(x.subject_tag || "?") + "</b> challenges a Joker from <b>@" + esc(x.maker_tag || "?") + "</b><br><small><b>Joker said:</b> " + esc((x.reasons || []).join(", ")) + " · " + esc(x.joker_statement || "") + "</small><br><small><b>Challenge:</b> " + esc(x.statement || "") + '</small></span><span class="row"><button class="chip sm" type="button" data-rule="' + x.challenge_id + '" data-false="1">False · backfire</button><button class="chip sm" type="button" data-rule="' + x.challenge_id + '" data-false="0">Stands</button></span></div>'; }).join("") : '<p class="hint">No challenges waiting.</p>';
+        });
+      };
+      if (cl) { cl.onclick = function (e) { var b = e.target.closest("[data-rule]"); if (!b) return; var f = b.getAttribute("data-false") === "1";
+        if (!confirm(f ? "Rule this Joker FALSE? It comes off, and the maker becomes a Joker for 45 days with no way out. This is final." : "Rule that this Joker STANDS? This is final.")) return;
+        window.SF_LIVE.rpc("rule_joker_challenge", { p_challenge: b.getAttribute("data-rule"), p_false: f, p_note: null }).then(function (r) { if (r.error) toast(r.error.message); else { toast(f ? "Removed. It backfired on the maker." : "The Joker stands."); loadChal(); } }); }; loadChal(); }
       window.SF_LIVE.rpc("suit_leads_recent", { p_limit: 25 }).then(function (r) {
         var rows = r.data || [], ll = $("#leadList"); if (!ll) return;
         ll.innerHTML = rows.length ? '<div class="leadtbl">' + rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.name) + "</b> · " + esc(x.email) + " · " + esc(x.phone) + " · " + esc(x.suit === "wild" ? "Wild Card" : x.suit === "joker" ? "Joker (review)" : SUIT[x.suit] ? SUIT[x.suit].name : x.suit) + (x.sms_ok ? " · texts OK" : "") + "</span><span class=\"hint\">" + new Date(x.created_at).toLocaleDateString() + "</span></div>"; }).join("") + "</div>" : '<p class="hint">No quiz leads yet.</p>';
