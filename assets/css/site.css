@@ -568,3 +568,13 @@ footer a{color:var(--cream-dim)}
 .imp label{display:flex;gap:10px;align-items:center;background:var(--ink-2);border-radius:10px;padding:8px 10px}
 .imp input{width:18px;height:18px;accent-color:var(--gold)}
 .imp small{color:var(--muted)}
+
+/* Your table = felt color = what you're looking for */
+.tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.tablepick{appearance:none;cursor:pointer;text-align:left;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--night);color:var(--cream);display:grid;gap:3px;position:relative;transition:transform .15s,border-color .15s}
+.tablepick i{display:block;height:26px;border-radius:7px;background:var(--tc);box-shadow:inset 0 0 12px rgba(0,0,0,.35),0 0 0 2px rgba(232,196,106,.35);margin-bottom:4px}
+.tablepick b{font:800 1rem var(--display);text-transform:uppercase;letter-spacing:.03em}
+.tablepick span{font-size:.8rem;color:var(--cream-dim)}
+.tablepick:hover{transform:translateY(-2px)}
+.tablepick[aria-pressed="true"]{border-color:var(--gold-hi);box-shadow:0 0 0 2px var(--gold)}
+.mycard .tablebadge{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);font:800 .72rem var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-hi);white-space:nowrap}

@@ -336,7 +336,19 @@
   }
 
   /* ---------- profile form ---------- */
-  var LOOK = [["serious", "Something serious"], ["seeing", "Dating to see"], ["friends", "Friends first"]];
+  var TABLES = [
+    ["marriage", "Marriage-minded", "#7A1022", "Looking for my forever person"],
+    ["longterm", "Long-term", "#1E6347", "A real relationship that lasts"],
+    ["seeing", "Dating to see", "#8A5A1C", "Open to where it goes"],
+    ["friends", "Friends first", "#14544F", "Start as friends, see what grows"],
+    ["casual", "Casual", "#5B2E4F", "Fun, easygoing, no pressure"],
+    ["open", "Open / ENM", "#2B2730", "Ethically non-monogamous"]
+  ];
+  var TABLE = {}; TABLES.forEach(function (t) { TABLE[t[0]] = t; });
+  var LOOK = TABLES.map(function (t) { return [t[0], t[1]]; });
+  if (P.looking === "serious") P.looking = "longterm";
+  if (!TABLE[P.looking]) P.looking = "longterm";
+  P.felt = TABLE[P.looking][2];
   var SHOW = [["women", "Women"], ["men", "Men"], ["everyone", "Everyone"]];
   var INTERESTS = ["Live music", "Hiking", "Cooking", "Board games", "Football", "Church", "Travel", "Dogs", "Cats", "Fitness", "Art", "Movies", "Brunch", "Fishing", "Reading", "Dancing"];
   var FELTS = [["#1E6347", "Felt green"], ["#7A1022", "Card red"], ["#2B2730", "Card black"], ["#5B2E4F", "Velvet"], ["#8A5A1C", "Brass"], ["#14544F", "Teal felt"]];
@@ -344,7 +356,11 @@
     el.innerHTML = opts.map(function (o) { return '<button type="button" class="chip" aria-pressed="' + (P[key] === o[0]) + '" data-v="' + o[0] + '">' + o[1] + "</button>"; }).join("");
     el.addEventListener("click", function (e) { var b = e.target.closest(".chip"); if (!b) return; P[key] = b.getAttribute("data-v"); $$(".chip", el).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); onChange(); });
   }
-  chipGroup($("#lookChips"), LOOK, "looking");
+  function renderTables() {
+    $("#lookChips").innerHTML = TABLES.map(function (t) { return '<button type="button" class="tablepick" aria-pressed="' + (P.looking === t[0]) + '" data-v="' + t[0] + '" style="--tc:' + t[2] + '"><i></i><b>' + t[1] + '</b><span>' + t[3] + "</span></button>"; }).join("");
+  }
+  renderTables();
+  $("#lookChips").addEventListener("click", function (e) { var b = e.target.closest(".tablepick"); if (!b) return; P.looking = b.getAttribute("data-v"); P.felt = TABLE[P.looking][2]; renderTables(); onChange(); });
   // interests
   var intWrap = document.createElement("div"); intWrap.className = "field";
   intWrap.innerHTML = '<span style="font-weight:600;font-size:.92rem">Things you love <span class="hint">(up to 5)</span></span><div class="chips" id="intChips"></div>';
@@ -357,8 +373,7 @@
     if (i > -1) P.interests.splice(i, 1); else { if (P.interests.length >= 5) { toast("Pick up to 5. Tap one to swap it out."); return; } P.interests.push(v); }
     renderInterests(); onChange();
   });
-  $("#swatches").innerHTML = FELTS.map(function (f) { return '<button type="button" class="sw" style="background:' + f[0] + '" aria-label="' + f[1] + '" aria-pressed="' + (P.felt === f[0]) + '" data-v="' + f[0] + '"></button>'; }).join("");
-  $("#swatches").addEventListener("click", function (e) { var b = e.target.closest(".sw"); if (!b) return; P.felt = b.getAttribute("data-v"); $$("#swatches .sw").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); onChange(); });
+  /* Felt now follows the table you pick (what you're looking for). */
 
   var F = { name: $("#fName"), handle: $("#fHandle"), age: $("#fAge"), zip: $("#fZip"), bio: $("#fBio") };
   Object.keys(F).forEach(function (k) { F[k].value = P[k] || ""; F[k].addEventListener("input", function () { P[k] = F[k].value; if (k === "bio") $("#bioCount").textContent = F[k].value.length; onChange(); }); });
@@ -492,7 +507,7 @@
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + "</div>" +
       '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" +
       '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + '<div class="facts">' + esc(myFacts()) + "</div>" +
-      '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>";
+      '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
   var deckDirty = false;
@@ -510,7 +525,7 @@
   });
   $("#faceForm").addEventListener("input", function () { if ($("#faceForm .err:not(:empty)")) validate(true); });
   $("#faceReset").addEventListener("click", function () {
-    var keep = { trumps: ORDER.slice() }; P = Object.assign({ name: "", handle: "", age: "", zip: "", bio: "", photo: "", looking: "serious", show: "everyone", ageMin: 25, ageMax: 40, dist: 25, felt: "#1E6347", mySuit: "", interests: [] }, keep);
+    var keep = { trumps: ORDER.slice() }; P = Object.assign({ name: "", handle: "", age: "", zip: "", bio: "", photo: "", looking: "longterm", show: "everyone", ageMin: 25, ageMax: 40, dist: 25, felt: "#1E6347", mySuit: "", interests: [] }, keep);
     saveP(); location.hash = "face"; location.reload();
   });
 
@@ -526,12 +541,12 @@
   };
   function rng(seed) { var x = seed >>> 0; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
   var POOL = (function () {
-    var r = rng(52), out = [], id = 0, looks = ["serious", "seeing", "friends"];
+    var r = rng(52), out = [], id = 0, looks = ["longterm", "longterm", "seeing", "marriage", "friends", "seeing", "casual", "open"];
     function add(name, gender) {
       var s = ORDER[id % 4];
       var ints = []; while (ints.length < 4) { var x = INTERESTS[(r() * INTERESTS.length) | 0]; if (ints.indexOf(x) < 0) ints.push(x); }
       out.push({ id: "p" + id, name: name, gender: gender, suit: s, age: 22 + Math.round(Math.pow(r(), 1.25) * 30), dist: Math.round((0.5 + Math.pow(r(), 1.4) * 60) * 10) / 10,
-        looking: looks[(r() * 3) | 0], interests: ints, bio: BIOS[s][(r() * 4) | 0], noise: r(), hue: (r() * 360) | 0 });
+        looking: looks[(r() * looks.length) | 0], interests: ints, bio: BIOS[s][(r() * 4) | 0], noise: r(), hue: (r() * 360) | 0 });
       id++;
     }
     var LAST = "ABCDEFGHJKLMNPRSTVW", used = {};
@@ -549,7 +564,8 @@
 
   function fitOf(p) {
     var shared = p.interests.filter(function (x) { return P.interests.indexOf(x) > -1; });
-    var lookMatch = p.looking === P.looking ? 1 : (p.looking === "seeing" || P.looking === "seeing") ? .6 : .2;
+    var LK = ["marriage", "longterm", "seeing", "friends", "casual", "open"], la = LK.indexOf(p.looking), lb = LK.indexOf(P.looking);
+    var lookMatch = p.looking === P.looking ? 1 : (p.looking === "open" || P.looking === "open") ? 0 : Math.abs(la - lb) === 1 ? .6 : Math.abs(la - lb) === 2 ? .3 : .1;
     var mid = (P.ageMin + P.ageMax) / 2, span = Math.max(4, (P.ageMax - P.ageMin) / 2);
     var pm = prefScore(p);
     var f = 28 * Math.min(1, shared.length / Math.max(1, Math.min(4, P.interests.length || 3))) + 16 * lookMatch +
@@ -631,7 +647,7 @@
   }
   function cardHTML(p, pos) {
     var col = SUIT[p.suit].red ? "red" : "";
-    var lookTxt = { serious: "Something serious", seeing: "Dating to see", friends: "Friends first" }[p.looking];
+    var lookTxt = (TABLE[p.looking] || TABLE.longterm)[1];
     if (p.joker) col += " jokercard";
     return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="' + esc(p.name) + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + '. Press to flip."><div class="flip">' +
       (p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + '</div></div><span class="idx br">J<b class="jk">★</b></span></div>' :
@@ -858,7 +874,7 @@
   var FORMS = {
     WAITLIST: { title: "Join the waitlist", btn: "Save my seat", subject: "Waitlist sign-up", fields: [
       ["name", "Your name", "text", true], ["email", "Email", "email", true], ["city", "City", "text", true],
-      ["looking", "Looking for", "select", false, ["Something serious", "Dating to see", "Friends first"]], ["adult", "I'm 18 or older", "checkbox", true]] },
+      ["looking", "Looking for", "select", false, ["Marriage-minded", "Long-term", "Dating to see", "Friends first", "Casual", "Open / ENM"]], ["adult", "I'm 18 or older", "checkbox", true]] },
     CONTACT: { title: "Send us a note", btn: "Send message", subject: "New inquiry", fields: [
       ["name", "Your name", "text", true], ["email", "Email", "email", true], ["message", "Message", "textarea", true]] },
     PAUSE: { title: "Pause my membership", btn: "Request a pause", subject: "Pause request", fields: [
