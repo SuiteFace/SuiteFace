@@ -621,6 +621,8 @@
   var qa = S.get("quiz", []), qw = S.get("quizWords", { self: [], others: [], fault: "" });
   var qi = qw.fault ? STEPS_Q : Math.min(qw.others.length ? 2 + qa.length : (qw.self.length ? 1 : 0), STEPS_Q - 1);
   function saveQW() { S.set("quizWords", qw); }
+  /* Answers from an earlier visit never skip the deck: anyone who hasn't unlocked a result starts at question 1. */
+  if (qi >= STEPS_Q && !S.get("suitLead", null) && !window.SF_LIVE) { qa = []; qw = { self: [], others: [], fault: "" }; qi = 0; S.set("quiz", qa); S.set("quizWords", qw); }
   function resetQuiz() { qa = []; qw = { self: [], others: [], fault: "" }; qi = 0; S.set("quiz", qa); saveQW(); renderQ(); }
   function shuffled(i) { var o = ORDER.slice(); var r = i * 7 + 3; for (var k = 3; k > 0; k--) { r = (r * 31 + 11) % 97; var j = r % (k + 1); var tmp = o[k]; o[k] = o[j]; o[j] = tmp; } return o; }
   function wordStep(key, title, hint) {
