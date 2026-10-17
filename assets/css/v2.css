@@ -345,3 +345,12 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .c-stage .screen img.ph{display:block;width:100%;height:auto;object-fit:cover;object-position:50% 30%}
 .dcard .dph{width:62%;aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:50% 30%;box-shadow:0 0 0 3px currentColor;margin-top:14px}
 .dcard .nm{font-size:1.35rem!important}
+.c-stage .screen .apphd .who{display:flex;align-items:center;gap:8px}
+.c-stage .screen .apphd .me{width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:50% 30%;box-shadow:0 0 0 2px #C9A55A}
+.c-stage .screen .apphd .who{color:#1F2A25}
+.c-stage .screen .apphd .who b{font-size:19px}
+.c-stage .screen .apphd>span:last-child{white-space:nowrap;font-size:10px}
+.c-stage .screen .mc.back{padding:4px;background:#fff}
+.c-stage .screen .mc.back i{display:block;height:100%;border-radius:4px;background:repeating-linear-gradient(45deg,#8E2230 0 5px,#7A1C28 5px 10px);box-shadow:inset 0 0 0 3px #fff,inset 0 0 0 4px #C9A55A}
+.c-stage .screen .mc.back{display:block}
+.c-stage .screen .apphd .who{margin-right:auto}
