@@ -1,0 +1,26 @@
+{
+  "name": "SuiteFace",
+  "short_name": "SuiteFace",
+  "description": "No Jokers Needed.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#17151B",
+  "theme_color": "#17151B",
+  "icons": [
+    {
+      "src": "/assets/brand/suiteface-joker-icon-cream-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/brand/suiteface-joker-icon-cream-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/brand/suiteface-joker-icon-cream-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}

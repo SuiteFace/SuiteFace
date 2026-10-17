@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="SuiteFace"><title>SuiteFace</title>
+<rect x="4" y="4" width="1016" height="1016" rx="226" fill="#FAF7F0" stroke="#E2DACA" stroke-width="8"/>
+<g transform="translate(512 560) scale(1.05) translate(-512 -540)">
+<path d="M392 690 C380 560 350 400 300 300 C380 300 460 360 490 450 C510 520 515 610 512 680 Z" fill="#C8102E" stroke="#FAF7F0" stroke-width="10" stroke-linejoin="round"/>
+<path d="M632.0 690 C644.0 560 674.0 400 724.0 300 C644.0 300 564.0 360 534.0 450 C514.0 520 509.0 610 512.0 680 Z" fill="#2B2730" stroke="#FAF7F0" stroke-width="10" stroke-linejoin="round"/>
+<path d="M300 700 C270 600 220 500 130 470 C170 430 250 430 300 470 C360 520 400 610 410 690 Z" fill="#2B2730" stroke="#FAF7F0" stroke-width="10" stroke-linejoin="round"/>
+<path d="M724.0 700 C754.0 600 804.0 500 894.0 470 C854.0 430 774.0 430 724.0 470 C664.0 520 624.0 610 614.0 690 Z" fill="#C8102E" stroke="#FAF7F0" stroke-width="10" stroke-linejoin="round"/>
+<path d="M250 690 Q512 640 774 690 L774 790 Q512 742 250 790 Z" fill="#B8862F"/>
+<circle cx="130" cy="470" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 4 C24 28 5 43 5 59 C5 73 15 81 27 81 C36 81 43 77 47 71 L45.5 79 C44 87 38 93 31 96 L69 96 C62 93 56 87 54.5 79 L53 71 C57 77 64 81 73 81 C85 81 95 73 95 59 C95 43 76 28 50 4 Z" fill="#2B2730" transform="translate(99.00 439.00) scale(0.6200)"/>
+<circle cx="300" cy="300" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 92 C22 72 4 54 4 33 C4 16 16 6 29.5 6 C39 6 46 11.5 50 20 C54 11.5 61 6 70.5 6 C84 6 96 16 96 33 C96 54 78 72 50 92 Z" fill="#C8102E" transform="translate(269.00 269.00) scale(0.6200)"/>
+<circle cx="724" cy="300" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 7 A20.5 20.5 0 1 1 49.99 7 Z M28 39 A20.5 20.5 0 1 1 27.99 39 Z M72 39 A20.5 20.5 0 1 1 71.99 39 Z M50 46 A12 12 0 1 1 49.99 46 Z M47 58 L45.5 79 C44 87 38 93 31 96 L69 96 C62 93 56 87 54.5 79 L53 58 Z" fill="#2B2730" transform="translate(693.00 269.00) scale(0.6200)"/>
+<circle cx="894" cy="470" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#C8102E" transform="translate(863.00 439.00) scale(0.6200)"/>
+</g>
+</svg>
