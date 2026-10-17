@@ -49,7 +49,7 @@
   }
 
   var AUTH = window.SF_AUTH = {
-    ready: function (cb) { if (client) cb(); else readyCbs.push(cb); },
+    ready: function (cb) { if (AUTH.__ready) cb(); else readyCbs.push(cb); },
     providers: settings,
     signedIn: function () { return !!session; },
     oauth: function (prov) {
@@ -117,6 +117,7 @@
       history.replaceState(null, "", location.pathname);
     }
     client.auth.getSession().then(function (r) { session = r.data && r.data.session; return loadMe(); }).then(function () {
+      AUTH.__ready = true;
       readyCbs.splice(0).forEach(function (cb) { cb(); });
       if (/[?&](signedin|linked)=/.test(location.search) || /access_token=/.test(location.hash)) history.replaceState(null, "", location.pathname + (/access_token=/.test(location.hash) ? "" : location.hash));
     });

@@ -1400,8 +1400,11 @@
     inp.value = S.get("comp", "");
     function apply() {
       var v = inp.value.trim(); if (!v) { S.set("comp", ""); msg.textContent = "Comps are applied at checkout. One per member."; return; }
+      var staffEmail = window.SF_LIVE && /(@suiteface\.com|@gofirehorsego\.com|^thesuiteface@gmail\.com)$/i.test(window.SF_LIVE.email() || "");
+      if (!window.SF_LIVE && !KNOWN[v.toUpperCase()] && PUBLIC_SITE) { msg.textContent = "Log in first, then apply your code."; return; }
       if (window.SF_LIVE && !KNOWN[v.toUpperCase()]) {
         window.SF_LIVE.rpc("house_comp_check", { p_code: v }).then(function (r) {
+          if (r.error && staffEmail) { msg.innerHTML = "<b style='color:#E5505E'>" + esc(/isn't valid/.test(r.error.message) ? "That house comp code isn't set or doesn't match. Owner: set it in Owner console → 🎩 House comp code." : r.error.message) + "</b>"; return; }
           if (!r.error && r.data) { window.SF_HOUSE = v; try { sessionStorage.setItem("sf.house", v); } catch (e) { } inp.value = ""; S.set("comp", ""); msg.innerHTML = "<b style='color:var(--gold-hi)'>🎩 House comp active on this tab: every checkout is free for your account.</b>"; jackpot(1800); burstAt($("#compApply"), 40); return; }
           S.set("comp", v); msg.textContent = "Code saved. Stripe checks it at checkout.";
         });
@@ -2140,6 +2143,7 @@
     $("#npwGo", m).onclick = function () { var v = $("#npw", m).value; if (v.length < 10) { $("#npwErr", m).textContent = "Use at least 10 characters."; return; } window.SF_AUTH.newPassword(v).then(function () { closeModal(); toast("Password saved. You're signed in."); }, function (e) { $("#npwErr", m).textContent = e.message; }); };
   });
   function liveBuyIn() {
+    if (window.SF_AUTH && !window.SF_AUTH.__ready) { toast("One moment…"); window.SF_AUTH.ready(function () { window.SF_AUTH.__ready = true; liveBuyIn(); }); return; }
     if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "buyin"); } catch (e) { } loginModal("create"); return; }
     if (ROLE !== "guest") { toast("You're already seated. Welcome back!"); location.hash = "face"; return; }
     if (houseCode()) { houseComp("membership").then(function (ok) { if (ok) location.hash = "face"; }); return; }
@@ -2231,7 +2235,9 @@
       $("#lvGo", m).disabled = true; say("");
       (create ? window.SF_AUTH.signUp(em, pw) : window.SF_AUTH.password(em, pw)).then(function (r) {
         $("#lvGo", m).disabled = false;
-        if (create && r && r.data && !r.data.session) { say("Almost there: we emailed " + em + ". Tap the link to confirm, and you'll come right back here.", true); return; }
+        if (create && r && r.data && r.data.user && Array.isArray(r.data.user.identities) && r.data.user.identities.length === 0) {
+          say("That email already has an account. Log in with your password, or tap “Email me a sign-in link”."); return; }
+        if (create && r && r.data && !r.data.session) { say("Almost there: we emailed " + em + ". Tap the link to confirm, and you'll come right back here, signed in.", true); return; }
         closeModal();
       }, function (x) { $("#lvGo", m).disabled = false; say(friendly(x)); });
     });
