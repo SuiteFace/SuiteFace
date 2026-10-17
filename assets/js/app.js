@@ -276,7 +276,7 @@
         '<div class="notice">Don\'t like the hand you\'re dealt? <b>Fold</b> once, free, within 7 days and the Dealer re-deals all new picks.</div>' +
         '<div class="row" style="margin-top:12px"><a class="btn gold" id="raiseBuy" href="' + esc(CFG.stripeRaiseLink || "#") + '" target="_blank" rel="noopener">Raise for $2.10</a><button class="btn ghost" type="button" id="raiseDemo">See a sample Raise</button></div>' +
         '<div id="raiseOut" class="raise-out" hidden></div><p class="hint" style="margin-top:8px">Each Raise is used when you ask. If the Dealer can\'t finish, your Raise comes back. Sales are final once used.</p>');
-      $("#raiseBuy", m2).addEventListener("click", function (e) { if (houseCode() && window.SF_LIVE) { e.preventDefault(); houseComp("raise"); } });
+      $("#raiseBuy", m2).addEventListener("click", function (e) { if (window.SF_LIVE && (houseCode() || staffEmail())) { e.preventDefault(); var href = this.href; compOr("raise", null, function () { window.open(href, "_blank", "noopener"); }); } });
       $("#raiseDemo", m2).addEventListener("click", function () { var o = $("#raiseOut", m2); o.hidden = false;
         o.innerHTML = md("**The Read**\nYou're both Hearts-first and both picked \"long walk, real talk.\" Jordan plans; you go with the flow. Let Jordan pick the time, you pick the place.\n\n**Where to play** (Birmingham, check hours before you go)\n1. Coffee at a busy spot in Avondale, outside seating, easy to leave.\n2. Railroad Park: a daylight walk where lots of people are around.\n3. Trivia night at a brewery in Lakeview: you both listed trivia.\n\n**Opening lines**\nWhat's the best hike you've ever done? · Which trivia category do you carry the team in? · What does a perfect Sunday look like?\n\n**Your tell**\nYou called your biggest fault \"overthinking.\" Ask one question, then really listen.\n\n**Play it safe**\nMeet there, take your own ride, tell a friend, keep your drink in sight, leave anytime. Call 911 in an emergency.") +
           '<div class="row" style="margin-top:10px"><button class="btn ghost sm" type="button" id="foldBtn">🂠 Fold: re-deal new picks</button></div>';
@@ -367,6 +367,19 @@
     });
   }
   window.SF_houseComp = houseComp;
+  /* Staff accounts are asked for the house comp code right at checkout (blank = pay normally). */
+  function staffEmail() { return !!(window.SF_LIVE && /(@suiteface\.com|@gofirehorsego\.com|^thesuiteface@gmail\.com)$/i.test(window.SF_LIVE.email() || "")); }
+  function askHouse() {
+    if (houseCode() || !staffEmail()) return Promise.resolve(!!houseCode());
+    var v = window.prompt("House comp code (staff only). Enter it to make this free, or leave blank to pay:", "");
+    if (!v || !v.trim()) return Promise.resolve(false);
+    return window.SF_LIVE.rpc("house_comp_check", { p_code: v.trim() }).then(function (r) {
+      if (r.error || !r.data) { toast((r.error && r.error.message) || "That comp code isn't valid for this account."); return false; }
+      window.SF_HOUSE = v.trim(); try { sessionStorage.setItem("sf.house", v.trim()); } catch (e) { } return true;
+    });
+  }
+  /* Run a purchase: comped for staff with the code, otherwise the normal checkout. */
+  function compOr(item, ref, payFn, onComped) { askHouse().then(function (ok) { if (ok) houseComp(item, ref).then(function (done) { if (done) { if (onComped) onComped(); } else payFn(); }); else payFn(); }); }
   function marquee(s, cls) {
     var bulbs = ""; for (var i = 0; i < 22; i++) bulbs += "<i style=\"animation-delay:" + (i % 3) * .3 + "s\"></i>";
     return '<div class="vsign ' + (cls || "") + '"><div class="vbulbs">' + bulbs + '</div><span class="vtag">' + (s.house ? "House sponsor" : "Sponsored") + '</span><b class="vhead">' + esc(s.headline || s.business) + '</b>' +
@@ -465,7 +478,7 @@
     $$("[data-hr]", m).forEach(function (b) { b.addEventListener("click", function () { var kind = b.getAttribute("data-hr");
       signed(function () {
         if (!live) { demo(kind === "buyin" ? "buyin" : "verified"); return; }
-        if (kind === "buyin" && houseCode()) { houseComp("high_roller").then(function (ok) { if (ok) closeModal(); }); return; }
+        if (kind === "buyin" && (houseCode() || staffEmail()) && !openHighRoller.__asked) { openHighRoller.__asked = true; var self = this; compOr("high_roller", null, function () { self.click(); }); setTimeout(function () { openHighRoller.__asked = false; }, 4000); return; }
         if (kind === "buyin") { location.href = CFG.stripeHighRollerLink + "?client_reference_id=" + encodeURIComponent(window.SF_LIVE.memberId()) + "&prefilled_email=" + encodeURIComponent(window.SF_LIVE.email() || ""); return; }
         fetch(CFG.supabaseUrl + "/functions/v1/high-roller", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ action: "bank" }) })
           .then(function (r) { return r.json(); }).then(function (j) { if (j.url) location.href = j.url; else toast(j.error || "Couldn't open bank linking."); });
@@ -2270,10 +2283,13 @@
     if (window.SF_AUTH && !window.SF_AUTH.__ready) { toast("One moment…"); window.SF_AUTH.ready(function () { window.SF_AUTH.__ready = true; liveBuyIn(); }); return; }
     if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "buyin"); } catch (e) { } loginModal("create"); return; }
     if (ROLE !== "guest") { toast("You're already seated. Welcome back!"); location.hash = "face"; return; }
-    if (houseCode()) { houseComp("membership").then(function (ok) { if (ok) location.hash = "face"; }); return; }
+    if (staffEmail()) { compOr("membership", null, function () { proceed(); }); return; }
+    proceed(); return;
+    function proceed() {
     var comp = (S.get("comp", "") || "").trim();
     var link = PLAN === "launch" && LAUNCH.open && CFG.stripeLaunchLink ? CFG.stripeLaunchLink : CFG.stripePaymentLink;
     window.SF_AUTH.checkout(link, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
+    }
   }
   if (!CAN_SWITCH && $("#roleBtn")) $("#roleBtn").hidden = true;
   function allowed(need) {
@@ -2728,8 +2744,12 @@
         window.SFSign.require("casino", build, { about: d.p_name });
       });
     }
-    function pay(action, id, order, errEl) {
-      if (houseCode()) { houseComp(action === "build" ? "casino_build" : "casino_zips", action === "build" ? id : order).then(function (ok) { if (ok) { closeModal(); loadMine(); find(); } }); return; }
+    function pay(action, id, order, errEl, skipComp) {
+      if (!skipComp && (houseCode() || staffEmail())) {
+        compOr(action === "build" ? "casino_build" : "casino_zips", action === "build" ? id : order, function () { pay(action, id, order, errEl, true); },
+          function () { closeModal(); toast("🎩 Comped by the house. Your Casino is in for its name check."); loadMine(); find(); });
+        return;
+      }
       fetch(CFG.supabaseUrl + "/functions/v1/casino-billing", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ action: action, id: id, order: order }) })
         .then(function (r) { return r.json(); }).then(function (j) { if (j.url) location.href = j.url; else if (errEl) errEl.textContent = j.error || "Checkout couldn't start."; else toast(j.error || "Checkout couldn't start."); }, function () { if (errEl) errEl.textContent = "Checkout couldn't start. Try again."; });
     }
