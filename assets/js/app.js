@@ -1819,6 +1819,7 @@
 
   function renderIdentity() {
     // tab bar: Basics · About me · Looking for
+    if ($("#faceForm .ftabs")) { if (typeof syncIdentityUI === "function") syncIdentityUI(); return; } // build once; later calls just refresh answers
     var form = $("#faceForm"), kids = Array.prototype.slice.call(form.children);
     var anchor = $("#jokerStatus");
     kids.forEach(function (el) { if (!el.querySelector("#faceMeter") && !el.querySelector('button[type="submit"]')) el.setAttribute("data-tab", "basics"); });
@@ -2760,7 +2761,7 @@
       (res[3].data || []).forEach(function (r) { P.prefs[r.question] = { sel: r.wanted, deal: r.dealbreaker }; });
       saveP();
       F.name.value = P.name || ""; F.handle.value = P.handle || ""; F.zip.value = P.zip || ""; F.bio.value = P.bio || "";
-      try { renderStyles(); renderInterests(); renderRank(); renderIam(); renderRooms(); renderIdentity(); syncRanges(); } catch (e) { }
+      try { renderStyles(); renderInterests(); renderRank(); renderIam(); renderRooms(); if (typeof syncIdentityUI === "function") syncIdentityUI(); syncRanges(); } catch (e) { }
       renderCard(); updateMeter(); zipHint();
     });
   }
