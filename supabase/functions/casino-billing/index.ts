@@ -4,6 +4,8 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const PRICE_BUILD = "price_1URQw5QciI2PcM3qWOQHmHAx"; // $21.00 one-time (live)
 const PRICE_ZIP = "price_1URQw5QciI2PcM3qeAD5lKRc";   // $2.10 per extra ZIP, one-time
+const PRICE_STATE = "price_1URRKoQciI2PcM3qDZKlZmMB";  // $210 per state, one-time
+const PRICE_NATIONAL = "price_1URRKoQciI2PcM3qJrNIbzxn"; // $2,100 nationwide, one-time
 const SITE = "https://suiteface.com";
 const URL_ = Deno.env.get("SUPABASE_URL")!, ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info", "Access-Control-Allow-Methods": "POST, OPTIONS" };
@@ -46,13 +48,15 @@ Deno.serve(async (req) => {
   let i = 0;
   if (!order) items[i++] = { price: PRICE_BUILD, quantity: 1 };
   if (c.extra > 0) items[i++] = { price: PRICE_ZIP, quantity: c.extra };
+  if (!order && c.states > 0) items[i++] = { price: PRICE_STATE, quantity: c.states };
+  if (!order && c.national) items[i++] = { price: PRICE_NATIONAL, quantity: 1 };
   const meta = order ? { sf_link: "casino_zips", casino_id: c.id, order_id: order } : { sf_link: "casino_build", casino_id: c.id };
   const cs = await stripe("POST", "checkout/sessions", {
     mode: "payment", line_items: items, customer_email: c.email, client_reference_id: c.id,
     metadata: meta, payment_intent_data: { metadata: meta, description: (order ? "Extra ZIPs · " : "Casino build · ") + c.name },
     success_url: SITE + "/?casino=" + (order ? "zips" : "built") + "#casinos", cancel_url: SITE + "/?casino=cancelled#casinos",
     custom_text: { submit: { message: order ? "Adds " + c.extra + " ZIP code(s) to " + c.name + ". One-time." : "Builds " + c.name + ". One-time. Your Casino opens after a quick name check under the Casino Host Agreement you signed." } },
-  }, (order ? "casino-zips-" + order : "casino-build-" + c.id));
+  }, (order ? "casino-zips-live-" + order : "casino-build-live-" + c.id + "-" + c.extra + "-" + c.states + "-" + (c.national ? 1 : 0)));
   if (cs.error) return json({ error: cs.error.message === "not_configured" ? "Casino checkout opens soon." : cs.error.message }, 400);
   return json({ url: cs.url });
 });

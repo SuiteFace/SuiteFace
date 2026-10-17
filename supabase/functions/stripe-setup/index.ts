@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
   async function link(id: string, items: { price: string; quantity?: number; adjustable?: boolean }[], redirect: string, extra: Record<string, unknown> = {}) {
     const line_items: Record<string, unknown> = {};
     items.forEach((it, i) => { line_items[i] = { price: it.price, quantity: it.quantity ?? 1, ...(it.adjustable ? { adjustable_quantity: { enabled: true, minimum: 1, maximum: 50 } } : {}) }; });
-    const l = await s("payment_links", { line_items, metadata: { sf_link: id }, allow_promotion_codes: true, after_completion: { type: "redirect", redirect: { url: redirect } }, ...extra }, "link-" + id);
+    const l = await s("payment_links", { line_items, metadata: { sf_link: id.replace(/2$/, "") }, allow_promotion_codes: true, after_completion: { type: "redirect", redirect: { url: redirect } }, ...extra }, "link-" + id);
     return { id: l.id, url: l.url };
   }
 
@@ -87,7 +87,10 @@ Deno.serve(async (req) => {
     // Casinos (checkout made per Casino by casino-billing)
     const cBuild = await product("casino_build", "SuiteFace Casino Build", "Build and name your own SuiteFace Casino. Includes up to 7 ZIP codes. One-time.", { unit_amount: 2100 });
     const cZip = await product("casino_zip", "SuiteFace Casino Extra ZIP", "Adds one more ZIP code to your SuiteFace Casino. One-time, per ZIP.", { unit_amount: 210 });
-    out.prices = { buyin: buyin.price, monthly: monthly.price, zip_sponsor_30d: zip.price, casino_build: cBuild.price, casino_zip: cZip.price, comp_redemption: comp.price, hr_redemption: hrRedeem.price, partner_monthly: pMonth.price };
+    const cState = await product("casino_state", "SuiteFace Casino Statewide", "Covers one whole state for your SuiteFace Casino. One-time, per state.", { unit_amount: 21000 });
+    const cNation = await product("casino_national", "SuiteFace Casino Nationwide", "Covers the whole United States for your SuiteFace Casino. One-time.", { unit_amount: 210000 });
+    out.casino_coverage = { state: cState.price, national: cNation.price };
+    out.prices = { buyin: buyin.price, monthly: monthly.price, zip_sponsor_30d: zip.price, casino_build: cBuild.price, casino_zip: cZip.price, comp_redemption: comp.price, hr_redemption: hrRedeem.price, partner_monthly: pMonth.price, hr_weekly: hrWeek, hr_annual_once: hrAnnualOnce };
     return json({ ok: true, live: out });
   } catch (e) {
     return json({ error: String((e as Error).message) }, 400);
