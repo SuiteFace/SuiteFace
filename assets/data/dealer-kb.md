@@ -130,6 +130,8 @@ No profile is activated and no payment is processed until the matching agreement
 
 **4.1d Referral credits and stickers.** Each member has an invite link. When someone who used your link creates an account and completes a paid membership (a Buy-In or a launch seat), SuiteFace credits **$2.10** to your account, applied to your next monthly charges, **up to 12 credits ($25.20) per member**, and unlocks a unique referral sticker for your card (one per successful referral, up to 12). Credits have no cash value, can't be transferred, and end if your membership ends. You can't refer yourself or create accounts to earn credits; SuiteFace may reverse credits and stickers earned in breach of these Terms.
 
+**4.1e House comps.** SuiteFace may waive any fee, in whole or in part, for its staff, business partners or members at its sole discretion. A comp applies only to the account it was given to, has no cash value, and can't be transferred or resold.
+
 **4.2 What you pay.**
 
 | Charge | Amount | When |

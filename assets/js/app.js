@@ -276,6 +276,7 @@
         '<div class="notice">Don\'t like the hand you\'re dealt? <b>Fold</b> once, free, within 7 days and the Dealer re-deals all new picks.</div>' +
         '<div class="row" style="margin-top:12px"><a class="btn gold" id="raiseBuy" href="' + esc(CFG.stripeRaiseLink || "#") + '" target="_blank" rel="noopener">Raise for $2.10</a><button class="btn ghost" type="button" id="raiseDemo">See a sample Raise</button></div>' +
         '<div id="raiseOut" class="raise-out" hidden></div><p class="hint" style="margin-top:8px">Each Raise is used when you ask. If the Dealer can\'t finish, your Raise comes back. Sales are final once used.</p>');
+      $("#raiseBuy", m2).addEventListener("click", function (e) { if (houseCode() && window.SF_LIVE) { e.preventDefault(); houseComp("raise"); } });
       $("#raiseDemo", m2).addEventListener("click", function () { var o = $("#raiseOut", m2); o.hidden = false;
         o.innerHTML = md("**The Read**\nYou're both Hearts-first and both picked \"long walk, real talk.\" Jordan plans; you go with the flow. Let Jordan pick the time, you pick the place.\n\n**Where to play** (Birmingham, check hours before you go)\n1. Coffee at a busy spot in Avondale, outside seating, easy to leave.\n2. Railroad Park: a daylight walk where lots of people are around.\n3. Trivia night at a brewery in Lakeview: you both listed trivia.\n\n**Opening lines**\nWhat's the best hike you've ever done? · Which trivia category do you carry the team in? · What does a perfect Sunday look like?\n\n**Your tell**\nYou called your biggest fault \"overthinking.\" Ask one question, then really listen.\n\n**Play it safe**\nMeet there, take your own ride, tell a friend, keep your drink in sight, leave anytime. Call 911 in an emergency.") +
           '<div class="row" style="margin-top:10px"><button class="btn ghost sm" type="button" id="foldBtn">🂠 Fold: re-deal new picks</button></div>';
@@ -327,6 +328,12 @@
       out.textContent = "Checking…";
       window.SF_LIVE.rpc("approve_staff", args).then(function (r) { out.textContent = r.error ? r.error.message : "✓ " + r.data; });
     });
+    var hcb = $("#hcSet"); if (hcb) hcb.addEventListener("click", function () {
+      var v = $("#hcNew").value, o = $("#hcOut");
+      if (!live()) { o.textContent = "Sign in as the Owner on suiteface.com to set the code."; return; }
+      if (v.length < 8) { o.textContent = "Use at least 8 characters."; return; }
+      window.SF_LIVE.rpc("set_house_comp_code", { p_new: v }).then(function (r) { o.textContent = r.error ? r.error.message : "✓ " + r.data + " Only staff email accounts can use it."; if (!r.error) $("#hcNew").value = ""; });
+    });
     $("#stSetPass").addEventListener("click", function () {
       var m = modal('<h3 style="font-size:1.8rem">Approval passcode</h3><p class="lede" style="margin:6px 0 10px">At least 12 characters with upper and lower case letters, a number and a symbol. Keep it in your password manager, not in email or chat.</p>' +
         '<div class="form-grid"><div class="field"><label for="pcCur">Current passcode <span class="hint">(leave blank the first time)</span></label><input id="pcCur" type="password" autocomplete="off"></div>' +
@@ -349,6 +356,17 @@
       .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error((j && j.message) || "Something went wrong."); return j; }); });
   }
   window.SF_rpc = rpc;
+  /* House comp: staff accounts (@suiteface.com, @gofirehorsego.com, thesuiteface@gmail.com) with the Owner's comp code get any member feature free.
+     The server checks both the code and the account's verified email; the code is kept only for this browser tab. */
+  function houseCode() { try { return window.SF_HOUSE || sessionStorage.getItem("sf.house") || ""; } catch (e) { return window.SF_HOUSE || ""; } }
+  function houseComp(item, ref) {
+    var code = houseCode(); if (!code || !window.SF_LIVE) return Promise.resolve(false);
+    return window.SF_LIVE.rpc("house_comp", { p_code: code, p_item: item, p_ref: ref || null }).then(function (r) {
+      if (r.error) { toast(r.error.message); return false; }
+      toast("🎩 Comped by the house. Enjoy!"); jackpot(2500); if (window.SF_AUTH) window.SF_AUTH.refresh(); return true;
+    });
+  }
+  window.SF_houseComp = houseComp;
   function marquee(s, cls) {
     var bulbs = ""; for (var i = 0; i < 22; i++) bulbs += "<i style=\"animation-delay:" + (i % 3) * .3 + "s\"></i>";
     return '<div class="vsign ' + (cls || "") + '"><div class="vbulbs">' + bulbs + '</div><span class="vtag">' + (s.house ? "House sponsor" : "Sponsored") + '</span><b class="vhead">' + esc(s.headline || s.business) + '</b>' +
@@ -447,6 +465,7 @@
     $$("[data-hr]", m).forEach(function (b) { b.addEventListener("click", function () { var kind = b.getAttribute("data-hr");
       signed(function () {
         if (!live) { demo(kind === "buyin" ? "buyin" : "verified"); return; }
+        if (kind === "buyin" && houseCode()) { houseComp("high_roller").then(function (ok) { if (ok) closeModal(); }); return; }
         if (kind === "buyin") { location.href = CFG.stripeHighRollerLink + "?client_reference_id=" + encodeURIComponent(window.SF_LIVE.memberId()) + "&prefilled_email=" + encodeURIComponent(window.SF_LIVE.email() || ""); return; }
         fetch(CFG.supabaseUrl + "/functions/v1/high-roller", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ action: "bank" }) })
           .then(function (r) { return r.json(); }).then(function (j) { if (j.url) location.href = j.url; else toast(j.error || "Couldn't open bank linking."); });
@@ -757,6 +776,7 @@
         STICKERS.filter(function (k) { return k[2] === pk; }).map(function (k) { return '<button type="button" class="stkpick' + (pk === "passport" ? " wide" : "") + '" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (open ? "" : ' data-locked="' + pk + '"') + ">" + k[1] + (open ? "" : "<em>🔒</em>") + "</button>"; }).join("") + "</div></div>"; }).join("");
   }
   function buy(id, label, price, then) {
+    if (houseCode() && window.SF_LIVE) { window.SF_LIVE.rpc("house_comp_check", { p_code: houseCode() }).then(function (r) { if (r.error || !r.data) { toast(r.error ? r.error.message : "Comp not valid."); return; } if (!owns(id)) P.owned.push(id); saveP(); toast("🎩 " + label + " comped by the house."); then && then(); }); return; }
     if (PUBLIC_SITE) { toast("Paid themes and sticker packs open soon. Free and earned ones are ready now."); return; }
     var m = modal('<h3 style="font-size:1.8rem">' + esc(label) + '</h3><p class="lede" style="margin:6px 0 12px">' + priceTag(price) + ', one time. It\'s yours for as long as you\'re a member.</p>' +
       '<div class="notice pv"><b>Preview mode.</b> On the live site this opens a secure Stripe checkout (card, Apple Pay, Google Pay, Cash App Pay). Here you can try it free.</div>' +
@@ -1380,6 +1400,13 @@
     inp.value = S.get("comp", "");
     function apply() {
       var v = inp.value.trim(); if (!v) { S.set("comp", ""); msg.textContent = "Comps are applied at checkout. One per member."; return; }
+      if (window.SF_LIVE && !KNOWN[v.toUpperCase()]) {
+        window.SF_LIVE.rpc("house_comp_check", { p_code: v }).then(function (r) {
+          if (!r.error && r.data) { window.SF_HOUSE = v; try { sessionStorage.setItem("sf.house", v); } catch (e) { } inp.value = ""; S.set("comp", ""); msg.innerHTML = "<b style='color:var(--gold-hi)'>🎩 House comp active on this tab: every checkout is free for your account.</b>"; jackpot(1800); burstAt($("#compApply"), 40); return; }
+          S.set("comp", v); msg.textContent = "Code saved. Stripe checks it at checkout.";
+        });
+        return;
+      }
       S.set("comp", v); var k = KNOWN[v.toUpperCase()];
       msg.innerHTML = k ? "<b style='color:var(--gold-hi)'>" + esc(k) + "</b>" : "Code saved. Stripe checks it at checkout.";
       if (k) { jackpot(1800); burstAt($("#compApply"), 40); }
@@ -2115,6 +2142,7 @@
   function liveBuyIn() {
     if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "buyin"); } catch (e) { } loginModal("create"); return; }
     if (ROLE !== "guest") { toast("You're already seated. Welcome back!"); location.hash = "face"; return; }
+    if (houseCode()) { houseComp("membership").then(function (ok) { if (ok) location.hash = "face"; }); return; }
     var comp = (S.get("comp", "") || "").trim();
     var link = PLAN === "launch" && LAUNCH.open && CFG.stripeLaunchLink ? CFG.stripeLaunchLink : CFG.stripePaymentLink;
     window.SF_AUTH.checkout(link, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
@@ -2550,6 +2578,7 @@
       });
     }
     function pay(action, id, order, errEl) {
+      if (houseCode()) { houseComp(action === "build" ? "casino_build" : "casino_zips", action === "build" ? id : order).then(function (ok) { if (ok) { closeModal(); loadMine(); find(); } }); return; }
       fetch(CFG.supabaseUrl + "/functions/v1/casino-billing", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ action: action, id: id, order: order }) })
         .then(function (r) { return r.json(); }).then(function (j) { if (j.url) location.href = j.url; else if (errEl) errEl.textContent = j.error || "Checkout couldn't start."; else toast(j.error || "Checkout couldn't start."); }, function () { if (errEl) errEl.textContent = "Checkout couldn't start. Try again."; });
     }
