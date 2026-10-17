@@ -2685,7 +2685,7 @@
         '<div class="field"><label for="cbTable">First Game Table</label><input type="text" id="cbTable" maxlength="40" placeholder="Tuesday Night Table"></div>' +
         '<div class="field"><label for="cbMeets">When and where it meets (a public place)</label><input type="text" id="cbMeets" maxlength="120" placeholder="Tuesdays 7pm · coffee shop downtown"></div>' +
         '<span class="err" id="cbErr" role="alert"></span>' +
-        '<div class="row"><button class="btn gold" type="submit" id="cbGo">Sign &amp; build</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>', { focus: "#cbName" });
+        '<div class="row"><button class="btn gold" type="submit" id="cbGo">Sign &amp; build</button><button class="btn ghost" type="button" id="cbDraft">Save draft · pay later</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>', { focus: "#cbName" });
       var nameT = null;
       var scope = "zips", states = [];
       function total() { return 2100 + (scope === "zips" ? Math.max(0, zips.length - 7) * 210 : 0) + (scope === "states" ? states.length * 21000 : 0) + (scope === "national" ? 210000 : 0); }
@@ -2714,6 +2714,38 @@
         nameT = setTimeout(function () { rpc("casino_name_available", { p_name: v }).then(function (ok) { $("#cbNameHint", m).textContent = ok ? "✓ " + v + " is available." : v + " is taken. Try another name."; $("#cbNameHint", m).className = ok ? "hint good" : "hint bad"; }, function () { }); }, 350);
       });
       cost();
+      /* Draft: everything typed here is kept on this device until the Casino is built, so nothing is lost. */
+      var DKEY = "casinoDraft";
+      function readDraft() {
+        return { name: $("#cbName", m).value, kind: $("#cbKind", m).value, about: $("#cbAbout", m).value, who: $("#cbWho", m).value, join: $("#cbJoin", m).value,
+          table: $("#cbTable", m).value, meets: $("#cbMeets", m).value, zips: zips.slice(), scope: scope, states: states.slice(), design: readDesign(m), at: Date.now() };
+      }
+      var saveDraftT = null;
+      function saveCasinoDraft() { clearTimeout(saveDraftT); saveDraftT = setTimeout(function () { S.set(DKEY, readDraft()); var n = $("#cbSaved", m); if (n) n.textContent = "Draft saved ✓"; }, 300); }
+      var dr = S.get(DKEY, null);
+      if (dr && dr.name !== undefined) {
+        $("#cbName", m).value = dr.name || ""; $("#cbKind", m).value = dr.kind || "friendship"; $("#cbAbout", m).value = dr.about || "";
+        $("#cbWho", m).value = dr.who || "everyone"; $("#cbJoin", m).value = dr.join || "request"; $("#cbTable", m).value = dr.table || ""; $("#cbMeets", m).value = dr.meets || "";
+        zips = dr.zips || zips; scope = dr.scope || "zips"; states = dr.states || [];
+        var dz = dr.design || {};
+        if ($("#cdVenue", m)) {
+          if (dz.venue) { $("#cdVenue", m).value = dz.venue; m.__venueTouched = true; }
+          if (dz.sign) $("#cdSign", m).value = dz.sign; if (dz.palette) $("#cdPal", m).value = dz.palette;
+          if (dz.c1) $("#cdC1", m).value = dz.c1; if (dz.c2) $("#cdC2", m).value = dz.c2; $("#cdClimate", m).value = dz.climate || "";
+          $$('input[name="cdTheme"]', m).forEach(function (x) { x.checked = (dz.themes || []).indexOf(x.value) > -1; });
+          $$('input[name="cdAm"]', m).forEach(function (x) { x.checked = (dz.amenities || []).indexOf(x.value) > -1; });
+          $("#cdTag", m).value = dz.tagline || ""; $("#cdCity", m).value = dz.city || ""; $("#cdMascot", m).value = dz.mascot || ""; $("#cdWelcome", m).value = dz.welcome || "";
+        }
+        cost(); $("#cbName", m).dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      var bar = document.createElement("div"); bar.className = "cbdraft";
+      bar.innerHTML = '<span id="cbSaved">' + (dr && dr.name !== undefined ? "Draft restored ✓ Pick up where you left off." : "Your progress saves as you go.") + '</span><button type="button" class="linkish" id="cbReset">Start over</button>';
+      $("#cbForm", m).insertBefore(bar, $("#cbForm", m).firstChild);
+      $("#cbReset", m).onclick = function () { if (!confirm("Clear this Casino draft and start over?")) return; S.set(DKEY, null); closeModal(); buildModal(); };
+      m.addEventListener("input", saveCasinoDraft); m.addEventListener("change", saveCasinoDraft); m.addEventListener("click", function (e) { if (e.target.closest("[data-scope],[data-st],[data-z],#cbZipAdd")) saveCasinoDraft(); });
+      var draftOnly = false;
+      $("#cbDraft", m).onclick = function () { draftOnly = true; $("#cbForm", m).requestSubmit ? $("#cbForm", m).requestSubmit() : $("#cbForm", m).dispatchEvent(new Event("submit", { cancelable: true })); };
+      $("#cbGo", m).addEventListener("click", function () { draftOnly = false; });
       $("#cbForm", m).addEventListener("submit", function (e) {
         e.preventDefault(); var err = $("#cbErr", m);
         var d = { style: readDesign(m), p_name: $("#cbName", m).value.trim(), p_kind: $("#cbKind", m).value, p_about: $("#cbAbout", m).value.trim(), p_zips: zips.slice(), p_who: $("#cbWho", m).value, p_join: $("#cbJoin", m).value, p_first_table: $("#cbTable", m).value.trim(), p_meets: $("#cbMeets", m).value.trim() };
@@ -2734,10 +2766,13 @@
               if (/Casino Host Agreement/i.test(r.error.message)) { window.SFSign.require("casino", build, { about: d.p_name }); return; }
               err.textContent = r.error.message; return;
             }
-            var newId = r.data.id;
+            var newId = r.data.id; S.set("casinoDraft", null);
             window.SF_LIVE.rpc("set_casino_scope", { p_casino: newId, p_scope: scope, p_states: states }).then(function (sr) {
               if (sr.error) { err.textContent = sr.error.message; return; }
-              window.SF_LIVE.rpc("set_casino_style", { p_casino: newId, p_style: d.style || {} }).then(function () { pay("build", newId, null, err); });
+              window.SF_LIVE.rpc("set_casino_style", { p_casino: newId, p_style: d.style || {} }).then(function () {
+                if (draftOnly) { closeModal(); toast("🚧 Saved as Under construction. Finish it anytime under Casinos you host."); loadMine(); var cm = $("#casMine"); if (cm) setTimeout(function () { cm.scrollIntoView({ behavior: "smooth", block: "center" }); }, 400); return; }
+                pay("build", newId, null, err);
+              });
             });
           });
         }
@@ -2757,12 +2792,15 @@
 
     /* ----- Host tools ----- */
     function manage(c) {
-      var m = modal('<h3 style="font-size:1.8rem">Run ' + esc(c.name) + '</h3><p class="hint">' + ({ unpaid: "Not paid yet.", review: "Paid. Waiting for the name check; you can set up tables now.", open: "Open on the floor.", rejected: "Not approved: " + (c.review_note || "rename and resubmit for free.") }[c.status] || "") + "</p>" +
+      var m = modal('<h3 style="font-size:1.8rem">Run ' + esc(c.name) + '</h3><p class="hint">' + ({ unpaid: "🚧 Under construction. Edit anything below, then tap Finish & pay when it's ready.", review: "Paid. Waiting for the name check; you can set up tables now.", open: "Open on the floor.", rejected: "Not approved: " + (c.review_note || "rename and resubmit for free.") }[c.status] || "") + "</p>" +
         '<h4>Members &amp; requests</h4><div id="cmPeople" class="cmpeople"><p class="hint">Loading…</p></div>' +
         '<h4>Add a Game Table</h4><div class="casbar"><input type="text" id="cmTName" maxlength="40" placeholder="Saturday Service"><input type="text" id="cmTMeets" maxlength="120" placeholder="Sat 9am · food bank"><button class="btn ghost sm" type="button" id="cmTAdd">Add table</button></div>' +
         '<h4>Add ZIP codes · $2.10 each</h4><div class="casbar"><input type="text" id="cmZips" maxlength="60" placeholder="35212, 35213"><button class="btn ghost sm" type="button" id="cmZipGo">Pay &amp; add</button></div>' +
         (c.status === "rejected" ? '<h4>Rename &amp; resubmit (free)</h4><div class="casbar"><input type="text" id="cmRename" maxlength="40" value="' + esc(c.name) + '"><button class="btn ghost sm" type="button" id="cmRenameGo">Resubmit</button></div>' : "") +
-        (c.status === "unpaid" ? '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="cmPay">Finish payment</button></div>' : "") +
+        (c.status === "unpaid" ? '<h4>Name &amp; details</h4><div class="field"><label for="cmName">Casino name</label><input type="text" id="cmName" maxlength="40" value="' + esc(c.name) + '"></div>' +
+          '<div class="field"><label for="cmAbout">About it</label><textarea id="cmAbout" maxlength="600" rows="3">' + esc(c.about || "") + '</textarea></div>' +
+          '<div class="row"><button class="btn ghost sm" type="button" id="cmSaveInfo">Save details</button></div>' +
+          '<div class="row" style="margin-top:12px"><button class="btn gold" type="button" id="cmPay">Finish &amp; pay</button></div>' : "") +
         (SC ? '<h4>Redesign</h4><div class="row"><button class="btn ghost sm" type="button" id="cmDesign">Change the look of your Casino</button><a class="btn ghost sm" href="casino.html?c=' + encodeURIComponent(c.id) + '">Walk in ›</a></div>' : "") +
         '<span class="err" id="cmErr" role="alert"></span><div class="row" style="margin-top:12px"><button class="btn ghost sm" type="button" id="cmClose">Close this Casino</button><button class="btn ghost" type="button" data-close>Done</button></div>');
       var err = $("#cmErr", m);
@@ -2777,6 +2815,12 @@
       $("#cmZipGo", m).onclick = function () { var z = ($("#cmZips", m).value.match(/\d{5}/g) || []); if (!z.length) { err.textContent = "Enter ZIP codes, separated by commas."; return; } call("add_casino_zips", { p_casino: c.id, p_zips: z }).then(function (r) { pay("zips", c.id, r.order, err); }, function (x) { err.textContent = x.message; }); };
       if ($("#cmRenameGo", m)) $("#cmRenameGo", m).onclick = function () { call("rename_casino", { p_casino: c.id, p_name: $("#cmRename", m).value.trim() }).then(function () { closeModal(); toast("Resubmitted for the name check."); loadMine(); }, function (x) { err.textContent = x.message; }); };
       if ($("#cmDesign", m)) $("#cmDesign", m).onclick = function () { closeModal(); redesign(c); };
+      if ($("#cmSaveInfo", m)) $("#cmSaveInfo", m).onclick = function () {
+        var nm = $("#cmName", m).value.trim(), ab = $("#cmAbout", m).value.trim();
+        var jobs = [call("update_casino", { p_casino: c.id, p_about: ab, p_who: c.who || "everyone", p_join: c.join_mode || "request" })];
+        if (nm && nm !== c.name) jobs.push(call("rename_casino", { p_casino: c.id, p_name: nm }));
+        Promise.all(jobs).then(function () { c.name = nm || c.name; c.about = ab; toast("Saved."); loadMine(); }, function (x) { err.textContent = x.message; });
+      };
       if ($("#cmPay", m)) $("#cmPay", m).onclick = function () { pay("build", c.id, null, err); };
       $("#cmClose", m).onclick = function () { if (!confirm("Close " + c.name + "? Members lose access and the name is released.")) return; call("close_casino", { p_casino: c.id }).then(function () { closeModal(); toast("Casino closed."); loadMine(); find(); }, function (x) { err.textContent = x.message; }); };
     }
@@ -2787,12 +2831,12 @@
     }
     function loadMine() {
       var box = $("#casMine"); if (!live()) { box.hidden = true; return; }
-      window.SF_LIVE.client.from("casinos").select("id,name,kind,about,zips,who,join_mode,status,review_note,style").eq("host_id", window.SF_LIVE.memberId()).neq("status", "closed").then(function (r) {
+      window.SF_LIVE.client.from("casinos").select("id,name,kind,about,zips,who,join_mode,status,review_note,style,scope,states").eq("host_id", window.SF_LIVE.memberId()).neq("status", "closed").then(function (r) {
         var rows = r.data || [];
         P.hostCasinos = rows.filter(function (x) { return x.status === "open"; }).map(function (x) { return x.name; }); saveP(); renderCard();
         if (!rows.length) { box.hidden = true; return; }
         box.hidden = false;
-        box.innerHTML = '<h3>Casinos you host</h3><div class="caslist">' + rows.map(function (x) { return '<button type="button" class="cascard" data-mine="' + x.id + '"><span class="casmarq"><i>' + (KIND[x.kind] ? KIND[x.kind][1] : "🎰") + "</i>" + esc(x.name) + '</span><span class="casfoot"><b>' + esc({ unpaid: "Waiting for payment", review: "In review", open: "Open", rejected: "Needs a new name" }[x.status] || x.status) + "</b></span></button>"; }).join("") + "</div>";
+        box.innerHTML = '<h3>Casinos you host</h3><div class="caslist">' + rows.map(function (x) { return '<button type="button" class="cascard" data-mine="' + x.id + '"><span class="casmarq"><i>' + (KIND[x.kind] ? KIND[x.kind][1] : "🎰") + "</i>" + esc(x.name) + '</span><span class="casfoot"><b>' + esc({ unpaid: "🚧 Under construction · not paid yet", review: "In review", open: "Open", rejected: "Needs a new name" }[x.status] || x.status) + "</b></span></button>"; }).join("") + "</div>";
         box.onclick = function (e) { var b = e.target.closest("[data-mine]"); if (!b) return; var x = rows.filter(function (y) { return y.id === b.getAttribute("data-mine"); })[0]; x.my_status = "host"; manage(x); };
       });
     }

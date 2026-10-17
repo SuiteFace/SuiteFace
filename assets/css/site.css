@@ -982,3 +982,5 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 #cbScope .chip small{font-size:.74rem;opacity:.8;margin-left:4px}
 .cbstates{max-height:190px;overflow:auto;padding:2px}
 .cbstates .chip{min-width:52px;justify-content:center}
+.cbdraft{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:rgba(30,122,76,.18);border:1px solid rgba(30,122,76,.55);font-size:.86rem;color:#CFE8D8}
+.cbdraft .linkish{color:#FFB4BC}
