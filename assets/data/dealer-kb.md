@@ -124,6 +124,12 @@ No profile is activated and no payment is processed until the matching agreement
 
 **4.1a The 12-Card Deck Guarantee.** If SuiteFace can't deal you **at least 12 cards within 10 days** of your Buy-In, you choose: **get your $21.00 back** (your membership then ends), or **stay with full access** while more players join your table. Ask from Settings → Membership, or email help@suiteface.com with the subject "Deck Guarantee," anytime in the 30 days after those first 10 days. We refund within 10 days.
 
+**4.1b Launch offer (October 17–31, 2026).** For members who buy in between **October 17, 2026 and 11:59 p.m. Central Time on October 31, 2026**, the $21.00 Buy-In is **waived**: you pay **$2.10 today and $2.10 every month** until you cancel. The waiver applies once per person and only while the offer is open. If a launch member's membership later ends (including a pause longer than 21 days), rejoining requires the regular $21.00 Buy-In. Because no Buy-In is paid, the 12-Card Deck Guarantee refund in 4.1a doesn't apply to launch seats; launch members can cancel anytime to stop future charges.
+
+**4.1c The First 1,000.** While the launch offer is open, a member may instead choose to pay the regular **$21.00 Buy-In** to become one of **SuiteFace's First 1,000**. First 1,000 members receive a numbered **★ First 1,000** badge and sticker on their card for as long as they're members; numbers are assigned in the order payments are received, and the badge ends when the first 1,000 are taken or the launch offer closes, whichever comes first. **The First 1,000 Buy-In is non-refundable, including under the 12-Card Deck Guarantee in 4.1a, even if fewer than 12 cards are dealt in the 10 days after the payment is received**, except where the law requires otherwise. Monthly membership of $2.10 then starts 30 days after the Buy-In.
+
+**4.1d Referral credits and stickers.** Each member has an invite link. When someone who used your link creates an account and completes a paid membership (a Buy-In or a launch seat), SuiteFace credits **$2.10** to your account, applied to your next monthly charges, **up to 12 credits ($25.20) per member**, and unlocks a unique referral sticker for your card (one per successful referral, up to 12). Credits have no cash value, can't be transferred, and end if your membership ends. You can't refer yourself or create accounts to earn credits; SuiteFace may reverse credits and stickers earned in breach of these Terms.
+
 **4.2 What you pay.**
 
 | Charge | Amount | When |
@@ -303,6 +309,8 @@ I confirm that:
 4. Charges are **non-refundable** except where the law requires.
 5. Contact with other members requires an active paid membership.
 6. **12-Card Deck Guarantee:** if I'm dealt fewer than 12 cards within 10 days, I may ask for my $21.00 back or choose to stay (Terms 4.1a).
+7. **Launch offer (Oct 17–31, 2026):** if I join with a launch seat, the $21.00 Buy-In is waived and I authorize **$2.10 today and every month** until I cancel; rejoining after my membership ends requires the $21.00 Buy-In (Terms 4.1b).
+8. **First 1,000:** if I choose the First 1,000 during the launch offer, I authorize the **$21.00 Buy-In, which is non-refundable even under the 12-Card Deck Guarantee**, and I receive a numbered First 1,000 badge (Terms 4.1c).
 
 ### C. Joker Maker Lobby Entry Agreement
 

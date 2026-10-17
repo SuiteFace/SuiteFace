@@ -890,3 +890,20 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 .hint.good{color:#7FD6A4}.hint.bad{color:#E5505E}
 .hostline{margin-top:4px;font:800 .78rem Figtree,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#E8C46A}
 @media (prefers-reduced-motion:reduce){.casign::before{animation:none}.cascard{transition:none}}
+
+/* ---------- launch offer ---------- */
+.launchbox{display:grid;gap:10px;padding:16px;border-radius:16px;background:radial-gradient(120% 120% at 0% 0%,rgba(200,150,30,.28),transparent 60%),#2a2230;border:1.5px solid #E8C46A;box-shadow:0 0 0 4px rgba(232,196,106,.12),0 0 30px -8px rgba(232,196,106,.5)}
+.launchbox h3{margin:0;font-size:1.6rem}
+.launchopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.lopt{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:4px;padding:12px 14px;border-radius:14px;border:1.5px solid rgba(250,247,240,.2);background:rgba(23,21,27,.6);transition:border-color .15s,box-shadow .15s}
+.lopt b{font:800 1.1rem var(--display,"Big Shoulders Display"),Impact,sans-serif;text-transform:uppercase;letter-spacing:.04em;color:#FAF7F0}
+.lopt span{font-size:.86rem;color:#CFC6B6}.lopt em{font-style:normal;font-size:.78rem;color:#E8C46A;font-weight:700}
+.lopt[aria-checked="true"]{border-color:#E8C46A;box-shadow:0 0 0 3px rgba(232,196,106,.25);background:rgba(200,150,30,.14)}
+.lopt:focus-visible{outline:3px solid #FFE7A3;outline-offset:2px}
+.f1kline{margin-top:4px;font:800 .78rem Figtree,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#C8961E}
+.stkpick.earnlock{opacity:.45;filter:grayscale(.6)}
+.tm{font-size:.42em;vertical-align:super;line-height:0;margin-left:2px;font-weight:800;letter-spacing:0;color:inherit;font-family:Figtree,system-ui,sans-serif}
+.brand .tm{align-self:flex-start;margin-top:2px;font-size:.62rem;color:var(--cream,#FAF7F0)}
+.tmwrap{position:relative}.tmwrap>.tm{position:absolute;right:-1.1em;top:0;font-size:.9rem}
+.copyright{line-height:1.5}
+.lopt{align-content:start}

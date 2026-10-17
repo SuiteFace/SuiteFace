@@ -31,13 +31,13 @@
   function show() {
     var g = document.createElement("div"); g.className = "sfg"; g.setAttribute("role", "dialog"); g.setAttribute("aria-modal", "true"); g.setAttribute("aria-labelledby", "sfgT");
     g.innerHTML = '<div class="sfg-box"><span class="sfg-badge" aria-hidden="true">18+</span>' +
-      '<h2 id="sfgT">Welcome to SuiteFace</h2>' +
+      '<h2 id="sfgT">Welcome to SuiteFace<sup style="font-size:.4em;vertical-align:super;margin-left:2px">™</sup></h2>' +
       '<p>SuiteFace is a dating site for <b>adults 18 and older</b>. Meeting people carries real risk: always meet in public, and call 911 in an emergency.</p>' +
       '<label class="sfg-check"><input type="checkbox" id="sfgAge"> <span>I confirm I am <b>18 years of age or older</b>.</span></label>' +
       '<label class="sfg-check"><input type="checkbox" id="sfgTerms"> <span>I agree to the <a href="' + up + 'terms.html" target="_blank" rel="noopener">Terms of Service</a> and have read the <a href="' + up + 'privacy.html" target="_blank" rel="noopener">Privacy Policy</a>, <a href="' + up + 'safety.html" target="_blank" rel="noopener">Safety Guide</a> and <a href="' + up + 'state-notices.html" target="_blank" rel="noopener">State Notices</a>.</span></label>' +
       '<div class="sfg-err" id="sfgErr" role="alert"></div>' +
       '<div class="sfg-row"><button class="sfg-go" type="button" id="sfgGo" aria-disabled="true">Enter SuiteFace</button><button class="sfg-no" type="button" id="sfgNo">I\'m under 18</button></div>' +
-      '<p class="sfg-fine">SuiteFace Inc., a Florida corporation. You\'ll confirm your full date of birth and sign the Sign-up Agreement when you create an account. Questions: <a href="mailto:help@suiteface.com">help@suiteface.com</a> · <a href="' + up + 'legal.html" target="_blank" rel="noopener">Legal center</a></p></div>';
+      '<p class="sfg-fine">© 2026 SuiteFace Inc., a Florida corporation. You\'ll confirm your full date of birth and sign the Sign-up Agreement when you create an account. Questions: <a href="mailto:help@suiteface.com">help@suiteface.com</a> · <a href="' + up + 'legal.html" target="_blank" rel="noopener">Legal center</a></p></div>';
     document.body.appendChild(g);
     document.documentElement.style.overflow = "hidden";
     var age = g.querySelector("#sfgAge"), terms = g.querySelector("#sfgTerms"), go = g.querySelector("#sfgGo"), err = g.querySelector("#sfgErr");

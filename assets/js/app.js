@@ -719,7 +719,7 @@
     ["midnight", "Midnight Felt", "premium", 2.10, "radial-gradient(circle at 30% 20%,#FFE7A3 0 1px,transparent 2px) 0 0/18px 18px,linear-gradient(135deg,#2B2730,#4A1F5C)", "Starry back room"]
   ];
   /* Sticker packs: [id, look, pack]. Stamps and showtime stickers are original art: no real names, faces or logos. */
-  var PACKS = { free: ["Free", 0], roller: ["High Roller", 2.10], passport: ["Passport Stamps", 2.10], showtime: ["Showtime", 2.10] };
+  var PACKS = { earned: ["Earned", 0], free: ["Free", 0], roller: ["High Roller", 2.10], passport: ["Passport Stamps", 2.10], showtime: ["Showtime", 2.10] };
   function stamp(city, sub, c, shape) { return '<b class="pstamp ' + (shape || "") + '" style="--c:' + c + '">' + city + "<small>" + sub + "</small></b>"; }
   var STICKERS = [
     ["dice", "🎲", "free"], ["chip", "🪙", "free"], ["spade", "♠️", "free"],
@@ -727,11 +727,17 @@
     ["vegas", stamp("LAS VEGAS", "NV ✈ ARRIVED", "#9B1B30"), "passport"], ["paris", stamp("PARIS", "FR · ADMIS", "#6E3A9E", "rnd"), "passport"], ["tokyo", stamp("TOKYO", "JP 入国", "#C23B7A", "rnd"), "passport"],
     ["nola", stamp("NEW ORLEANS", "LA · LAISSEZ", "#1E7A4C"), "passport"], ["nyc", stamp("NEW YORK", "NY · JFK", "#2B2730"), "passport"], ["cancun", stamp("CANCÚN", "MX · ENTRADA", "#D2622A", "rnd"), "passport"],
     ["rome", stamp("ROMA", "IT · ARRIVO", "#8A5A1C"), "passport"], ["nashville", stamp("NASHVILLE", "TN · BNA", "#C8961E", "rnd"), "passport"], ["bahamas", stamp("NASSAU", "BS · ARRIVED", "#1E7A4C", "rnd"), "passport"],
+    ["first1000", stamp("FIRST 1,000", "FOUNDING PLAYER", "#C8961E"), "earned"],
+    ["ref1", stamp("SEAT SAVER", "INVITE № 1", "#9B1B30", "rnd"), "earned"], ["ref2", stamp("DOUBLE DOWN", "INVITE № 2", "#1E7A4C"), "earned"], ["ref3", stamp("THREE OF A KIND", "INVITE № 3", "#6E3A9E", "rnd"), "earned"],
+    ["ref4", stamp("FOUR ACES", "INVITE № 4", "#C23B7A"), "earned"], ["ref5", stamp("HIGH FIVE", "INVITE № 5", "#D2622A", "rnd"), "earned"], ["ref6", stamp("HOT HAND", "INVITE № 6", "#9B1B30"), "earned"],
+    ["ref7", stamp("LUCKY SEVEN", "INVITE № 7", "#1E7A4C", "rnd"), "earned"], ["ref8", stamp("CRAZY EIGHTS", "INVITE № 8", "#C8961E"), "earned"], ["ref9", stamp("DEALER'S CHOICE", "INVITE № 9", "#6E3A9E", "rnd"), "earned"],
+    ["ref10", stamp("TABLE BOSS", "INVITE № 10", "#C23B7A"), "earned"], ["ref11", stamp("FULL HOUSE", "INVITE № 11", "#D2622A", "rnd"), "earned"], ["ref12", stamp("ROYAL FLUSH", "INVITE № 12", "#8A5A1C"), "earned"],
     ["carpet", "🎞️", "showtime"], ["popcorn", "🍿", "showtime"], ["clap", "🎬", "showtime"], ["trophy", "🏆", "showtime"], ["mic", "🎤", "showtime"], ["shades", "🕶️", "showtime"], ["limo", "🚘", "showtime"], ["camera", "📸", "showtime"], ["walk", "🌟", "showtime"]
   ];
   var THEME = {}; THEMES.forEach(function (t) { THEME[t[0]] = t; });
   P.theme = P.theme === "straight" ? "classic" : (P.theme || "private"); P.stickers = P.stickers || []; P.owned = P.owned || [];
   function owns(id) { return P.owned.indexOf(id) > -1; }
+  function earnedHas(id) { if (id === "first1000") return !!P.founderNo; var n = +String(id).replace("ref", ""); return (P.refCount || 0) >= n; }
   function priceTag(n) { return n ? "$" + n.toFixed(2) : "Free"; }
   var styleField = document.createElement("div"); styleField.className = "field cardstyle";
   styleField.innerHTML = '<span style="font-weight:700">Card style</span>' +
@@ -746,10 +752,12 @@
     $("#thFree").innerHTML = THEMES.filter(function (t) { return t[2] !== "premium"; }).map(tile).join("");
     $("#thPrem").innerHTML = THEMES.filter(function (t) { return t[2] === "premium"; }).map(tile).join("");
     $("#stk").innerHTML = Object.keys(PACKS).map(function (pk) { var pv = PACKS[pk], open = !pv[1] || owns("pack_" + pk) || (pk === "roller" && owns("stickers"));
+      if (pk === "earned") return '<div class="stkpack"><span class="stkhead">Earned <span class="hint">(First 1,000 and one for each friend who joins, up to 12)</span></span><div class="stickers">' + STICKERS.filter(function (k) { return k[2] === "earned"; }).map(function (k) { var got = earnedHas(k[0]); return '<button type="button" class="stkpick wide' + (got ? "" : " earnlock") + '" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (got ? "" : ' data-earn="' + k[0] + '"') + ">" + k[1] + (got ? "" : "<em>🔒</em>") + "</button>"; }).join("") + "</div></div>";
       return '<div class="stkpack"><span class="stkhead">' + pv[0] + (open ? "" : ' <button type="button" class="unlockbtn" data-pack="' + pk + '">Unlock · $' + pv[1].toFixed(2) + "</button>") + '</span><div class="stickers">' +
         STICKERS.filter(function (k) { return k[2] === pk; }).map(function (k) { return '<button type="button" class="stkpick' + (pk === "passport" ? " wide" : "") + '" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (open ? "" : ' data-locked="' + pk + '"') + ">" + k[1] + (open ? "" : "<em>🔒</em>") + "</button>"; }).join("") + "</div></div>"; }).join("");
   }
   function buy(id, label, price, then) {
+    if (PUBLIC_SITE) { toast("Paid themes and sticker packs open soon. Free and earned ones are ready now."); return; }
     var m = modal('<h3 style="font-size:1.8rem">' + esc(label) + '</h3><p class="lede" style="margin:6px 0 12px">' + priceTag(price) + ', one time. It\'s yours for as long as you\'re a member.</p>' +
       '<div class="notice pv"><b>Preview mode.</b> On the live site this opens a secure Stripe checkout (card, Apple Pay, Google Pay, Cash App Pay). Here you can try it free.</div>' +
       '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="buyGo">Try it (preview)</button><button class="btn ghost" type="button" data-close>Not now</button></div>');
@@ -760,6 +768,7 @@
     if (pb) { var pk2 = pb.getAttribute("data-pack"); return buy("pack_" + pk2, PACKS[pk2][0] + " sticker pack", PACKS[pk2][1], function () { renderStyle(); }); }
     if (t) { var th = THEME[t.getAttribute("data-th")]; var apply = function () { P.theme = th[0]; renderStyle(); onChange(); };
       if (th[3] && !owns(th[0])) return buy(th[0], th[1] + " theme", th[3], apply); return apply(); }
+    if (k && k.hasAttribute("data-earn")) { var ek = k.getAttribute("data-earn"); toast(ek === "first1000" ? "The First 1,000 badge goes to members who chose the $21 Buy-In during the launch offer." : "Unlocks when " + ek.replace("ref", "") + " friend" + (ek === "ref1" ? "" : "s") + " you invited join SuiteFace. Share your invite link from Invite."); return; }
     if (k) { var id = k.getAttribute("data-stk");
       if (k.hasAttribute("data-locked")) { var pk = k.getAttribute("data-locked"); return buy("pack_" + pk, PACKS[pk][0] + " sticker pack", PACKS[pk][1], function () { renderStyle(); }); }
       var at = P.stickers.indexOf(id); if (at > -1) P.stickers.splice(at, 1); else { if (P.stickers.length >= 3) { toast("Up to 3 stickers. Tap one to remove it."); return; } P.stickers.push(id); }
@@ -1045,7 +1054,7 @@
     var thm = THEME[P.theme] || THEME.private; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +
-      '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") + ((P.hostCasinos || []).length ? '<div class="hostline">🎰 Host · ' + esc(P.hostCasinos.join(" · ")) + "</div>" : "") + (P.highRoller ? '<div class="hrb mine">💎 High Roller' + (P.highRoller === "verified" ? " ✓ Verified" : "") + "</div>" + (P.masked ? '<div class="maskline">🎭 Others see: ' + esc(P.maskName || "Masked High Roller") + (parseInt(P.age, 10) ? ", " + (parseInt(P.age, 10) - 1) + "–" + (parseInt(P.age, 10) + 1) : "") + "</div>" : "") : "") +
+      '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") + (P.founderNo ? '<div class="f1kline">★ First 1,000 · №' + String(P.founderNo).padStart(4, "0") + "</div>" : "") + ((P.hostCasinos || []).length ? '<div class="hostline">🎰 Host · ' + esc(P.hostCasinos.join(" · ")) + "</div>" : "") + (P.highRoller ? '<div class="hrb mine">💎 High Roller' + (P.highRoller === "verified" ? " ✓ Verified" : "") + "</div>" + (P.masked ? '<div class="maskline">🎭 Others see: ' + esc(P.maskName || "Masked High Roller") + (parseInt(P.age, 10) ? ", " + (parseInt(P.age, 10) - 1) + "–" + (parseInt(P.age, 10) + 1) : "") + "</div>" : "") : "") +
       '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" +
       '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="stk-' + k[2] + '">' + k[1] + "</span>" : ""; }).join("") + "</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
@@ -1310,6 +1319,52 @@
     });
   }
 
+
+  /* ---------- Launch offer (15 days): Buy-In waived, or choose First 1,000 ---------- */
+  var LAUNCH = { open: false, ends: "2026-11-01T05:00:00Z", left: 1000 }, PLAN = "launch";
+  function launchUI() {
+    var box = $("#launchBox"); if (!box) return;
+    LAUNCH.open = LAUNCH.open && new Date(LAUNCH.ends).getTime() > Date.now();
+    box.hidden = !LAUNCH.open;
+    if (!LAUNCH.open) PLAN = "first";
+    var first = $('[data-plan="first"]', box); if (first) first.hidden = LAUNCH.left <= 0;
+    if (LAUNCH.left <= 0 && PLAN === "first" && LAUNCH.open) PLAN = "launch";
+    $$("[data-plan]", box).forEach(function (b) { b.setAttribute("aria-checked", String(b.getAttribute("data-plan") === PLAN)); });
+    var end = new Date(LAUNCH.ends), ms = end.getTime() - Date.now(), d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5);
+    $("#launchEnds").textContent = new Date(end.getTime() - 1).toLocaleDateString([], { month: "short", day: "numeric", timeZone: "America/Chicago" }) + " at 11:59 pm CT";
+    $("#launchLeft").textContent = ms > 0 ? (d ? d + " day" + (d === 1 ? "" : "s") + " " : "") + h + " hr left." : "";
+    $("#f1kLeft").textContent = LAUNCH.left.toLocaleString() + " of 1,000 left";
+    var launch = LAUNCH.open && PLAN === "launch";
+    $("#payBtn").textContent = launch ? "Join for $2.10 with Stripe" : (LAUNCH.open ? "Pay $21.00 · First 1,000" : "Pay $21.00 with Stripe");
+    var ag = $("#agree").parentElement.querySelector("span");
+    ag.innerHTML = launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and SuiteFace charges <b>$2.10 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership (rejoining then requires the Buy-In). I agree to the <a href="terms.html">Terms of Service</a>.'
+      : LAUNCH.open ? 'I choose the <b>First 1,000</b> Buy-In instead of the free launch seat. SuiteFace charges <b>$21.00 USD today, non-refundable</b> (the 12-Card Deck Guarantee doesn\'t apply to it), then <b>$2.10 USD every month</b> starting in 30 days until I cancel. I agree to the <a href="terms.html">Terms of Service</a>.'
+      : 'I understand that SuiteFace charges <b>$21.00 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership. I agree to the <a href="terms.html">Terms of Service</a>.';
+    var amt = document.querySelector("#membership .amt"); if (amt) amt.textContent = launch ? "$0" : "$21";
+  }
+  $("#launchBox").addEventListener("click", function (e) { var b = e.target.closest("[data-plan]"); if (!b) return; PLAN = b.getAttribute("data-plan"); $("#agree").checked = false; launchUI(); });
+  (function () {
+    var fallback = function () { LAUNCH.open = new Date(LAUNCH.ends).getTime() > Date.now(); launchUI(); };
+    if (!CFG.supabaseUrl) { fallback(); return; }
+    rpc("launch_status", {}).then(function (r) { LAUNCH.open = !!r.open; if (r.ends) LAUNCH.ends = r.ends; LAUNCH.left = r.first1000_left == null ? 1000 : r.first1000_left; launchUI(); }, fallback);
+    setInterval(launchUI, 60000);
+  })();
+  /* Referrals: ?ref=handle (or the older ?invite=) is remembered and credited to the inviter once the new member signs in. */
+  (function () {
+    var m = location.search.match(/[?&](?:ref|invite)=([a-z0-9._]{3,24})/i);
+    if (m) { try { localStorage.setItem("sf.ref", m[1].toLowerCase()); } catch (e) { } }
+    document.addEventListener("sf:live", function () {
+      if (!window.SF_LIVE) return;
+      var ref = null; try { ref = localStorage.getItem("sf.ref"); } catch (e) { }
+      if (ref) window.SF_LIVE.rpc("set_referrer", { p_handle: ref }).then(function (r) { if (!r.error && r.data !== "not_found") { try { localStorage.removeItem("sf.ref"); } catch (e) { } } });
+      window.SF_LIVE.rpc("my_perks").then(function (r) {
+        if (r.error || !r.data) return; P.founderNo = r.data.founder_no || null; P.refCount = r.data.referrals || 0; saveP();
+        try { renderStyle(); } catch (e) { } renderCard();
+      });
+    });
+    var q = location.search.match(/[?&](joined|buyin)=(1|success)/);
+    if (q) setTimeout(function () { toast("Payment received. Welcome to the table! Your seat opens in a moment."); jackpot(4000); if (window.SF_AUTH) window.SF_AUTH.refresh(); }, 1200);
+  })();
   /* ---------- membership (Stripe) ---------- */
   function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."; $("#agree").focus(); return false; }
   $("#payBtn").addEventListener("click", function (e) {
@@ -1413,7 +1468,7 @@
     if (!n) { $("#iNameErr").textContent = "Add your friend's first name."; $("#iName").focus(); return; }
     $("#iNameErr").textContent = "";
     var from = (P.handle || "").trim().replace(/^@/, "");
-    var link = CFG.siteUrl + "?invite=" + encodeURIComponent(from || "a-friend") + "&seat=" + encodeURIComponent(n) + "#join";
+    var link = CFG.siteUrl + "?ref=" + encodeURIComponent(from || "a-friend") + "&seat=" + encodeURIComponent(n) + "#membership";
     var note = $("#iNote").value.trim() || "You'd be an Ace in somebody's Hand.";
     var msg = "Hey " + n + "! " + note + " I saved you a seat at SuiteFace, dating dealt like a deck of cards. No Jokers Needed: " + link;
     $("#inviteLink").value = link; $("#inviteOut").hidden = false;
@@ -2061,7 +2116,8 @@
     if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "buyin"); } catch (e) { } loginModal("create"); return; }
     if (ROLE !== "guest") { toast("You're already seated. Welcome back!"); location.hash = "face"; return; }
     var comp = (S.get("comp", "") || "").trim();
-    window.SF_AUTH.checkout(CFG.stripePaymentLink, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
+    var link = PLAN === "launch" && LAUNCH.open && CFG.stripeLaunchLink ? CFG.stripeLaunchLink : CFG.stripePaymentLink;
+    window.SF_AUTH.checkout(link, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
   }
   if (!CAN_SWITCH && $("#roleBtn")) $("#roleBtn").hidden = true;
   function allowed(need) {
