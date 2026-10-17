@@ -2214,6 +2214,7 @@
       if (/already registered/i.test(s)) return "That email already has an account. Log in instead.";
       if (/rate limit|too many/i.test(s)) return "Too many tries. Wait a minute and try again.";
       if (/Failed to fetch|offline|NetworkError/i.test(s)) return "Can't reach SuiteFace right now. Check your connection.";
+      if (/error sending|sending .*email|smtp/i.test(s)) return "We couldn't send that email just now. Try again in a few minutes, or log in with your password.";
       return s;
     }
     window.SF_AUTH.ready(function (bad) {
