@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>House Fit Rules · SuiteFace</title>
+<meta name="description" content="How your 52 are ranked: the gates, the 100-point fit score, and the research behind it.">
+<link rel="icon" href="assets/brand/suiteface-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
+<style>:root{--night:#17151B;--ink:#2B2730;--felt-hi:#2F8A62;--red-soft:#E5505E;--gold:#B8862F;--gold-hi:#E8C46A;--cream:#FAF7F0;--cream-dim:#CFC6B6;--muted:#A69DB0;--line:rgba(250,247,240,.12);
+--display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--body:"Figtree","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--night);color:var(--cream-dim);font:16px/1.65 var(--body)}
+a{color:var(--gold-hi)}
+.bar{position:sticky;top:0;background:rgba(23,21,27,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);z-index:5}
+.bar div{max-width:900px;margin:0 auto;padding:0 16px;height:58px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bar a.home{display:flex;gap:10px;align-items:center;color:var(--cream);text-decoration:none;font:800 1.3rem var(--display);letter-spacing:.04em}
+.bar img{width:32px;height:32px;border-radius:8px}
+.bar nav{display:flex;gap:12px;align-items:center;font-size:.92rem}
+main{max-width:900px;margin:0 auto;padding:24px 16px 70px}
+h1,h2,h3{font-family:var(--display);color:var(--cream);text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
+h1{font-size:clamp(2.2rem,7vw,3.4rem);margin:.2em 0 .4em}
+h2{font-size:1.75rem;margin:2em 0 .6em;padding-top:.6em;border-top:1px solid var(--line)}
+h3{font-size:1.3rem;margin:1.6em 0 .5em;color:var(--gold-hi)}
+strong{color:var(--cream)}
+blockquote{margin:1em 0;padding:12px 16px;border-left:4px solid var(--red-soft);background:rgba(229,80,94,.1);border-radius:0 10px 10px 0}
+blockquote p{margin:0}
+table{width:100%;border-collapse:collapse;margin:1em 0;font-size:.95rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:.55em .7em;text-align:left;vertical-align:top}
+th{background:var(--ink);color:var(--cream)}
+li{margin:.3em 0}
+.print{background:transparent;border:1px solid var(--line);color:var(--cream);border-radius:10px;padding:.4rem .75rem;font:600 .88rem var(--body);cursor:pointer}
+.crumbs{font-size:.9rem;color:var(--muted)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));margin:16px 0}
+.tile{display:block;text-decoration:none;background:var(--ink);border:1px solid var(--line);border-radius:14px;padding:16px;color:var(--cream-dim);transition:transform .15s,border-color .15s}
+.tile:hover{transform:translateY(-2px);border-color:var(--gold)}
+.tile b{display:block;font:800 1.35rem var(--display);text-transform:uppercase;color:var(--cream);letter-spacing:.03em}
+.tile small{display:block;margin-top:6px;color:var(--gold-hi);font-weight:600}
+.sig{margin-top:28px;border:1px dashed var(--gold);border-radius:12px;padding:14px 16px;background:rgba(184,134,47,.08)}
+footer{max-width:900px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:.88rem}
+@media print{.bar,.print,footer{display:none}body{background:#fff;color:#222}h1,h2,h3,strong{color:#000}a{color:#000}}</style>
+</head>
+<body>
+<header class="bar"><div><a class="home" href="./"><img src="assets/brand/suiteface-joker-icon-cream-180.png" alt="">SuiteFace</a>
+<nav><a href="legal.html">Legal center</a><button class="print" onclick="print()">Print / PDF</button></nav></div></header>
+<main>
+<h1 id="house-fit-rules">House Fit Rules</h1>
+<p><strong>How SuiteFace ranks your 52</strong> · Algorithm best52-v2 · Last updated October 16, 2026</p>
+<p>Your deck isn't a popularity contest and rank is never for sale. Every card is scored for <strong>you</strong>, from 0 to 100, with the same written rules for everyone. The rules lean on what relationship research has found, and on one house belief: <strong>the more truthfully you fill in your Face, the better your deck gets.</strong></p>
+<h2 id="step-1-the-house-gates">Step 1: The house gates</h2>
+<p>Before anyone is scored, both people must pass every gate. Miss one and the card simply isn't dealt.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Seat</td>
+<td>Paid, active member with a verified email and phone</td>
+</tr>
+<tr>
+<td>Distance</td>
+<td>Inside your chosen radius, measured ZIP to ZIP</td>
+</tr>
+<tr>
+<td>Age</td>
+<td>Inside your age range</td>
+</tr>
+<tr>
+<td>Both ways</td>
+<td>You fit who <strong>they</strong> want to see, and they fit who you want to see</td>
+</tr>
+<tr>
+<td>Dealbreakers</td>
+<td>Any answer you marked as a dealbreaker must match</td>
+</tr>
+<tr>
+<td>History</td>
+<td>Never burned, blocked or reported by either of you</td>
+</tr>
+</tbody>
+</table>
+<h2 id="step-2-the-fit-score-100-points">Step 2: The fit score (100 points)</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Points</th>
+<th>IF … THEN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Values</strong></td>
+<td>30</td>
+<td><strong>Kids plans (10):</strong> both want kids or both don't → 10 · one is open → 8 · one unsure → 5 · one wants and one doesn't → 0. <strong>Faith (10):</strong> same faith → 10 · you're open-minded or open to a non-religious partner → 8 · "equal time" → 7 · you want the same faith and they differ → 1. <strong>Politics (5):</strong> same → 5 · one moderate or not political → 3.5 · opposite → 0.5. <strong>Lifestyle (5):</strong> same drinking and smoking habits score highest; sober vs. drinks often, or never vs. smokes regularly, scores 0. "Prefer not to say" always scores the middle.</td>
+</tr>
+<tr>
+<td><strong>Your table</strong></td>
+<td>20</td>
+<td>Same table (what you're looking for) → 20 · neighboring tables (for example Long-term and Marriage-minded) → 12 · two steps apart → 6 · far apart → 2 · Open/ENM with a monogamous table → 0</td>
+</tr>
+<tr>
+<td><strong>Shared interests</strong></td>
+<td>15</td>
+<td>Points for each interest you share, up to 5</td>
+</tr>
+<tr>
+<td><strong>Your trumps</strong></td>
+<td>10</td>
+<td>Their suit is your #1 trump → 10 · #2 → 7 · #3 → 4 · #4 → 2</td>
+</tr>
+<tr>
+<td><strong>Truth</strong></td>
+<td>5</td>
+<td>Their own words match the words their friends and family chose for them → up to 5</td>
+</tr>
+<tr>
+<td><strong>Closeness</strong></td>
+<td>10</td>
+<td>Closer scores higher, inside your radius</td>
+</tr>
+<tr>
+<td><strong>Age fit</strong></td>
+<td>5</td>
+<td>Nearer the middle of your range scores higher</td>
+</tr>
+<tr>
+<td><strong>House tiebreak</strong></td>
+<td>5</td>
+<td>A fixed shuffle so equal scores don't always land the same way</td>
+</tr>
+</tbody>
+</table>
+<h2 id="step-3-rank">Step 3: Rank</h2>
+<p>Everyone who passed the gates is lined up by suit, highest fit first. <strong>Ace, King, Queen and Jack are face cards and go only to ID-verified members.</strong> The next nine best fits in each suit become 10 down to 2. Four suits × 13 = your 52.</p>
+<h2 id="why-these-rules">Why these rules</h2>
+<ul>
+<li><strong>Shared values and life plans carry the most weight.</strong> Couples tend to match on religion and politics, and a mismatch on whether to have children is one of the plainest reasons relationships end, so Values is the biggest part of the score and can be made a hard dealbreaker.</li>
+<li><strong>Similarity sparks first attraction.</strong> A large meta-analysis found that actual similarity (attitudes, interests, personality) strongly predicts attraction when people don't know each other well yet. That's exactly the moment a deck is dealt. (Montoya, Horton &amp; Kirchner, 2008)</li>
+<li><strong>Who someone is matters, a little.</strong> Partners who are kind, dependable, steady and outgoing tend to have happier relationships. Your suit and your trump order let you choose the style you click with. (Malouff et al., 2010)</li>
+<li><strong>No formula predicts love.</strong> The largest study of its kind, 43 datasets and more than 11,000 couples, found that what happens <em>inside</em> a relationship (commitment, appreciation, how conflict goes) predicts satisfaction far better than anything known beforehand. (Joel et al., 2020) That's why SuiteFace deals you a deck instead of "the one," and why <strong>Play Hand</strong> results matter more than any score.</li>
+<li><strong>Truth is the house edge.</strong> Scores are only as good as the answers. Members whose own words line up with what their people say about them earn the Truth points, and verified members are the only ones who can be face cards.</li>
+</ul>
+<h2 id="sources">Sources</h2>
+<ul>
+<li>Joel, S., Eastwick, P. W., et al. (2020). Machine learning uncovers the most robust self-report predictors of relationship quality across 43 longitudinal couples studies. <em>Proceedings of the National Academy of Sciences</em>, 117(32), 19061–19071.</li>
+<li>Montoya, R. M., Horton, R. S., &amp; Kirchner, J. (2008). Is actual similarity necessary for attraction? A meta-analysis of actual and perceived similarity. <em>Journal of Social and Personal Relationships</em>, 25(6), 889–922.</li>
+<li>Malouff, J. M., Thorsteinsson, E. B., Schutte, N. S., Bhullar, N., &amp; Rooke, S. E. (2010). The five-factor model of personality and relationship satisfaction of intimate partners: A meta-analysis. <em>Journal of Research in Personality</em>, 44(1), 124–127.</li>
+<li>Research on religious, political and educational homogamy in couples (see, for example, the overview of assortative mating and homogamy in family sociology).</li>
+</ul>
+<p><em>SuiteFace's scoring is a house rule set inspired by this research, not a scientific or medical test, and it can't predict whether any relationship will work. Your judgment, and how each date actually goes, always count most.</em></p>
+</main>
+<footer>SuiteFace Inc., a Florida corporation · hello@suiteface.com · <a href="legal.html">Legal center</a> · <a href="safety.html">Safety</a> · In an emergency, call 911.</footer>
+</body>
+</html>

@@ -184,12 +184,24 @@ footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
   function calc(p){
     var d=miles(ME.lat,ME.lon,p.lat,p.lon), shared=p.interests.filter(function(x){return ME.interests.indexOf(x)>-1;});
     var mid=(ME.ageMin+ME.ageMax)/2, half=(ME.ageMax-ME.ageMin)/2+1;
+    function ans(q){var r=p.identity.filter(function(x){return x[0]===q;})[0];return r?r[1]:null;}
+    var kid=ans("Kids"), fa=ans("Faith"), pol=ans("Politics");
+    var kids= !kid?5 : kid==="Want kids"?10 : kid==="Open to kids"?8 : kid==="Don't want kids"?0 : 5;
+    var faith= !fa?5 : fa.indexOf("Christian")===0?10 : 8;
+    var polp= !pol||pol==="Prefer not to say"?2.5 : pol==="Moderate"?5 : 3.5;
+    var vals=kids+faith+polp+3.5;
+    var TF={longterm:{longterm:1,marriage:.6,seeing:.6,friends:.3},marriage:{marriage:1,longterm:.6}};
+    var tbl=p.lookingFor==="serious"?20:Math.round(20*((TF.longterm[p.lookingFor==="seeing"?"seeing":p.lookingFor])||.1)*10)/10;
+    var pos=ME.trumps.indexOf(p.suit), style=[10,7,4,2][pos];
     var parts=[
-      ["Shared interests", Math.round(34*shared.length/Math.max(1,Math.min(5,ME.interests.length))*10)/10, 34, shared.length+" in common"+(shared.length?": "+shared.join(", "):"")],
-      ["Looking for", p.lookingFor===ME.lookingFor?24:0, 24, p.lookingFor===ME.lookingFor?"You both want something serious":"You want serious; they're seeing where it goes"],
-      ["Closeness", Math.round(20*(1-d/ME.radius)*10)/10, 20, "About "+Math.max(1,Math.round(d))+" mi, inside your "+ME.radius+" mi"],
-      ["Age fit", Math.round(12*Math.max(0,1-Math.abs(p.age-mid)/half)*10)/10, 12, p.age+", your range "+ME.ageMin+"–"+ME.ageMax],
-      ["House tiebreak", Math.round(10*(hash(p.name+ME.name)%1000)/1000*10)/10, 10, "Keeps ties fair, same every deal"]
+      ["Values", Math.round(vals*10)/10, 30, "Kids plans, faith, politics, lifestyle"+(kid?" · kids: "+kid:"")],
+      ["Your table", tbl, 20, p.lookingFor==="serious"?"You both want something long-term":"You want long-term; they're dating to see"],
+      ["Shared interests", Math.round(15*shared.length/Math.max(1,Math.min(5,ME.interests.length))*10)/10, 15, shared.length+" in common"+(shared.length?": "+shared.join(", "):"")],
+      ["Your trumps", style, 10, SUITS[p.suit].name+"s are your #"+(pos+1)+" trump"],
+      ["Truth", p.verified?5:3.5, 5, "Their words match what friends say about them"],
+      ["Closeness", Math.round(10*(1-d/ME.radius)*10)/10, 10, "About "+Math.max(1,Math.round(d))+" mi, inside your "+ME.radius+" mi"],
+      ["Age fit", Math.round(5*Math.max(0,1-Math.abs(p.age-mid)/half)*10)/10, 5, p.age+", your range "+ME.ageMin+"–"+ME.ageMax],
+      ["House tiebreak", Math.round(5*(hash(p.name+ME.name)%1000)/1000*10)/10, 5, "Keeps ties fair, same every deal"]
     ];
     var total=Math.min(100,Math.round(parts.reduce(function(s,x){return s+x[1];},0)));
     var kidAns=(p.identity.filter(function(x){return x[0]==="Kids";})[0]||[])[1];
@@ -239,7 +251,7 @@ footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
       '<div class="verdict" style="color:'+(c.pass?"var(--felt)":"var(--red)")+'">'+(c.pass?"All gates passed. On to scoring.":esc(p.name)+" isn't dealt to you.")+'</div></div>';
     } else if(cur===3){
       if(!c.pass){ html='<h2>Station 4 · Fit score</h2><div class="not"><h3>Not dealt</h3><p>'+esc(p.name)+' stopped at a house gate, so there\'s no score and no card. Try Jordan or Maya to see the full deal.</p></div>'; }
-      else html='<h2>Station 4 · Fit score</h2><p class="why">Now SuiteFace scores how well '+esc(p.name)+' fits <b>your</b> settings, out of 100. Someone else would see a different score for the same person: same deck, different hands.</p>'+
+      else html='<h2>Station 4 · Fit score</h2><p class="why">Now SuiteFace scores how well '+esc(p.name)+' fits <b>your</b> settings, out of 100, using the <a href="fit.html" style="color:var(--gold-hi)">house fit rules</a>. Someone else would see a different score for the same person: same deck, different hands.</p>'+
       '<div class="paper fit">'+c.parts.map(function(x){return '<div class="frow"><b>'+x[0]+'<small>'+esc(x[3])+'</small></b><div class="track"><div class="fill" data-w="'+(x[1]/x[2]*100)+'" style="background:var(--felt-hi)"></div></div><span class="pts">'+x[1]+'<small style="font:600 .75rem var(--body);color:#6b6470"> / '+x[2]+'</small></span></div>';}).join("")+
       '<div class="total"><b style="font:800 1.4rem var(--display);text-transform:uppercase">Fit for Taylor</b><span>'+c.total+'</span></div></div>';
     } else if(cur===4){
