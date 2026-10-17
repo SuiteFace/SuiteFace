@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Casino · SuiteFace</title>
+<meta name="description" content="A SuiteFace Casino: a group built and run by a SuiteFace player.">
+<link rel="icon" href="assets/brand/suiteface-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--gold:#E8C46A}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#17151B;color:#CFC6B6;font:16px/1.55 Figtree,"Segoe UI",system-ui,sans-serif}
+a{color:var(--gold)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(250,247,240,.1);background:rgba(23,21,27,.9);position:sticky;top:0;z-index:5;backdrop-filter:blur(8px)}
+.home{display:flex;align-items:center;gap:8px;color:#FAF7F0;text-decoration:none;font:800 1.2rem "Big Shoulders Display",Impact,sans-serif;text-transform:uppercase;letter-spacing:.04em}
+.home img{width:32px;height:32px}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 80px;display:grid;gap:18px}
+.door{position:relative}
+.doors{position:absolute;inset:0;display:flex;pointer-events:none;z-index:3;border-radius:18px;overflow:hidden}
+.doors i{flex:1;background:repeating-linear-gradient(90deg,#3a2418 0 18px,#4a2e1e 18px 36px);border:3px solid var(--gold);transition:transform 1.2s cubic-bezier(.6,.05,.3,1)}
+.doors i:first-child{transform-origin:left}.doors i:last-child{transform-origin:right}
+.open .doors i:first-child{transform:perspective(900px) rotateY(-100deg)}.open .doors i:last-child{transform:perspective(900px) rotateY(100deg)}
+.doors.gone{display:none}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:end}
+h1{margin:0;color:#FAF7F0;font:900 clamp(2rem,6vw,3.4rem)/1 "Big Shoulders Display","Arial Narrow",Impact,sans-serif;text-transform:uppercase;letter-spacing:.02em}
+.meta{color:#A69DB0;font-size:.92rem}
+.btn{all:unset;cursor:pointer;display:inline-block;padding:.75rem 1.3rem;border-radius:999px;font-weight:800;text-align:center}
+.btn.gold{background:linear-gradient(180deg,#E8C46A,#B8862F);color:#231C10}.btn.ghost{border:1px solid rgba(250,247,240,.25);color:#FAF7F0}
+.btn:focus-visible{outline:3px solid #FFE7A3;outline-offset:3px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.about{color:#E8E0D0;font-size:1.05rem;max-width:70ch}
+.err{color:#E5505E;font-weight:600}
+.note{font-size:.85rem;color:#A69DB0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2B2730;border:1px solid var(--gold);color:#FAF7F0;padding:10px 16px;border-radius:12px;z-index:20;max-width:calc(100% - 32px)}
+footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:center;font-size:.85rem;color:#A69DB0}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="home" href="./#casinos"><img src="assets/brand/suiteface-joker-icon-cream-180.png" alt="">SuiteFace<sup style="font-size:.45em;vertical-align:super;margin-left:2px" aria-label="trademark">™</sup></a>
+  <a href="./#casinos">All Casinos ›</a>
+</header>
+<main id="main">
+  <p class="note" id="status">Opening the doors…</p>
+</main>
+<footer>© 2026 SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™ and SuiteFace Casinos™ are trademarks of SuiteFace Inc. Casinos are built and run by SuiteFace players. Always meet in public. In an emergency, call 911.</footer>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/live.js"></script>
+<script src="assets/js/casino-scene.js"></script>
+<script>
+(function () {
+  var CFG = window.SUITEFACE_CONFIG || {}, main = document.getElementById("main");
+  var id = (location.search.match(/[?&]c=([0-9a-f-]{36})/i) || [])[1];
+  var KIND = { friendship: "🤝 Friendship", faith: "🙏 Faith small group", prayer: "🕊️ Prayer group", service: "🧺 Service & volunteering", games: "🎲 Board games", greek: "🏛️ Greek life", alumni: "🎓 Alumni", club: "♣️ Club", sports: "🏀 Sports & fitness", hobby: "🎨 Hobbies", parents: "🧸 Parents", other: "🎰 Casino" };
+  var WHO = { everyone: "Everyone welcome", men: "Men only", women: "Women only" };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function toast(t) { var d = document.createElement("div"); d.className = "toast"; d.setAttribute("role", "status"); d.textContent = t; document.body.appendChild(d); setTimeout(function () { d.remove(); }, 4200); }
+  function anon(fn, args) {
+    return fetch(CFG.supabaseUrl + "/rest/v1/rpc/" + fn, { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(args || {}) })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.message || "Error"); return j; }); });
+  }
+  function call(fn, args) { if (window.SF_LIVE) return window.SF_LIVE.rpc(fn, args).then(function (r) { if (r.error) throw r.error; return r.data; }); return anon(fn, args); }
+  if (!id && /[?&]demo=1/.test(location.search)) {
+    var demo = null; try { demo = JSON.parse(sessionStorage.getItem("sf.demoCasino") || "null"); } catch (e) { }
+    if (demo) { window.__demo = demo; }
+  }
+  if (!id && !window.__demo) { main.innerHTML = '<h1>Pick a Casino</h1><p class="about">Find one near you, or build your own.</p><div class="row"><a class="btn gold" href="./#casinos">Find Casinos</a></div>'; return; }
+
+  function draw(c) {
+    document.title = c.name + " · SuiteFace Casino";
+    var host = c.my_status === "host";
+    main.innerHTML = '<div class="door" id="door"><div id="scene"></div><div class="doors" id="doors" aria-hidden="true"><i></i><i></i></div></div>' +
+      '<div class="head"><div><p class="meta">' + esc(KIND[c.kind] || "Casino") + " · Hosted by @" + esc(c.host_handle) + " · " + c.members + " member" + (c.members === 1 ? "" : "s") + " · " + esc(WHO[c.who] || "") + "</p><h1>" + esc(c.name) + "</h1></div>" +
+      '<div class="row">' + (host ? '<a class="btn gold" href="./#casinos">Run this Casino</a>' : c.my_status === "member" ? '<span class="btn ghost" aria-disabled="true">You\'re in ✓</span>' : c.my_status === "requested" ? '<span class="btn ghost" aria-disabled="true">Request sent</span>' : '<button class="btn gold" id="join" type="button">' + (c.join_mode === "open" ? "Join free" : "Ask to join") + "</button>") + "</div></div>" +
+      (c.about ? '<p class="about">' + esc(c.about) + "</p>" : "") + '<p class="err" id="err" role="alert"></p>' +
+      '<div id="floor"></div>' +
+      (c.status !== "open" ? '<p class="note">Only you can see this Casino until it passes its name check.</p>' : "") +
+      '<p class="note">Game Tables meet in public places. Never send money to anyone you meet. Covers ZIP ' + esc((c.zips || []).slice(0, 7).join(", ")) + ((c.zips || []).length > 7 ? " and " + ((c.zips || []).length - 7) + " more" : "") + ".</p>";
+    window.SFCasino.render(document.getElementById("scene"), c);
+    window.SFCasino.render(document.getElementById("floor"), c, { floor: true });
+    var fl = document.querySelector("#floor .cs-ext"); if (fl) fl.remove(); // floor view shows only the tables
+    var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var dd = document.getElementById("doors"); if (dd) dd.classList.add("gone"); // the entrance already opened the doors
+    var j = document.getElementById("join");
+    if (j) j.onclick = function () {
+      if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "casinos"); } catch (e) { } location.href = "./?login=1#casinos"; return; }
+      call("join_casino", { p_casino: c.id }).then(function (st) { toast(st === "member" ? "You're in! Welcome to " + c.name + "." : "Request sent. The Host will let you in."); load(); }, function (e) { document.getElementById("err").textContent = e.message; });
+    };
+  }
+  function load() {
+    if (window.__demo) { var d0 = window.__demo; if (!entered) { entered = true; window.SFCasino.entry(d0, function () { draw(d0); var n = document.createElement("p"); n.className = "note"; n.textContent = "This is an example Casino, made up to show how yours could look."; main.prepend(n); var j0 = document.getElementById("join"); if (j0) j0.outerHTML = '<a class="btn gold" href="./#casinos">Build one like it · $21</a>'; }); } return; }
+    call("casino_floor", { p_id: id }).then(function (c) {
+      if (!c) { main.innerHTML = '<h1>Casino not found</h1><p class="about">It may be closed, or still waiting for its name check.</p><a class="btn gold" href="./#casinos">Find Casinos</a>'; return; }
+      if (!entered) { entered = true; window.SFCasino.entry(c, function () { draw(c); }); } else draw(c);
+    }, function () { main.innerHTML = '<h1>Can\'t reach the floor</h1><p class="about">Check your connection and try again.</p>'; });
+  }
+  var started = false, entered = false;
+  function go() { if (started) return; started = true; load(); }
+  document.addEventListener("sf:live", function () { started = false; go(); });
+  setTimeout(go, window.__demo ? 0 : 700); // anonymous visitors don't wait long for a session
+})();
+</script>
+<script src="assets/js/gate.js"></script>
+<script src="assets/js/fx.js"></script>
+</body>
+</html>

@@ -2372,10 +2372,10 @@
     var KIND = {}; KINDS.forEach(function (k) { KIND[k[0]] = k; });
     var WHO = { everyone: "Everyone", men: "Men only", women: "Women only" };
     var EXAMPLES = [
-      { id: "ex1", name: "Tuesday Prayer Brothers", kind: "faith", about: "A small group of Christian men. Coffee, Scripture and honest talk.", zips: ["35203", "35205", "35209"], who: "men", join_mode: "request", host_handle: "marcus.t", members: 9, tables: [{ name: "Tuesday Night Table", meets: "Tue 7pm · coffee shop" }, { name: "Saturday Service", meets: "Sat 9am · food bank" }] },
-      { id: "ex2", name: "Magic City Game Night", kind: "games", about: "Board games, card games, snacks. Beginners welcome.", zips: ["35233", "35222"], who: "everyone", join_mode: "open", host_handle: "dana.rolls", members: 23, tables: [{ name: "Friday Strategy Table", meets: "Fri 7pm · game café" }] },
-      { id: "ex3", name: "Southside Volunteers", kind: "service", about: "Monthly service projects around town. Bring a friend.", zips: ["35205", "35211"], who: "everyone", join_mode: "open", host_handle: "kels.helps", members: 41, tables: [{ name: "Park Cleanup Crew", meets: "1st Sat · 8am" }, { name: "Meal Packers", meets: "3rd Thu · 6pm" }] },
-      { id: "ex4", name: "Alumni Brunch Club", kind: "alumni", about: "Grads who moved here and want a monthly brunch crew.", zips: ["35209", "35216"], who: "everyone", join_mode: "request", host_handle: "j.ortiz", members: 14, tables: [{ name: "Sunday Brunch", meets: "Last Sun · 11am" }] }
+      { id: "ex1", style: { venue: "indoor", sign: "neon_script", palette: "gold_wine", themes: ["christian"], amenities: ["coffee", "prayer_space", "free"], tagline: "Iron sharpens iron", welcome: "Pull up a chair, brother." }, name: "Tuesday Prayer Brothers", kind: "faith", about: "A small group of Christian men. Coffee, Scripture and honest talk.", zips: ["35203", "35205", "35209"], who: "men", join_mode: "request", host_handle: "marcus.t", members: 9, tables: [{ name: "Tuesday Night Table", meets: "Tue 7pm · coffee shop" }, { name: "Saturday Service", meets: "Sat 9am · food bank" }] },
+      { id: "ex2", style: { venue: "off_strip", palette: "neon", themes: ["games"], amenities: ["food", "late_night"], tagline: "Roll for initiative" }, name: "Magic City Game Night", kind: "games", about: "Board games, card games, snacks. Beginners welcome.", zips: ["35233", "35222"], who: "everyone", join_mode: "open", host_handle: "dana.rolls", members: 23, tables: [{ name: "Friday Strategy Table", meets: "Fri 7pm · game café" }] },
+      { id: "ex3", style: { venue: "outdoor", palette: "emerald", themes: ["service", "outdoors"], amenities: ["family", "free", "accessible"], tagline: "Many hands" }, name: "Southside Volunteers", kind: "service", about: "Monthly service projects around town. Bring a friend.", zips: ["35205", "35211"], who: "everyone", join_mode: "open", host_handle: "kels.helps", members: 41, tables: [{ name: "Park Cleanup Crew", meets: "1st Sat · 8am" }, { name: "Meal Packers", meets: "3rd Thu · 6pm" }] },
+      { id: "ex4", style: { venue: "highrise", sign: "arch", palette: "rose_gold", themes: ["alumni", "food"], amenities: ["food", "coffee"], tagline: "Once a grad, always a grad" }, name: "Alumni Brunch Club", kind: "alumni", about: "Grads who moved here and want a monthly brunch crew.", zips: ["35209", "35216"], who: "everyone", join_mode: "request", host_handle: "j.ortiz", members: 14, tables: [{ name: "Sunday Brunch", meets: "Last Sun · 11am" }] }
     ];
     var kindPick = "", lastList = [];
     function live() { return !!window.SF_LIVE; }
@@ -2385,6 +2385,38 @@
     }
     function kindLabel(k) { var x = KIND[k] || KIND.other; return x[1] + " " + x[2]; }
     function money(c) { return "$" + (c / 100).toFixed(2); }
+    /* ----- Casino designer: dropdowns, checkboxes and words; the scene is generated live ----- */
+    var SC = window.SFCasino;
+    function opt(list, cur) { return list.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === cur ? " selected" : "") + ">" + esc(x[1]) + "</option>"; }).join(""); }
+    function designerHTML(st, kind) {
+      st = st || {}; if (!SC) return "";
+      var pal = Object.keys(SC.PALETTES).map(function (k) { return [k, SC.PALETTES[k][0]]; });
+      var venue = st.venue || SC.KIND_DEFAULT[kind] || "vegas_old";
+      return '<fieldset class="cdes"><legend>Design your Casino</legend>' +
+        '<div class="cdes-grid"><div class="field"><label for="cdVenue">Location style</label><select id="cdVenue">' + SC.VENUES.map(function (v) { return '<option value="' + v[0] + '"' + (v[0] === venue ? " selected" : "") + ">" + esc(v[1]) + " · " + esc(v[2]) + "</option>"; }).join("") + "</select></div>" +
+        '<div class="field"><label for="cdSign">Sign</label><select id="cdSign">' + opt(SC.SIGNS, st.sign || "marquee") + "</select></div>" +
+        '<div class="field"><label for="cdPal">Colors</label><select id="cdPal">' + opt(pal, st.palette || "gold_wine") + '</select><div class="cdes-colors" id="cdCustom"' + (st.palette === "custom" ? "" : " hidden") + '><label>Main <input type="color" id="cdC1" value="' + (st.c1 || "#E8C46A") + '"></label><label>Accent <input type="color" id="cdC2" value="' + (st.c2 || "#9B1B30") + '"></label></div></div>' +
+        '<div class="field"><label for="cdClimate">Climate</label><select id="cdClimate"><option value="">Match the location</option>' + opt(SC.CLIMATES, st.climate || "") + "</select></div></div>" +
+        '<div class="field"><span class="lbl">Themes <span class="hint">(check all that apply)</span></span><div class="cdes-checks">' + SC.THEMES.map(function (t) { return '<label class="ck"><input type="checkbox" name="cdTheme" value="' + t[0] + '"' + ((st.themes || []).indexOf(t[0]) > -1 ? " checked" : "") + "> <span>" + esc(t[2]) + " " + esc(t[1]) + "</span></label>"; }).join("") + "</div></div>" +
+        '<div class="field"><span class="lbl">On the floor <span class="hint">(check all that apply)</span></span><div class="cdes-checks">' + SC.AMENITIES.map(function (t) { return '<label class="ck"><input type="checkbox" name="cdAm" value="' + t[0] + '"' + ((st.amenities || []).indexOf(t[0]) > -1 ? " checked" : "") + "> <span>" + t[2] + " " + esc(t[1]) + "</span></label>"; }).join("") + "</div></div>" +
+        '<div class="cdes-grid"><div class="field"><label for="cdTag">Tagline on the sign</label><input type="text" id="cdTag" maxlength="80" value="' + esc(st.tagline || "") + '" placeholder="Iron sharpens iron"></div>' +
+        '<div class="field"><label for="cdCity">City or area</label><input type="text" id="cdCity" maxlength="40" value="' + esc(st.city || "") + '" placeholder="Birmingham, AL"></div>' +
+        '<div class="field"><label for="cdMascot">Mascot or animal <span class="hint">(optional)</span></label><input type="text" id="cdMascot" maxlength="30" value="' + esc(st.mascot || "") + '" placeholder="Lions"></div></div>' +
+        '<div class="field"><label for="cdWelcome">Welcome message on the floor</label><textarea id="cdWelcome" maxlength="280" rows="2" placeholder="Pull up a chair. All are welcome here.">' + esc(st.welcome || "") + "</textarea></div></fieldset>";
+    }
+    function readDesign(m) {
+      if (!$("#cdVenue", m)) return {};
+      return { venue: $("#cdVenue", m).value, sign: $("#cdSign", m).value, palette: $("#cdPal", m).value, c1: $("#cdC1", m).value, c2: $("#cdC2", m).value, climate: $("#cdClimate", m).value || undefined,
+        themes: $$('input[name="cdTheme"]:checked', m).map(function (x) { return x.value; }), amenities: $$('input[name="cdAm"]:checked', m).map(function (x) { return x.value; }),
+        tagline: $("#cdTag", m).value.trim(), city: $("#cdCity", m).value.trim(), mascot: $("#cdMascot", m).value.trim(), welcome: $("#cdWelcome", m).value.trim() };
+    }
+    function wireDesigner(m, getCasino, previewEl) {
+      if (!SC || !previewEl) return;
+      function draw() { var c = getCasino(); c.style = readDesign(m); $("#cdCustom", m).hidden = c.style.palette !== "custom"; SC.render(previewEl, c); }
+      m.addEventListener("input", function (e) { if (e.target.closest(".cdes") || e.target.id === "cbName" || e.target.id === "cbKind") draw(); });
+      m.addEventListener("change", function (e) { if (e.target.closest(".cdes") || e.target.id === "cbKind") draw(); });
+      draw();
+    }
 
     $("#casKinds").innerHTML = '<button class="chip sm" type="button" data-kind="" aria-pressed="true">All</button>' + KINDS.map(function (k) { return '<button class="chip sm" type="button" data-kind="' + k[0] + '" aria-pressed="false">' + k[1] + " " + esc(k[2]) + "</button>"; }).join("");
     $("#casKinds").addEventListener("click", function (e) { var b = e.target.closest("[data-kind]"); if (!b) return; kindPick = b.getAttribute("data-kind"); $$("[data-kind]", this).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); find(); });
@@ -2411,7 +2443,10 @@
       var zip = $("#casZip").value, q = $("#casQ").value.trim();
       if (!CFG.supabaseUrl) { show([], "Preview mode."); return; }
       $("#casList").innerHTML = '<p class="hint">Shuffling the floor…</p>';
-      call("casino_search", { p_zip: zip || null, p_kind: kindPick || null, p_q: q || null }).then(function (r) { show(r || []); }, function () { show([], "Casinos couldn't load right now."); });
+      call("casino_search", { p_zip: zip || null, p_kind: kindPick || null, p_q: q || null }).then(function (r) {
+        r = r || []; show(r);
+        if (r.length) call("casino_styles", { p_ids: r.map(function (x) { return x.id; }) }).then(function (st) { (st || []).forEach(function (x) { r.forEach(function (c) { if (c.id === x.id) c.style = x.style; }); }); }, function () { });
+      }, function () { show([], "Casinos couldn't load right now."); });
     }
     $("#casList").addEventListener("click", function (e) {
       var b = e.target.closest("[data-cas]"); if (!b) return; var id = b.getAttribute("data-cas");
@@ -2426,7 +2461,8 @@
 
     function openCasino(c, example) {
       var host = c.my_status === "host";
-      var m = modal('<div class="casign big" aria-hidden="true"><span>' + esc(kindLabel(c.kind)) + "</span><b>" + esc(c.name) + "</b><span>Host @" + esc(c.host_handle || "host") + "</span></div>" +
+      var m = modal((SC ? '<div id="cjScene"></div>' : '<div class="casign big" aria-hidden="true"><span>' + esc(kindLabel(c.kind)) + "</span><b>" + esc(c.name) + "</b><span>Host @" + esc(c.host_handle || "host") + "</span></div>") +
+        '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · Host @" + esc(c.host_handle || "host") + (example ? ' · <a href="casino.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="casino.html?c=' + encodeURIComponent(c.id) + '">Walk in to the Casino ›</a>') + "</p>" +
         (c.about ? '<p class="lede" style="margin:12px 0 6px">' + esc(c.about) + "</p>" : "") +
         '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "The Host approves each request") + " · " + (c.members || 1) + " members · ZIP " + esc((c.zips || []).slice(0, 7).join(", ")) + ((c.zips || []).length > 7 ? " +" + ((c.zips || []).length - 7) : "") + "</p>" +
         '<h4 style="margin:14px 0 6px">Game Tables</h4><ul class="castbl">' + (c.tables || []).map(function (t) { return "<li><b>" + esc(t.name) + "</b>" + (t.meets ? "<span>" + esc(t.meets) + "</span>" : "") + "</li>"; }).join("") + "</ul>" +
@@ -2437,6 +2473,8 @@
           c.my_status === "member" || c.my_status === "requested" ? '<button class="btn ghost" type="button" id="cjLeave">' + (c.my_status === "member" ? "Leave Casino" : "Cancel request") + "</button>" :
           '<button class="btn gold" type="button" id="cjJoin">' + (c.join_mode === "open" ? "Join free" : "Ask to join") + "</button>") +
         '<button class="btn ghost" type="button" data-close>Close</button></div>');
+      if (SC) SC.render($("#cjScene", m), c);
+      var dl = $("[data-democas]", m); if (dl) dl.addEventListener("click", function () { try { sessionStorage.setItem("sf.demoCasino", JSON.stringify(Object.assign({}, c, { my_status: null, status: "open" }))); } catch (e) { } });
       if (example) return;
       if ($("#cjJoin", m)) $("#cjJoin", m).onclick = function () {
         if (!live()) { needLogin("casinos"); return; }
@@ -2453,7 +2491,7 @@
       if (!live() && PUBLIC_SITE) { needLogin("casino"); return; }
       var zips = []; if (/^\d{5}$/.test(P.zip || "")) zips.push(P.zip);
       var m = modal('<h3 style="font-size:1.8rem">Build your Casino</h3><p class="lede" style="margin:4px 0 12px">You name it, you run it. $21 once covers 7 ZIP codes.</p>' +
-        '<div class="casign big" id="cbSign" aria-hidden="true"><span id="cbKindL">🤝 Friendship</span><b id="cbNameL">YOUR CASINO</b><span>Host @' + esc(P.handle || "you") + "</span></div>" +
+        (SC ? '<div id="cbScene" class="cbscene"></div>' : '<div class="casign big" id="cbSign" aria-hidden="true"><span id="cbKindL">🤝 Friendship</span><b id="cbNameL">YOUR CASINO</b><span>Host @' + esc(P.handle || "you") + "</span></div>") +
         '<form class="form-grid" id="cbForm" novalidate style="margin-top:14px">' +
         '<div class="field"><label for="cbName">Casino name</label><input type="text" id="cbName" maxlength="40" placeholder="Tuesday Prayer Brothers"><span class="hint" id="cbNameHint">3–40 characters. Names are checked before opening.</span></div>' +
         '<div class="field"><label for="cbKind">What kind of Casino?</label><select id="cbKind">' + KINDS.map(function (k) { return '<option value="' + k[0] + '">' + k[1] + " " + esc(k[2]) + "</option>"; }).join("") + "</select></div>" +
@@ -2461,6 +2499,7 @@
         '<div class="field"><label for="cbWho">Who can join?</label><select id="cbWho"><option value="everyone">Everyone</option><option value="men">Men only</option><option value="women">Women only</option></select></div>' +
         '<div class="field"><label for="cbJoin">How do people join?</label><select id="cbJoin"><option value="request">I approve each request</option><option value="open">Anyone can join</option></select></div>' +
         '<div class="field"><label for="cbZipIn">ZIP codes it covers</label><div class="casbar"><input type="text" id="cbZipIn" inputmode="numeric" maxlength="5" placeholder="35203"><button class="btn ghost sm" type="button" id="cbZipAdd">Add ZIP</button></div><div class="chips" id="cbZips"></div><span class="hint" id="cbCost"></span></div>' +
+        designerHTML({}, "friendship") +
         '<div class="field"><label for="cbTable">First Game Table</label><input type="text" id="cbTable" maxlength="40" placeholder="Tuesday Night Table"></div>' +
         '<div class="field"><label for="cbMeets">When and where it meets (a public place)</label><input type="text" id="cbMeets" maxlength="120" placeholder="Tuesdays 7pm · coffee shop downtown"></div>' +
         '<span class="err" id="cbErr" role="alert"></span>' +
@@ -2476,16 +2515,18 @@
       $("#cbZipAdd", m).onclick = addZip;
       $("#cbZipIn", m).addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addZip(); } });
       $("#cbZips", m).addEventListener("click", function (e) { var b = e.target.closest("[data-z]"); if (!b) return; zips.splice(zips.indexOf(b.getAttribute("data-z")), 1); cost(); });
-      $("#cbKind", m).onchange = function () { $("#cbKindL", m).textContent = kindLabel(this.value); };
+      $("#cbKind", m).onchange = function () { if ($("#cbKindL", m)) $("#cbKindL", m).textContent = kindLabel(this.value); if ($("#cdVenue", m) && !m.__venueTouched) $("#cdVenue", m).value = SC.KIND_DEFAULT[this.value] || "vegas_old"; };
+      if ($("#cdVenue", m)) $("#cdVenue", m).addEventListener("change", function () { m.__venueTouched = true; });
+      wireDesigner(m, function () { return { id: "preview", name: $("#cbName", m).value.trim() || "Your Casino", kind: $("#cbKind", m).value, tables: [{ name: $("#cbTable", m).value.trim() || "Main Table", meets: $("#cbMeets", m).value.trim() }] }; }, $("#cbScene", m));
       $("#cbName", m).addEventListener("input", function () {
-        var v = this.value.trim(); $("#cbNameL", m).textContent = v ? v.toUpperCase() : "YOUR CASINO";
+        var v = this.value.trim(); if ($("#cbNameL", m)) $("#cbNameL", m).textContent = v ? v.toUpperCase() : "YOUR CASINO";
         clearTimeout(nameT); if (v.length < 3 || !CFG.supabaseUrl) return;
         nameT = setTimeout(function () { rpc("casino_name_available", { p_name: v }).then(function (ok) { $("#cbNameHint", m).textContent = ok ? "✓ " + v + " is available." : v + " is taken. Try another name."; $("#cbNameHint", m).className = ok ? "hint good" : "hint bad"; }, function () { }); }, 350);
       });
       cost();
       $("#cbForm", m).addEventListener("submit", function (e) {
         e.preventDefault(); var err = $("#cbErr", m);
-        var d = { p_name: $("#cbName", m).value.trim(), p_kind: $("#cbKind", m).value, p_about: $("#cbAbout", m).value.trim(), p_zips: zips.slice(), p_who: $("#cbWho", m).value, p_join: $("#cbJoin", m).value, p_first_table: $("#cbTable", m).value.trim(), p_meets: $("#cbMeets", m).value.trim() };
+        var d = { style: readDesign(m), p_name: $("#cbName", m).value.trim(), p_kind: $("#cbKind", m).value, p_about: $("#cbAbout", m).value.trim(), p_zips: zips.slice(), p_who: $("#cbWho", m).value, p_join: $("#cbJoin", m).value, p_first_table: $("#cbTable", m).value.trim(), p_meets: $("#cbMeets", m).value.trim() };
         if (d.p_name.length < 3) { err.textContent = "Give your Casino a name (3–40 characters)."; return; }
         if (!zips.length) { err.textContent = "Add at least one ZIP code."; return; }
         err.textContent = "";
@@ -2494,13 +2535,15 @@
           P.hostCasinos = [d.p_name]; saveP(); renderCard(); return;
         }
         function build() {
-          window.SF_LIVE.rpc("build_casino", d).then(function (r) {
+          var args = Object.assign({}, d); delete args.style;
+          window.SF_LIVE.rpc("build_casino", args).then(function (r) {
             if (r.error) {
               if (/Sign-up Agreement/i.test(r.error.message)) { window.SFSign.require("signup", build); return; }
               if (/Casino Host Agreement/i.test(r.error.message)) { window.SFSign.require("casino", build, { about: d.p_name }); return; }
               err.textContent = r.error.message; return;
             }
-            pay("build", r.data.id, null, err);
+            var newId = r.data.id;
+            window.SF_LIVE.rpc("set_casino_style", { p_casino: newId, p_style: d.style || {} }).then(function () { pay("build", newId, null, err); });
           });
         }
         window.SFSign.require("casino", build, { about: d.p_name });
@@ -2520,6 +2563,7 @@
         '<h4>Add ZIP codes · $2.10 each</h4><div class="casbar"><input type="text" id="cmZips" maxlength="60" placeholder="35212, 35213"><button class="btn ghost sm" type="button" id="cmZipGo">Pay &amp; add</button></div>' +
         (c.status === "rejected" ? '<h4>Rename &amp; resubmit (free)</h4><div class="casbar"><input type="text" id="cmRename" maxlength="40" value="' + esc(c.name) + '"><button class="btn ghost sm" type="button" id="cmRenameGo">Resubmit</button></div>' : "") +
         (c.status === "unpaid" ? '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="cmPay">Finish payment</button></div>' : "") +
+        (SC ? '<h4>Redesign</h4><div class="row"><button class="btn ghost sm" type="button" id="cmDesign">Change the look of your Casino</button><a class="btn ghost sm" href="casino.html?c=' + encodeURIComponent(c.id) + '">Walk in ›</a></div>' : "") +
         '<span class="err" id="cmErr" role="alert"></span><div class="row" style="margin-top:12px"><button class="btn ghost sm" type="button" id="cmClose">Close this Casino</button><button class="btn ghost" type="button" data-close>Done</button></div>');
       var err = $("#cmErr", m);
       function people() {
@@ -2532,12 +2576,18 @@
       $("#cmTAdd", m).onclick = function () { var n = $("#cmTName", m).value.trim(); if (n.length < 2) { err.textContent = "Name the table."; return; } call("save_casino_table", { p_casino: c.id, p_name: n, p_meets: $("#cmTMeets", m).value.trim() }).then(function () { toast("Game Table added."); $("#cmTName", m).value = $("#cmTMeets", m).value = ""; loadMine(); }, function (x) { err.textContent = x.message; }); };
       $("#cmZipGo", m).onclick = function () { var z = ($("#cmZips", m).value.match(/\d{5}/g) || []); if (!z.length) { err.textContent = "Enter ZIP codes, separated by commas."; return; } call("add_casino_zips", { p_casino: c.id, p_zips: z }).then(function (r) { pay("zips", c.id, r.order, err); }, function (x) { err.textContent = x.message; }); };
       if ($("#cmRenameGo", m)) $("#cmRenameGo", m).onclick = function () { call("rename_casino", { p_casino: c.id, p_name: $("#cmRename", m).value.trim() }).then(function () { closeModal(); toast("Resubmitted for the name check."); loadMine(); }, function (x) { err.textContent = x.message; }); };
+      if ($("#cmDesign", m)) $("#cmDesign", m).onclick = function () { closeModal(); redesign(c); };
       if ($("#cmPay", m)) $("#cmPay", m).onclick = function () { pay("build", c.id, null, err); };
       $("#cmClose", m).onclick = function () { if (!confirm("Close " + c.name + "? Members lose access and the name is released.")) return; call("close_casino", { p_casino: c.id }).then(function () { closeModal(); toast("Casino closed."); loadMine(); find(); }, function (x) { err.textContent = x.message; }); };
     }
+    function redesign(c) {
+      var m = modal('<h3 style="font-size:1.8rem">Redesign ' + esc(c.name) + '</h3><div id="rdScene" class="cbscene"></div>' + designerHTML(c.style || {}, c.kind) + '<span class="err" id="rdErr"></span><div class="row"><button class="btn gold" type="button" id="rdSave">Save the look</button><button class="btn ghost" type="button" data-close>Cancel</button></div>');
+      wireDesigner(m, function () { return { id: c.id, name: c.name, kind: c.kind, tables: c.tables || [] }; }, $("#rdScene", m));
+      $("#rdSave", m).onclick = function () { call("set_casino_style", { p_casino: c.id, p_style: readDesign(m) }).then(function (st) { c.style = st; closeModal(); toast("New look saved. Walk in to see it."); loadMine(); find(); }, function (x) { $("#rdErr", m).textContent = x.message; }); };
+    }
     function loadMine() {
       var box = $("#casMine"); if (!live()) { box.hidden = true; return; }
-      window.SF_LIVE.client.from("casinos").select("id,name,kind,about,zips,who,join_mode,status,review_note").eq("host_id", window.SF_LIVE.memberId()).neq("status", "closed").then(function (r) {
+      window.SF_LIVE.client.from("casinos").select("id,name,kind,about,zips,who,join_mode,status,review_note,style").eq("host_id", window.SF_LIVE.memberId()).neq("status", "closed").then(function (r) {
         var rows = r.data || [];
         P.hostCasinos = rows.filter(function (x) { return x.status === "open"; }).map(function (x) { return x.name; }); saveP(); renderCard();
         if (!rows.length) { box.hidden = true; return; }
