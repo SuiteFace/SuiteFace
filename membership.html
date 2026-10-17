@@ -79,9 +79,9 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792271155">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792271155">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792271155">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792271938">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792271938">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792271938">
 </head>
 <body data-page="membership">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -213,7 +213,7 @@
   <!-- ============ HOME: just enough to want in ============ -->
   <section data-pg="home" class="h-steps" aria-labelledby="hStepsT">
     <div class="wrap">
-      <h2 id="hStepsT">Three moves to your first pair</h2>
+      <h2 id="hStepsT">Three moves to your first pair</h2><div class="reel-div"></div>
       <ol class="h3up">
         <li><span class="ic" aria-hidden="true"><svg><use href="#i-quiz"/></svg></span><h3>Find your suit</h3><p>Twelve quick questions tell you how you show up in love.</p></li>
         <li><span class="ic" aria-hidden="true"><svg><use href="#i-deck"/></svg></span><h3>Get your hand</h3><p>The best fits near you, 13 in each suit, ranked Ace to 2.</p></li>
@@ -257,7 +257,7 @@
   <section data-pg="home" class="h-final" aria-labelledby="hFinalT">
     <div class="wrap h-final-in">
       <h2 id="hFinalT">Your seat is waiting.</h2>
-      <p class="lede">Real people near you, verified faces at the top of your deck, and no endless scroll. No Jokers Needed.</p>
+      <p class="lede">Real people near you, verified faces at the top of your deck, and no endless scroll. No Jokers Needed.</p><div class="reel-div"></div>
       <div class="row"><a class="btn gold" href="membership.html">Get dealt in for $2.10</a><a class="textlink" href="tables.html">Not here to date? Host a Private Table</a></div>
     </div>
   </section>
@@ -355,7 +355,7 @@
             <span class="flabel">I identify as</span><div class="chips" id="iamChips" role="group" aria-label="I identify as"></div>
             <span class="flabel" style="margin-top:10px">Looking for <small class="hint">(check all that apply)</small></span><div class="chips" id="seekChips" role="group" aria-label="Looking for"></div>
             <span class="hint" id="iamSum"></span>
-            <span class="flabel" style="margin-top:12px">Your Rooms <small class="hint">(check all that apply)</small></span>
+            <span class="flabel" style="margin-top:12px"><i data-slot="bell" data-size="16"></i> Your Rooms <small class="hint">(check all that apply)</small></span>
             <p class="hint" style="margin:0">Rooms are the house's themed floors. Join one and you can play a deck of only players who joined it too. You can only join a Room your own answers fit.</p>
             <div class="chips" id="roomChips" role="group" aria-label="Your Rooms"></div>
             <div id="maskBox" class="maskbox" hidden></div>
@@ -371,6 +371,8 @@
           </div>
           <div class="field verpanel" id="verPanel"></div>
           <div class="field hrdeck" id="hrDeck" hidden></div>
+          <div class="field comppanel" id="compPanel" hidden></div>
+          <div class="field headsup" id="headsUp" hidden></div>
           <div class="two">
             <div class="field"><label for="fName">Face Name</label><input type="text" id="fName" maxlength="40" placeholder="Jordan" autocomplete="given-name"><span class="err" id="fNameErr"></span></div>
             <div class="field"><label for="fHandle">Calling Card <small class="hint">(your @tag)</small></label><div class="atfield"><span aria-hidden="true">@</span><input type="text" id="fHandle" maxlength="24" placeholder="jordan.plays" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="handleHint"></div><span class="hint" id="handleHint">Just type your name. The @ is added for you.</span><div id="handleSug" class="handlesug" aria-live="polite"></div><span class="err" id="fHandleErr"></span></div>
@@ -732,14 +734,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792271155"></script>
-<script src="/assets/js/sign.js?v=1792271155"></script>
-<script src="/assets/js/live.js?v=1792271155"></script>
-<script src="/assets/js/gate.js?v=1792271155"></script>
-<script src="/assets/js/fx.js?v=1792271155"></script>
-<script src="/assets/js/casino-scene.js?v=1792271155"></script>
-<script src="/assets/js/chips.js?v=1792271155"></script>
-<script src="/assets/js/bumpers.js?v=1792271155"></script>
-<script src="/assets/js/app.js?v=1792271155"></script>
+<script src="/assets/js/config.js?v=1792271938"></script>
+<script src="/assets/js/sign.js?v=1792271938"></script>
+<script src="/assets/js/live.js?v=1792271938"></script>
+<script src="/assets/js/gate.js?v=1792271938"></script>
+<script src="/assets/js/fx.js?v=1792271938"></script>
+<script src="/assets/js/casino-scene.js?v=1792271938"></script>
+<script src="/assets/js/chips.js?v=1792271938"></script>
+<script src="/assets/js/bumpers.js?v=1792271938"></script>
+<script src="/assets/js/slots.js?v=1792271938"></script>
+<script src="/assets/js/app.js?v=1792271938"></script>
 </body>
 </html>

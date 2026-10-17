@@ -775,12 +775,45 @@
       (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your Wild Card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your deck.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") + "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
+    lockNote(R);
     $$("#quizResult [data-use],#quizResult [data-wild]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        var w = b.hasAttribute("data-wild"); P.wild = w; P.mySuit = b.getAttribute(w ? "data-wild" : "data-use");
-        P.selfWords = qw.self.slice(); P.othersWords = qw.others.slice(); P.fault = qw.fault; saveP(); renderStyles(); renderCard(); updateMeter();
-        toast(w ? "You're a Wild Card. It's on your card now." : "Your suit is " + SUIT[P.mySuit].name + ". It's on your card now.", P.mySuit);
-      });
+      b.addEventListener("click", function () { var w = b.hasAttribute("data-wild"); pickSuit(b.getAttribute(w ? "data-wild" : "data-use"), w, b); });
+    });
+  }
+  /* Locking in a suit: members who are signed in and seated (Buy-In confirmed) lock their suit for 7 days, after a confirmation. */
+  function suitLocked() { var L = P.suitLock; return !!(L && L.locked && new Date(L.unlocks_at) > new Date()); }
+  function unlockDay() { return new Date(P.suitLock.unlocks_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }); }
+  function canLock() { return !!(window.SF_LIVE && window.SF_LIVE.seated && ROLE !== "guest"); }
+  function applySuit(suit, wild) { P.wild = !!wild; P.mySuit = suit; P.selfWords = qw.self.slice(); P.othersWords = qw.others.slice(); P.fault = qw.fault; saveP(); renderStyles(); renderCard(); updateMeter(); }
+  function suitName(suit, wild) { return wild ? "a Wild Card (seated as " + SUIT[suit].name + ")" : SUIT[suit].sym + " " + SUIT[suit].name; }
+  function lockNote(R) {
+    if (!canLock()) return;
+    var box = document.createElement("div");
+    if (suitLocked()) {
+      box.className = "notice lockednote"; box.innerHTML = "🔒 <b>Your suit is locked as " + esc(suitName(P.suitLock.suit, P.suitLock.wild)) + "</b> until <b>" + esc(unlockDay()) + "</b>. This result is just for fun until then.";
+      $$("[data-use],[data-wild]", R).forEach(function (b) { b.disabled = true; b.title = "Locked until " + unlockDay(); });
+    } else {
+      box.className = "hint locknote"; box.innerHTML = "🔒 Choosing your suit <b>locks it in for 7 days</b>. You'll confirm first.";
+      $$("[data-use],[data-wild]", R).forEach(function (b) { if (b.classList.contains("gold")) b.textContent = b.hasAttribute("data-wild") ? "Lock in Wild Card" : "Lock in " + SUIT[b.getAttribute("data-use")].name; });
+    }
+    var chips = $(".chips", R); if (chips) chips.parentNode.insertBefore(box, chips);
+  }
+  function pickSuit(suit, wild, btn) {
+    if (!canLock()) { applySuit(suit, wild); toast(wild ? "You're a Wild Card. It's on your card now." : "Your suit is " + SUIT[suit].name + ". It's on your card now.", suit); if (!wild) { jackpot(2500); burstAt(btn, 50); } return; }
+    if (suitLocked()) { toast("Your suit is locked until " + unlockDay() + "."); return; }
+    var until = new Date(Date.now() + 7 * 864e5).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+    var m = modal('<span class="big" style="color:' + suitColor(suit) + '">' + pip(suit, "big") + '</span><h3 style="font-size:1.8rem">Lock in ' + esc(suitName(suit, wild)) + '?</h3>' +
+      '<p class="lede" style="margin:6px 0 10px">Once you lock it in, <b>you can\'t change your suit for 7 days</b>, until <b>' + esc(until) + '</b>. Your deck is dealt from it, and retaking the quiz won\'t change it until then.</p>' +
+      '<label class="check"><input type="checkbox" id="lockOk"> <span>I understand I\'m locking in my suit and can\'t change it for 7 days.</span></label>' +
+      '<div class="row" style="margin-top:12px"><button class="btn gold" type="button" id="lockGo" disabled>🔒 Lock in my suit</button><button class="btn ghost" type="button" data-close>Not yet</button></div>');
+    $("#lockOk", m).addEventListener("change", function () { $("#lockGo", m).disabled = !this.checked; });
+    $("#lockGo", m).addEventListener("click", function () {
+      var go = this; go.disabled = true;
+      lrpc("lock_my_suit", { p_suit: suit, p_wild: !!wild }).then(function (r) {
+        P.suitLock = Object.assign({ locked: true }, r || {}); applySuit(suit, wild); closeModal();
+        toast("🔒 Locked in: " + suitName(suit, wild) + " until " + unlockDay() + ".", suit); jackpot(2500);
+        var R = $("#quizResult"); if (R) { $$(".locknote", R).forEach(function (x) { x.remove(); }); lockNote(R); }
+      }, function (er) { go.disabled = false; toast((er && er.message) || "Couldn't lock your suit. Try again."); });
     });
   }
   function showResult() {
@@ -837,11 +870,9 @@
       "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
+    lockNote(R);
     $$("#quizResult [data-use]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        P.wild = false; P.mySuit = b.getAttribute("data-use"); P.selfWords = qw.self.slice(); P.othersWords = qw.others.slice(); P.fault = qw.fault; saveP(); renderStyles(); renderCard(); updateMeter();
-        toast("Your suit is " + SUIT[P.mySuit].name + ". It's on your card now.", P.mySuit); jackpot(2500); burstAt(b, 50);
-      });
+      b.addEventListener("click", function () { pickSuit(b.getAttribute("data-use"), false, b); });
     });
   }
 
@@ -1143,6 +1174,29 @@
       (ch ? '<div class="notice"><b>We matched your card to your ID:</b><ul>' + ch + "</ul></div>" : "") +
       ((P.verifiedOnly || "any") !== "any" && !(photo && id) ? '<p class="hint" style="margin:6px 0 0">Tip: people who ask for verified players usually want to be dealt to verified players too. Verify yourself to fill more decks.</p>' : "");
   }
+  function renderHeadsUp() {
+    var el = $("#headsUp"); if (!el || !window.SFSlots) return; var H = P.headsUp; if (!H || !(H.items || []).length) { el.hidden = true; return; } el.hidden = false;
+    var stuck = H.stuck || {}, M = SFSlots.meaning;
+    el.innerHTML = '<span class="flabel">Heads-ups <span class="hint">(private)</span></span><p class="hint" style="margin:2px 0 6px">Only you see these. Dispute one with a credit and it\'s gone. If three different dates send the same one, it sticks on your card for 7 days and can\'t be disputed. Dispute credits: <b>' + (H.credits || 0) + '</b> · <button type="button" class="linkish" data-buycredit>Buy a credit · $2.10</button></p>' +
+      Object.keys(stuck).map(function (k) { return '<p class="notice bad" style="margin:4px 0">' + SFSlots.svg(k, 18) + " <b>" + M[k][0] + "</b> is on your card until " + new Date(stuck[k]).toLocaleDateString("en-US", { month: "long", day: "numeric" }) + ". " + M[k][1] + "</p>"; }).join("") +
+      '<div class="hulist">' + H.items.map(function (x) { return '<div class="cmrow"><span>' + SFSlots.svg(x.kind, 18) + " <b>" + M[x.kind][0] + "</b> · " + new Date(x.at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "</span>" + (x.disputed ? '<span class="hint">Disputed · removed</span>' : x.stuck ? '<span class="hint">Stuck (3 dates)</span>' : '<button class="chip sm" type="button" data-dispute="' + x.id + '">Dispute</button>') + "</div>"; }).join("") + "</div>";
+  }
+  document.addEventListener("click", function (e) {
+    var d = e.target.closest("[data-dispute]");
+    if (d) { if (!confirm("Use 1 dispute credit to remove this heads-up?")) return;
+      lrpc("dispute_heads_up", { p_id: +d.getAttribute("data-dispute") }).then(function () { toast("Removed."); return lrpc("my_heads_ups"); }).then(function (h) { if (h) { P.headsUp = h; renderHeadsUp(); } }, function (er) { toast((er && er.message) || "Couldn't dispute."); }); return; }
+    if (e.target.closest("[data-buycredit]")) buy("dispute_credit", "Dispute credit", 2.10, function () { toast("In the live app, your credit is added to your account right after checkout."); });
+  });
+  function renderCompPanel() {
+    var el = $("#compPanel"); if (!el || !window.SFSlots) return; var rows = P.compRows || [];
+    if (!rows.length) { el.hidden = true; return; } el.hidden = false;
+    el.innerHTML = '<span class="flabel">' + SFSlots.svg("seven", 16) + ' Your compliment stickers</span><p class="hint" style="margin:2px 0 6px">Earned from people you played a hand with. Tap one to hide it from your card, or show it again.</p><div class="cpmine">' +
+      rows.map(function (x) { return '<button type="button" class="cp mine" data-cphide="' + x.kind + '" aria-pressed="' + !x.hidden + '">' + SFSlots.svg(x.kind, 22) + "<b>" + SFSlots.meaning[x.kind][0] + " × " + x.n + "</b><span>" + (x.hidden ? "Hidden" : "On your card") + "</span></button>"; }).join("") + "</div>";
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-cphide]"); if (!b) return; var k = b.getAttribute("data-cphide"), hide = b.getAttribute("aria-pressed") === "true";
+    lrpc("set_compliment_hidden", { p_kind: k, p_hidden: hide }).then(function () { (P.compRows || []).forEach(function (x) { if (x.kind === k) x.hidden = hide; }); P.myComps = null; (P.compRows || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function (er) { toast(er.message); });
+  });
   function renderHrDeck() {
     var el = $("#hrDeck"); if (!el) return; el.hidden = !P.highRoller; if (!P.highRoller) { el.innerHTML = ""; return; }
     var D = P.hrDeck || {}, st = D.status || "needs_address", by = D.ship_by ? new Date(D.ship_by).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "within 180 days of your confirmation";
@@ -1323,7 +1377,7 @@
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +
       '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") + (P.founderNo ? '<div class="f1kline">★ First 1,000 · №' + String(P.founderNo).padStart(4, "0") + "</div>" : "") + ((P.hostCasinos || []).length ? '<div class="hostline">♠ Host · ' + esc(P.hostCasinos.join(" · ")) + "</div>" : "") + (P.highRoller ? '<div class="hrb mine">💎 High Roller · ' + (P.highRoller === "verified" ? "Platinum ✓" : "Gold") + "</div>" + (P.masked ? '<div class="maskline">🎭 Others see: ' + esc(P.maskName || "Masked High Roller") + (parseInt(P.age, 10) ? ", " + (parseInt(P.age, 10) - 1) + "–" + (parseInt(P.age, 10) + 1) : "") + "</div>" : "") : "") +
-      '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" + (window.SFBumpers ? SFBumpers.strip(P.bumpers, P.bumpersOk) : "") +
+      '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" + (window.SFBumpers ? SFBumpers.strip(P.bumpers, P.bumpersOk) : "") + (window.SFSlots && P.myComps ? SFSlots.strip(P.myComps, { size: 16 }) : "") +
       '<div class="tr" style="color:' + col + '">' + (P.wild ? "★ Wild Card" : P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="stk-' + k[2] + '">' + k[1] + "</span>" : ""; }).join("") + "</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
@@ -1512,9 +1566,9 @@
     return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="' + esc(p.name) + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + '. Press to flip."><div class="flip">' +
       (p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + '</div></div><span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
-      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + ((p.photoV || p.idV || p.hr || (p.bumpers || []).length) ? '<div class="ficons">' + (p.hr ? "" : verBadges(p)) + (p.hr ? '<span class="hrb" title="High Roller">' + (isMasked(p) ? "🎭 " : "💎 ") + (p.hr === "verified" ? "Platinum ✓" : "Gold") + "</span>" : (window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, p.photoV && p.idV ? 1 : 2), p.bumpersOk) : "")) + "</div>" : "") + jmeter(p) + "</div>" +
+      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + ((p.photoV || p.idV || p.hr || (p.bumpers || []).length || p.comps) ? '<div class="ficons">' + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 2, size: 12 }) : "") + (p.hr ? "" : verBadges(p)) + (p.hr ? '<span class="hrb" title="High Roller">' + (isMasked(p) ? "🎭 " : "💎 ") + (p.hr === "verified" ? "Platinum ✓" : "Gold") + "</span>" : (window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, p.photoV && p.idV ? 1 : 2), p.bumpersOk) : "")) + "</div>" : "") + jmeter(p) + "</div>" +
       '<span class="idx br">' + p.rank + pip(p.suit) + "</span>" + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>") +
-      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
+      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
       '</div></div><div class="card-actions"><button class="btn ghost" type="button" data-burn>Burn</button><button class="btn red" type="button" data-play>Play</button></div></div>';
   }
   function renderTable(redeal) {
@@ -2022,6 +2076,7 @@
     ["zodiac", "Zodiac sign", "one", ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"], 0, 0, "Lifestyle"]
   ];
   var IDX = {}; IDF.forEach(function (f) { IDX[f[0]] = f; });
+  POOL.forEach(function (p) { var q = rng(hash(p.id + "cmp")), K = ["cherries", "kiss", "hug", "goldbars", "talk", "clover", "seven", "horseshoe"], c = null; if (q() < .45) { c = {}; var n = 1 + ((q() * 3) | 0); while (n--) { var k = K[(q() * K.length) | 0]; c[k] = (c[k] || 0) + 1 + ((q() * 4) | 0); } } p.comps = c; });
   POOL.forEach(function (p) { p.idV = hash(p.id + "idv") % 100 < 55; p.photoV = p.idV || hash(p.id + "pv") % 100 < 45; });
   POOL.forEach(function (p) { p.id_ = sampleIdentity(p); p.hr = hash(p.id + "hr") % 100 < 9 ? (hash(p.id + "hrk") % 3 ? "verified" : "buyin") : null; });
   /* Masked High Rollers: alias + 3-year age range + blurred photo until you check in together in person. */
@@ -2369,12 +2424,13 @@
         '<div class="outcomes two"><button class="oc win" type="button" data-oc="win"><b>Win</b><span>They said yes to a second date</span></button><button class="oc loss" type="button" data-oc="loss"><b>Loss</b><span>Not a match</span></button></div>' +
         '<p class="hint" id="jokerLeft">Joker window: ' + (jokerOpen ? fmtLeft(h.playAt + JOKER_WINDOW - now()) : "closed") + ".</p>";
     } else if (h.stage === "win") {
-      html = '<h3 class="win-t">Win! Second date with ' + nm + '</h3><p class="hint">Keep the Pair going. Check in again when you meet so the next hand counts.</p><button class="btn gold" type="button" data-again>Check in for date #' + (h.dates + 1) + "</button>";
+      html = '<h3 class="win-t">Win! Second date with ' + nm + '</h3><p class="hint">Keep the Pair going. Check in again when you meet so the next hand counts.</p><button class="btn gold" type="button" data-again>Check in for date #' + (h.dates + 1) + "</button>" + compPicker(h.comps || [], false);
     } else if (h.stage === "loss") {
       html = '<h3>Loss</h3><p class="hint">' + (h.result === "joker" ? nm + " is now a <b>Joker</b> in your deck and won't be dealt to you again. If ten different people make the same call within 180 days, their card shows JOKER for 45 days." :
         h.result === "auto" ? "No Win from both of you within 24 hours of the Push, so this became an automatic Loss on " + fmtDate(h.endAt) + ". The card is burned. No Joker can be made." : nm + "'s card is burned. It won't be dealt to you again.") + "</p>";
     }
     box.innerHTML = html + safety;
+    if (h.stage === "win") compWire(box, function (ks) { h.comps = (h.comps || []).concat(ks); saveG(); toast("Sent " + ks.length + " sticker" + (ks.length > 1 ? "s" : "") + " to " + p.name.split(" ")[0] + ". Nice play."); jackpot(1800); renderHand(m, p); });
     box.onclick = function (e) {
       var t = e.target;
       if (t.closest("[data-safety]")) { closeModal(); location.hash = "join"; toast("In an emergency, call 911. In the live app, safety reports go straight to our Judges."); return; }
@@ -3141,7 +3197,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -3149,6 +3205,8 @@
   function liveDeck(redeal) {
     var go = redeal ? lrpc("deal_deck").then(function () { return lrpc("my_deck"); }) : lrpc("my_deck").then(function (rows) { return rows && rows.length ? rows : lrpc("deal_deck").then(function () { return lrpc("my_deck"); }); });
     return go.then(function (rows) {
+      return lrpc("deck_compliments").then(function (cs) { var m = {}; (cs || []).forEach(function (x) { m[x.member_id] = x.kinds; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.comps = m[r.member_id]; }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
       return lrpc("deck_status").then(function (ss) { var m = {}; (ss || []).forEach(function (x) { m[x.member_id] = x.high_roller; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.high_roller = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_badges").then(function (vs) { var m = {}; (vs || []).forEach(function (v) { m[v.member_id] = v; }); (rows || []).forEach(function (r) { var v = m[r.member_id]; if (v) { r.photo_ok = v.photo_verified; r.id_ok = v.id_verified; r.confirmed = v.confirmed; } }); return rows; }, function () { return rows; });
@@ -3217,6 +3275,9 @@
       if (m.rooms) P.rooms = m.rooms;
       if (m.bumpers) { P.bumpers = m.bumpers; lrpc("my_bumpers").then(function (rs) { P.bumpersOk = (rs || []).filter(function (x) { return x.status === "verified"; }).map(function (x) { return x.bumper; }); saveP(); if (typeof renderStyle === "function") renderStyle(); renderCard(); }, function () { }); }
       var st = res[1].data; if (st && st.verified_only) { P.verifiedOnly = st.verified_only; if ($("#fVerOnly")) $("#fVerOnly").value = P.verifiedOnly; }
+      lrpc("my_heads_ups").then(function (h) { P.headsUp = h || null; renderHeadsUp(); }, function () { });
+      lrpc("my_compliments").then(function (rs) { P.compRows = rs || []; P.myComps = null; (rs || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function () { });
+      lrpc("my_suit_lock").then(function (L) { if (L) { P.suitLock = L; if (L.locked) { P.mySuit = L.suit; P.wild = !!L.wild; } saveP(); renderCard(); } }, function () { });
       lrpc("my_verification").then(function (v) { if (v) { P.ver = v; saveP(); renderVerPanel(); } }, function () { });
       lrpc("my_high_roller").then(function (h) { P.highRoller = h && h.in_room ? h.status : null; saveP(); renderCard(); if (P.highRoller) lrpc("my_hr_deck").then(function (d) { P.hrDeck = d || null; renderHrDeck(); }, function () { }); else renderHrDeck(); }, function () { });
       if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
@@ -3270,6 +3331,24 @@
     });
     renderLiveHand(m, h);
   }
+  /* Compliment stickers: after a date, tap what was true. Earned only, never bought. */
+  function compPicker(given, done) {
+    var K = window.SFSlots ? SFSlots.kinds : [], M = window.SFSlots ? SFSlots.meaning : {};
+    if (!K.length) return "";
+    return '<div class="comppick"><h4>' + SFSlots.svg("cherries", 18) + ' Leave compliment stickers <span class="hint">(optional)</span></h4><p class="hint">Tap what was true. They show on their card, and nobody sees who sent them.</p><div class="cpgrid">' +
+      K.map(function (k) { var had = (given || []).indexOf(k) > -1; return '<button type="button" class="cp' + (had ? " sent" : "") + '" data-cp="' + k + '" aria-pressed="' + had + '"' + (had ? " disabled" : "") + ">" + SFSlots.svg(k, 26) + "<b>" + M[k][0] + "</b><span>" + M[k][1] + "</span></button>"; }).join("") +
+      '</div><details class="cpneg"><summary>Honest heads-up <span class="hint">(private)</span></summary><p class="hint">Only they see a heads-up, and they can dispute it. If three different dates send the same one, it sticks on their card for 7 days. Be kind, and be sure.</p><div class="cpgrid">' +
+      SFSlots.neg.map(function (k) { var had = (given || []).indexOf(k) > -1; return '<button type="button" class="cp neg' + (had ? " sent" : "") + '" data-cp="' + k + '" aria-pressed="' + had + '"' + (had ? " disabled" : "") + ">" + SFSlots.svg(k, 26) + "<b>" + M[k][0] + "</b><span>" + M[k][1] + "</span></button>"; }).join("") +
+      '</div></details><div class="row"><button type="button" class="btn gold sm" data-cpsend' + (done ? " disabled" : "") + '>Send stickers</button></div></div>';
+  }
+  function compWire(box, send) {
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-cp]"); if (b && !b.disabled) { b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true"); return; }
+      if (e.target.closest("[data-cpsend]")) { var ks = $$("[data-cp][aria-pressed=true]:not([disabled])", box).map(function (x) { return x.getAttribute("data-cp"); }); if (!ks.length) { toast("Tap at least one sticker."); return; }
+        if (ks.some(function (k) { return SFSlots.neg.indexOf(k) > -1; }) && !confirm("Send an honest heads-up? It's private to them and they can dispute it. Three from different dates puts it on their card for 7 days.")) return;
+        send(ks); }
+    });
+  }
   function renderLiveHand(m, h) {
     var box = $("#handBox", m); if (!box) return; var nm = esc((h.other_name || "Player").split(" ")[0]), html = "";
     var safety = '<p class="hint">Felt unsafe, harassed or threatened? That\'s never just a Loss. <button type="button" class="linkish" data-lreport>Report and block ' + nm + "</button>. In an emergency, call 911.</p>";
@@ -3286,6 +3365,13 @@
       html = "<h3>" + esc(STAGE_LABEL[h.outcome] || "Settled") + '</h3><p class="hint">This hand is settled.</p>';
     }
     box.innerHTML = html + safety;
+    if (h.play_hand_id && (h.outcome === "win" || (h.my_call && h.my_call !== "loss_joker")) && window.SFSlots) {
+      var cpb = document.createElement("div"); box.appendChild(cpb);
+      lrpc("my_given_compliments", { p_play_hand: h.play_hand_id }).then(function (given) {
+        cpb.innerHTML = compPicker(given || [], false);
+        compWire(cpb, function (ks) { lrpc("give_compliments", { p_play_hand: h.play_hand_id, p_kinds: ks }).then(function (n) { toast(n ? "Sent " + n + " sticker" + (n > 1 ? "s" : "") + ". Nice play." : "Already sent."); jackpot(1800); renderLiveHand(m, h); }, function (x) { toast(x.message); }); });
+      }, function () { });
+    }
     box.onclick = function (e) {
       var t = e.target, out = $("#lcOut", m);
       function refresh() { liveTable().then(function () { var n = LIVE_HANDS.filter(function (x) { return x.hand_id === h.hand_id; })[0]; if (n) { h = n; renderLiveHand(m, h); } }); }

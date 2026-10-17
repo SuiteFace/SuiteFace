@@ -458,3 +458,22 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .pcard .face .ficons:has(.hrb){max-width:84%}
 .pcard .face .vbad i{white-space:nowrap}
 .hrdeck .addr input{padding:.6rem .75rem;border-radius:10px;border:1px solid rgba(43,39,48,.22);font:inherit;min-width:0}
+
+/* Compliment stickers */
+.comppick{margin-top:14px;padding:14px;border-radius:16px;border:1px solid rgba(201,165,90,.5);background:linear-gradient(135deg,rgba(232,196,106,.12),rgba(255,253,248,.04))}
+.comppick h4{margin:0 0 2px;display:flex;align-items:center;gap:6px}
+.cpgrid,.cpmine{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:8px 0 10px}
+.cp{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:28px 1fr;column-gap:8px;align-items:center;padding:9px 10px;border-radius:12px;background:#FFFDF8;color:#2B2730;box-shadow:0 0 0 1px rgba(43,39,48,.12),0 3px 0 #E4D9C4;transition:transform .12s,box-shadow .12s}
+.cp svg{grid-row:span 2}.cp b{font:700 .86rem/1.15 var(--body)}.cp span{font:500 .72rem/1.25 var(--body);color:#5B5560}
+.cp:hover{transform:translateY(-1px)}.cp:focus-visible{outline:3px solid #C9A55A;outline-offset:2px}
+.cp[aria-pressed=true]{box-shadow:0 0 0 2px #C9A55A,0 3px 0 #C9A55A;background:#FFF6DC}
+.cp.sent{opacity:.6;cursor:default}.cp.sent span::after{content:" · sent"}
+.cp.mine[aria-pressed=false]{opacity:.55}
+.pcard .face .ficons .comps{margin:0;gap:2px}.pcard .face .ficons .comp{padding:1px 4px 1px 2px}.pcard .face .ficons .comp b{font-size:8px}
+.pcard .back .comps{justify-content:flex-start;margin:2px 0 4px}
+.mycard .comps{margin-top:4px}
+.h-steps .reel-div{justify-content:flex-start;margin:6px 0 0;max-width:360px}
+.flabel [data-slot],.eyebrow [data-slot]{display:inline-block;vertical-align:-2px;margin-right:4px}
+.cpneg{margin:2px 0 8px}.cpneg summary{cursor:pointer;font-weight:700;padding:6px 0}
+.cp.neg[aria-pressed=true]{box-shadow:0 0 0 2px #9C4A7A,0 3px 0 #9C4A7A;background:#F8EEF4}
+.headsup .hulist .cmrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
