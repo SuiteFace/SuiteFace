@@ -484,8 +484,9 @@
   /* ---------- Card style: identity themes (free, opt-in), premium themes, stickers ---------- */
   var THEMES = [
     // [id, label, group, price (USD, 0 = free), css background for the frame ring, note]
-    ["classic", "Classic felt", "free", 0, "", "Your table's felt, nothing else. Keeps your identity private."],
-    ["rainbow", "Rainbow", "identity", 0, "linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#24408E,#732982)", "Gay and the wider LGBTQ+ community"],
+    ["private", "Private", "free", 0, "", "No identity theme. Your table's felt and the classic card face."],
+    ["classic", "Heterosexual", "identity", 0, "linear-gradient(90deg,#9B1B30 0 50%,#2B2730 50%)", "Heterosexual, in classic card red and black"],
+    ["rainbow", "Rainbow / Gay", "identity", 0, "linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#24408E,#732982)", "Gay and the wider LGBTQ+ community"],
     ["lesbian", "Lesbian", "identity", 0, "linear-gradient(90deg,#D52D00,#FF9A56,#FFFFFF,#D362A4,#A30262)", "Lesbian pride"],
     ["bi", "Bisexual", "identity", 0, "linear-gradient(90deg,#D60270 0 40%,#9B4F96 40% 60%,#0038A8 60%)", "Bisexual pride"],
     ["pan", "Pansexual", "identity", 0, "linear-gradient(90deg,#FF218C 0 33%,#FFD800 33% 66%,#21B1FF 66%)", "Pansexual pride"],
@@ -493,34 +494,42 @@
     ["nonbinary", "Nonbinary", "identity", 0, "linear-gradient(90deg,#FCF434,#FFFFFF,#9C59D1,#2C2C2C)", "Nonbinary pride"],
     ["genderqueer", "Genderqueer", "identity", 0, "linear-gradient(90deg,#B57EDC,#FFFFFF,#4A8123)", "Genderqueer pride"],
     ["ace", "Asexual", "identity", 0, "linear-gradient(90deg,#000000,#A3A3A3,#FFFFFF,#800080)", "Asexual pride"],
-    ["straight", "Straight", "identity", 0, "repeating-linear-gradient(90deg,#2B2730 0 14px,#FAF7F0 14px 28px)", "Straight, in house card colors"],
-    ["furry", "Furry", "community", 0, "radial-gradient(circle at 20% 30%,#FAF7F0 0 6px,transparent 7px),radial-gradient(circle at 70% 70%,#FAF7F0 0 6px,transparent 7px),linear-gradient(135deg,#8A5A1C,#C98A3C)", "Furry community, with paw-print felt"],
+    ["furry", "Furry 🐾", "community", 0, "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='%23FAF7F0' fill-opacity='.85' transform='rotate(-14 22 22)'%3E%3Cellipse cx='22' cy='28' rx='8' ry='6.5'/%3E%3Cellipse cx='12.5' cy='19' rx='3' ry='4'/%3E%3Cellipse cx='19' cy='14' rx='3' ry='4.2'/%3E%3Cellipse cx='25.5' cy='14' rx='3' ry='4.2'/%3E%3Cellipse cx='31.5' cy='19' rx='3' ry='4'/%3E%3C/g%3E%3C/svg%3E\") 0 0/30px 30px,linear-gradient(135deg,#6B3E14,#B8742A 55%,#E0A458)", "Furry community: paw prints on warm fur tones"],
     ["neon", "Vegas Neon", "premium", 4.20, "linear-gradient(90deg,#FF2E88,#FFE66D,#2EF2C2,#FF2E88)", "Glowing marquee frame"],
     ["gold", "Gold Leaf", "premium", 2.10, "linear-gradient(135deg,#7a5410,#E8C46A,#fff3c4,#B8862F,#7a5410)", "High roller gold"],
     ["velvet", "Velvet Rope", "premium", 2.10, "repeating-linear-gradient(45deg,#8e1222 0 10px,#b4182f 10px 20px)", "VIP rope red"],
     ["midnight", "Midnight Felt", "premium", 2.10, "radial-gradient(circle at 30% 20%,#FFE7A3 0 1px,transparent 2px) 0 0/18px 18px,linear-gradient(135deg,#2B2730,#4A1F5C)", "Starry back room"]
   ];
+  /* Sticker packs: [id, look, pack]. Stamps and showtime stickers are original art: no real names, faces or logos. */
+  var PACKS = { free: ["Free", 0], roller: ["High Roller", 2.10], passport: ["Passport Stamps", 2.10], showtime: ["Showtime", 2.10] };
+  function stamp(city, sub, c, shape) { return '<b class="pstamp ' + (shape || "") + '" style="--c:' + c + '">' + city + "<small>" + sub + "</small></b>"; }
   var STICKERS = [
-    ["dice", "🎲", 0], ["chip", "🪙", 0], ["spade", "♠️", 0],
-    ["rose", "🌹", 1], ["crown", "👑", 1], ["cocktail", "🍸", 1], ["fire", "🔥", 1], ["star", "⭐", 1], ["paw", "🐾", 1], ["kiss", "💋", 1], ["sparkle", "✨", 1], ["slot", "🎰", 1]
+    ["dice", "🎲", "free"], ["chip", "🪙", "free"], ["spade", "♠️", "free"],
+    ["rose", "🌹", "roller"], ["crown", "👑", "roller"], ["cocktail", "🍸", "roller"], ["fire", "🔥", "roller"], ["star", "⭐", "roller"], ["paw", "🐾", "roller"], ["kiss", "💋", "roller"], ["sparkle", "✨", "roller"], ["slot", "🎰", "roller"],
+    ["vegas", stamp("LAS VEGAS", "NV ✈ ARRIVED", "#9B1B30"), "passport"], ["paris", stamp("PARIS", "FR · ADMIS", "#6E3A9E", "rnd"), "passport"], ["tokyo", stamp("TOKYO", "JP 入国", "#C23B7A", "rnd"), "passport"],
+    ["nola", stamp("NEW ORLEANS", "LA · LAISSEZ", "#1E7A4C"), "passport"], ["nyc", stamp("NEW YORK", "NY · JFK", "#2B2730"), "passport"], ["cancun", stamp("CANCÚN", "MX · ENTRADA", "#D2622A", "rnd"), "passport"],
+    ["rome", stamp("ROMA", "IT · ARRIVO", "#8A5A1C"), "passport"], ["nashville", stamp("NASHVILLE", "TN · BNA", "#C8961E", "rnd"), "passport"], ["bahamas", stamp("NASSAU", "BS · ARRIVED", "#1E7A4C", "rnd"), "passport"],
+    ["carpet", "🎞️", "showtime"], ["popcorn", "🍿", "showtime"], ["clap", "🎬", "showtime"], ["trophy", "🏆", "showtime"], ["mic", "🎤", "showtime"], ["shades", "🕶️", "showtime"], ["limo", "🚘", "showtime"], ["camera", "📸", "showtime"], ["walk", "🌟", "showtime"]
   ];
   var THEME = {}; THEMES.forEach(function (t) { THEME[t[0]] = t; });
-  P.theme = P.theme || "classic"; P.stickers = P.stickers || []; P.owned = P.owned || [];
+  P.theme = P.theme === "straight" ? "classic" : (P.theme || "private"); P.stickers = P.stickers || []; P.owned = P.owned || [];
   function owns(id) { return P.owned.indexOf(id) > -1; }
   function priceTag(n) { return n ? "$" + n.toFixed(2) : "Free"; }
   var styleField = document.createElement("div"); styleField.className = "field cardstyle";
   styleField.innerHTML = '<span style="font-weight:700">Card style</span>' +
-    '<p class="hint" style="margin:0">Optional. An identity theme shows on your card for everyone in your deck to see, so pick one only if you want it known. Classic keeps it private.</p>' +
+    '<p class="hint" style="margin:0">Optional. An identity theme shows on your card for everyone in your deck to see, so pick one only if you want it known. <b>Private</b> shows no theme.</p>' +
     '<div class="thgroup"><b>Identity &amp; community themes <span class="free">Free</span></b><div class="themes" id="thFree"></div></div>' +
     '<div class="thgroup"><b>House themes <span class="prem">Premium</span></b><div class="themes" id="thPrem"></div></div>' +
-    '<div class="thgroup"><b>Stickers <span class="hint">(up to 3)</span></b><div class="stickers" id="stk"></div><p class="hint" style="margin:0">First three are free. The <b>High Roller sticker pack</b> unlocks the rest for $2.10.</p></div>' +
+    '<div class="thgroup"><b>Stickers <span class="hint">(up to 3 on your card)</span></b><div id="stk"></div></div>' +
     '<button class="btn ghost sm" type="button" id="openCage">Visit the Cashier\'s Cage</button>';
   $("#lookChips").closest(".field").after(styleField);
   function renderStyle() {
     function tile(t) { var locked = t[3] && !owns(t[0]); return '<button type="button" class="thpick" data-th="' + t[0] + '" aria-pressed="' + (P.theme === t[0]) + '" title="' + esc(t[5]) + '"><i style="background:' + (t[4] || "var(--felt-c," + P.felt + ")") + '"></i><span>' + esc(t[1]) + "</span>" + (locked ? '<em>' + priceTag(t[3]) + "</em>" : "") + "</button>"; }
     $("#thFree").innerHTML = THEMES.filter(function (t) { return t[2] !== "premium"; }).map(tile).join("");
     $("#thPrem").innerHTML = THEMES.filter(function (t) { return t[2] === "premium"; }).map(tile).join("");
-    $("#stk").innerHTML = STICKERS.map(function (k) { var locked = k[2] && !owns("stickers"); return '<button type="button" class="stkpick" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (locked ? ' data-locked="1"' : "") + ">" + k[1] + (locked ? "<em>🔒</em>" : "") + "</button>"; }).join("");
+    $("#stk").innerHTML = Object.keys(PACKS).map(function (pk) { var pv = PACKS[pk], open = !pv[1] || owns("pack_" + pk) || (pk === "roller" && owns("stickers"));
+      return '<div class="stkpack"><span class="stkhead">' + pv[0] + (open ? "" : ' <button type="button" class="unlockbtn" data-pack="' + pk + '">Unlock · $' + pv[1].toFixed(2) + "</button>") + '</span><div class="stickers">' +
+        STICKERS.filter(function (k) { return k[2] === pk; }).map(function (k) { return '<button type="button" class="stkpick' + (pk === "passport" ? " wide" : "") + '" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (open ? "" : ' data-locked="' + pk + '"') + ">" + k[1] + (open ? "" : "<em>🔒</em>") + "</button>"; }).join("") + "</div></div>"; }).join("");
   }
   function buy(id, label, price, then) {
     var m = modal('<h3 style="font-size:1.8rem">' + esc(label) + '</h3><p class="lede" style="margin:6px 0 12px">' + priceTag(price) + ', one time. It\'s yours for as long as you\'re a member.</p>' +
@@ -529,11 +538,12 @@
     $("#buyGo", m).onclick = function () { if (!owns(id)) P.owned.push(id); saveP(); closeModal(); toast(label + " unlocked."); jackpot(2000); then && then(); };
   }
   styleField.addEventListener("click", function (e) {
-    var t = e.target.closest("[data-th]"), k = e.target.closest("[data-stk]");
+    var t = e.target.closest("[data-th]"), k = e.target.closest("[data-stk]"), pb = e.target.closest("[data-pack]");
+    if (pb) { var pk2 = pb.getAttribute("data-pack"); return buy("pack_" + pk2, PACKS[pk2][0] + " sticker pack", PACKS[pk2][1], function () { renderStyle(); }); }
     if (t) { var th = THEME[t.getAttribute("data-th")]; var apply = function () { P.theme = th[0]; renderStyle(); onChange(); };
       if (th[3] && !owns(th[0])) return buy(th[0], th[1] + " theme", th[3], apply); return apply(); }
     if (k) { var id = k.getAttribute("data-stk");
-      if (k.hasAttribute("data-locked")) return buy("stickers", "High Roller sticker pack", 2.10, function () { renderStyle(); });
+      if (k.hasAttribute("data-locked")) { var pk = k.getAttribute("data-locked"); return buy("pack_" + pk, PACKS[pk][0] + " sticker pack", PACKS[pk][1], function () { renderStyle(); }); }
       var at = P.stickers.indexOf(id); if (at > -1) P.stickers.splice(at, 1); else { if (P.stickers.length >= 3) { toast("Up to 3 stickers. Tap one to remove it."); return; } P.stickers.push(id); }
       renderStyle(); onChange(); }
     if (e.target.closest("#openCage")) openCage();
@@ -542,6 +552,8 @@
     var ITEMS = [
       ["Premium card themes", "Vegas Neon, Gold Leaf, Velvet Rope, Midnight Felt", "$2.10–$4.20"],
       ["High Roller sticker pack", "Nine extra stickers for your card", "$2.10"],
+      ["Passport Stamps sticker pack", "Vegas, Paris, Tokyo, New Orleans, NYC, Cancún, Rome, Nashville, Nassau", "$2.10"],
+      ["Showtime sticker pack", "Red carpet, popcorn, clapboard, trophy, mic, shades, limo and more", "$2.10"],
       ["Peek", "See one card that has already played you", "$2.10"],
       ["High Card", "Your Play arrives with a gold spotlight, so they notice it first", "$1.05"],
       ["Fresh Shuffle", "Re-deal your 52 now instead of waiting for new players", "$2.10"],
@@ -737,17 +749,45 @@
     return Math.round(pts.filter(Boolean).length / pts.length * 100);
   }
   function updateMeter() { var s = strength(); $("#faceMeter").style.width = s + "%"; $("#pct").textContent = s + "%"; }
+  /* I identify as + Looking for (check all that apply): always a gate, so the deck only holds people you want to see. */
+  var IAM = ["Woman", "Man", "Trans woman", "Trans man", "Nonbinary", "Genderfluid", "Agender", "Two-Spirit", "Another identity"];
+  var SEEKS = [["Women", ["Woman"]], ["Men", ["Man"]], ["Trans women", ["Trans woman"]], ["Trans men", ["Trans man"]], ["Nonbinary & gender-diverse", ["Nonbinary", "Genderfluid", "Agender", "Two-Spirit", "Another identity"]], ["Everyone", null]];
+  function seekPicked() { var pr = (P.prefs || {}).gender; if (!pr || !pr.sel || !pr.sel.length || pr.sel.indexOf(OPEN) > -1) return pr && pr.sel && pr.sel.indexOf(OPEN) > -1 ? ["Everyone"] : [];
+    return SEEKS.filter(function (s) { return s[1] && s[1].every(function (v) { return pr.sel.indexOf(v) > -1; }); }).map(function (s) { return s[0]; }); }
+  function seekLine() { var me = (P.id || {}).gender, sk = seekPicked(); if (!me && !sk.length) return "";
+    return (me && me !== PNTS ? me : "") + (sk.length ? (me && me !== PNTS ? " · seeking " : "Seeking ") + sk.join(", ") : ""); }
+  function renderIam() {
+    var box = $("#iamBox"); if (!box) return; var me = (P.id || {}).gender, sk = seekPicked();
+    $("#iamChips").innerHTML = IAM.map(function (g) { return '<button type="button" class="chip" data-iam="' + esc(g) + '" aria-pressed="' + (me === g) + '">' + esc(g) + "</button>"; }).join("");
+    $("#seekChips").innerHTML = SEEKS.map(function (s) { return '<button type="button" class="chip" data-seek="' + esc(s[0]) + '" aria-pressed="' + (sk.indexOf(s[0]) > -1) + '">' + (sk.indexOf(s[0]) > -1 ? "✓ " : "") + esc(s[0]) + "</button>"; }).join("");
+    $("#iamSum").textContent = seekLine() ? "Your card says: " + seekLine() : "";
+  }
+  function wireIam() {
+    var box = $("#iamBox"); if (!box || box.wired) return; box.wired = true;
+    box.addEventListener("click", function (e) {
+      var g = e.target.closest("[data-iam]"), s = e.target.closest("[data-seek]");
+      P.id = P.id || {}; P.prefs = P.prefs || {};
+      if (g) { P.id.gender = g.getAttribute("data-iam"); }
+      if (s) { var name = s.getAttribute("data-seek"), cur = seekPicked().filter(function (x) { return x !== "Everyone"; });
+        if (name === "Everyone") cur = cur.length === SEEKS.length - 1 ? [] : ["Everyone"];
+        else { var i = cur.indexOf(name); if (i > -1) cur.splice(i, 1); else cur.push(name); }
+        var sel = []; if (cur.indexOf("Everyone") > -1) sel = [OPEN]; else cur.forEach(function (n) { SEEKS.filter(function (x) { return x[0] === n; })[0][1].forEach(function (v) { if (sel.indexOf(v) < 0) sel.push(v); }); });
+        P.prefs.gender = { sel: sel.length ? sel : [OPEN], deal: sel.length > 0 && sel[0] !== OPEN }; }
+      if (!g && !s) return;
+      saveP(); renderIam(); if (typeof syncIdentityUI === "function") syncIdentityUI(); deckDirty = true; onChange();
+    });
+  }
   function initials(n) { return (n || "?").trim().split(/\s+/).map(function (x) { return x[0]; }).join("").slice(0, 2).toUpperCase() || "?"; }
   function renderCard() {
     var s = P.mySuit || P.trumps[0], col = SUIT[s].red ? "var(--red)" : "#2B2730";
     var h = P.handle.trim() ? "@" + P.handle.trim().replace(/^@/, "") : "@yourname";
     $("#myCard").style.setProperty("--felt-c", P.felt);
-    var thm = THEME[P.theme] || THEME.classic; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
+    var thm = THEME[P.theme] || THEME.private; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +
-      '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" +
+      '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") +
       '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" +
-      '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? "<span>" + k[1] + "</span>" : ""; }).join("") + "</div>";
+      '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="stk-' + k[2] + '">' + k[1] + "</span>" : ""; }).join("") + "</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
   var deckDirty = false;
@@ -1857,6 +1897,6 @@
 
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();
-  renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); loadZips(); renderMap();
+  wireIam(); renderIam(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); loadZips(); renderMap();
   $("#pile").style.setProperty("--hat", "url(\"data:image/svg+xml," + encodeURIComponent(BRAND.hat) + "\")");
 })();
