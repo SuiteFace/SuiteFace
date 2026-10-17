@@ -160,6 +160,74 @@
     }).join("");
   }
 
+  /* ---------- How it plays: each tile opens a real example ---------- */
+  (function () {
+    var box = $("#howSteps"); if (!box) return;
+    function card(rank, s, name, sub) { return '<div class="bigcard"><div><div style="font:900 2.4rem var(--display);color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + rank + SUIT[s].sym + '</div><div style="font:900 1.4rem var(--display);text-transform:uppercase">' + name + '</div><div class="hint" style="color:#4a4552">' + sub + "</div></div></div>"; }
+    var MINI = {
+      1: '<div class="mt">Sample question</div><div style="font-weight:700;margin-bottom:6px">First date, you\'d rather…</div><div class="mrow"><span class="mchip">Book the place</span><span class="mchip" style="background:var(--bulb)">Long walk and real talk</span></div><div style="margin-top:8px;font-weight:800;color:var(--red)">♥ You\'re a Heart</div>',
+      2: '<div class="mt">A Face</div><div style="display:flex;gap:8px;align-items:center"><div class="mcard" style="background:var(--red);color:var(--cream);width:48px;height:48px;border-radius:12px">J</div><div><b>Jordan, 33</b><div style="font-size:.8rem">@jordan.k · Homewood</div></div></div><div class="mrow" style="margin-top:6px"><span class="mchip">Hiking</span><span class="mchip">Live music</span></div>',
+      3: '<div class="mt">Your trumps</div><div style="font:900 1.6rem var(--display);letter-spacing:.1em"><span style="color:var(--red)">♥</span> <span style="color:var(--red)">♦</span> ♣ ♠</div><div style="font-size:.82rem">Hearts lead your Hand, Spades come last.</div>',
+      4: '<div class="mt">Your 52</div><div class="mrow"><span class="mcard" style="color:var(--red)">A♥</span><span class="mcard" style="color:var(--red)">K♦</span><span class="mcard">Q♣</span></div><div style="font-size:.82rem;margin-top:6px">13 per suit, Ace to 2.</div>',
+      5: '<div class="mt">Burn or Play</div><div class="mrow"><span class="mchip" style="background:#f6d5d9">🔥 Burn: gone for good</span><span class="mchip" style="background:var(--bulb)">✋ Play: I\'m interested</span></div>',
+      6: '<div class="mt">It\'s a Pair</div><div style="font-weight:800">You hold Jordan as <span style="color:var(--red)">A♥</span><br>Jordan holds you as <span style="color:var(--red)">A♦</span></div><div style="font-size:.82rem;margin-top:4px">Pair of Aces. The Side Table opens.</div>'
+    };
+    $$("[data-mini]", box).forEach(function (m) { m.innerHTML = MINI[m.getAttribute("data-mini")]; });
+    var EX = {
+      1: function () {
+        var Qs = [["First date, you'd rather…", [["diamond", "Pick the place and book it"], ["club", "Something lively, like trivia"], ["heart", "A long walk and real conversation"], ["spade", "A spot with great reviews"]]],
+                  ["You show you care by…", [["diamond", "Solving the problem"], ["club", "Planning a surprise"], ["heart", "Showing up, no matter what"], ["spade", "Remembering the little details"]]]];
+        var picks = [];
+        var m = modal('<div class="ex"><p class="eyebrow">Example · Step 1</p><div class="exh">Find your suit</div><p class="lede">Try two real quiz questions. Each answer leans toward a suit.</p><div class="felt" id="exQ"></div><div class="res" id="exR"></div><a class="btn gold sm" href="#quiz" data-close>Take the full quiz</a></div>');
+        function q(i) {
+          if (i >= Qs.length) { var t = {}; picks.forEach(function (s) { t[s] = (t[s] || 0) + 1; }); var top = picks[picks.length - 1]; if (picks[0] === picks[1]) top = picks[0];
+            $("#exQ", m).innerHTML = '<div style="text-align:center;color:' + suitColor(top) + '">' + pip(top, "big") + '<div class="exh" style="color:var(--cream)">' + SUIT[top].sym + " You lean " + SUIT[top].name + '</div><p style="color:#dbeee4">' + SUIT[top].line + "</p></div>"; jackpot(1500); return; }
+          $("#exQ", m).innerHTML = '<div style="font:800 1.4rem var(--display);text-transform:uppercase;margin-bottom:10px">' + Qs[i][0] + '</div><div class="opts">' + Qs[i][1].map(function (o) { return '<button class="opt" type="button" data-s="' + o[0] + '">' + o[1] + "</button>"; }).join("") + "</div>";
+          $$(".opt", m).forEach(function (b) { b.onclick = function () { b.classList.add("on"); picks.push(b.getAttribute("data-s")); setTimeout(function () { q(i + 1); }, 250); }; });
+        }
+        q(0);
+      },
+      2: function () {
+        modal('<div class="ex"><p class="eyebrow">Example · Step 2</p><div class="exh">Set your Face</div><p class="lede">Your Face is your profile. You choose what\'s Face Up (on your card) and what stays Face Down (private, only for matching).</p>' +
+          '<div class="mface"><div class="avatar" style="width:84px;margin:0;background:var(--red)">J</div><div><b style="font:900 1.5rem var(--display);text-transform:uppercase">Jordan, 33</b><div class="hint" style="color:#4a4552">@jordan.k · Calling Card · Homewood, AL · ✓ Verified</div><p style="margin-top:6px">"Weekend hiker, weeknight cook. Looking for my person to share both."</p></div></div>' +
+          '<div class="mface" style="grid-template-columns:1fr"><div><b>Height</b> 5\'11"<span class="tag up">Face Up</span></div><div><b>Faith</b> Christian · Baptist<span class="tag up">Face Up</span></div><div><b>Kids</b> Want kids<span class="tag up">Face Up</span></div><div><b>Income</b> Prefer not to say<span class="tag down">Face Down</span></div><div><b>Biggest fault</b> Impatient<span class="tag down">Face Down</span></div></div>' +
+          '<a class="btn gold sm" href="how-cards-work.html">See how a Face becomes a card</a></div>');
+      },
+      3: function () {
+        var order = ["heart", "diamond", "club", "spade"];
+        var m = modal('<div class="ex"><p class="eyebrow">Example · Step 3</p><div class="exh">Call trumps</div><p class="lede">Rank the four suits by who you click with. Your #1 trump leads your Hand. Tap the arrows to reorder.</p><ol class="trumps" id="exT"></ol><p class="hint" id="exTn"></p></div>');
+        function draw() {
+          $("#exT", m).innerHTML = order.map(function (s, i) { return '<li><span class="tp" style="color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + SUIT[s].sym + '</span><b>#' + (i + 1) + "</b><span>" + SUIT[s].name + 's<br><small style="font-weight:500">' + SUIT[s].line + '</small></span><span>' + (i ? '<button type="button" data-up="' + i + '" aria-label="Move ' + SUIT[s].name + ' up">▲</button>' : "") + "</span></li>"; }).join("");
+          $("#exTn", m).textContent = "Your Hand opens with " + SUIT[order[0]].name + "s, then " + SUIT[order[1]].name + "s, " + SUIT[order[2]].name + "s and " + SUIT[order[3]].name + "s.";
+          $$("[data-up]", m).forEach(function (b) { b.onclick = function () { var i = +b.getAttribute("data-up"); var t = order[i]; order[i] = order[i - 1]; order[i - 1] = t; draw(); }; });
+        }
+        draw();
+      },
+      4: function () {
+        var m = modal('<div class="ex"><p class="eyebrow">Example · Step 4</p><div class="exh">Get your 52</div><p class="lede">Everyone near you who passes your gates (distance, ages, who you want to see, dealbreakers, and who wants to see you) is ranked by fit. The best 13 in each suit become Ace to 2.</p><div class="felt"><div class="deckgrid" id="exD"></div></div><a class="btn gold sm" href="how-cards-work.html">Follow one card from Face to rank</a></div>');
+        var html = ""; ["heart", "diamond", "club", "spade"].forEach(function (s) { RANKS.forEach(function (r) { html += '<i style="color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + r + SUIT[s].sym + "</i>"; }); });
+        $("#exD", m).innerHTML = html; $$("#exD i", m).forEach(function (el, n) { setTimeout(function () { el.classList.add("in"); }, REDUCED ? 0 : n * 18); });
+      },
+      5: function () {
+        var m = modal('<div class="ex"><p class="eyebrow">Example · Step 5</p><div class="exh">Burn or Play</div><p class="lede">Every card gets a choice. Burn is private and permanent. Play tells them you\'re interested; they only find out if they play you too.</p><div class="felt" id="exB">' + card("Q", "club", "Maya, 29", "Pelham · about 16 mi") + '</div><div class="row"><button class="btn red" type="button" data-burn>🔥 Burn</button><button class="btn gold" type="button" data-play>✋ Play</button><button class="btn ghost sm" type="button" data-reset>Reset</button></div><p class="res" id="exBr"></p></div>');
+        var c = $(".bigcard", m);
+        $("[data-burn]", m).onclick = function () { c.className = "bigcard burn"; $("#exBr", m).textContent = "Burned. Maya is gone from your deck for good, and she's never told."; };
+        $("[data-play]", m).onclick = function () { c.className = "bigcard play"; $("#exBr", m).textContent = "Played. If Maya plays you too, it's a Pair."; burstAt(c, 40); };
+        $("[data-reset]", m).onclick = function () { c.className = "bigcard"; $("#exBr", m).textContent = ""; };
+      },
+      6: function () {
+        var m = modal('<div class="ex"><p class="eyebrow">Example · Step 6</p><div class="exh">Make a Pair</div><p class="lede">When you both play each other\'s card, it\'s a Pair. Each of you sees how you hold the other, and the Side Table opens for chat. Phone numbers stay hidden until you both call a Win.</p><div class="felt"><div class="pairrow" id="exP">' +
+          '<div class="bigcard l"><div><div style="font:900 2rem var(--display);color:var(--red)">A♥</div><b>Jordan</b><div class="hint" style="color:#4a4552">You hold Jordan</div></div></div>' +
+          '<div class="bigcard r"><div><div style="font:900 2rem var(--display);color:var(--red)">A♦</div><b>You</b><div class="hint" style="color:#4a4552">Jordan holds you</div></div></div></div></div>' +
+          '<div class="exh" id="exPt" style="text-align:center;color:var(--gold-hi);opacity:0;transition:opacity .4s">Pair of Aces!</div>' +
+          '<div style="display:grid;gap:8px" id="exC"></div></div>');
+        setTimeout(function () { $("#exP", m).classList.add("met"); $("#exPt", m).style.opacity = 1; jackpot(3000); burstAt($("#exP", m), 80); }, REDUCED ? 0 : 500);
+        setTimeout(function () { $("#exC", m).innerHTML = '<div class="bub">A Pair! I knew it. Coffee Saturday?</div><div class="bub me">Yes. Somewhere public, I\'ll meet you there ☕</div>'; }, REDUCED ? 0 : 1300);
+      }
+    };
+    box.addEventListener("click", function (e) { var b = e.target.closest("[data-ex]"); if (b) EX[b.getAttribute("data-ex")](); });
+  })();
+
   /* ---------- quiz ---------- */
   var Q = [
     ["First date, you'd rather…", { diamond: "Pick the place and book it", club: "Something lively, like trivia night", heart: "A long walk and real conversation", spade: "A spot I've researched with great reviews" }],
@@ -295,6 +363,49 @@
   var F = { name: $("#fName"), handle: $("#fHandle"), age: $("#fAge"), zip: $("#fZip"), bio: $("#fBio") };
   Object.keys(F).forEach(function (k) { F[k].value = P[k] || ""; F[k].addEventListener("input", function () { P[k] = F[k].value; if (k === "bio") $("#bioCount").textContent = F[k].value.length; onChange(); }); });
   $("#bioCount").textContent = (P.bio || "").length;
+  /* ---------- Build my Face from a social account ---------- */
+  (function () {
+    var wrap = $("#socBtns"); if (!wrap) return;
+    var PROV = {
+      facebook: { name: "Facebook", gets: ["Name", "Profile photo", "Email", "Birthday and hometown (after Meta approves SuiteFace)"], sample: { name: "Jordan", handle: "jordan.k", bio: "Weekend hiker, weeknight cook. Looking for my person to share both.", color: "#3b5bbf" } },
+      tiktok: { name: "TikTok", gets: ["Display name", "Profile photo", "@username", "Bio"], sample: { name: "Jordan", handle: "jordanmoves", bio: "Dance breaks in the kitchen. Coffee snob. Dog dad.", color: "#2B2730" } },
+      snapchat: { name: "Snapchat", gets: ["Display name", "Bitmoji avatar"], sample: { name: "Jordan", handle: "jordsnaps", bio: "", color: "#E8C46A" } },
+      x: { name: "X", gets: ["Name", "@username", "Profile photo", "Bio", "Location"], sample: { name: "Jordan", handle: "jordan_k", bio: "Birmingham. Live music, long walks, strong opinions about barbecue.", color: "#4A4552" } },
+      google: { name: "Google", gets: ["Name", "Profile photo", "Email"], sample: { name: "Jordan", handle: "", bio: "", color: "#2F8A62" } },
+      apple: { name: "Apple", gets: ["Name", "Email (can be hidden)"], sample: { name: "Jordan", handle: "", bio: "", color: "#36313D" } }
+    };
+    var linked = S.get("socialLinked", []);
+    function mark() { $$(".socb", wrap).forEach(function (b) { b.classList.toggle("linked", linked.indexOf(b.getAttribute("data-prov")) > -1); });
+      $("#socLinked").textContent = linked.length ? "Linked: " + linked.map(function (k) { return PROV[k].name; }).join(", ") + ". Interests, quiz and preferences always come from you." : ""; }
+    function samplePhoto(letter, color) {
+      var c = document.createElement("canvas"); c.width = c.height = 320; var x = c.getContext("2d");
+      var g = x.createLinearGradient(0, 0, 320, 320); g.addColorStop(0, color); g.addColorStop(1, "#17151B"); x.fillStyle = g; x.fillRect(0, 0, 320, 320);
+      x.fillStyle = "#FAF7F0"; x.font = "900 170px 'Big Shoulders Display', Impact, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(letter, 160, 172);
+      return c.toDataURL("image/jpeg", .85);
+    }
+    wrap.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-prov]"); if (!b) return; var k = b.getAttribute("data-prov"), pv = PROV[k];
+      if (window.SF_LIVE && window.SF_LIVE.linkIdentity) { window.SF_LIVE.linkIdentity(k); return; }
+      var sm = pv.sample;
+      var fields = [["photo", "Profile photo", !!sm.color], ["name", "Face Name: " + sm.name, true], ["handle", sm.handle ? "Calling Card: @" + sm.handle : "", !!sm.handle], ["bio", sm.bio ? "Face Value: “" + sm.bio + "”" : "", !!sm.bio]].filter(function (f) { return f[2] && f[1]; });
+      var m = modal('<h3 style="font-size:1.8rem">Build from ' + esc(pv.name) + '</h3><p class="lede" style="margin:6px 0">' + esc(pv.name) + ' can share: <b>' + esc(pv.gets.join(", ")) + '</b>. Choose what to use:</p>' +
+        '<div class="imp">' + fields.map(function (f) { return '<label><input type="checkbox" checked data-f="' + f[0] + '"> <span>' + esc(f[1]) + "</span></label>"; }).join("") + "</div>" +
+        '<p class="hint">SuiteFace never posts to your account, never reads your messages or friends list, and you can unlink anytime in Settings. Your @username is checked so no one else has it.</p>' +
+        '<div class="notice pv"><b>Preview mode.</b> This fills in sample details so you can see how it works. On the live site, ' + esc(pv.name) + ' opens to approve the link and your real details come through.</div>' +
+        '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="impGo">Use these on my Face</button><button class="btn ghost" type="button" data-close>Cancel</button></div>');
+      $("#impGo", m).onclick = function () {
+        $$("[data-f]", m).forEach(function (cb) { if (!cb.checked) return; var f = cb.getAttribute("data-f");
+          if (f === "photo") P.photo = samplePhoto(sm.name.charAt(0), sm.color);
+          if (f === "name") { P.name = sm.name; F.name.value = sm.name; }
+          if (f === "handle") { P.handle = "@" + sm.handle; F.handle.value = P.handle; }
+          if (f === "bio") { P.bio = sm.bio; F.bio.value = sm.bio; $("#bioCount").textContent = sm.bio.length; } });
+        if (P.photo) { var ph = $("#ph"); if (ph) { ph.style.background = "url(" + P.photo + ") center/cover"; ph.textContent = ""; } }
+        if (linked.indexOf(k) < 0) linked.push(k); S.set("socialLinked", linked); mark(); saveP(); onChange(); closeModal();
+        toast(pv.name + " linked. Check your card on the right.");
+      };
+    });
+    mark();
+  })();
   var ageMin = $("#fAgeMin"), ageMax = $("#fAgeMax"), dist = $("#fDist");
   ageMin.value = P.ageMin; ageMax.value = P.ageMax; dist.value = P.dist;
   function syncRanges(e) {

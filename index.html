@@ -157,13 +157,13 @@
         <h2 id="howTitle">Six moves from stranger to Pair</h2>
         <p class="lede">Most apps hand you an endless scroll. SuiteFace hands you a real deck: 52 people, no filler, no Jokers. Every card is someone who fits what you asked for.</p>
       </div>
-      <ol class="steps">
-        <li><span class="no">1</span><b>Find your suit</b><span>A two-minute style quiz. Your suit is how you show up in love.</span></li>
-        <li><span class="no">2</span><b>Set your Face</b><span>Photo, Calling Card, a few lines about you. Shown only to your deck.</span></li>
-        <li><span class="no">3</span><b>Call trumps</b><span>Rank the four suits by who you click with. Your trump leads your Hand.</span></li>
-        <li><span class="no">4</span><b>Get your 52</b><span>The best fits near you who pass your gates: 13 of each suit, Ace to 2.</span></li>
-        <li><span class="no">5</span><b>Burn or Play</b><span>Burn a card and it's gone for good. Play a card to say you're interested.</span></li>
-        <li><span class="no">6</span><b>Make a Pair</b><span>When you both play each other's card, the Side Table opens and you can talk.</span></li>
+      <ol class="steps" id="howSteps">
+        <li><button class="stepbtn" type="button" data-ex="1" aria-haspopup="dialog"><span class="no">1</span><b>Find your suit</b><span>A two-minute style quiz. Your suit is how you show up in love.</span><em class="peek">See an example ›</em></button><div class="mini" data-mini="1" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="2" aria-haspopup="dialog"><span class="no">2</span><b>Set your Face</b><span>Photo, Calling Card, a few lines about you. Shown only to your deck.</span><em class="peek">See an example ›</em></button><div class="mini" data-mini="2" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="3" aria-haspopup="dialog"><span class="no">3</span><b>Call trumps</b><span>Rank the four suits by who you click with. Your trump leads your Hand.</span><em class="peek">See an example ›</em></button><div class="mini" data-mini="3" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="4" aria-haspopup="dialog"><span class="no">4</span><b>Get your 52</b><span>The best fits near you who pass your gates: 13 of each suit, Ace to 2.</span><em class="peek">See an example ›</em></button><div class="mini" data-mini="4" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="5" aria-haspopup="dialog"><span class="no">5</span><b>Burn or Play</b><span>Burn a card and it's gone for good. Play a card to say you're interested.</span><em class="peek">See an example ›</em></button><div class="mini" data-mini="5" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="6" aria-haspopup="dialog"><span class="no">6</span><b>Make a Pair</b><span>When you both play each other's card, the Side Table opens and you can talk.</span><em class="peek">See an example ›</em></button><div class="mini" data-mini="6" aria-hidden="true"></div></li>
       </ol>
     </div>
   </section>
@@ -224,6 +224,19 @@
       </div>
       <div class="profile">
         <form class="panel form-grid" id="faceForm" novalidate>
+          <div class="field social-build">
+            <span style="font-weight:700">Build my Face from a social account</span>
+            <p class="hint">Link an account to fill in your photo, name, @username and more. You review everything before it shows on your card.</p>
+            <div class="soc" id="socBtns">
+              <button type="button" class="socb" data-prov="facebook">Facebook</button>
+              <button type="button" class="socb" data-prov="tiktok">TikTok</button>
+              <button type="button" class="socb" data-prov="snapchat">Snapchat</button>
+              <button type="button" class="socb" data-prov="x">X</button>
+              <button type="button" class="socb" data-prov="google">Google</button>
+              <button type="button" class="socb" data-prov="apple">Apple</button>
+            </div>
+            <div class="hint" id="socLinked"></div>
+          </div>
           <div class="field">
             <span id="photoLbl" style="font-weight:600;font-size:.92rem">Portrait</span>
             <div class="drop" id="drop" tabindex="0" role="button" aria-labelledby="photoLbl" aria-describedby="photoHint">
