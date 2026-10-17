@@ -2734,7 +2734,7 @@
             var url = db.storage.from("faces").getPublicUrl(path).data.publicUrl;
             return lrpc("set_my_photo", { p_url: url, p_source: P.photoLive ? "live" : "upload", p_pose: P.photoLive || null }).then(function () { P.photo = url; saveP(); });
           });
-        });
+        }).catch(function (e) { toast("Your Face saved, but the photo didn't upload (" + ((e && e.message) || "try again") + "). Tap Save my Face again in a moment."); });
       });
   }
   function pullFace() {
