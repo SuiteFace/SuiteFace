@@ -373,6 +373,79 @@
     if (i > -1) P.interests.splice(i, 1); else { if (P.interests.length >= 5) { toast("Pick up to 5. Tap one to swap it out."); return; } P.interests.push(v); }
     renderInterests(); onChange();
   });
+  /* ---------- Card style: identity themes (free, opt-in), premium themes, stickers ---------- */
+  var THEMES = [
+    // [id, label, group, price (USD, 0 = free), css background for the frame ring, note]
+    ["classic", "Classic felt", "free", 0, "", "Your table's felt, nothing else. Keeps your identity private."],
+    ["rainbow", "Rainbow", "identity", 0, "linear-gradient(90deg,#E40303,#FF8C00,#FFED00,#008026,#24408E,#732982)", "Gay and the wider LGBTQ+ community"],
+    ["lesbian", "Lesbian", "identity", 0, "linear-gradient(90deg,#D52D00,#FF9A56,#FFFFFF,#D362A4,#A30262)", "Lesbian pride"],
+    ["bi", "Bisexual", "identity", 0, "linear-gradient(90deg,#D60270 0 40%,#9B4F96 40% 60%,#0038A8 60%)", "Bisexual pride"],
+    ["pan", "Pansexual", "identity", 0, "linear-gradient(90deg,#FF218C 0 33%,#FFD800 33% 66%,#21B1FF 66%)", "Pansexual pride"],
+    ["trans", "Transgender", "identity", 0, "linear-gradient(90deg,#5BCEFA,#F5A9B8,#FFFFFF,#F5A9B8,#5BCEFA)", "Trans pride"],
+    ["nonbinary", "Nonbinary", "identity", 0, "linear-gradient(90deg,#FCF434,#FFFFFF,#9C59D1,#2C2C2C)", "Nonbinary pride"],
+    ["genderqueer", "Genderqueer", "identity", 0, "linear-gradient(90deg,#B57EDC,#FFFFFF,#4A8123)", "Genderqueer pride"],
+    ["ace", "Asexual", "identity", 0, "linear-gradient(90deg,#000000,#A3A3A3,#FFFFFF,#800080)", "Asexual pride"],
+    ["straight", "Straight", "identity", 0, "repeating-linear-gradient(90deg,#2B2730 0 14px,#FAF7F0 14px 28px)", "Straight, in house card colors"],
+    ["furry", "Furry", "community", 0, "radial-gradient(circle at 20% 30%,#FAF7F0 0 6px,transparent 7px),radial-gradient(circle at 70% 70%,#FAF7F0 0 6px,transparent 7px),linear-gradient(135deg,#8A5A1C,#C98A3C)", "Furry community, with paw-print felt"],
+    ["neon", "Vegas Neon", "premium", 4.20, "linear-gradient(90deg,#FF2E88,#FFE66D,#2EF2C2,#FF2E88)", "Glowing marquee frame"],
+    ["gold", "Gold Leaf", "premium", 2.10, "linear-gradient(135deg,#7a5410,#E8C46A,#fff3c4,#B8862F,#7a5410)", "High roller gold"],
+    ["velvet", "Velvet Rope", "premium", 2.10, "repeating-linear-gradient(45deg,#8e1222 0 10px,#b4182f 10px 20px)", "VIP rope red"],
+    ["midnight", "Midnight Felt", "premium", 2.10, "radial-gradient(circle at 30% 20%,#FFE7A3 0 1px,transparent 2px) 0 0/18px 18px,linear-gradient(135deg,#2B2730,#4A1F5C)", "Starry back room"]
+  ];
+  var STICKERS = [
+    ["dice", "🎲", 0], ["chip", "🪙", 0], ["spade", "♠️", 0],
+    ["rose", "🌹", 1], ["crown", "👑", 1], ["cocktail", "🍸", 1], ["fire", "🔥", 1], ["star", "⭐", 1], ["paw", "🐾", 1], ["kiss", "💋", 1], ["sparkle", "✨", 1], ["slot", "🎰", 1]
+  ];
+  var THEME = {}; THEMES.forEach(function (t) { THEME[t[0]] = t; });
+  P.theme = P.theme || "classic"; P.stickers = P.stickers || []; P.owned = P.owned || [];
+  function owns(id) { return P.owned.indexOf(id) > -1; }
+  function priceTag(n) { return n ? "$" + n.toFixed(2) : "Free"; }
+  var styleField = document.createElement("div"); styleField.className = "field cardstyle";
+  styleField.innerHTML = '<span style="font-weight:700">Card style</span>' +
+    '<p class="hint" style="margin:0">Optional. An identity theme shows on your card for everyone in your deck to see, so pick one only if you want it known. Classic keeps it private.</p>' +
+    '<div class="thgroup"><b>Identity &amp; community themes <span class="free">Free</span></b><div class="themes" id="thFree"></div></div>' +
+    '<div class="thgroup"><b>House themes <span class="prem">Premium</span></b><div class="themes" id="thPrem"></div></div>' +
+    '<div class="thgroup"><b>Stickers <span class="hint">(up to 3)</span></b><div class="stickers" id="stk"></div><p class="hint" style="margin:0">First three are free. The <b>High Roller sticker pack</b> unlocks the rest for $2.10.</p></div>' +
+    '<button class="btn ghost sm" type="button" id="openCage">Visit the Cashier\'s Cage</button>';
+  $("#lookChips").closest(".field").after(styleField);
+  function renderStyle() {
+    function tile(t) { var locked = t[3] && !owns(t[0]); return '<button type="button" class="thpick" data-th="' + t[0] + '" aria-pressed="' + (P.theme === t[0]) + '" title="' + esc(t[5]) + '"><i style="background:' + (t[4] || "var(--felt-c," + P.felt + ")") + '"></i><span>' + esc(t[1]) + "</span>" + (locked ? '<em>' + priceTag(t[3]) + "</em>" : "") + "</button>"; }
+    $("#thFree").innerHTML = THEMES.filter(function (t) { return t[2] !== "premium"; }).map(tile).join("");
+    $("#thPrem").innerHTML = THEMES.filter(function (t) { return t[2] === "premium"; }).map(tile).join("");
+    $("#stk").innerHTML = STICKERS.map(function (k) { var locked = k[2] && !owns("stickers"); return '<button type="button" class="stkpick" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (locked ? ' data-locked="1"' : "") + ">" + k[1] + (locked ? "<em>🔒</em>" : "") + "</button>"; }).join("");
+  }
+  function buy(id, label, price, then) {
+    var m = modal('<h3 style="font-size:1.8rem">' + esc(label) + '</h3><p class="lede" style="margin:6px 0 12px">' + priceTag(price) + ', one time. It\'s yours for as long as you\'re a member.</p>' +
+      '<div class="notice pv"><b>Preview mode.</b> On the live site this opens a secure Stripe checkout (card, Apple Pay, Google Pay, Cash App Pay). Here you can try it free.</div>' +
+      '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="buyGo">Try it (preview)</button><button class="btn ghost" type="button" data-close>Not now</button></div>');
+    $("#buyGo", m).onclick = function () { if (!owns(id)) P.owned.push(id); saveP(); closeModal(); toast(label + " unlocked."); jackpot(2000); then && then(); };
+  }
+  styleField.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-th]"), k = e.target.closest("[data-stk]");
+    if (t) { var th = THEME[t.getAttribute("data-th")]; var apply = function () { P.theme = th[0]; renderStyle(); onChange(); };
+      if (th[3] && !owns(th[0])) return buy(th[0], th[1] + " theme", th[3], apply); return apply(); }
+    if (k) { var id = k.getAttribute("data-stk");
+      if (k.hasAttribute("data-locked")) return buy("stickers", "High Roller sticker pack", 2.10, function () { renderStyle(); });
+      var at = P.stickers.indexOf(id); if (at > -1) P.stickers.splice(at, 1); else { if (P.stickers.length >= 3) { toast("Up to 3 stickers. Tap one to remove it."); return; } P.stickers.push(id); }
+      renderStyle(); onChange(); }
+    if (e.target.closest("#openCage")) openCage();
+  });
+  function openCage() {
+    var ITEMS = [
+      ["Premium card themes", "Vegas Neon, Gold Leaf, Velvet Rope, Midnight Felt", "$2.10–$4.20"],
+      ["High Roller sticker pack", "Nine extra stickers for your card", "$2.10"],
+      ["Peek", "See one card that has already played you", "$2.10"],
+      ["High Card", "Your Play arrives with a gold spotlight, so they notice it first", "$1.05"],
+      ["Fresh Shuffle", "Re-deal your 52 now instead of waiting for new players", "$2.10"],
+      ["Comp a friend", "Gift a friend's $21 Buy-In; they get a comp code", "$21.00"],
+      ["Table merch", "Joker hats, chips and decks from the SuiteFace store", "Coming soon"]
+    ];
+    modal('<p class="eyebrow">The Cashier\'s Cage</p><h3 style="font-size:2rem">Extras for your table</h3><p class="lede" style="margin:6px 0 12px">Everything here is optional. Rank is never for sale: your 52 is always dealt by fit.</p><div class="cage">' +
+      ITEMS.map(function (it) { return '<div class="cageitem"><div><b>' + it[0] + "</b><span>" + it[1] + '</span></div><em>' + it[2] + "</em></div>"; }).join("") +
+      '</div><p class="hint" style="margin-top:10px">Identity and community themes are always free.</p>');
+  }
+  window.SF_openCage = openCage;
+  renderStyle();
   /* Felt now follows the table you pick (what you're looking for). */
 
   var F = { name: $("#fName"), handle: $("#fHandle"), age: $("#fAge"), zip: $("#fZip"), bio: $("#fBio") };
@@ -503,11 +576,12 @@
     var s = P.mySuit || P.trumps[0], col = SUIT[s].red ? "var(--red)" : "#2B2730";
     var h = P.handle.trim() ? "@" + P.handle.trim().replace(/^@/, "") : "@yourname";
     $("#myCard").style.setProperty("--felt-c", P.felt);
+    var thm = THEME[P.theme] || THEME.classic; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + "</div>" +
       '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" +
-      '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + '<div class="facts">' + esc(myFacts()) + "</div>" +
-      '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>";
+      '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" +
+      '<div class="tr" style="color:' + col + '">' + (P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? "<span>" + k[1] + "</span>" : ""; }).join("") + "</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
   var deckDirty = false;
