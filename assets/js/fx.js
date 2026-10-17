@@ -137,13 +137,13 @@
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var a = e.target.closest && e.target.closest("a"); if (!sameSite(a)) return;
     if (location.protocol === "file:" || window.top !== window.self && !/suiteface\.com$/.test(location.hostname)) return;
-    if (/casino\.html/.test(a.getAttribute("href") || "")) return; // each Casino plays its own entrance
+    if (/(casino|private-table)\.html/.test(a.getAttribute("href") || "")) return; // each Casino plays its own entrance
     e.preventDefault(); pageSpin(a.href);
   });
   // arriving: reels stop and the veil lifts
   (function () {
     var arrive = false; try { arrive = sessionStorage.getItem("sfx-arrive") === "1"; sessionStorage.removeItem("sfx-arrive"); } catch (e) { }
-    if (!arrive || REDUCED || /casino\.html/.test(location.pathname)) return;
+    if (!arrive || REDUCED || /(casino|private-table)\.html/.test(location.pathname)) return;
     function go() { var lobby = /joker-lobby\.html/.test(location.pathname), land = lobby ? threeJokers() : LAND;
       var v = machine(lobby ? "JOKER LOBBY" : "NEXT TABLE"); v.classList.add("page"); v.querySelectorAll(".sfx-strip").forEach(function (s) { s.innerHTML = symHTML(land[0]); });
       spin(v, land, 380, function () { setTimeout(function () { v.classList.remove("on"); setTimeout(function () { v.remove(); }, 260); }, 220); }); }

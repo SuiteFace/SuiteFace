@@ -984,3 +984,13 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 .cbstates .chip{min-width:52px;justify-content:center}
 .cbdraft{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;border-radius:12px;background:rgba(30,122,76,.18);border:1px solid rgba(30,122,76,.55);font-size:.86rem;color:#CFE8D8}
 .cbdraft .linkish{color:#FFB4BC}
+/* Private Tables */
+.anchor-alias{position:absolute;margin-top:-80px}
+#private-tables{position:relative}
+.casbuild-art{border-radius:16px;overflow:hidden;border:1px solid rgba(232,196,106,.3);box-shadow:0 20px 40px -26px #0E0C11}
+.casbuild-art svg{display:block;width:100%;height:auto}
+.cbseats{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cbseats input[type=range]{flex:1;min-width:160px;accent-color:#E8C46A;height:28px}
+.cbseats output{font-weight:800;color:#231C10;background:linear-gradient(180deg,#FFE7A3,#E8C46A);border-radius:999px;padding:.35rem .8rem;font-size:.86rem;white-space:nowrap}
+.cbscene .sft-wrap{border-radius:16px}
+#cjScene{margin-bottom:6px}
