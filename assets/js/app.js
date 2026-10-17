@@ -1100,7 +1100,7 @@
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
   var deckDirty = false;
-  function onChange() { renderCard(); updateMeter(); deckDirty = true; saveDraft(); zipHint(); }
+  function onChange() { renderCard(); updateMeter(); deckDirty = true; saveDraft(); zipHint(); if (typeof tabCounts === "function") tabCounts(); }
   function zipHint() {
     var z = ZIPS[P.zip], el = $("#zipHint"); if (!el) return;
     el.textContent = z ? z.city + ", " + z.st + ". Your 52 are measured from here." : 'Your 52 are measured from your ZIP. Only "about X miles" is ever shown.';
@@ -1864,13 +1864,55 @@
     kids.forEach(function (el) { if (!el.querySelector("#faceMeter") && !el.querySelector('button[type="submit"]')) el.setAttribute("data-tab", "basics"); });
     $("#showChips") && $("#showChips").closest(".field").remove();
     var bar = document.createElement("div"); bar.className = "ftabs"; bar.setAttribute("role", "tablist");
-    bar.innerHTML = [["basics", "Basics"], ["about", "About me"], ["look", "Looking for"]].map(function (t, i) { return '<button type="button" role="tab" class="chip" data-ft="' + t[0] + '" aria-selected="' + (i === 0) + '" aria-pressed="' + (i === 0) + '">' + t[1] + "</button>"; }).join("");
+    bar.innerHTML = [["basics", "Basics", "🃏"], ["about", "About me", "♥"], ["look", "Looking for", "♠"]].map(function (t, i) { return '<button type="button" role="tab" class="ftab" data-ft="' + t[0] + '" aria-selected="' + (i === 0) + '" aria-pressed="' + (i === 0) + '"><i aria-hidden="true">' + t[2] + "</i><b>" + t[1] + '</b><small data-ftc="' + t[0] + '"></small></button>'; }).join("");
     form.insertBefore(bar, form.firstChild);
     var about = document.createElement("div"); about.setAttribute("data-tab", "about"); about.className = "form-grid"; about.hidden = true;
     var look = document.createElement("div"); look.setAttribute("data-tab", "look"); look.className = "form-grid"; look.hidden = true;
     form.insertBefore(look, anchor); form.insertBefore(about, look);
     about.innerHTML = '<p class="hint">Every question is optional and has <b>Prefer not to say</b>. Use the eye to choose what shows on your card: <b>Face Up</b> is shown, <b>Face Down</b> is private but still helps match you.</p>' + groupHTML(false);
     look.innerHTML = '<div class="pmatch"><button type="button" class="btn gold sm" id="perfectMatch">✨ Perfect match</button><span class="hint">Copies your About me answers here in one tap (top 3 each). Then change anything you want different.</span></div><p class="hint">Pick <b>your top 3</b>, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
+    /* Slide-deck mode: one question at a time with a running count, like the suit quiz. */
+    function makeDeck(box, sel, name) {
+      var fields = $$(sel, box), idx = 0, on = S.get("deck_" + name, true);
+      var ctl = document.createElement("div"); ctl.className = "qdeck";
+      ctl.innerHTML = '<div class="qtop"><span class="qcount"></span><button type="button" class="linkish qmode"></button></div><div class="qbar"><i></i></div>' +
+        '<div class="qnav"><button type="button" class="btn ghost sm qback">‹ Back</button><button type="button" class="btn ghost sm qskip">Skip</button><button type="button" class="btn gold sm qnext">Next ›</button></div>';
+      var first = box.querySelector(".idgroup"); box.insertBefore(ctl, first);
+      var nav = ctl.querySelector(".qnav"); box.appendChild(nav);
+      function answered(f) { var k = f.getAttribute("data-k"); if (name === "look") { var pr = P.prefs[k]; return !!(pr && pr.sel && pr.sel.length && pr.sel.indexOf(OPEN) < 0); } return asList(P.id[k]).filter(Boolean).length > 0; }
+      function show() {
+        box.classList.toggle("deckmode", on);
+        ctl.querySelector(".qmode").textContent = on ? "See all as a list" : "One question at a time";
+        nav.hidden = !on; ctl.querySelector(".qbar").hidden = !on;
+        var left = fields.filter(function (f) { return !answered(f); }).length;
+        ctl.querySelector(".qcount").textContent = on ? "Question " + (idx + 1) + " of " + fields.length + " · " + left + " left" : fields.length - left + " of " + fields.length + " answered";
+        ctl.querySelector(".qbar i").style.width = ((idx + 1) / fields.length * 100) + "%";
+        fields.forEach(function (f, i) { f.classList.toggle("cur", on && i === idx); });
+        $$(".idgroup", box).forEach(function (g) { g.classList.toggle("curg", on && !!g.querySelector(".cur")); });
+        nav.querySelector(".qback").disabled = idx === 0;
+        nav.querySelector(".qnext").textContent = idx === fields.length - 1 ? (name === "about" ? "Done · Looking for ›" : "Done ✓") : "Next ›";
+      }
+      function go(d) {
+        if (idx + d >= fields.length) { if (name === "about") $('.ftabs [data-ft="look"]').click(); else { toast("All set. Tap Save my Face to keep it."); var sv = $('#faceForm button[type="submit"]'); if (sv) sv.scrollIntoView({ behavior: "smooth", block: "center" }); } return; }
+        idx = Math.max(0, Math.min(fields.length - 1, idx + d)); show();
+        var c = fields[idx]; if (c && on) { c.classList.remove("qin"); void c.offsetWidth; c.classList.add("qin"); }
+      }
+      ctl.querySelector(".qmode").onclick = function () { on = !on; S.set("deck_" + name, on); show(); };
+      nav.querySelector(".qback").onclick = function () { go(-1); };
+      nav.querySelector(".qskip").onclick = function () { go(1); };
+      nav.querySelector(".qnext").onclick = function () { go(1); };
+      box.addEventListener("click", function (e) {
+        if (!on) return; var c = e.target.closest(".chip"); if (!c) return; var f = c.closest(sel); if (!f || f !== fields[idx]) return;
+        var single = c.getAttribute("role") === "radio" || (name === "look" && c.getAttribute("data-v") === OPEN);
+        setTimeout(show, 0); if (single) setTimeout(function () { if (fields[idx] === f) go(1); }, 420);
+      });
+      box.addEventListener("change", function (e) { if (on && e.target.tagName === "SELECT" && e.target.closest(sel) === fields[idx]) { setTimeout(show, 0); setTimeout(function () { go(1); }, 420); } });
+      document.addEventListener("keydown", function (e) { if (!on || box.hidden || /INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || "")) return; if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
+      show();
+      return { refresh: show };
+    }
+    var deckAbout = makeDeck(about, ".idf", "about"), deckLook = makeDeck(look, ".pf", "look");
+    window.SF_deckRefresh = function () { deckAbout.refresh(); deckLook.refresh(); };
     look.addEventListener("click", function (e) {
       if (!e.target.closest("#perfectMatch")) return;
       var n = 0;
@@ -1918,7 +1960,15 @@
     return '<div class="field pf" data-k="' + k + '"><div class="idhead"><span class="lbl">' + f[1].replace(" (check all that apply)", "") + '</span><label class="deal" title="Only people who match what you picked here can be dealt into your 52"><input type="checkbox" data-deal="' + k + '"> Dealbreaker if not…</label></div><div class="chips" role="group" aria-label="' + esc(f[1]) + ' preference">' +
       [OPEN].concat(opts).map(function (o) { return '<button type="button" class="chip sm" data-pk="' + k + '" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + "</button>"; }).join("") + "</div></div>";
   }
-  function syncIdentityUI() { if (typeof renderRooms === "function") setTimeout(renderRooms, 0);
+  function tabCounts() {
+    var b = $('[data-ftc="basics"]'); if (!b) return;
+    b.textContent = validate(false) ? "✓ Done" : "To finish";
+    var answered = IDF.filter(function (f) { return asList(P.id[f[0]]).filter(Boolean).length; }).length;
+    $('[data-ftc="about"]').textContent = answered + " of " + IDF.length;
+    var set = Object.keys(P.prefs || {}).filter(function (k) { var pr = P.prefs[k]; return pr && pr.sel && pr.sel.length && pr.sel.indexOf(OPEN) < 0; }).length;
+    $('[data-ftc="look"]').textContent = set ? set + " set" : "Open";
+  }
+  function syncIdentityUI() { setTimeout(tabCounts, 0); if (window.SF_deckRefresh) setTimeout(window.SF_deckRefresh, 0); if (typeof renderRooms === "function") setTimeout(renderRooms, 0);
     IDF.forEach(function (f) {
       var k = f[0], v = P.id[k], box = $('.idf[data-k="' + k + '"]');
       if (box) {

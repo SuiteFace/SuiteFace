@@ -943,3 +943,39 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 .field.needs,.idf.needs{outline:3px solid #E5505E;outline-offset:6px;border-radius:12px;animation:needsPulse 1.2s ease-in-out 3}
 @keyframes needsPulse{50%{outline-color:rgba(229,80,94,.35)}}
 @media (prefers-reduced-motion:reduce){.field.needs{animation:none}}
+
+/* ---------- Face tabs: one segmented switcher with progress, pinned while you scroll ---------- */
+#faceForm .ftabs{position:sticky;top:76px;z-index:6;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:5px;border:1px solid var(--line);border-radius:18px;background:rgba(23,21,27,.92);backdrop-filter:blur(8px);box-shadow:0 10px 24px -14px #000}
+.ftab{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;padding:9px 12px;border-radius:13px;color:var(--cream-dim);transition:background .18s,color .18s,box-shadow .18s}
+.ftab i{grid-row:1/3;font-style:normal;font-size:1.25rem;line-height:1;opacity:.8}
+.ftab b{font:800 1rem/1.1 var(--display);text-transform:uppercase;letter-spacing:.06em;color:var(--cream)}
+.ftab small{font-size:.74rem;color:var(--cream-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ftab:hover{background:rgba(250,247,240,.06)}
+.ftab[aria-selected=true]{background:linear-gradient(180deg,#E8C46A,#B8862F);color:#231C10;box-shadow:0 6px 16px -6px rgba(232,196,106,.6)}
+.ftab[aria-selected=true] b,.ftab[aria-selected=true] small{color:#231C10}
+.ftab[aria-selected=true] i{opacity:1}
+.ftab[data-ft=look][aria-selected=true]{background:#FAF7F0;box-shadow:0 6px 16px -6px rgba(250,247,240,.45)}
+.ftab:focus-visible{outline:3px solid #FFE7A3;outline-offset:2px}
+@media(max-width:520px){.ftab{grid-template-columns:1fr;text-align:center;padding:8px 6px}.ftab i{grid-row:auto;font-size:1.05rem}.ftab b{font-size:.86rem}#faceForm .ftabs{top:64px}}
+
+/* ---------- One question at a time (About me / Looking for) ---------- */
+.qdeck{display:grid;gap:8px}
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.qcount{font:800 .95rem var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-hi)}
+[data-tab="look"] .qcount{color:#9B1B30}
+.qbar{height:8px;border-radius:999px;background:rgba(250,247,240,.12);overflow:hidden}
+[data-tab="look"] .qbar{background:rgba(43,39,48,.12)}
+.qbar i{display:block;height:100%;background:linear-gradient(90deg,#C8102E,#E8C46A,#2F8A62);border-radius:inherit;transition:width .35s}
+.qnav{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:4px}
+.qnav .qnext{margin-left:auto}
+.deckmode .idgroup{display:none}
+.deckmode .idgroup.curg{display:grid;min-height:260px;align-content:start}
+.deckmode .idf,.deckmode .pf{display:none}
+.deckmode .idf.cur,.deckmode .pf.cur{display:grid}
+.deckmode .cur .idhead .lbl,.deckmode .cur .idhead label{font:900 clamp(1.5rem,4vw,2rem)/1.1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.deckmode .cur .chip{font-size:1rem;padding:.75rem 1.05rem}
+.deckmode .cur select{font-size:1.05rem;padding:.85rem}
+.qin{animation:qIn .38s cubic-bezier(.3,.7,.3,1.15)}
+@keyframes qIn{from{opacity:0;transform:translateX(26px) rotate(1deg)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.qin{animation:none}}
+.qmode{color:var(--gold-hi)!important;font-weight:700}[data-tab="look"] .qmode{color:#9B1B30!important}
