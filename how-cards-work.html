@@ -122,7 +122,7 @@ p{margin:0}
 .paper h3{font-size:1.3rem;color:var(--card-ink)}
 .cols{display:grid;gap:16px;grid-template-columns:1fr 1fr}@media (max-width:700px){.cols{grid-template-columns:1fr}}
 .face{display:flex;gap:14px;align-items:center}
-.av{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;font:900 1.8rem var(--display);color:var(--cream);flex:none}
+.av{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;font:900 1.8rem var(--display);color:var(--cream);flex:none;overflow:hidden}
 .kv{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;margin-top:12px;font-size:.93rem;align-items:center}
 .kv dt{color:#6b6470;font-weight:600}.kv dd{margin:0}
 .fu{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap}
@@ -192,8 +192,8 @@ p{margin:0}
 .not h3{font-size:1.8rem;color:var(--red)}
 footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792252960">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792252960">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792263305">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792263305">
 <link rel="canonical" href="https://suiteface.com/how-cards-work.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SuiteFace">
@@ -307,7 +307,7 @@ footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
     drawStations(); var p=P[who], c=calc(p), s=SUITS[p.suit], html="";
     if(cur===0){
       html='<h2>Station 1 · '+esc(p.name)+'\'s Face</h2><p class="why">This is what '+esc(p.name)+' filled in. <b>Face Up</b> answers show on the card. <b>Face Down</b> answers stay private and are only used for matching.</p>'+
-      '<div class="cols"><div class="paper"><div class="face"><div class="av" style="background:'+p.color+'">'+initials(p.name)+'</div><div><h3>'+esc(p.name)+', '+p.age+'</h3><div style="color:#4a4552">'+esc(p.city)+' · ZIP '+p.zip+'</div>'+(p.verified?'<div style="margin-top:4px;font-weight:700;color:#8a6420">✓ ID verified</div>':'<div style="margin-top:4px;color:#6b6470">Not ID verified</div>')+'</div></div>'+
+      '<div class="cols"><div class="paper"><div class="face"><div class="av" style="background:'+p.color+'">'+'<img src="assets/people/'+p.name.toLowerCase()+'.jpg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 30%;border-radius:inherit;display:block">'+'</div><div><h3>'+esc(p.name)+', '+p.age+'</h3><div style="color:#4a4552">'+esc(p.city)+' · ZIP '+p.zip+'</div>'+(p.verified?'<div style="margin-top:4px;font-weight:700;color:#8a6420">✓ ID verified</div>':'<div style="margin-top:4px;color:#6b6470">Not ID verified</div>')+'</div></div>'+
       '<dl class="kv">'+p.identity.map(function(x){return '<dt>'+x[0]+'</dt><dd>'+esc(x[1])+'</dd><dd><span class="fu '+(x[2]?"up":"down")+'">'+(x[2]?"Face Up":"Face Down")+'</span></dd>';}).join("")+'</dl></div>'+
       '<div class="paper"><h3>Interests</h3><div class="chips" style="margin:8px 0 14px">'+p.interests.map(function(x){return '<span>'+esc(x)+'</span>';}).join("")+'</div><h3>Looking for</h3><p style="margin:6px 0 14px">'+(p.lookingFor==="serious"?"Something serious":"Seeing where it goes")+'</p><h3>Who they want to see</h3><p style="margin-top:6px">'+(p.wantsToSee==="everyone"?"Everyone":"Women")+'</p></div></div>';
     } else if(cur===1){
@@ -339,7 +339,7 @@ footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
         '<div class="deal"><button class="pc" id="pc" type="button" aria-label="Flip the card" style="border:0;background:none;padding:0;cursor:pointer"><div class="in"><div class="sd back"></div><div class="sd front">'+
           '<div class="corner" style="color:'+(s.red?"var(--red)":"var(--card-ink)")+'">'+c.rank+'<span>'+s.sym+'</span></div>'+
           (p.verified?'<span class="ver">✓ Verified</span>':"")+
-          '<div class="mid"><div class="av" style="background:'+p.color+'">'+initials(p.name)+'</div><div class="nm">'+esc(p.name)+', '+p.age+'</div><div class="meta">'+esc(p.city.split(",")[0])+' · about '+Math.max(1,Math.round(c.d))+' mi</div><div class="chips" style="justify-content:center">'+c.shared.slice(0,2).map(function(x){return '<span class="hit">'+esc(x)+'</span>';}).join("")+'</div></div>'+
+          '<div class="mid"><div class="av" style="background:'+p.color+'">'+'<img src="assets/people/'+p.name.toLowerCase()+'.jpg" alt="" style="width:100%;height:100%;object-fit:cover;object-position:50% 30%;border-radius:inherit;display:block">'+'</div><div class="nm">'+esc(p.name)+', '+p.age+'</div><div class="meta">'+esc(p.city.split(",")[0])+' · about '+Math.max(1,Math.round(c.d))+' mi</div><div class="chips" style="justify-content:center">'+c.shared.slice(0,2).map(function(x){return '<span class="hit">'+esc(x)+'</span>';}).join("")+'</div></div>'+
           '<div class="corner br" style="color:'+(s.red?"var(--red)":"var(--card-ink)")+'">'+c.rank+'<span>'+s.sym+'</span></div>'+
           '<span class="jm">Joker meter '+p.jokers+'/10</span></div></div></button>'+
         '<div class="why2"><div class="paper"><b>Why '+c.rank+s.sym+'?</b> '+s.name+'s are your #'+(ME.trumps.indexOf(p.suit)+1)+' trump; fit '+c.total+' for you; #'+(c.idx+1)+' of '+p.pool+' '+s.name+'s nearby'+(c.capped?"; would be "+RANKS[c.natural]+s.sym+" but capped at 10 until verified":"")+'.</div>'+
@@ -359,8 +359,8 @@ footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
   render();
 })();
 </script>
-<script src="assets/js/gate.js?v=1792252960"></script>
-<script src="assets/js/fx.js?v=1792252960"></script>
+<script src="assets/js/gate.js?v=1792263305"></script>
+<script src="assets/js/fx.js?v=1792263305"></script>
 <p class="sf-credit" style="margin:0;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));text-align:center;font:600 .85rem/1.5 Figtree,system-ui,sans-serif;color:var(--muted,#A69DB0)">U.S. patent pending (USPTO). Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--gold-hi,#E8C46A);text-decoration:none;font-weight:800">GoFirehorseGo</a>.</p>
 </body>
 </html>

@@ -177,7 +177,8 @@ html[data-play="day"] .phone{box-shadow:0 0 0 1.5px rgba(18,56,43,.25),0 50px 90
 .screen .ace .tag{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:999px;background:rgba(201,165,90,.25);color:#E2C47E;font-weight:700;font-size:9.5px}
 .screen .grid{flex:1;min-height:0;overflow:hidden;align-content:start;padding:0 16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .screen .mc{min-width:0;overflow:hidden;background:#fff;aspect-ratio:5/7;border-radius:5%/3.57%;padding:5px;align-content:start;box-shadow:0 1px 2px rgba(0,0,0,.06);display:grid;gap:4px}
-.screen .mc .ph{aspect-ratio:5/4;border-radius:4px}
+.screen .mc .ph{aspect-ratio:5/4;border-radius:4px;display:block;width:100%;height:auto;object-fit:cover;object-position:50% 30%}
+.screen img.avatar{object-fit:cover;padding:0}
 .screen .mc b{font-size:10px;margin-top:2px;display:flex;justify-content:space-between}
 .screen .mc b em{font-style:normal;color:#8E2230}
 .screen .mc span{color:#6C7A73;font-size:9px}
@@ -278,7 +279,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
 .ribbon a{color:var(--brass-hi);font-weight:700}
 @media (max-width:700px){.ribbon{top:auto;bottom:16px;right:12px;left:auto;max-width:220px;padding-right:30px}}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792252960">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792263305">
 <link rel="canonical" href="https://suiteface.com/preview-club.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SuiteFace">
@@ -352,17 +353,17 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
             <div class="sbar"><span>9:41</span><span>●●●</span></div>
             <div class="apphd"><b>Your 52</b><span>Dealt today</span></div>
             <div class="seg"><i class="on"><svg style="color:#8E2230"><use href="#s-heart"/></svg>13</i><i><svg style="color:#8E2230"><use href="#s-diamond"/></svg>13</i><i><svg><use href="#s-club"/></svg>13</i><i><svg><use href="#s-spade"/></svg>13</i></div>
-            <div class="ace"><span class="avatar">M</span><span><small>Ace of Hearts</small><b>Maya, 31</b><br><span class="tag">ID verified</span></span></div>
+            <div class="ace"><img class="avatar" src="assets/people/maya.jpg" alt="Maya" width="54" height="54" loading="eager"><span><small>Ace of Hearts</small><b>Maya, 31</b><br><span class="tag">ID verified</span></span></div>
             <div class="grid">
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#5B7F70,#2E5446)"></span><b>Jordan<em>K</em></b><span>4 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#C9A55A,#8C6A2B)"></span><b>Priya<em>Q</em></b><span>2 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#7C6A8E,#4C3F5C)"></span><b>Sam<em>J</em></b><span>7 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#B4505E,#7A2433)"></span><b>Leah<em>10</em></b><span>3 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#4E7A8A,#2F4E5A)"></span><b>Chris<em>9</em></b><span>9 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#8A9A6A,#566540)"></span><b>Ana<em>8</em></b><span>5 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#A07A5A,#6B4C33)"></span><b>Theo<em>7</em></b><span>6 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#6A6F9A,#40446A)"></span><b>Nia<em>6</em></b><span>8 miles</span></div>
-              <div class="mc"><span class="ph" style="background:linear-gradient(140deg,#B07A8A,#7A4A5A)"></span><b>Ellis<em>5</em></b><span>4 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/jordan.jpg" alt="" loading="lazy"><b>Jordan<em>K</em></b><span>4 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/priya.jpg" alt="" loading="lazy"><b>Priya<em>Q</em></b><span>2 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/sam.jpg" alt="" loading="lazy"><b>Sam<em>J</em></b><span>7 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/leah.jpg" alt="" loading="lazy"><b>Leah<em>10</em></b><span>3 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/chris.jpg" alt="" loading="lazy"><b>Chris<em>9</em></b><span>9 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/ana.jpg" alt="" loading="lazy"><b>Ana<em>8</em></b><span>5 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/theo.jpg" alt="" loading="lazy"><b>Theo<em>7</em></b><span>6 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/nia.jpg" alt="" loading="lazy"><b>Nia<em>6</em></b><span>8 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/ellis.jpg" alt="" loading="lazy"><b>Ellis<em>5</em></b><span>4 miles</span></div>
             </div>
             <div class="tabbar"><svg class="on"><use href="#i-cards"/></svg><svg><use href="#i-msg"/></svg><svg><use href="#i-chair"/></svg><svg><use href="#i-user"/></svg></div>
           </div>
@@ -469,7 +470,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
 
 <aside class="ribbon" aria-label="About this page"><button type="button" aria-label="Hide this note" onclick="this.parentNode.remove()">×</button><b>Design preview</b>Private draft of the new look. Not linked from the site. <a href="./">Back to the live site</a></aside>
 
-<script src="assets/js/casino-scene.js?v=1792252960"></script>
+<script src="assets/js/casino-scene.js?v=1792263305"></script>
 <script>
 (function () {
   var el = document.getElementById("tableArt");
@@ -477,7 +478,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
   draw();
 })();
 </script>
-<script src="assets/js/gate.js?v=1792252960"></script>
-<script src="assets/js/fx.js?v=1792252960"></script>
+<script src="assets/js/gate.js?v=1792263305"></script>
+<script src="assets/js/fx.js?v=1792263305"></script>
 </body>
 </html>

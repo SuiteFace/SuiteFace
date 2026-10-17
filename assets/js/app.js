@@ -2592,25 +2592,25 @@
       ["Pair of Aces", "Pair of Aces!", "Two Aces. The lights go wild and the Side Table opens so they can plan a date.", { pair: 1, aces: 1 }],
       ["Check in", "Play Hand", "Saturday, 7:02 pm. They both tap Check in at the restaurant. Both phones flash PLAY HAND.", { play: 1 }],
       ["Call it", "Win", "They both call it a Win: second date. The Pair stays, and they'll check in again next time.", { win: 1 }]] },
-    { name: "The Push", cast: [["Maya", "club", "Q"], ["Marcus", "spade", "9"]], steps: [
-      ["The pair", "A Pair", "Maya holds Marcus as the 9 of Spades. Marcus holds Maya as the Queen of Clubs. They both play.", { pair: 1 }],
+    { name: "The Push", cast: [["Maya", "club", "Q"], ["Malik", "spade", "9"]], steps: [
+      ["The pair", "A Pair", "Maya holds Malik as the 9 of Spades. Malik holds Maya as the Queen of Clubs. They both play.", { pair: 1 }],
       ["Play Hand", "Coffee date", "They check in at a coffee shop. Play Hand.", { play: 1 }],
-      ["Push", "Maya calls Push", "Fun date. Maya asks about a second one and waits for Marcus to answer.", { push: 1 }],
+      ["Push", "Maya calls Push", "Fun date. Maya asks about a second one and waits for Malik to answer.", { push: 1 }],
       ["Seven days", "No answer in 7 days", "A week passes with no reply. The hand becomes an automatic Loss. The card burns, and no Joker can be made.", { loss: 1 }]] },
-    { name: "Joker window", cast: [["Tasha", "heart", "K"], ["Wes", "diamond", "J"]], steps: [
-      ["Play Hand", "Dinner at 7", "Tasha and Wes check in. Play Hand at 7:10 pm.", { play: 1 }],
-      ["Loss", "A disaster", "Wes was rude to the server and on his phone all night. At 9:40 pm Tasha calls it a Loss.", { loss: 1 }],
-      ["Joker", "Make a Joker", "It's 2.5 hours after Play Hand, inside the 12-hour window, so Tasha makes Wes a Joker in her deck.", { joker: 1 }],
-      ["The meter", "Others see 4/10", "Other members holding Wes's card now see Jokers 4/10. Wes never sees his own count.", { meter: 4 }]] },
-    { name: "Too late to Joker", cast: [["Luis", "spade", "7"], ["Grace", "club", "5"]], steps: [
-      ["Play Hand", "Brunch", "Luis and Grace check in at brunch. Play Hand at 11:00 am.", { play: 1 }],
-      ["Next day", "Two days later", "Luis finally calls the hand: Loss.", { loss: 1 }],
+    { name: "Joker window", cast: [["Priya", "heart", "K"], ["Jordan", "diamond", "J"]], steps: [
+      ["Play Hand", "Dinner at 7", "Priya and Jordan check in. Play Hand at 7:10 pm.", { play: 1 }],
+      ["Loss", "A disaster", "Jordan was rude to the server and on his phone all night. At 9:40 pm Priya calls it a Loss.", { loss: 1 }],
+      ["Joker", "Make a Joker", "It's 2.5 hours after Play Hand, inside the 12-hour window, so Priya makes Jordan a Joker in her deck.", { joker: 1 }],
+      ["The meter", "Others see 4/10", "Other members holding Jordan's card now see Jokers 4/10. Jordan never sees his own count.", { meter: 4 }]] },
+    { name: "Too late to Joker", cast: [["Chris", "spade", "7"], ["Grace", "club", "5"]], steps: [
+      ["Play Hand", "Brunch", "Chris and Grace check in at brunch. Play Hand at 11:00 am.", { play: 1 }],
+      ["Next day", "Two days later", "Chris finally calls the hand: Loss.", { loss: 1 }],
       ["Burn only", "Burn the card", "The 12-hour Joker window closed long ago, so he can only burn Grace's card. Burns are private.", { burn: 1 }]] }
   ];
   var dS = 0, dI = 0, dTimer = null;
   function demoCard(c, flags, side) {
     var red = SUIT[c[1]].red, cls = "dcard" + (red ? " red" : "") + (flags.joker && side === 1 ? " jk" : "") + (flags.burn && side === 1 ? " burnt" : "") + ((flags.loss || flags.burn) && side === 1 && !flags.joker ? " dim" : "");
-    var face = flags.joker && side === 1 ? '<span class="jhat">' + BRAND.hat + '</span><b>JOKER</b>' : '<span class="ix">' + c[2] + pip(c[1]) + '</span><span class="nm">' + c[0] + '</span><span class="st">' + SUIT[c[1]].sym + " " + SUIT[c[1]].name + "</span>";
+    var face = flags.joker && side === 1 ? '<span class="jhat">' + BRAND.hat + '</span><b>JOKER</b>' : '<span class="ix">' + c[2] + pip(c[1]) + '</span><img class="dph" src="assets/people/' + c[0].toLowerCase() + '.jpg" alt="" loading="lazy"><span class="nm">' + c[0] + '</span><span class="st">' + SUIT[c[1]].sym + " " + SUIT[c[1]].name + "</span>";
     var meter = flags.meter && side === 1 ? '<span class="dmeter">Jokers ' + flags.meter + "/10</span>" : "";
     return '<div class="' + cls + '">' + face + meter + (flags.a && side === 0 ? '<span class="tag">Played</span>' : "") + (flags.b && side === 1 ? '<span class="tag">Played</span>' : "") + "</div>";
   }
