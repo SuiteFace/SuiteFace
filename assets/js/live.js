@@ -102,16 +102,23 @@
   }
 
   function start() {
-    client = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" } });
+    client = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "implicit" } });
     hookSign();
     client.auth.onAuthStateChange(function (ev, s) {
       var was = session && session.user && session.user.id; session = s;
       if (ev === "PASSWORD_RECOVERY") document.dispatchEvent(new Event("sf:recovery"));
       if ((s && s.user && s.user.id) !== was) loadMe();
     });
+    // A confirmation or sign-in link that failed (expired, already used) comes back with an error in the URL.
+    var errm = (location.hash + "&" + location.search).match(/error_description=([^&]+)/);
+    if (errm) {
+      var msg = decodeURIComponent(errm[1].replace(/\+/g, " "));
+      setTimeout(function () { alert("That sign-in link didn't work: " + msg + ". Go to Log in and tap \"Email me a sign-in link\" to get a fresh one."); }, 600);
+      history.replaceState(null, "", location.pathname);
+    }
     client.auth.getSession().then(function (r) { session = r.data && r.data.session; return loadMe(); }).then(function () {
       readyCbs.splice(0).forEach(function (cb) { cb(); });
-      if (/[?&](signedin|linked)=/.test(location.search)) history.replaceState(null, "", location.pathname + location.hash);
+      if (/[?&](signedin|linked)=/.test(location.search) || /access_token=/.test(location.hash)) history.replaceState(null, "", location.pathname + (/access_token=/.test(location.hash) ? "" : location.hash));
     });
   }
   if (window.supabase && window.supabase.createClient) start();
