@@ -834,6 +834,7 @@
       var a = ageFrom(P.dob); P.age = isNaN(a) ? "" : String(a);
       $("#dobAge").textContent = isNaN(a) ? "" : "Your card shows " + a + ". It updates on your birthday.";
       onChange(); }
+    window.SF_setDob = function (d) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d || ""); if (!m) return; sy.value = String(+m[1]); sm.value = String(+m[2]); days(); sd.value = String(+m[3]); var a = ageFrom(d); $("#dobAge").textContent = isNaN(a) ? "" : "Your card shows " + a + ". It updates on your birthday."; };
     var m0 = /^(\d{4})-(\d{2})-(\d{2})$/.exec(P.dob || ""); days();
     if (m0) { sy.value = String(+m0[1]); sm.value = String(+m0[2]); days(); sd.value = String(+m0[3]); var a0 = ageFrom(P.dob); P.age = String(a0); $("#dobAge").textContent = "Your card shows " + a0 + ". It updates on your birthday."; }
     else P.age = "";
@@ -1105,11 +1106,47 @@
     el.textContent = z ? z.city + ", " + z.st + ". Your 52 are measured from here." : 'Your 52 are measured from your ZIP. Only "about X miles" is ever shown.';
   }
   var saveDraft = debounce(function () { saveP(); }, 400);
+  /* Save problems: list them at the top, open the right tab, scroll to and outline each field. */
+  function faceProblems(list) {
+    var form = $("#faceForm"), box = $("#faceProblems");
+    $$(".needs", form).forEach(function (x) { x.classList.remove("needs"); });
+    if (!box) { box = document.createElement("div"); box.id = "faceProblems"; box.className = "faceprob"; box.setAttribute("role", "alert"); form.insertBefore(box, form.firstChild); }
+    if (!list.length) { box.hidden = true; return; }
+    box.hidden = false;
+    box.innerHTML = "<b>Finish " + (list.length === 1 ? "this" : "these " + list.length) + " to save:</b><ul>" + list.map(function (p, i) { return '<li><button type="button" class="linkish" data-prob="' + i + '">' + esc(p.label) + "</button>: " + esc(p.msg) + "</li>"; }).join("") + "</ul>";
+    list.forEach(function (p) { var f = p.el && (p.el.closest(".field") || p.el); if (f) f.classList.add("needs"); });
+    function go(p) {
+      var tab = p.el && p.el.closest("[data-tab]"), t = tab && tab.getAttribute("data-tab"), b = t && $('.ftabs [data-ft="' + t + '"]', form);
+      if (b && b.getAttribute("aria-selected") !== "true") b.click();
+      var f = p.el.closest(".field") || p.el; f.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "center" });
+      var inp = f.querySelector("input,select,textarea,button"); if (inp) setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) { } }, 350);
+    }
+    box.onclick = function (e) { var b = e.target.closest("[data-prob]"); if (b) go(list[+b.getAttribute("data-prob")]); };
+    go(list[0]);
+  }
+  function fieldLabel(el) { var f = el && el.closest(".field"), l = f && f.querySelector("label,.lbl"); return l ? l.textContent.replace(/Face (Up|Down)/, "").trim() : "This field"; }
+  $("#faceForm").addEventListener("input", function (e) { var f = e.target.closest(".needs"); if (f) f.classList.remove("needs"); });
+  $("#faceForm").addEventListener("click", function (e) { var f = e.target.closest(".needs"); if (f && e.target.closest(".chip,select")) f.classList.remove("needs"); });
+  function serverProblem(x) {
+    var m = String((x && x.message) || x || ""), el = null, msg = m;
+    if (/handle|duplicate key.*handle|members_handle/i.test(m)) { el = F.handle; msg = "That Calling Card is taken or not allowed. Try another."; }
+    else if (/birth|dob|18/i.test(m)) { el = $("#dobM") || $("#fAgeErr"); msg = "Check your birthday. SuiteFace is for adults 18 and over."; }
+    else if (/zip/i.test(m)) { el = F.zip; msg = "Check your ZIP code."; }
+    else if (/face_name|name/i.test(m)) { el = F.name; msg = "Check your name (1–40 characters)."; }
+    else if (/bio/i.test(m)) { el = F.bio; msg = "Your Face Value is too long (500 characters max)."; }
+    else if (/Pick up to 3 answers for (\w+)/.test(m)) { var k = m.match(/for (\w+)/)[1]; el = $('.idf[data-k="' + k + '"]'); msg = "Pick up to 3."; }
+    else if (/top3|cardinality/i.test(m)) { el = $('[data-tab="look"]'); msg = "Pick your top 3 at most for each Looking for question."; }
+    if (el) faceProblems([{ el: el, label: fieldLabel(el), msg: msg }]); else toast("Couldn't save: " + m);
+  }
   $("#faceForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    if (!validate(true)) { toast("A few things need a look before saving."); var f = $("#faceForm .err:not(:empty)"); if (f) f.previousElementSibling.focus(); return; }
+    if (!validate(true)) {
+      var probs = $$("#faceForm .err").filter(function (x) { return x.textContent.trim(); }).map(function (x) { var el = x.closest(".field") || x; return { el: el, label: fieldLabel(el), msg: x.textContent.trim() }; });
+      faceProblems(probs); toast("A few things need a look before saving."); return;
+    }
+    faceProblems([]);
     saveP();
-    if (liveOn()) { toast("Saving your Face…"); pushFace().then(function () { toast("Face saved. Dealing your 52 from real members…", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80); return liveDeck(true); }, function (x) { toast((x && x.message) || "Couldn't save. Try again."); }); return; }
+    if (liveOn()) { toast("Saving your Face…"); pushFace().then(function () { toast("Face saved. Dealing your 52 from real members…", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80); return liveDeck(true); }, function (x) { serverProblem(x); }); return; }
     placePool(); buildDeck(); renderTable(true); mapT0 = performance.now(); renderMap();
     toast("Face saved. Your 52 have been re-dealt.", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80);
   });
@@ -1833,7 +1870,18 @@
     var look = document.createElement("div"); look.setAttribute("data-tab", "look"); look.className = "form-grid"; look.hidden = true;
     form.insertBefore(look, anchor); form.insertBefore(about, look);
     about.innerHTML = '<p class="hint">Every question is optional and has <b>Prefer not to say</b>. Use the eye to choose what shows on your card: <b>Face Up</b> is shown, <b>Face Down</b> is private but still helps match you.</p>' + groupHTML(false);
-    look.innerHTML = '<p class="hint">Pick <b>your top 3</b>, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
+    look.innerHTML = '<div class="pmatch"><button type="button" class="btn gold sm" id="perfectMatch">✨ Perfect match</button><span class="hint">Copies your About me answers here in one tap (top 3 each). Then change anything you want different.</span></div><p class="hint">Pick <b>your top 3</b>, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
+    look.addEventListener("click", function (e) {
+      if (!e.target.closest("#perfectMatch")) return;
+      var n = 0;
+      IDF.forEach(function (f) {
+        if (!f[4]) return; var k = f[0], mine = asList(P.id[k]).filter(function (x) { return x && x !== PNTS; }); if (!mine.length) return;
+        var opts = prefOpts(f), vals = (k === "height" ? [hband(P.id[k])] : mine).filter(function (x) { return x && opts.indexOf(x) > -1; }).slice(0, 3);
+        if (!vals.length) return; var pr = P.prefs[k] || { deal: false }; pr.sel = vals; P.prefs[k] = pr; n++;
+      });
+      syncIdentityUI(); onChange();
+      toast(n ? "Perfect match: copied " + n + " answers from About me. Change anything you want different." : "Fill in About me first, then tap Perfect match.");
+    });
     bar.addEventListener("click", function (e) {
       var b = e.target.closest("[data-ft]"); if (!b) return; var t = b.getAttribute("data-ft");
       $$("[data-ft]", bar).forEach(function (x) { var on = x === b; x.setAttribute("aria-selected", String(on)); x.setAttribute("aria-pressed", String(on)); });
@@ -1856,6 +1904,8 @@
   function eye(k) { return '<button type="button" class="eye" data-eye="' + k + '" aria-pressed="false">Face Down</button>'; }
   function idField(f) {
     var k = f[0], id = "id_" + k, head = '<div class="idhead"><label for="' + id + '">' + f[1] + "</label>" + eye(k) + "</div>";
+    if (f[2] === "one" && f[3].length <= 12) return '<div class="field idf" data-k="' + k + '"><div class="idhead"><span class="lbl" id="' + id + '">' + f[1] + "</span>" + eye(k) + '</div><div class="chips" role="radiogroup" aria-labelledby="' + id + '">' +
+      f[3].concat([PNTS]).map(function (o) { return '<button type="button" class="chip sm" role="radio" data-k="' + k + '" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + "</button>"; }).join("") + "</div></div>";
     if (f[2] === "one") return '<div class="field idf" data-k="' + k + '">' + head + '<select id="' + id + '" data-k="' + k + '"><option value="">Choose…</option><option>' + PNTS + "</option>" + f[3].map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") + "</select></div>";
     if (f[2] === "many") return '<div class="field idf" data-k="' + k + '"><div class="idhead"><span class="lbl" id="' + id + '">' + f[1] + "</span>" + eye(k) + '</div><div class="chips" role="group" aria-labelledby="' + id + '">' + f[3].concat([PNTS]).map(function (o) { return '<button type="button" class="chip sm" data-k="' + k + '" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + "</button>"; }).join("") + "</div></div>";
     if (f[2] === "denom") return '<div class="field idf" data-k="' + k + '">' + head + '<select id="' + id + '" data-k="' + k + '"></select></div>';
@@ -1872,7 +1922,7 @@
     IDF.forEach(function (f) {
       var k = f[0], v = P.id[k], box = $('.idf[data-k="' + k + '"]');
       if (box) {
-        if (f[2] === "one") $("select", box).value = v || "";
+        if (f[2] === "one" && $("select", box)) $("select", box).value = v || "";
         if (f[2] === "denom") {
           var list = DENOMS[P.id.religion] || [], sel = $("select", box);
           sel.innerHTML = list.length ? '<option value="">Choose…</option><option>' + PNTS + "</option>" + list.map(function (o) { return "<option>" + esc(o) + "</option>"; }).join("") : '<option value="">' + (P.id.religion ? "No denominations for this faith" : "Pick a faith first") + "</option>";
@@ -1905,6 +1955,7 @@
     if (li) { var inp = li.closest(".ac").querySelector("input"); inp.value = li.textContent; P.id[inp.getAttribute("data-k")] = li.textContent; li.parentElement.hidden = true; inp.setAttribute("aria-expanded", "false"); syncIdentityUI(); onChange(); return; }
     var c = e.target.closest("[data-v][data-k]"); if (!c) return;
     var k = c.getAttribute("data-k"), v = c.getAttribute("data-v"), f = IDX[k];
+    if (f[2] === "one") { P.id[k] = P.id[k] === v ? "" : v; if (k === "religion") P.id.denomination = ""; syncIdentityUI(); onChange(); return; }
     if (f[2] === "many") {
       var list = asList(P.id[k]).filter(function (x) { return x !== PNTS; });
       if (v === PNTS) list = asList(P.id[k]).indexOf(PNTS) > -1 ? [] : [PNTS];
@@ -2758,7 +2809,7 @@
       }
       if (m.face_name) P.name = m.face_name; if (m.handle) P.handle = m.handle; if (m.bio) P.bio = m.bio; if (m.home_zip) P.zip = m.home_zip;
       if (m.style_suit) P.mySuit = m.style_suit; if (m.looking_for) P.looking = m.looking_for; if (m.interests && m.interests.length) P.interests = m.interests;
-      if (m.birth_date) { P.dob = m.birth_date; var a = ageFrom(m.birth_date); if (!isNaN(a)) P.age = String(a); }
+      if (m.birth_date) { P.dob = m.birth_date; var a = ageFrom(m.birth_date); if (!isNaN(a)) P.age = String(a); if (window.SF_setDob) window.SF_setDob(m.birth_date); }
       if (m.photo_url) { P.photo = m.photo_url; P.photoLive = m.photo_source === "live" ? (P.photoLive || "live") : null; }
       if (m.rooms) P.rooms = m.rooms;
       var st = res[1].data; if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
