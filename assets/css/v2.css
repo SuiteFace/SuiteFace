@@ -428,3 +428,33 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .pcard .face .ficons .bump svg{width:10px;height:10px}
 .pcard .face .ficons .bump svg.bflag{width:24px;height:16px}
 .pcard .face .ficons{max-width:74%;margin-inline:auto}
+
+/* ===== High Roller cards: platinum (verified $1M) or gold (High Roller Buy-In), with a rhinestone frame and a slow light sweep.
+   Shown at every table, so everyone sees the status. ===== */
+.pcard.hrcard .face,.mycard.hr .in{overflow:hidden;
+  background:linear-gradient(135deg,#F7F7F5 0%,#DADBE0 18%,#FFFFFF 34%,#C8CAD0 52%,#F1F2F4 68%,#B9BBC2 86%,#ECEDEF 100%)!important;
+  box-shadow:inset 0 0 0 2px #E8C46A,inset 0 0 0 4px #FFF3C4,inset 0 0 0 5px #B8862F,0 0 0 1px rgba(184,134,47,.6),0 0 22px rgba(232,196,106,.55)}
+.pcard.hrcard.hrgold .face,.mycard.hr.hrgold .in{
+  background:linear-gradient(135deg,#FFF6D8 0%,#E9C46B 20%,#FFF1BF 36%,#C9963A 54%,#FBE3A0 70%,#B98432 88%,#F5D98E 100%)!important}
+.pcard.hrcard .face::before,.mycard.hr .in::before{content:"";position:absolute;inset:5px;border-radius:inherit;pointer-events:none;padding:4px;
+  background:radial-gradient(circle,#FFFFFF 0 1.1px,#FFF6D0 1.3px 1.7px,#C9A55A 1.9px 2.3px,transparent 2.6px) 0 0/8px 8px;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:.95}
+.pcard.hrcard .face::after,.mycard.hr .in::after{content:"";position:absolute;inset:-40%;pointer-events:none;
+  background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.75) 50%,transparent 58%);transform:translateX(-60%);animation:hrsweep 5.5s ease-in-out infinite}
+@keyframes hrsweep{0%,55%{transform:translateX(-60%)}100%{transform:translateX(60%)}}
+.pcard.hrcard .face>*:not(.idx):not(.stamp),.mycard.hr .in>*:not(.corner){position:relative;z-index:1}
+.pcard.hrcard .face>.idx,.pcard.hrcard .face>.stamp,.mycard.hr .in>.corner{z-index:2}
+.pcard.hrcard .face .idx,.pcard.hrcard .face .title{text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.pcard.hrcard .hrb,.mycard.hr .hrb{background:linear-gradient(180deg,#2B2730,#4A3F55);color:#FFE7A3;box-shadow:0 0 0 1px #E8C46A,0 2px 6px rgba(43,39,48,.35)}
+.slot:has(.hrcard) .card-actions{filter:drop-shadow(0 0 8px rgba(232,196,106,.35))}
+@media (prefers-reduced-motion:reduce){.pcard.hrcard .face::after,.mycard.hr .in::after{animation:none;opacity:0}}
+.hrdeck{padding:14px 16px;border-radius:16px;border:1px solid #C9A55A;background:linear-gradient(135deg,rgba(232,196,106,.16),rgba(201,165,90,.06))}
+.hrdeck .addr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.hrdeck .addr .full{grid-column:1/-1}
+@media (max-width:560px){.hrdeck .addr{grid-template-columns:1fr}}
+
+.pcard.hrcard .face{position:relative}
+.pcard .face .hrb{white-space:nowrap;font-size:.6rem;padding:2px 7px;margin-top:2px}
+.pcard .face .ficons .hrb{margin:0;font-size:.56rem;padding:2px 6px}
+.pcard .face .ficons:has(.hrb){max-width:84%}
+.pcard .face .vbad i{white-space:nowrap}
+.hrdeck .addr input{padding:.6rem .75rem;border-radius:10px;border:1px solid rgba(43,39,48,.22);font:inherit;min-width:0}
