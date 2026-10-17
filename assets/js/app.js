@@ -164,14 +164,36 @@
   (function () {
     var box = $("#howSteps"); if (!box) return;
     function card(rank, s, name, sub) { return '<div class="bigcard"><div><div style="font:900 2.4rem var(--display);color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + rank + SUIT[s].sym + '</div><div style="font:900 1.4rem var(--display);text-transform:uppercase">' + name + '</div><div class="hint" style="color:#4a4552">' + sub + "</div></div></div>"; }
+    function fr(cap, html) { return { cap: cap, html: html }; }
+    function ca(r, s, cls) { return '<span class="cc' + (cls ? " " + cls : "") + '" style="color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + r + SUIT[s].sym + "</span>"; }
     var MINI = {
-      1: '<div class="mt">Sample question</div><div style="font-weight:700;margin-bottom:6px">First date, you\'d rather…</div><div class="mrow"><span class="mchip">Book the place</span><span class="mchip" style="background:var(--bulb)">Long walk and real talk</span></div><div style="margin-top:8px;font-weight:800;color:var(--red)">♥ You\'re a Heart</div>',
-      2: '<div class="mt">A Face</div><div style="display:flex;gap:8px;align-items:center"><div class="mcard" style="background:var(--red);color:var(--cream);width:48px;height:48px;border-radius:12px">J</div><div><b>Jordan, 33</b><div style="font-size:.8rem">@jordan.k · Homewood</div></div></div><div class="mrow" style="margin-top:6px"><span class="mchip">Hiking</span><span class="mchip">Live music</span></div>',
-      3: '<div class="mt">Your trumps</div><div style="font:900 1.6rem var(--display);letter-spacing:.1em"><span style="color:var(--red)">♥</span> <span style="color:var(--red)">♦</span> ♣ ♠</div><div style="font-size:.82rem">Hearts lead your Hand, Spades come last.</div>',
-      4: '<div class="mt">Your 52</div><div class="mrow"><span class="mcard" style="color:var(--red)">A♥</span><span class="mcard" style="color:var(--red)">K♦</span><span class="mcard">Q♣</span></div><div style="font-size:.82rem;margin-top:6px">13 per suit, Ace to 2.</div>',
-      5: '<div class="mt">Burn or Play</div><div class="mrow"><span class="mchip" style="background:#f6d5d9">🔥 Burn: gone for good</span><span class="mchip" style="background:var(--bulb)">✋ Play: I\'m interested</span></div>',
-      6: '<div class="mt">It\'s a Pair</div><div style="font-weight:800">You hold Jordan as <span style="color:var(--red)">A♥</span><br>Jordan holds you as <span style="color:var(--red)">A♦</span></div><div style="font-size:.82rem;margin-top:4px">Pair of Aces. The Side Table opens.</div>'
+      1: ["Find your suit", [
+        fr("Answer 12 quick questions", '<div class="qq">First date, you\'d rather…</div><div class="ops"><i>Book the place</i><i>Trivia night</i><i>Long walk, real talk</i><i>Spot with great reviews</i></div>'),
+        fr("Tap the answer that's most you", '<div class="qq">First date, you\'d rather…</div><div class="ops"><i>Book the place</i><i>Trivia night</i><i class="pick">Long walk, real talk <b>♥ +1</b></i><i>Spot with great reviews</i></div><span class="tap"></span>'),
+        fr("Your suit is how you show up in love", '<div class="big" style="color:var(--red)">♥</div><div class="qq">You\'re a Heart</div><div class="sm">Caring, steady, all in.</div>')]],
+      2: ["Set your Face", [
+        fr("Link a social account (or type it in)", '<div class="ops"><i class="pick">Continue with Facebook</i><i>Continue with TikTok</i><i>Continue with Snapchat</i></div><span class="tap"></span>'),
+        fr("Your photo and name fill in", '<div class="face"><span class="ph">J</span><div><b>Jordan, 33</b><div class="sm">@jordan.k · Homewood</div></div></div><div class="sm grow">Photo ✓ Name ✓ Interests ✓</div>'),
+        fr("Add a few lines. Only your deck sees it", '<div class="face"><span class="ph">J</span><div><b>Jordan, 33</b><div class="sm">"Sunday hikes, loud trivia."</div></div></div><div class="chips"><i>Loyal</i><i>Funny</i><i>Driven</i></div>')]],
+      3: ["Call trumps", [
+        fr("Four suits, four ways of loving", '<div class="suits"><b style="color:var(--night)">♠</b><b style="color:var(--red)">♦</b><b style="color:var(--red)">♥</b><b style="color:var(--night)">♣</b></div>'),
+        fr("Drag the one you click with to first", '<div class="suits"><b class="lift" style="color:var(--red)">♥</b><b style="color:var(--night)">♠</b><b style="color:var(--red)">♦</b><b style="color:var(--night)">♣</b></div><span class="tap"></span>'),
+        fr("Your trump leads your Hand", '<div class="suits ranked"><b style="color:var(--red)">♥<em>1</em></b><b style="color:var(--red)">♦<em>2</em></b><b style="color:var(--night)">♣<em>3</em></b><b style="color:var(--night)">♠<em>4</em></b></div><div class="sm">Hearts are dealt first.</div>')]],
+      4: ["Get your 52", [
+        fr("Set your gates", '<div class="gates"><i>📍 Within 25 mi</i><i>🎂 Ages 30–40</i><i>🚫 Dealbreaker: smoking</i></div>'),
+        fr("Only people who pass, both ways", '<div class="fan">' + ca("A", "heart", "deal") + ca("K", "heart", "deal d2") + ca("Q", "heart", "deal d3") + '</div><div class="sm">Best fit = Ace.</div>'),
+        fr("52 cards: 13 per suit, Ace to 2", '<div class="grid52">' + ["heart", "diamond", "club", "spade"].map(function (s) { return '<div style="color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + SUIT[s].sym + " A K Q J 10 … 2</div>"; }).join("") + "</div>")]],
+      5: ["Burn or Play", [
+        fr("Look at a card", '<div class="face solo"><span class="ph">M</span><div><b>Morgan, 31</b><div class="sm">K♦ · Live music · Dogs</div></div></div>'),
+        fr("Not for you? Burn it. Gone for good", '<div class="face solo out"><span class="ph">M</span><div><b>Morgan, 31</b><div class="sm">K♦</div></div></div><div class="stamp burn">🔥 Burned</div>'),
+        fr("Interested? Play it", '<div class="face solo"><span class="ph" style="background:var(--night)">J</span><div><b>Jordan, 33</b><div class="sm">A♥ · Hiking · Trivia</div></div></div><div class="stamp play">✋ Played</div>')]],
+      6: ["Make a Pair", [
+        fr("You play Jordan's card", '<div class="fan">' + ca("A", "heart") + '<span class="arrow">→</span><span class="cc who">Jordan</span></div>'),
+        fr("Jordan plays yours", '<div class="fan"><span class="cc who">You</span><span class="arrow">←</span>' + ca("A", "diamond") + "</div>"),
+        fr("It's a Pair. The Side Table opens", '<div class="fan pair">' + ca("A", "heart") + ca("A", "diamond") + '</div><div class="bubble">Coffee Saturday? ☕</div>')]]
     };
+    Object.keys(MINI).forEach(function (k) { var t = MINI[k][0], f = MINI[k][1];
+      MINI[k] = '<div class="ct">' + t + '<span>example</span></div><div class="stage">' + f.map(function (x, i) { return '<div class="fr f' + (i + 1) + '">' + x.html + '<div class="cap"><b>' + (i + 1) + "/3</b> " + x.cap + "</div></div>"; }).join("") + '</div><div class="prog"><i></i></div>'; });
     $$("[data-mini]", box).forEach(function (m) { m.innerHTML = MINI[m.getAttribute("data-mini")]; });
     var EX = {
       1: function () {
@@ -244,13 +266,53 @@
       ["How do I change or delete my account?", "Settings lets you edit your Face, change your @username if it's free, download your data, or delete your account."],
       ["How do I contact SuiteFace?", "Email help@suiteface.com. SuiteFace doesn't take phone calls; every request is answered by email so there's a written record."]
     ];
+    var DEALER = CFG.dealerUrl || "";
+    var chat = [];
+    function md(t) { return esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/^#+\s*(.+)$/gm, "<b>$1</b>").replace(/\n/g, "<br>"); }
+    function openRaise() {
+      var m2 = modal('<p class="eyebrow">Upsell · one time</p><h3 style="font-size:2rem">✋ The Raise</h3>' +
+        '<p>Before you play the hand, raise. The Dealer reads both cards and deals you a plan for your date.</p>' +
+        '<ul class="raise-list"><li><b>The Read:</b> what you two share and where you differ.</li><li><b>Where to play:</b> three real places near you: coffee, a meal, a concert or movie, a park, mall or busy trail, a community center, or a church, mosque, synagogue or temple when you share a faith. Planning a double date? It plans a <b>Party Table</b>.</li><li><b>Opening lines</b> from your shared interests.</li><li><b>Your tell:</b> one kind tip from your own words.</li><li><b>Play it safe</b> reminders.</li></ul>' +
+        '<div class="notice">Don\'t like the hand you\'re dealt? <b>Fold</b> once, free, within 7 days and the Dealer re-deals all new picks.</div>' +
+        '<div class="row" style="margin-top:12px"><a class="btn gold" id="raiseBuy" href="' + esc(CFG.stripeRaiseLink || "#") + '" target="_blank" rel="noopener">Raise for $2.10</a><button class="btn ghost" type="button" id="raiseDemo">See a sample Raise</button></div>' +
+        '<div id="raiseOut" class="raise-out" hidden></div><p class="hint" style="margin-top:8px">Each Raise is used when you ask. If the Dealer can\'t finish, your Raise comes back. Sales are final once used.</p>');
+      $("#raiseDemo", m2).addEventListener("click", function () { var o = $("#raiseOut", m2); o.hidden = false;
+        o.innerHTML = md("**The Read**\nYou're both Hearts-first and both picked \"long walk, real talk.\" Jordan plans; you go with the flow. Let Jordan pick the time, you pick the place.\n\n**Where to play** (Birmingham, check hours before you go)\n1. Coffee at a busy spot in Avondale, outside seating, easy to leave.\n2. Railroad Park: a daylight walk where lots of people are around.\n3. Trivia night at a brewery in Lakeview: you both listed trivia.\n\n**Opening lines**\nWhat's the best hike you've ever done? · Which trivia category do you carry the team in? · What does a perfect Sunday look like?\n\n**Your tell**\nYou called your biggest fault \"overthinking.\" Ask one question, then really listen.\n\n**Play it safe**\nMeet there, take your own ride, tell a friend, keep your drink in sight, leave anytime. Call 911 in an emergency.") +
+          '<div class="row" style="margin-top:10px"><button class="btn ghost sm" type="button" id="foldBtn">🂠 Fold: re-deal new picks</button></div>';
+        $("#foldBtn", m2).addEventListener("click", function () { this.disabled = true; this.textContent = "Folded. In the live version the Dealer re-deals three new places here."; });
+      });
+    }
+    window.SF_openRaise = openRaise;
     hb.addEventListener("click", function () {
-      var m = modal('<p class="eyebrow">Help desk</p><h3 style="font-size:2rem">How can we help?</h3><label class="sr" for="hdQ">Search help</label><input class="hd-search" id="hdQ" type="search" placeholder="Search: cancel, comp, Joker, location…" autocomplete="off">' +
+      var m = modal('<p class="eyebrow">Help desk</p><h3 style="font-size:2rem">Ask the Dealer</h3>' +
+        '<div class="dealer" id="dlr"><div class="dlog" id="dlog" aria-live="polite"><div class="dmsg them">Hi, I\'m the Dealer. Ask me anything about SuiteFace: costs, your deck, Jokers, safety, the Terms.</div></div>' +
+        '<form class="dask" id="dask"><label class="sr" for="dq">Your question</label><input id="dq" maxlength="500" placeholder="Ask the Dealer…" autocomplete="off"><button class="btn gold sm" type="submit">Ask</button></form>' +
+        '<div class="dquick">' + ["How much does it cost?", "How do Jokers work?", "How do I stay safe on a date?", "Can I cancel?"].map(function (q) { return '<button type="button" class="chip">' + q + "</button>"; }).join("") + "</div></div>" +
+        '<div class="raise-cta"><div><b>✋ Raise before you play the hand</b><span>Date prep from the Dealer: where to go, what to say, how to play it safe. $2.10.</span></div><button class="btn ghost sm" type="button" id="toRaise">See the Raise</button></div>' +
+        '<h4 class="hd-sub">Quick answers</h4><label class="sr" for="hdQ">Search help</label><input class="hd-search" id="hdQ" type="search" placeholder="Search: cancel, comp, Joker, location…" autocomplete="off">' +
         '<div class="faq" id="hdList">' + FAQ.map(function (f) { return "<details><summary>" + esc(f[0]) + "</summary><p>" + esc(f[1]) + "</p></details>"; }).join("") + "</div>" +
         '<div class="row" style="margin-top:12px"><a class="btn gold sm" href="mailto:help@suiteface.com?subject=SuiteFace%20help">Email help@suiteface.com</a><a class="btn ghost sm" href="legal.html">Legal center</a><a class="btn ghost sm" href="safety.html">Safety Guide</a></div>' +
-        '<p class="hint" style="margin-top:8px">No phone line: every answer comes by email, in writing. In an emergency, call 911.</p>', { focus: "#hdQ" });
+        '<p class="hint" style="margin-top:8px">The Dealer is an AI. It can explain the rules but can\'t change your account or give legal advice. No phone line: a person answers help@suiteface.com in writing. In an emergency, call 911.</p>', { focus: "#dq" });
+      $("#toRaise", m).addEventListener("click", openRaise);
       $("#hdQ", m).addEventListener("input", function () { var q = this.value.trim().toLowerCase();
         $$("#hdList details", m).forEach(function (d) { var hit = !q || d.textContent.toLowerCase().indexOf(q) > -1; d.hidden = !hit; if (q && hit) d.open = true; }); });
+      var log = $("#dlog", m), busy = false;
+      function say(who, html) { var d = document.createElement("div"); d.className = "dmsg " + who; d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d; }
+      function localAnswer(q) { var w = q.toLowerCase().split(/\W+/).filter(function (x) { return x.length > 3; }), best = null, sc = 0;
+        FAQ.forEach(function (f) { var t = (f[0] + " " + f[1]).toLowerCase(), s = 0; w.forEach(function (x) { if (t.indexOf(x) > -1) s++; }); if (s > sc) { sc = s; best = f; } });
+        return best ? best[1] : "I don't have that one yet. Email help@suiteface.com and a person will answer in writing."; }
+      function ask(q) {
+        if (busy || !q.trim()) return; busy = true; say("me", esc(q)); chat.push({ role: "user", content: q });
+        var t = say("them typing", "<span></span><span></span><span></span>");
+        var done = function (ans, note) { t.className = "dmsg them"; t.innerHTML = md(ans) + (note ? '<small>' + note + "</small>" : ""); chat.push({ role: "assistant", content: ans }); busy = false; log.scrollTop = log.scrollHeight; };
+        if (!DEALER) return setTimeout(function () { done(localAnswer(q), "Quick answer · the live Dealer opens soon"); }, 500);
+        fetch(DEALER, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: chat.slice(-8) }) })
+          .then(function (r) { return r.json(); })
+          .then(function (j) { if (j && j.answer) done(j.answer); else done(localAnswer(q), "Quick answer · the live Dealer opens soon"); })
+          .catch(function () { done(localAnswer(q), "Quick answer · couldn't reach the Dealer"); });
+      }
+      $("#dask", m).addEventListener("submit", function (e) { e.preventDefault(); var i = $("#dq", m); ask(i.value); i.value = ""; });
+      $$(".dquick .chip", m).forEach(function (b) { b.addEventListener("click", function () { ask(b.textContent); }); });
     });
   })();
 

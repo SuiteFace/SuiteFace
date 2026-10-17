@@ -65,6 +65,7 @@ footer{max-width:900px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font
 <li><strong>Activity at the table:</strong> cards dealt, burned and played; Pairs; check-ins; Play Hand results; Jokers you make or receive; challenges; reports and blocks.</li>
 <li><strong>Messages</strong> you send through SuiteFace chat.</li>
 <li><strong>Payments:</strong> handled by Stripe. We receive your purchase history and the last four digits and brand of your card, never the full card number.</li>
+<li><strong>Ask the Dealer and The Raise:</strong> the questions you type. Help-desk questions aren't tied to your account; we keep only a scrambled daily counter to limit abuse. For a Raise we keep a record that it was used.</li>
 <li><strong>Identity verification (optional):</strong> handled by Stripe Identity. We receive the result (verified or not), your legal first name and date of birth, never the images of your ID or selfie.</li>
 <li><strong>Support and forms:</strong> anything you send to help@suiteface.com or through our forms.</li>
 </ul>
@@ -114,6 +115,10 @@ footer{max-width:900px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font
 <tr>
 <td>Twilio</td>
 <td>Phone verification codes and text alerts</td>
+</tr>
+<tr>
+<td>Anthropic (Claude)</td>
+<td>Powers Ask the Dealer and The Raise. It receives your question and, for a Raise, what's shown on your card and the other member's card (handle, age, suit, interests, chosen words, city). Never your phone, email, legal name, exact location or ID. Not used to train AI models.</td>
 </tr>
 <tr>
 <td>Resend</td>

@@ -3,6 +3,7 @@
    stripePaymentLink     Stripe Payment Link for the $21.00 Buy-In + $2.10/month membership (https://buy.stripe.com/...).
    stripePortalLink      Stripe customer portal login link, so members can update cards, see receipts or cancel.
    stripeJokerBuyoutLink  $2,100 public-Joker buy-out. stripeJokerLobbyLink $210 Joker Maker Lobby entry. stripeJokerRemovalLink $210 lobby-Joker removal.
+   stripeRaiseLink       $2.10 one-time Raise (Dealer date prep). dealerUrl  the Ask the Dealer function (the AI key lives in Supabase, never here).
    Anything left empty runs in Preview mode: nothing is sent and no payment is taken. */
 window.SUITEFACE_CONFIG = {
   formAccessKey: "",
@@ -11,6 +12,8 @@ window.SUITEFACE_CONFIG = {
   stripeJokerBuyoutLink: "https://buy.stripe.com/test_8x25kD6aneH1fEC8dI14403",
   stripeJokerLobbyLink: "https://buy.stripe.com/test_28E9AT2Yb0QbgIGalQ14401",
   stripeJokerRemovalLink: "https://buy.stripe.com/test_8x200j56j7ez0JIctY14402",
+  stripeRaiseLink: "https://buy.stripe.com/test_7sY7sL0Q32Yj2RQbpU14404",
+  dealerUrl: "https://huiuztyvqzxfvqnjdswl.supabase.co/functions/v1/ask-dealer",
   siteUrl: "https://suiteface.com/",
   zipDataUrl: "assets/data/zips.psv"
 };
