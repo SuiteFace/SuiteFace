@@ -1694,7 +1694,7 @@
     ["gender", "Gender", "one", ["Woman", "Man", "Trans woman", "Trans man", "Nonbinary", "Genderfluid", "Agender", "Two-Spirit", "Another identity"], 1, 0, "Who I am"],
     ["pronouns", "Pronouns", "many", ["she/her", "he/him", "they/them", "Any pronouns", "Ask me"], 0, 0, "Who I am"],
     ["orientation", "Sexual orientation", "many", ["Straight", "Gay", "Lesbian", "Bisexual", "Pansexual", "Queer", "Asexual", "Demisexual", "Questioning", "Another"], 0, 1, "Who I am"],
-    ["race", "Race & ethnicity (check all that apply)", "many", ["American Indian or Alaska Native", "Asian", "Black or African American", "Hispanic or Latino", "Middle Eastern or North African", "Native Hawaiian or Pacific Islander", "White", "Another"], 1, 1, "Who I am"],
+    ["race", "Race & ethnicity (pick up to 3)", "many", ["American Indian or Alaska Native", "Asian", "Black or African American", "Hispanic or Latino", "Middle Eastern or North African", "Native Hawaiian or Pacific Islander", "White", "Another"], 1, 1, "Who I am"],
     ["height", "Height", "one", HEIGHTS, 1, 0, "Who I am"],
     ["weight", "Weight", "one", WEIGHTS, 1, 1, "Who I am"],
     ["body", "Body type", "one", ["Slim", "Athletic", "Average", "Curvy", "A few extra pounds", "Big & beautiful", "Muscular"], 1, 0, "Who I am"],
@@ -1713,7 +1713,7 @@
     ["religion", "Faith", "one", FAITHS, 1, 1, "Faith"],
     ["denomination", "Denomination or tradition", "denom", [], 0, 1, "Faith"],
     ["faithImportance", "How much faith matters to me", "one", ["Very important", "Somewhat important", "Not very important", "Not at all"], 1, 1, "Faith"],
-    ["faithPartner", "Faith in a partner (check all that apply)", "many", FAITH_PARTNER, 0, 0, "Faith"],
+    ["faithPartner", "Faith in a partner (pick up to 3)", "many", FAITH_PARTNER, 0, 0, "Faith"],
     ["politics", "Politics", "one", ["Liberal", "Moderate", "Conservative", "Not political", "Another"], 1, 1, "Lifestyle"],
     ["party", "Political party", "one", ["Democrat", "Republican", "Independent", "Libertarian", "Green", "Not affiliated", "Another"], 1, 1, "Lifestyle"],
     ["drink", "Drinking", "one", ["Never", "Socially", "Often", "Sober"], 1, 0, "Lifestyle"],
@@ -1833,7 +1833,7 @@
     var look = document.createElement("div"); look.setAttribute("data-tab", "look"); look.className = "form-grid"; look.hidden = true;
     form.insertBefore(look, anchor); form.insertBefore(about, look);
     about.innerHTML = '<p class="hint">Every question is optional and has <b>Prefer not to say</b>. Use the eye to choose what shows on your card: <b>Face Up</b> is shown, <b>Face Down</b> is private but still helps match you.</p>' + groupHTML(false);
-    look.innerHTML = '<p class="hint">Pick what you want, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
+    look.innerHTML = '<p class="hint">Pick <b>your top 3</b>, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
     bar.addEventListener("click", function (e) {
       var b = e.target.closest("[data-ft]"); if (!b) return; var t = b.getAttribute("data-ft");
       $$("[data-ft]", bar).forEach(function (x) { var on = x === b; x.setAttribute("aria-selected", String(on)); x.setAttribute("aria-pressed", String(on)); });
@@ -1909,7 +1909,7 @@
       var list = asList(P.id[k]).filter(function (x) { return x !== PNTS; });
       if (v === PNTS) list = asList(P.id[k]).indexOf(PNTS) > -1 ? [] : [PNTS];
       else if (k === "faithPartner" && v === "No preference") list = asList(P.id[k]).indexOf(v) > -1 ? [] : [v];
-      else { var i = list.indexOf(v); if (i > -1) list.splice(i, 1); else { if (k === "faithPartner") list = list.filter(function (x) { return x !== "No preference"; }); list.push(v); } }
+      else { var i = list.indexOf(v); if (i > -1) list.splice(i, 1); else { if (k === "faithPartner") list = list.filter(function (x) { return x !== "No preference"; }); if (TOP3.indexOf(k) > -1 && list.length >= 3) { toast("Pick up to 3 that fit you best. Tap one to swap it out."); return; } list.push(v); } }
       P.id[k] = list;
     } else P.id[k] = P.id[k] === v ? "" : v;
     syncIdentityUI(); onChange();
@@ -1923,11 +1923,12 @@
     ul.innerHTML = hits.map(function (h) { return '<li role="option" tabindex="-1">' + esc(h) + "</li>"; }).join("");
     ul.hidden = !hits.length; inp.setAttribute("aria-expanded", String(!!hits.length));
   }
+  var TOP3 = ["pronouns", "orientation", "race", "style", "faithPartner"]; // answers that decide who can see you: top 3 only
   function onPrefClick(e) {
     var c = e.target.closest("[data-pk]"); if (!c) return;
     var k = c.getAttribute("data-pk"), v = c.getAttribute("data-v"), pr = P.prefs[k] || { sel: [OPEN], deal: false };
     var sel = (pr.sel || []).filter(function (x) { return x !== OPEN; });
-    if (v === OPEN) { sel = []; pr.deal = false; } else { var i = sel.indexOf(v); if (i > -1) sel.splice(i, 1); else sel.push(v); }
+    if (v === OPEN) { sel = []; pr.deal = false; } else { var i = sel.indexOf(v); if (i > -1) sel.splice(i, 1); else { if (sel.length >= 3) { toast("Pick your top 3. Tap one to swap it out, or choose Open to anyone."); return; } sel.push(v); } }
     pr.sel = sel.length ? sel : [OPEN]; if (!sel.length) pr.deal = false; P.prefs[k] = pr;
     syncIdentityUI(); onChange();
   }
