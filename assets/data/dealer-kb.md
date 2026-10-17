@@ -96,6 +96,8 @@ No profile is activated and no payment is processed until the matching agreement
 
 **2.5a Suits and Wild Cards.** The suit quiz is a playful self-description, not a psychological, medical or personality assessment. It places most members in one of four suits (Diamond, Club, Heart or Spade). A member whose answers don't lean strongly toward any one suit is a **Wild Card**. "Wild Card" is a neutral description that only means the member's answers spread across the suits instead of matching the most common patterns. It is **not** a judgment of character, conduct, safety or worth, it is never shown as a warning, and it is unrelated to **Jokers** (Section 6), which concern conduct. A Wild Card is seated first in the suit their answers lean toward and may choose any suit at any time.
 
+**2.5b Quiz answers and safety review.** Some answers in the suit quiz describe behaviors that can make dating unsafe. If your answers match a pattern SuiteFace uses for safety, your account may be held for a private review by SuiteFace staff, and we may ask for an identity check, before you are dealt a deck. A review is not a finding of wrongdoing, isn't shown to other members, and doesn't make you a Joker. SuiteFace may refund your Buy-In if it decides not to deal you a deck.
+
 **2.6 Information from members.** Profiles, answers, photos, Jokers and statements come from members. SuiteFace doesn't verify them except where a feature says so, and isn't responsible for their accuracy.
 
 ## 3. Meeting people: risk and safety

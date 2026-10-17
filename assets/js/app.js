@@ -350,6 +350,20 @@
       out.textContent = "Checking…";
       window.SF_LIVE.rpc("approve_staff", args).then(function (r) { out.textContent = r.error ? r.error.message : "✓ " + r.data; });
     });
+    var hl = $("#holdList"); if (hl && window.SF_LIVE) {
+      var loadHolds = function () {
+        window.SF_LIVE.rpc("review_holds").then(function (r) {
+          var rows = r.data || [];
+          hl.innerHTML = rows.length ? rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.handle ? "@" + x.handle : x.email) + "</b> · " + esc(x.note || "") + '</span><button class="chip sm" type="button" data-clear="' + x.member_id + '">Clear</button></div>'; }).join("") : '<p class="hint">Nothing waiting.</p>';
+        });
+      };
+      hl.onclick = function (e) { var b = e.target.closest("[data-clear]"); if (!b || !confirm("Clear this account to be dealt a deck?")) return; window.SF_LIVE.rpc("clear_review_hold", { p_member: b.getAttribute("data-clear") }).then(function (r) { if (r.error) toast(r.error.message); else { toast("Cleared."); loadHolds(); } }); };
+      loadHolds();
+      window.SF_LIVE.rpc("suit_leads_recent", { p_limit: 25 }).then(function (r) {
+        var rows = r.data || [], ll = $("#leadList"); if (!ll) return;
+        ll.innerHTML = rows.length ? '<div class="leadtbl">' + rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.name) + "</b> · " + esc(x.email) + " · " + esc(x.phone) + " · " + esc(x.suit === "wild" ? "Wild Card" : SUIT[x.suit] ? SUIT[x.suit].name : x.suit) + (x.sms_ok ? " · texts OK" : "") + "</span><span class=\"hint\">" + new Date(x.created_at).toLocaleDateString() + "</span></div>"; }).join("") + "</div>" : '<p class="hint">No quiz leads yet.</p>';
+      });
+    }
     var hcb = $("#hcSet"); if (hcb) hcb.addEventListener("click", function () {
       var v = $("#hcNew").value, o = $("#hcOut");
       if (!live()) { o.textContent = "Sign in as the Owner on suiteface.com to set the code."; return; }
@@ -619,6 +633,9 @@
   function wordList(table) { var all = []; ORDER.forEach(function (k) { all = all.concat(table[k]); }); return all.sort(function (a, b) { return (hash(a) % 97) - (hash(b) % 97); }); }
   /* The deck of slides: 4 "which word fits you" batches, 2 "what would friends pick" batches, 12 questions, 1 honest-fault batch.
      Every word batch shows one word per suit plus "None of these". */
+  /* Hidden tells: one sits among the words on each "fits you best" card and on the fault card. Picking all five sends the
+     account to a private staff review before a deck is dealt. They never change the suit result and are never shown. */
+  var TELLS = ["Jealous", "Possessive", "Vengeful", "Manipulative", "Hot-tempered"];
   var SLIDES = [];
   [0, 1, 2, 3].forEach(function (i) { SLIDES.push({ t: "self", i: i }); });
   [0, 3].forEach(function (i, n) { SLIDES.push({ t: "oth", i: i, n: n }); });
@@ -627,13 +644,14 @@
   var STEPS_Q = SLIDES.length;
   var QV = 2, qs = S.get("quizDeck", null);
   if (!qs || qs.v !== QV) qs = { v: QV, ans: {}, i: 0 };
-  var qa = [], qw = { self: [], others: [], fault: "", none: 0 }, qi = qs.i;
+  var qa = [], qw = { self: [], others: [], fault: "", none: 0, tells: 0 }, qi = qs.i;
   function slideKey(sl) { return sl.t + sl.i; }
   function derive() {
-    qa = []; qw = { self: [], others: [], fault: "", none: 0 };
+    qa = []; qw = { self: [], others: [], fault: "", none: 0, tells: 0 };
     SLIDES.forEach(function (sl) {
       var v = qs.ans[slideKey(sl)]; if (v == null) return;
       if (v === "none") { qw.none++; return; }
+      if (v === "tell") { qw.tells++; return; }
       if (sl.t === "q") qa[sl.i] = v;
       else if (sl.t === "self") qw.self.push(WORDS[v][sl.i]);
       else if (sl.t === "oth") qw.others.push(WORDS[v][sl.i]);
@@ -649,8 +667,10 @@
   function shuffled(i) { var o = ORDER.slice(); var r = i * 7 + 3; for (var k = 3; k > 0; k--) { r = (r * 31 + 11) % 97; var j = r % (k + 1); var tmp = o[k]; o[k] = o[j]; o[j] = tmp; } return o; }
   function batch(sl, label) {
     var cur = qs.ans[slideKey(sl)], seed = sl.t === "self" ? sl.i + 20 : sl.t === "oth" ? sl.i + 40 : 60;
-    return '<div class="batch">' + shuffled(seed).map(function (k) {
-      var w = sl.t === "fault" ? FAULTS[k][0] : WORDS[k][sl.i];
+    var keys = shuffled(seed), tell = sl.t === "self" ? TELLS[sl.i] : sl.t === "fault" ? TELLS[4] : "";
+    if (tell) keys.splice((sl.i * 3 + 1) % 5, 0, "tell");
+    return '<div class="batch' + (tell ? " five" : "") + '">' + keys.map(function (k) {
+      var w = k === "tell" ? tell : sl.t === "fault" ? FAULTS[k][0] : WORDS[k][sl.i];
       return '<button class="ans bword' + (cur === k ? " picked" : "") + '" type="button" data-s="' + k + '">' + esc(w) + "</button>";
     }).join("") + '</div><button class="ans none' + (cur === "none" ? " picked" : "") + '" type="button" data-s="none">' + esc(label) + "</button>";
   }
@@ -711,10 +731,10 @@
       if (!ok) { var bad = f.querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
       var btn = $("#sgGo", f); btn.disabled = true; btn.textContent = "Dealing your suit…";
       var scores = {}; ORDER.forEach(function (k) { scores[k] = Math.round(c[k] / tot * 100); });
-      var args = { p_name: nm, p_email: em, p_phone: ph, p_suit: top, p_scores: scores, p_self: qw.self.slice(0, 5), p_others: qw.others.slice(0, 5), p_sms_ok: $("#sgSms", f).checked, p_ref: (new URLSearchParams(location.search).get("ref") || S.get("ref", "") || null), p_page: location.pathname };
+      var args = { p_name: nm, p_email: em, p_phone: ph, p_suit: top, p_scores: scores, p_self: qw.self.slice(0, 5), p_others: qw.others.slice(0, 5), p_sms_ok: $("#sgSms", f).checked, p_ref: (new URLSearchParams(location.search).get("ref") || S.get("ref", "") || null), p_page: location.pathname, p_tells: qw.tells };
       var done = function () { S.set("suitLead", { email: em, at: Date.now() }); S.set("leadDraft", null); showResult(); var r = $("#quizResult"); if (r) r.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); };
       if (!CFG.supabaseUrl) { done(); return; }
-      fetch(CFG.supabaseUrl + "/rest/v1/rpc/submit_suit_lead", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(args) })
+      fetch(CFG.supabaseUrl + "/rest/v1/rpc/submit_suit_lead_v2", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(args) })
         .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error((j && j.message) || "That didn't go through."); return j; }); })
         .then(done, function (x) { btn.disabled = false; btn.textContent = "Show my suit"; $("#sgErr", f).textContent = x.message + " Try again, or email help@suiteface.com."; });
     });
@@ -772,6 +792,7 @@
     $("#quizBox").hidden = true; var R = $("#quizResult"); R.hidden = false;
     /* The result is revealed after the player tells us where to send it: name, email and phone. */
     if (!window.SF_LIVE && !S.get("suitLead", null)) { suitGate(R, wild ? "wild" : top, c, tot); return; }
+    if (window.SF_LIVE && qw.tells >= 5 && !S.get("tellsSent", false)) { S.set("tellsSent", true); window.SF_LIVE.rpc("set_quiz_tells", { p_tells: qw.tells }); }
     if (wild) { wildResult(R, top, c, tot); return; }
     R.innerHTML = '<span class="big" style="color:' + suitColor(top) + '">' + pip(top, "big") + '</span><div class="form-grid" style="gap:10px"><p class="eyebrow">Your suit</p><h3 style="font-size:2.4rem">' +
       SUIT[top].sym + " You're a " + SUIT[top].name + "</h3><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
