@@ -22,7 +22,7 @@ async function stripe(method: string, path: string, body?: Record<string, unknow
   const key = Deno.env.get("STRIPE_SECRET_KEY");
   if (!key) return { error: { message: "not_configured" } };
   const r = await fetch("https://api.stripe.com/v1/" + path, {
-    method, headers: { Authorization: "Bearer " + key, "Content-Type": "application/x-www-form-urlencoded", ...(idem ? { "Idempotency-Key": idem } : {}) },
+    method, headers: { Authorization: "Bearer " + key, "Stripe-Version": "2025-08-27.basil", "Content-Type": "application/x-www-form-urlencoded", ...(idem ? { "Idempotency-Key": idem } : {}) },
     body: body ? form(body).join("&") : undefined,
   });
   return await r.json();
