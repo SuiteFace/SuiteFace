@@ -15,6 +15,7 @@ window.SUITEFACE_CONFIG = {
   stripeJokerRemovalLink: "https://buy.stripe.com/test_8x200j56j7ez0JIctY14402",
   stripeRaiseLink: "https://buy.stripe.com/test_7sY7sL0Q32Yj2RQbpU14404",
   dealerUrl: "https://huiuztyvqzxfvqnjdswl.supabase.co/functions/v1/ask-dealer",
+  stripePartnerLink: "https://buy.stripe.com/test_14A3cvaqD0QbfECgKe14406",
   supabaseUrl: "https://huiuztyvqzxfvqnjdswl.supabase.co",
   supabaseKey: "sb_publishable_jIViI02IuEYNwK5ZsjvFYQ_7mIavgMV",
   siteUrl: "https://suiteface.com/",

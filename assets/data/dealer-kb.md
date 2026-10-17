@@ -2,7 +2,7 @@
 SuiteFace Inc., a Florida corporation. Contact: help@suiteface.com only (no phone line). Emergency: 911.
 ## Quick answers
 Q: How much does SuiteFace cost?
-A: Joining and building your Face are free. When your table is ready, the Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Cancel anytime in Settings.
+A: Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings.
 Q: What does a comp code do?
 A: Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days.
 Q: How do I cancel or pause?
@@ -120,7 +120,9 @@ No profile is activated and no payment is processed until the matching agreement
 
 ## 4. Membership, payments and automatic renewal
 
-**4.1 Free to join.** Creating an account and building your Face is free. The Buy-In opens when your table is ready: at least 13 fitting members within 100 miles, or 52 within 250 miles.
+**4.1 Free to join.** Creating an account and building your Face is free. You can buy in anytime. We'll show you how full your table is before you pay.
+
+**4.1a The 12-Card Deck Guarantee.** If SuiteFace can't deal you **at least 12 cards within 10 days** of your Buy-In, you choose: **get your $21.00 back** (your membership then ends), or **stay with full access** while more players join your table. Ask from Settings → Membership, or email help@suiteface.com with the subject "Deck Guarantee," anytime in the 30 days after those first 10 days. We refund within 10 days.
 
 **4.2 What you pay.**
 
@@ -147,7 +149,7 @@ Prices are in US dollars, plus any tax that applies. Payments are processed by S
 
 **4.8 Failed payments.** If a monthly payment fails, Stripe will retry. Contact and deck access pause until payment succeeds.
 
-**4.9 Ask the Dealer and The Raise.** **Ask the Dealer** is a free AI help desk. **The Raise** is an optional one-time purchase of **$2.10** per Raise: AI-generated date suggestions based on what is shown on your card and the other member's card. Both are produced by artificial intelligence and may be wrong or out of date. Place suggestions are ideas, not endorsements: **check hours, details and safety yourself, always meet in a public place, and call 911 in an emergency.** The Dealer is not a lawyer, counselor or safety service. A Raise is used when you submit it. If the Dealer can't finish, that Raise is returned to you. You may **Fold** once within 7 days of a Raise for one free set of new suggestions. A used Raise is non-refundable except where the law requires otherwise.
+**4.9 Ask the Dealer and The Raise.** **Ask the Dealer** is a free AI help desk. **The Raise** is an optional one-time purchase of **$2.10** per Raise: AI-generated date suggestions based on what is shown on your card and the other member's card. Both are produced by artificial intelligence and may be wrong or out of date. Place suggestions are ideas, not endorsements. A venue that pays SuiteFace to be featured is always labeled **Sponsored**, and partner deals ("Comps") are offered by the venue, not SuiteFace: **check hours, details and safety yourself, always meet in a public place, and call 911 in an emergency.** The Dealer is not a lawyer, counselor or safety service. A Raise is used when you submit it. If the Dealer can't finish, that Raise is returned to you. You may **Fold** once within 7 days of a Raise for one free set of new suggestions. A used Raise is non-refundable except where the law requires otherwise.
 
 ## 5. House rules: member conduct
 
@@ -276,6 +278,7 @@ I confirm that:
 3. A pause longer than **21 days** ends my membership, and returning requires a new $21.00 Buy-In.
 4. Charges are **non-refundable** except where the law requires.
 5. Contact with other members requires an active paid membership.
+6. **12-Card Deck Guarantee:** if I'm dealt fewer than 12 cards within 10 days, I may ask for my $21.00 back or choose to stay (Terms 4.1a).
 
 ### C. Joker Maker Lobby Entry Agreement
 
@@ -308,6 +311,26 @@ About the member named in my Joker, I swear that:
 6. **I take full ownership of this Joker and its claims.** I understand I may be legally responsible if it is false, and I agree to defend and repay SuiteFace Inc. for any claim that results.
 7. If any of this is untrue, SuiteFace may remove the Joker, close my account and keep any fees I paid.
 
+### F. Business Partner and ZIP Sponsor Agreement (signed before any House Partner or ZIP Sponsor checkout)
+
+This agreement is between **SuiteFace Inc., a Florida corporation**, and the business named at checkout ("you"). The person signing confirms they are 18 or older and authorized to bind that business.
+
+1. **What you're buying.**
+   - **House Partner:** a one-time **$210.00 Partner Buy-In**, then **$21.00 a month**, plus **$2.10 for each Comp redeemed** by a SuiteFace pair, billed monthly. The Partner Buy-In covers 12 months of partnership. To continue after 12 months, a new $210.00 Partner Buy-In is due.
+   - **ZIP Sponsor:** **$210.00 every 30 days** per package of up to **7 ZIP codes**, renewing automatically every 30 days from your payment date until you cancel.
+2. **One sponsor per ZIP.** Each ZIP code has one live sponsor at a time. If a ZIP you want is taken, you may join its **On Deck** line, which holds up to **3 businesses** in the order they joined.
+3. **On Deck automatic payment.** By joining On Deck, you save a card and **authorize SuiteFace to charge it $210.00 (per package) automatically when one of your ZIP codes opens**, for example because the current sponsor cancels, doesn't renew, or its payment fails after Stripe's retries. Your sign goes live once you're charged and your sign is approved, and your 30-day cycle starts on the charge date. You can leave On Deck anytime before you're charged by emailing help@suiteface.com.
+4. **Your sign and offer.** You supply your business name, headline, tagline, offer and website. SuiteFace approves every sign before it goes live and may decline or remove content that is false, misleading, unlawful, adult, hateful, or unsafe for a dating audience. Every paid placement is labeled **Sponsored**. Your offer must be real, honored as stated, and lawful where you operate.
+5. **Leads.** People who tap your sign may choose to send you their name, email and an optional phone number and message. They do so only after checking a consent box. You may use those details **only to respond to that person's request**. You won't sell or share them, add them to marketing lists without their separate consent, or contact them by text or autodialed call without the consent the law requires. You'll honor every opt-out and follow all privacy, email (CAN-SPAM) and telemarketing (TCPA) laws.
+6. **Comps.** A Comp is your offer to SuiteFace pairs who check in at your venue. You set its terms and fine print and you honor it. SuiteFace counts a redemption when a pair checked in through Play Hand reveals your Comp code.
+7. **No guarantees.** SuiteFace doesn't promise any number of views, leads, redemptions or customers.
+8. **Cancel anytime.** Cancel online or by emailing help@suiteface.com. Cancellation takes effect at the end of the period you've paid for. **Fees already paid are non-refundable** except where the law requires otherwise.
+9. **Missed payments.** If a payment fails, Stripe retries. If it still fails, your placement ends, your ZIP codes pass to the next business On Deck, and any Comp stops showing.
+10. **Your responsibilities.** You're responsible for your offer, your venue, your staff, and your customers' experience. You'll defend and repay SuiteFace Inc. for claims arising from your offer, your content, or your use of leads.
+11. **Liability.** SuiteFace's total liability under this agreement is limited to the fees you paid in the 3 months before the claim.
+12. **Changes and ending.** SuiteFace may change prices with 30 days' notice. Either side may end this agreement at the end of a paid period. SuiteFace may end it right away for a breach.
+13. **Law.** Florida law applies, and disputes are handled under Section 9 of these Terms. Notices: help@suiteface.com.
+
 
 
 === Privacy Policy (privacy.html) ===
@@ -335,6 +358,7 @@ This policy explains what SuiteFace collects, why, who we share it with, and the
 - **Activity at the table:** cards dealt, burned and played; Pairs; check-ins; Play Hand results; Jokers you make or receive; challenges; reports and blocks.
 - **Messages** you send through SuiteFace chat.
 - **Payments:** handled by Stripe. We receive your purchase history and the last four digits and brand of your card, never the full card number.
+- **Sponsor signs:** if you tap a Sponsored sign and choose to send your details, that business receives your name, email, and any phone number and message you add. You check a box first, every time. Businesses may use them only to reply to you.
 - **Ask the Dealer and The Raise:** the questions you type. Help-desk questions aren't tied to your account; we keep only a scrambled daily counter to limit abuse. For a Raise we keep a record that it was used.
 - **Identity verification (optional):** handled by Stripe Identity. We receive the result (verified or not), your legal first name and date of birth, never the images of your ID or selfie.
 - **Support and forms:** anything you send to help@suiteface.com or through our forms.

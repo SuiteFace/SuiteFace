@@ -254,7 +254,7 @@
   (function () {
     var hb = $("#helpBtn"); if (!hb) return;
     var FAQ = [
-      ["How much does SuiteFace cost?", "Joining and building your Face are free. When your table is ready, the Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Cancel anytime in Settings."],
+      ["How much does SuiteFace cost?", "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."],
       ["What does a comp code do?", "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."],
       ["How do I cancel or pause?", "Settings → Membership → Manage billing. You can pause up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."],
       ["Why don't I have 52 cards yet?", "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."],
@@ -341,6 +341,90 @@
       });
     });
   })();
+
+  /* ---------- ZIP Sponsors: the Vegas sign, the lead pop-up, and the sponsor signup ---------- */
+  function rpc(name, args) {
+    if (!CFG.supabaseUrl || !CFG.supabaseKey) return Promise.reject(new Error("Preview mode"));
+    return fetch(CFG.supabaseUrl + "/rest/v1/rpc/" + name, { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(args || {}) })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error((j && j.message) || "Something went wrong."); return j; }); });
+  }
+  window.SF_rpc = rpc;
+  function marquee(s, cls) {
+    var bulbs = ""; for (var i = 0; i < 22; i++) bulbs += "<i style=\"animation-delay:" + (i % 3) * .3 + "s\"></i>";
+    return '<div class="vsign ' + (cls || "") + '"><div class="vbulbs">' + bulbs + '</div><span class="vtag">Sponsored</span><b class="vhead">' + esc(s.headline || s.business) + '</b>' +
+      (s.tagline ? '<span class="vtl">' + esc(s.tagline) + "</span>" : "") + (s.offer ? '<span class="voffer">' + esc(s.offer) + "</span>" : "") + "</div>";
+  }
+  function quiet(id, days) { try { localStorage.setItem("sf.sp." + id, String(Date.now() + days * 864e5)); } catch (e) { } }
+  function isQuiet(id) { try { return +localStorage.getItem("sf.sp." + id) > Date.now(); } catch (e) { return false; } }
+  function showSponsor(s, house) {
+    if (!s || isQuiet(s.id) || $(".vdock")) return;
+    var d = document.createElement("div"); d.className = "vdock"; d.setAttribute("role", "complementary"); d.setAttribute("aria-label", house ? "Sponsor this ZIP" : "Sponsored by " + s.business);
+    d.innerHTML = '<button type="button" class="vopen" aria-haspopup="dialog">' + marquee(s, "sm") + '</button><button type="button" class="vx" aria-label="Close sponsor sign">×</button>';
+    document.body.appendChild(d);
+    $(".vx", d).addEventListener("click", function () { d.remove(); quiet(s.id, 1); if (!house) rpc("sponsor_event", { p_sponsor: s.id, p_kind: "closed" }).catch(function () { }); });
+    $(".vopen", d).addEventListener("click", function () {
+      if (house) { d.remove(); openSponsorSignup(); return; }
+      rpc("sponsor_event", { p_sponsor: s.id, p_kind: "opened" }).catch(function () { });
+      var m = modal(marquee(s, "big") + '<p class="lede" style="margin:12px 0 4px">' + esc(s.business) + (s.website ? ' · <a href="' + esc(s.website) + '" target="_blank" rel="noopener sponsored">Visit website</a>' : "") + "</p>" +
+        '<form class="form-grid" id="spLead" novalidate><div class="two"><div class="field"><label for="spN">Name</label><input id="spN" autocomplete="name" required></div><div class="field"><label for="spE">Email</label><input id="spE" type="email" autocomplete="email" required></div></div>' +
+        '<div class="field"><label for="spP">Phone <span class="hint">(optional)</span></label><input id="spP" type="tel" autocomplete="tel"></div>' +
+        '<div class="field"><label for="spM">Message <span class="hint">(optional)</span></label><textarea id="spM" maxlength="600" placeholder="Table for two on Saturday?"></textarea></div>' +
+        '<label class="check"><input type="checkbox" id="spOk"> <span>Send my details to <b>' + esc(s.business) + '</b> so they can reply to me. SuiteFace doesn\'t run this offer.</span></label>' +
+        '<div class="row"><button class="btn gold" type="submit">Send to ' + esc(s.business) + '</button><button class="btn ghost" type="button" id="spNo">Not interested</button></div><p class="hint" id="spOut" role="status"></p></form>', { focus: "#spN" });
+      $("#spNo", m).addEventListener("click", function () { quiet(s.id, 30); d.remove(); rpc("sponsor_event", { p_sponsor: s.id, p_kind: "not_interested" }).catch(function () { }); closeModal(); toast("Got it. You won't see this sign for 30 days."); });
+      $("#spLead", m).addEventListener("submit", function (e) { e.preventDefault(); var o = $("#spOut", m);
+        if (!$("#spOk", m).checked) { o.textContent = "Check the box to send your details."; return; }
+        rpc("sponsor_lead", { p_sponsor: s.id, p_name: $("#spN", m).value, p_email: $("#spE", m).value, p_phone: $("#spP", m).value, p_message: $("#spM", m).value, p_consent: true, p_zip: P.zip || null })
+          .then(function () { closeModal(); d.remove(); quiet(s.id, 7); toast("Sent to " + s.business + ". They'll reply to you directly."); })
+          .catch(function (er) { o.textContent = er.message; }); });
+    });
+  }
+  (function waitForRoom(tries) { setTimeout(function () {
+    var w = $(".welcome"); if (w && document.body.contains(w) && w.getClientRects().length && tries < 20) return waitForRoom(tries + 1);
+    var z = P.zip; if (!/^\d{5}$/.test(z || "")) return;
+    rpc("sponsor_for_zip", { p_zip: z }).then(function (s) {
+      if (s && s.id) showSponsor(s, false);
+      else if (!isQuiet("house")) showSponsor({ id: "house", business: "SuiteFace", headline: "YOUR NAME IN LIGHTS", tagline: "Sponsor ZIP " + z, offer: "$210 / 30 days · 7 ZIPs" }, true);
+    }).catch(function () { });
+  }, tries ? 4000 : 7000); })(0);
+
+  function openSponsorSignup() {
+    var m = modal('<p class="eyebrow">ZIP Sponsor · $210 every 30 days · up to 7 ZIP codes</p><h3 style="font-size:2rem">Put your name in lights</h3>' +
+      '<p class="hint">One sponsor per ZIP. If a ZIP is taken, join its On Deck line (3 deep) and your card is charged only when it opens.</p>' +
+      '<div class="field"><label for="szZ">Your ZIP codes (up to 7)</label><div class="row"><input id="szZ" inputmode="numeric" placeholder="35203, 35205, 35209…" style="flex:1"><button class="btn ghost sm" type="button" id="szCheck">Check ZIPs</button></div><div id="szAvail" class="szavail"></div></div>' +
+      '<div class="two"><div class="field"><label for="szB">Business name</label><input id="szB" maxlength="80"></div><div class="field"><label for="szE">Billing email</label><input id="szE" type="email"></div></div>' +
+      '<div class="two"><div class="field"><label for="szH">Sign headline <span class="hint">(40)</span></label><input id="szH" maxlength="40" placeholder="MAGIC CITY BBQ"></div><div class="field"><label for="szT">Tagline <span class="hint">(120)</span></label><input id="szT" maxlength="120" placeholder="Date-night ribs since 1987"></div></div>' +
+      '<div class="two"><div class="field"><label for="szO">Offer <span class="hint">(optional)</span></label><input id="szO" maxlength="200" placeholder="Free dessert for SuiteFace pairs"></div><div class="field"><label for="szW">Website <span class="hint">(https://)</span></label><input id="szW" placeholder="https://"></div></div>' +
+      '<div id="szPrev"></div><div class="row"><button class="btn gold" type="button" id="szGo">Sign the agreement and continue</button></div><p class="hint" id="szOut" role="status"></p>' +
+      '<p class="hint">Every sign is approved by SuiteFace before it goes live and is labeled Sponsored. Renews every 30 days from payment until you cancel.</p>', { focus: "#szZ" });
+    function prev() { $("#szPrev", m).innerHTML = marquee({ headline: $("#szH", m).value || "YOUR NAME IN LIGHTS", tagline: $("#szT", m).value, offer: $("#szO", m).value, business: $("#szB", m).value }, "big"); }
+    ["#szH", "#szT", "#szO", "#szB"].forEach(function (q) { $(q, m).addEventListener("input", prev); }); prev();
+    $("#szCheck", m).addEventListener("click", function () { var box = $("#szAvail", m); box.textContent = "Checking…";
+      rpc("zip_availability", { p_zips: $("#szZ", m).value }).then(function (rows) {
+        box.innerHTML = rows && rows.length ? rows.map(function (r) { return '<span class="' + (r.open ? "ok" : r.deck_full ? "full" : "deck") + '">' + r.zip + " " + esc(r.city) + ": " + (r.open ? "Open" : r.deck_full ? "Taken · On Deck full" : "Taken · On Deck " + r.on_deck + " of 3") + "</span>"; }).join("") : "No US ZIP codes found.";
+      }).catch(function (e) { box.textContent = e.message; }); });
+    $("#szGo", m).addEventListener("click", function () {
+      var o = $("#szOut", m), v = function (q) { return $(q, m).value.trim(); };
+      if (!v("#szZ") || !v("#szB") || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v("#szE")) || !v("#szH")) { o.textContent = "Add your ZIP codes, business name, email and a headline."; return; }
+      var data = { p_business: v("#szB"), p_email: v("#szE"), p_headline: v("#szH"), p_tagline: v("#szT"), p_offer: v("#szO"), p_website: v("#szW"), p_zips: v("#szZ") };
+      closeModal();
+      window.SFSign.require("sponsor", function (rec) {
+        data.p_signer = (rec.signature || "").replace(/\//g, "").trim(); data.p_agreed = true; data.p_version = rec.version || "1.0";
+        rpc("start_sponsorship", data).then(function (r) {
+          if (r.next === "pay" && r.pay_url) { location.href = r.pay_url + "?client_reference_id=" + encodeURIComponent(r.id) + "&prefilled_email=" + encodeURIComponent(data.p_email); return; }
+          return fetch(CFG.supabaseUrl + "/functions/v1/sponsor-billing", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey }, body: JSON.stringify({ action: "card", id: r.id }) })
+            .then(function (x) { return x.json(); }).then(function (j) { if (j.url) location.href = j.url; else toast(j.error || "Couldn't open On Deck checkout."); });
+        }).catch(function (e) { toast(e.message === "Preview mode" ? "Preview: on suiteface.com this goes to secure Stripe checkout." : e.message); });
+      }, { about: data.p_business });
+    });
+  }
+  window.SF_openSponsorSignup = openSponsorSignup;
+  document.addEventListener("click", function (e) { if (!e.target.closest("[data-partner-join]")) return; e.preventDefault();
+    window.SFSign.require("sponsor", function () { location.href = CFG.stripePartnerLink; }, { about: "House Partner" }); });
+  document.addEventListener("click", function (e) { if (e.target.closest("[data-sponsor-signup]")) { e.preventDefault(); openSponsorSignup(); } });
+  (function () { var q = new URLSearchParams(location.search).get("sponsor");
+    if (q === "welcome") toast("You're in. SuiteFace will approve your sign within 1 business day.");
+    if (q === "ondeck") toast("You're On Deck. We'll charge your card only when your ZIP opens."); })();
 
   /* ---------- quiz ---------- */
   var Q = [
@@ -803,6 +887,38 @@
       saveP(); renderIam(); if (typeof syncIdentityUI === "function") syncIdentityUI(); deckDirty = true; onChange();
     });
   }
+  /* ---------- Rooms: the casino's themed rooms. Same deck rules, smaller crowd.
+     Main Floor = everyone. A Room deals only players who joined it, and you can only join a Room your own answers fit. ---------- */
+  var ROOMS = [
+    ["main", "Main Floor", "🎰", null, null, "Everyone at your table"],
+    ["christian", "Christian Room", "✝️", "religion", ["Christian"]], ["jewish", "Jewish Room", "✡️", "religion", ["Jewish"]],
+    ["muslim", "Muslim Room", "☪️", "religion", ["Muslim"]], ["hindu", "Hindu Room", "🕉️", "religion", ["Hindu"]],
+    ["buddhist", "Buddhist Room", "☸️", "religion", ["Buddhist"]], ["spiritual", "Spiritual Room", "✨", "religion", ["Spiritual, not religious"]],
+    ["secular", "Secular Room", "🔭", "religion", ["Agnostic", "Atheist", "Humanist"]],
+    ["democrat", "Democrat Room", "🏛️", "party", ["Democrat"]], ["republican", "Republican Room", "🏛️", "party", ["Republican"]], ["independent", "Independent Room", "🏛️", "party", ["Independent"]],
+    ["sober", "Sober Room", "🥤", "drink", ["Never", "Sober"]], ["parents", "Parents Room", "🧸", "kids", ["Kids at home", "Kids, not at home", "Kids part-time"]],
+    ["lgbtq", "Pride Room", "🏳️‍🌈", "orientation", ["Gay", "Lesbian", "Bisexual", "Pansexual", "Queer", "Asexual", "Demisexual", "Questioning"]]
+  ];
+  var ROOM = {}; ROOMS.forEach(function (r) { ROOM[r[0]] = r; });
+  P.rooms = (P.rooms || []).filter(function (id) { return ROOM[id] && id !== "main"; }); P.room = ROOM[P.room] ? P.room : "main";
+  function roomFits(r, o) { if (!r || !r[3]) return true; var v = asList((o || {})[r[3]]); return v.some(function (x) { return r[4].indexOf(x) > -1; }); }
+  function canJoin(r) { return roomFits(r, P.id || {}); }
+  function inRoom(p) { var r = ROOM[P.room]; return !r || !r[3] || roomFits(r, p.id_); }
+  function renderRooms() {
+    var box = $("#roomChips"); if (box) box.innerHTML = ROOMS.slice(1).map(function (r) { var ok = canJoin(r), on = P.rooms.indexOf(r[0]) > -1 && ok;
+      return '<button type="button" class="chip room" data-room="' + r[0] + '" aria-pressed="' + on + '"' + (ok ? "" : ' aria-disabled="true" title="Answer ' + esc((IDX[r[3]] || [0, r[3]])[1]) + ' in About me to join"') + ">" + r[2] + " " + esc(r[1]) + (ok ? "" : " 🔒") + "</button>"; }).join("");
+    var bar = $("#roomBar"); if (bar) { var mine = ["main"].concat(P.rooms.filter(function (id) { return canJoin(ROOM[id]); }));
+      if (mine.indexOf(P.room) < 0) P.room = "main";
+      bar.innerHTML = '<span class="rb-l">Playing in</span>' + mine.map(function (id) { var r = ROOM[id]; return '<button type="button" class="chip room" data-play-room="' + id + '" aria-pressed="' + (P.room === id) + '">' + r[2] + " " + esc(r[1]) + "</button>"; }).join("") +
+        (mine.length < 2 ? '<a class="rb-add" href="#face">Join a Room ›</a>' : ""); }
+  }
+  document.addEventListener("click", function (e) {
+    var j = e.target.closest("[data-room]"), pl = e.target.closest("[data-play-room]");
+    if (j) { var r = ROOM[j.getAttribute("data-room")]; if (!canJoin(r)) { toast("Rooms are for members whose own answers fit. Answer " + ((IDX[r[3]] || [0, r[3]])[1]) + " under About me to join."); return; }
+      var i = P.rooms.indexOf(r[0]); if (i > -1) P.rooms.splice(i, 1); else P.rooms.push(r[0]); saveP(); renderRooms(); toast((i > -1 ? "Left the " : "Joined the ") + r[1] + "."); }
+    if (pl) { P.room = pl.getAttribute("data-play-room"); saveP(); renderRooms(); deckDirty = true; buildDeck(); renderTable(false);
+      toast(P.room === "main" ? "Back on the Main Floor: your 52 from everyone at your table." : "Now playing the " + ROOM[P.room][1] + ": " + DECK.length + " cards dealt."); }
+  });
   function initials(n) { return (n || "?").trim().split(/\s+/).map(function (x) { return x[0]; }).join("").slice(0, 2).toUpperCase() || "?"; }
   function renderCard() {
     var s = P.mySuit || P.trumps[0], col = SUIT[s].red ? "var(--red)" : "#2B2730";
@@ -921,7 +1037,7 @@
   var DECK = [], BY = {}, G = Object.assign({ dealt: [], burned: [], played: [], pairs: [], hands: {}, jokered: [], clock: 0 }, S.get("game", {}));
   function saveG() { S.set("game", G); }
   function buildDeck() {
-    var el = POOL.filter(eligible).map(function (p) { var f = fitOf(p); return Object.assign({}, p, { fit: f.score, shared: f.shared }); });
+    var el = POOL.filter(eligible).filter(inRoom).map(function (p) { var f = fitOf(p); return Object.assign({}, p, { fit: f.score, shared: f.shared }); });
     el.sort(function (a, b) { return b.fit - a.fit || a.dist - b.dist; });
     DECK = []; BY = {};
     ORDER.forEach(function (s) {
@@ -1188,7 +1304,8 @@
       ["note", "Anything we should know?", "textarea", false]] },
     PARTNER: { title: "Partner with SuiteFace", btn: "Send to partnerships", subject: "Partnership inquiry", fields: [
       ["name", "Your name", "text", true], ["company", "Business or organization", "text", true], ["email", "Email", "email", true],
-      ["kind", "I'm a…", "select", true, ["Date-night venue", "Advertiser", "Investor", "Press", "Other"]], ["message", "Tell us more", "textarea", true]] },
+      ["kind", "I'm interested in…", "select", true, ["Comp Table: a deal for pairs who play their hand at my venue", "Featured in the Raise: a labeled Sponsored pick", "Hosting Party Table nights", "Sponsoring giveaways, stickers or card backs", "Advertising", "Investing", "Press", "Other"]],
+      ["venue", "Venue address or city (if you have one)", "text", false], ["offer", "Your member offer, if any (e.g. 15% off for SuiteFace pairs)", "text", false], ["message", "Tell us more", "textarea", true]] },
     FEEDBACK: { title: "Feedback", btn: "Send feedback", subject: "Site feedback", fields: [] }
   };
   function fieldHTML(f, pre) {
@@ -1204,7 +1321,11 @@
   function renderForm(type) {
     var f = FORMS[type], el = $("#mainForm");
     el.setAttribute("data-type", type);
-    el.innerHTML = "<h3>" + f.title + "</h3>" + (type === "PAUSE" ? '<p class="hint">Pauses last up to 21 days and stop your $2.10 billing. If you don\'t resume within 21 days, your membership ends and returning needs a new $21.00 Buy-In.</p>' : "") + f.fields.map(function (x) { return fieldHTML(x, "m"); }).join("") + HONEY +
+    el.innerHTML = "<h3>" + f.title + "</h3>" + (type === "PAUSE" ? '<p class="hint">Pauses last up to 21 days and stop your $2.10 billing. If you don\'t resume within 21 days, your membership ends and returning needs a new $21.00 Buy-In.</p>' : "") + (type === "PARTNER" ? '<div class="partners"><p class="hint" style="margin:0 0 8px">Every SuiteFace date ends with two people checking in, together, somewhere real. Be that place.</p>' +
+      [["🌟", "ZIP Sponsor", "Your own Vegas-style sign in up to 7 ZIP codes, with a pop-up that sends interested people to you. $210 every 30 days. <a href=\"#\" data-sponsor-signup>Sponsor ZIP codes ›</a>"], ["🎟️", "Comp Table", "Offer a deal to pairs who check in at your venue for Play Hand. Members see your Comp on the map and in their hand."], ["✋", "Featured in the Raise", "When it fits the pair, the Dealer can suggest your venue, always labeled Sponsored."], ["🎉", "Party Table nights", "Host double dates and group meetups for local members."], ["🎁", "Giveaways & card backs", "Sponsor merch drops, sticker packs or a branded card back."]]
+        .map(function (p) { return '<div class="pt"><b>' + p[0] + " " + p[1] + "</b><span>" + (p[0] === "🌟" ? p[2] : esc(p[2])) + "</span></div>"; }).join("") +
+      '<div class="pt price"><b>House Partner pricing</b><span><b>$210.00</b> one-time Partner Buy-In · <b>$21.00</b> a month · <b>$2.10</b> each time a pair redeems your Comp, billed monthly. Cancel the monthly anytime.</span>' +
+      (CFG.stripePartnerLink ? '<button class="btn gold sm" type="button" style="justify-self:start;margin-top:6px" data-partner-join>Become a House Partner</button>' : "") + "</div></div>" : "") + f.fields.map(function (x) { return fieldHTML(x, "m"); }).join("") + HONEY +
       '<button class="btn gold" type="submit">' + f.btn + '</button><div class="out" aria-live="polite"></div>';
   }
   $$('[data-form]').forEach(function (b) {
@@ -1249,7 +1370,8 @@
           out.innerHTML = '<div class="notice good">' + (type === "WAITLIST" ? "Your seat is saved. " : "Got it. ") + 'Your reference number is <span class="ticket">' + tk + "</span>. We'll email you" + (type === "WAITLIST" ? " the moment your table is ready." : ".") + "</div>";
           formEl.querySelectorAll("input:not([type=checkbox]),textarea,select").forEach(function (x) { x.value = ""; });
           formEl.querySelectorAll("input[type=checkbox]").forEach(function (x) { x.checked = false; });
-          jackpot(2500); burstAt(btn, 40);
+          if (window.SFX) window.SFX.cashOut(formEl, tk, ({ WAITLIST: { title: "SAVE MY SEAT", stamp: "SEAT SAVED", done: "Your seat is saved. We'll email you when your table is ready." }, FEEDBACK: { title: "THANK YOU", stamp: "RECEIVED", done: "Thanks. Every note gets read." }, PARTNER: { title: "HOUSE PARTNER", stamp: "COMP\u2019D", done: "Partnerships will email you within 2 business days." } })[type] || { title: "SUITEFACE", stamp: "RECEIVED", done: "Got it. We'll reply by email." });
+          else { jackpot(2500); burstAt(btn, 40); }
         } else out.innerHTML = '<div class="notice bad">That didn\'t go through: ' + esc((j && j.message) || "the server said no.") + " Try again, or email help@suiteface.com.</div>";
       })
       .catch(function () { out.innerHTML = '<div class="notice bad">We couldn\'t reach SuiteFace. Check your connection and try again, or email help@suiteface.com.</div>'; })
@@ -1346,6 +1468,7 @@
     ["faithImportance", "How much faith matters to me", "one", ["Very important", "Somewhat important", "Not very important", "Not at all"], 1, 1, "Faith"],
     ["faithPartner", "Faith in a partner (check all that apply)", "many", FAITH_PARTNER, 0, 0, "Faith"],
     ["politics", "Politics", "one", ["Liberal", "Moderate", "Conservative", "Not political", "Another"], 1, 1, "Lifestyle"],
+    ["party", "Political party", "one", ["Democrat", "Republican", "Independent", "Libertarian", "Green", "Not affiliated", "Another"], 1, 1, "Lifestyle"],
     ["drink", "Drinking", "one", ["Never", "Socially", "Often", "Sober"], 1, 0, "Lifestyle"],
     ["smoke", "Smoking", "one", ["Never", "Socially", "Regularly", "Trying to quit"], 1, 0, "Lifestyle"],
     ["cannabis", "Cannabis", "one", ["Never", "Sometimes", "Often"], 1, 0, "Lifestyle"],
@@ -1386,6 +1509,7 @@
     o.faithImportance = NONRELIGIOUS.indexOf(o.religion) > -1 ? pick(["Not very important", "Not at all"]) : pick(["Very important", "Somewhat important", "Somewhat important", "Not very important"]);
     o.faithPartner = [o.faithImportance === "Very important" ? pick(["Same faith as me", "Same denomination as me", "Equal time: we'd share both faiths"]) : pick(["Open-minded about faith", "No preference", "Open to a non-religious partner", "Equal time: we'd share both faiths"])];
     o.politics = sens(pick(IDX.politics[3]));
+    o.party = sens(pick(o.politics === "Liberal" ? ["Democrat", "Democrat", "Independent", "Green"] : o.politics === "Conservative" ? ["Republican", "Republican", "Independent", "Libertarian"] : ["Independent", "Not affiliated", "Democrat", "Republican"]));
     o.drink = pick(IDX.drink[3]); o.smoke = pick(["Never", "Never", "Never", "Socially", "Trying to quit"]); o.cannabis = pick(["Never", "Never", "Sometimes", "Often"]);
     o.pets = [pick(IDX.pets[3])]; o.languages = r() < .25 ? ["English", pick(["Spanish", "Spanish", "Vietnamese", "Tagalog", "ASL", "Arabic"])] : ["English"];
     o.zodiac = pick(IDX.zodiac[3]);
@@ -1483,7 +1607,7 @@
     return '<div class="field pf" data-k="' + k + '"><div class="idhead"><span class="lbl">' + f[1].replace(" (check all that apply)", "") + '</span><label class="deal"><input type="checkbox" data-deal="' + k + '"> Dealbreaker</label></div><div class="chips" role="group" aria-label="' + esc(f[1]) + ' preference">' +
       [OPEN].concat(opts).map(function (o) { return '<button type="button" class="chip sm" data-pk="' + k + '" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + "</button>"; }).join("") + "</div></div>";
   }
-  function syncIdentityUI() {
+  function syncIdentityUI() { if (typeof renderRooms === "function") setTimeout(renderRooms, 0);
     IDF.forEach(function (f) {
       var k = f[0], v = P.id[k], box = $('.idf[data-k="' + k + '"]');
       if (box) {
@@ -1750,14 +1874,21 @@
     pitboss: ["Pit Boss", "IT, approved by the Owner with the passcode: system health, errors and the payment webhook. Never sees private member details."],
     owner: ["Owner", "Everything: player view, every console and the house numbers."]
   };
+  /* On the public site the view switcher is hidden and everyone is a Guest until they sign in.
+     A signed-in member gets their real role from the server (window.SF_LIVE.role). The switcher only
+     appears in Claude's private preview or on a developer's own machine. */
+  var PUBLIC_SITE = /(^|\.)suiteface\.com$/i.test(location.hostname);
   var ROLE = S.get("role", "guest"); if (!ROLE_INFO[ROLE]) ROLE = "guest";
+  if (PUBLIC_SITE) ROLE = (window.SF_LIVE && window.SF_LIVE.role && ROLE_INFO[window.SF_LIVE.role]) ? window.SF_LIVE.role : (ROLE === "player" ? "player" : "guest");
+  var CAN_SWITCH = !PUBLIC_SITE || ROLE === "owner";
+  if (!CAN_SWITCH && $("#roleBtn")) $("#roleBtn").hidden = true;
   function allowed(need) {
     if (!need) return true;
     if (need === "member") return ROLE !== "guest";
     if (ROLE === "owner") return true;
     return ROLE === need;
   }
-  function setRole(r) { ROLE = r; S.set("role", r); applyRole(); }
+  function setRole(r) { if (!CAN_SWITCH && r !== "guest" && r !== "player") return; ROLE = r; S.set("role", r); applyRole(); }
   function applyRole() {
     $("#roleName").textContent = ROLE_INFO[ROLE][0];
     document.documentElement.setAttribute("data-role", ROLE);
@@ -1792,7 +1923,7 @@
       '<span class="err" id="lgErr"></span><div class="row"><button class="btn gold" type="submit">Log in</button><button class="btn ghost" type="button" id="lgPasskey">Use a passkey</button></div>' +
       '<p class="hint">New here? <a href="#membership" data-close>Buy in first</a>. Your account is created right after your $21 Buy-In.</p></form>' +
       '<div class="notice pv" id="lgNote" hidden><b>Preview mode.</b> Member accounts open at launch, so no real login happens here. Try a demo view instead:<div class="chips" style="margin-top:10px">' +
-      ["player", "dealer", "pitboss", "owner"].map(function (r) { return '<button class="chip sm" type="button" data-demo="' + r + '">Demo: ' + ROLE_INFO[r][0] + "</button>"; }).join("") + "</div></div>", { focus: "#lgEmail" });
+      (CAN_SWITCH ? ["player", "dealer", "pitboss", "owner"] : ["player"]).map(function (r) { return '<button class="chip sm" type="button" data-demo="' + r + '">Demo: ' + ROLE_INFO[r][0] + "</button>"; }).join("") + "</div></div>", { focus: "#lgEmail" });
     $("#lgShow", m).addEventListener("click", function () { var i = $("#lgPass", m); i.type = i.type === "password" ? "text" : "password"; this.textContent = i.type === "password" ? "Show" : "Hide"; });
     $("#lgPasskey", m).addEventListener("click", function () { $("#lgNote", m).hidden = false; });
     $("#loginForm", m).addEventListener("submit", function (e) {
@@ -1932,6 +2063,6 @@
 
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();
-  wireIam(); renderIam(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); loadZips(); renderMap();
+  wireIam(); renderIam(); renderRooms(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); loadZips(); renderMap();
   $("#pile").style.setProperty("--hat", "url(\"data:image/svg+xml," + encodeURIComponent(BRAND.hat) + "\")");
 })();
