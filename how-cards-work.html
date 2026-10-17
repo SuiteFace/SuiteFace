@@ -192,8 +192,8 @@ p{margin:0}
 .not h3{font-size:1.8rem;color:var(--red)}
 footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792263760">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792263760">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792264077">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792264077">
 <link rel="canonical" href="https://suiteface.com/how-cards-work.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SuiteFace">
@@ -332,7 +332,7 @@ footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
       '<div class="legend"><span><i style="background:#fbf3df;border:1px solid #e7cf95"></i>Face cards: verified only</span><span><i style="background:var(--gold)"></i>'+esc(p.name)+'</span></div>'+
       '<p style="margin-top:12px">'+(!c.capped?esc(p.name)+' has the #'+(c.idx+1)+' fit among '+s.name+'s for you, so they\'re your <b>'+c.rank+s.sym+'</b>.':esc(p.name)+'\'s fit is #'+(c.natural+1)+', worth a '+RANKS[c.natural]+', but they haven\'t verified their ID, so the highest they can hold is <b>10</b>. They land as your <b>'+c.rank+s.sym+'</b>. Verifying would move them up.')+' The other '+(p.pool-13)+' '+s.name+'s wait in the shoe for your next deal.</p></div>';
     } else {
-      if(!c.pass){ html='<h2>Station 6 · Your card</h2><div class="not"><h3>No card</h3><p>'+esc(p.name)+' isn\'t in your 52. Pick Jordan or Maya above to watch a card get dealt.</p></div>'; }
+      if(!c.pass){ html='<h2>Station 6 · Your card</h2><div class="not"><h3>No card</h3><p>'+esc(p.name)+' isn\'t in your hand. Pick Jordan or Maya above to watch a card get dealt.</p></div>'; }
       else {
         var up=p.identity.filter(function(x){return x[2];});
         html='<h2>Station 6 · Your card</h2><p class="why">Here\'s '+esc(p.name)+' in your hand, exactly as you\'d see it. Tap the card to flip it.</p>'+
@@ -359,8 +359,8 @@ footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
   render();
 })();
 </script>
-<script src="assets/js/gate.js?v=1792263760"></script>
-<script src="assets/js/fx.js?v=1792263760"></script>
+<script src="assets/js/gate.js?v=1792264077"></script>
+<script src="assets/js/fx.js?v=1792264077"></script>
 <p class="sf-credit" style="margin:0;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));text-align:center;font:600 .85rem/1.5 Figtree,system-ui,sans-serif;color:var(--muted,#A69DB0)">U.S. patent pending (USPTO). Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--gold-hi,#E8C46A);text-decoration:none;font-weight:800">GoFirehorseGo</a>.</p>
 </body>
 </html>

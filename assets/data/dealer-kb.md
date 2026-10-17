@@ -7,7 +7,7 @@ Q: What does a comp code do?
 A: Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days.
 Q: How do I cancel or pause?
 A: Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund.
-Q: Why don't I have 52 cards yet?
+Q: Why isn't my deck full yet?
 A: Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages.
 Q: How is my deck ranked?
 A: Each card gets a 100-point fit score for you: values, your table, shared interests, trumps, truth, closeness and age. Ace, King, Queen and Jack go only to ID-verified members. See House Fit Rules.
@@ -669,7 +669,7 @@ SuiteFace Inc., a Florida corporation · help@suiteface.com · suiteface.com
 === House Fit Rules (fit.html) ===
 # House Fit Rules
 
-**How SuiteFace ranks your 52** · Algorithm best52-v2 · Last updated October 16, 2026
+**How SuiteFace ranks your hand** · Algorithm best52-v2 · Last updated October 16, 2026
 
 Your deck isn't a popularity contest and rank is never for sale. Every card is scored for **you**, from 0 to 100, with the same written rules for everyone. The rules lean on what relationship research has found, and on one house belief: **the more truthfully you fill in your Face, the better your deck gets.**
 
@@ -701,7 +701,7 @@ Before anyone is scored, both people must pass every gate. Miss one and the card
 
 ## Step 3: Rank
 
-Everyone who passed the gates is lined up by suit, highest fit first. **Ace, King, Queen and Jack are face cards and go only to ID-verified members.** The next nine best fits in each suit become 10 down to 2. Four suits × 13 = your 52.
+Everyone who passed the gates is lined up by suit, highest fit first. **Ace, King, Queen and Jack are face cards and go only to ID-verified members.** The next nine best fits in each suit become 10 down to 2. Four suits × 13 = a full deck, capped at 52 cards.
 
 ## Why these rules
 

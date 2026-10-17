@@ -201,7 +201,7 @@
         fr("Four suits, four ways of loving", '<div class="suits"><b style="color:var(--night)">♠</b><b style="color:var(--red)">♦</b><b style="color:var(--red)">♥</b><b style="color:var(--night)">♣</b></div>'),
         fr("Drag the one you click with to first", '<div class="suits"><b class="lift" style="color:var(--red)">♥</b><b style="color:var(--night)">♠</b><b style="color:var(--red)">♦</b><b style="color:var(--night)">♣</b></div><span class="tap"></span>'),
         fr("Your trump leads your Hand", '<div class="suits ranked"><b style="color:var(--red)">♥<em>1</em></b><b style="color:var(--red)">♦<em>2</em></b><b style="color:var(--night)">♣<em>3</em></b><b style="color:var(--night)">♠<em>4</em></b></div><div class="sm">Hearts are dealt first.</div>')]],
-      4: ["Get your 52", [
+      4: ["Get your hand", [
         fr("Set your gates", '<div class="gates"><i>📍 Within 25 mi</i><i>🎂 Ages 30–40</i><i>🚫 Dealbreaker: smoking</i></div>'),
         fr("Only people who pass, both ways", '<div class="fan">' + ca("A", "heart", "deal") + ca("K", "heart", "deal d2") + ca("Q", "heart", "deal d3") + '</div><div class="sm">Best fit = Ace.</div>'),
         fr("52 cards: 13 per suit, Ace to 2", '<div class="grid52">' + ["heart", "diamond", "club", "spade"].map(function (s) { return '<div style="color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + SUIT[s].sym + " A K Q J 10 … 2</div>"; }).join("") + "</div>")]],
@@ -248,7 +248,7 @@
         draw();
       },
       4: function () {
-        var m = modal('<div class="ex"><p class="eyebrow">Example · Step 4</p><div class="exh">Get your 52</div><p class="lede">Everyone near you who passes your gates (distance, ages, who you want to see, dealbreakers, and who wants to see you) is ranked by fit. The best 13 in each suit become Ace to 2.</p><div class="felt"><div class="deckgrid" id="exD"></div></div><a class="btn gold sm" href="how-cards-work.html">Follow one card from Face to rank</a></div>');
+        var m = modal('<div class="ex"><p class="eyebrow">Example · Step 4</p><div class="exh">Get your hand</div><p class="lede">Everyone near you who passes your gates (distance, ages, who you want to see, dealbreakers, and who wants to see you) is ranked by fit. The best 13 in each suit become Ace to 2.</p><div class="felt"><div class="deckgrid" id="exD"></div></div><a class="btn gold sm" href="how-cards-work.html">Follow one card from Face to rank</a></div>');
         var html = ""; ["heart", "diamond", "club", "spade"].forEach(function (s) { RANKS.forEach(function (r) { html += '<i style="color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + r + SUIT[s].sym + "</i>"; }); });
         $("#exD", m).innerHTML = html; $$("#exD i", m).forEach(function (el, n) { setTimeout(function () { el.classList.add("in"); }, REDUCED ? 0 : n * 18); });
       },
@@ -279,7 +279,7 @@
       ["How much does SuiteFace cost?", "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."],
       ["What does a comp code do?", "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."],
       ["How do I cancel or pause?", "Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."],
-      ["Why don't I have 52 cards yet?", "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."],
+      ["Why isn't my deck full yet?", "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."],
       ["How is my deck ranked?", "Each card gets a 100-point fit score for you: values, your table, shared interests, trumps, truth, closeness and age. Ace, King, Queen and Jack go only to ID-verified members. See House Fit Rules."],
       ["How do I get the verified Seal?", "Verify with a driver's license, state ID or passport plus a quick live selfie. That confirms you're 18+ and that your face matches your card."],
       ["How do Jokers work?", "After a Loss on one of your first three dates together, you can make a Joker within 12 hours of Play Hand. Ten Jokers within 180 days shows JOKER on a card for 45 days. Every Joker can be challenged for free. See Joker Rules."],
@@ -819,7 +819,7 @@
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
       ORDER.filter(function (s) { return s !== top; }).map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
       '<button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
-      (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your 52.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
+      (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your hand.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
       "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
@@ -956,11 +956,11 @@
       ["Showtime sticker pack", "Red carpet, popcorn, clapboard, trophy, mic, shades, limo and more", "$2.10"],
       ["Peek", "See one card that has already played you", "$2.10"],
       ["High Card", "Your Play arrives with a gold spotlight, so they notice it first", "$1.05"],
-      ["Fresh Shuffle", "Re-deal your 52 now instead of waiting for new players", "$2.10"],
+      ["Fresh Shuffle", "Re-deal your hand now instead of waiting for new players", "$2.10"],
       ["Comp a friend", "Gift a friend's $21 Buy-In; they get a comp code", "$21.00"],
       ["Table merch", "Joker hats, chips and decks from the SuiteFace store", "Coming soon"]
     ];
-    modal('<p class="eyebrow">The Cashier\'s Cage</p><h3 style="font-size:2rem">Extras for your table</h3><p class="lede" style="margin:6px 0 12px">Everything here is optional. Rank is never for sale: your 52 is always dealt by fit.</p><div class="cage">' +
+    modal('<p class="eyebrow">The Cashier\'s Cage</p><h3 style="font-size:2rem">Extras for your table</h3><p class="lede" style="margin:6px 0 12px">Everything here is optional. Rank is never for sale: your hand is always dealt by fit.</p><div class="cage">' +
       ITEMS.map(function (it) { return '<div class="cageitem"><div><b>' + it[0] + "</b><span>" + it[1] + '</span></div><em>' + it[2] + "</em></div>"; }).join("") +
       '</div><p class="hint" style="margin-top:10px">Identity and community themes are always free.</p>');
   }
@@ -1237,7 +1237,7 @@
     if (j) { var r = ROOM[j.getAttribute("data-room")]; if (!canJoin(r)) { toast("Rooms are for members whose own answers fit. Answer " + ((IDX[r[3]] || [0, r[3]])[1]) + " under About me to join."); return; }
       var i = P.rooms.indexOf(r[0]); if (i > -1) P.rooms.splice(i, 1); else P.rooms.push(r[0]); saveP(); renderRooms(); toast((i > -1 ? "Left the " : "Joined the ") + r[1] + "."); }
     if (pl) { P.room = pl.getAttribute("data-play-room"); saveP(); renderRooms(); deckDirty = true; buildDeck(); renderTable(false);
-      toast(P.room === "main" ? "Back on the Main Floor: your 52 from everyone at your table." : "Now playing the " + ROOM[P.room][1] + ": " + DECK.length + " cards dealt."); }
+      toast(P.room === "main" ? "Back on the Main Floor: your hand from everyone at your table." : "Now playing the " + ROOM[P.room][1] + ": " + DECK.length + " cards dealt."); }
   });
   function initials(n) { return (n || "?").trim().split(/\s+/).map(function (x) { return x[0]; }).join("").slice(0, 2).toUpperCase() || "?"; }
   function renderCard() {
@@ -1256,7 +1256,7 @@
   function onChange() { renderCard(); updateMeter(); deckDirty = true; saveDraft(); zipHint(); if (typeof tabCounts === "function") tabCounts(); }
   function zipHint() {
     var z = ZIPS[P.zip], el = $("#zipHint"); if (!el) return;
-    el.textContent = z ? z.city + ", " + z.st + ". Your 52 are measured from here." : 'Your 52 are measured from your ZIP. Only "about X miles" is ever shown.';
+    el.textContent = z ? z.city + ", " + z.st + ". Your cards are measured from here." : 'Your cards are measured from your ZIP. Only "about X miles" is ever shown.';
   }
   var saveDraft = debounce(function () { saveP(); }, 400);
   /* Save problems: list them at the top, open the right tab, scroll to and outline each field. */
@@ -1299,9 +1299,9 @@
     }
     faceProblems([]);
     saveP();
-    if (liveOn()) { toast("Saving your Face…"); pushFace().then(function () { toast("Face saved. Dealing your 52 from real members…", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80); return liveDeck(true); }, function (x) { serverProblem(x); }); return; }
+    if (liveOn()) { toast("Saving your Face…"); pushFace().then(function () { toast("Face saved. Dealing your hand from real members…", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80); return liveDeck(true); }, function (x) { serverProblem(x); }); return; }
     placePool(); buildDeck(); renderTable(true); mapT0 = performance.now(); renderMap();
-    toast("Face saved. Your 52 have been re-dealt.", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80);
+    toast("Face saved. Your hand has been re-dealt.", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80);
   });
   $("#faceForm").addEventListener("input", function () { if ($("#faceForm .err:not(:empty)")) validate(true); });
   $("#faceReset").addEventListener("click", function () {
@@ -1470,7 +1470,7 @@
   }
   $("#dealBtn").addEventListener("click", function () { if (!G.dealt.length) { deal(); } else deal(); });
   $("#shuffleBtn").addEventListener("click", function () {
-    if (liveOn() && LIVE_ROWS) { toast("Fresh Shuffle: re-dealing your 52…"); G.dealt = []; liveDeck(true).then(function () { setTimeout(deal, 150); }); return; }
+    if (liveOn() && LIVE_ROWS) { toast("Fresh Shuffle: re-dealing your hand…"); G.dealt = []; liveDeck(true).then(function () { setTimeout(deal, 150); }); return; }
     G = { dealt: [], burned: [], played: [], pairs: G.pairs, hands: G.hands || {}, jokered: G.jokered || [], clock: G.clock || 0 }; buildDeck(); saveG(); renderTable(false);
     toast("Fresh Shuffle. Burned and played cards are back in your deck."); setTimeout(deal, 150);
   });
@@ -1533,9 +1533,9 @@
         return '<div class="mini ' + st + '" title="' + esc(p.name) + ", " + rk + " of " + SUIT[s].name + (st ? " (" + st + ")" : "") + " · " + (p.joker ? "JOKER" : "Jokers " + (p.jk || 0) + "/10") + '">' + esc(initials(p.name)) + "</div>";
       }).join("");
     }).join("");
-    modal('<h3 style="font-size:2rem">Your 52</h3><p class="lede" style="margin:6px 0 14px">Rows follow your trump order. Columns run Ace to 2. Gold outline: in your Hand. Red: played. Grey: burned.</p><div class="scrollx"><div class="deckgrid"><div></div>' +
+    modal('<h3 style="font-size:2rem">Your Hand</h3><p class="lede" style="margin:6px 0 14px">Rows follow your trump order. Columns run Ace to 2. Gold outline: in your Hand. Red: played. Grey: burned.</p><div class="scrollx"><div class="deckgrid"><div></div>' +
       RANKS.map(function (r) { return '<div class="h">' + r + "</div>"; }).join("") + rows + "</div></div>" +
-      (DECK.length < 52 ? '<p class="hint" style="margin-top:12px">Only ' + DECK.length + " cards pass your gates in the sample deck. Widen your age range or distance to fill all 52.</p>" : ""));
+      (DECK.length < 52 ? '<p class="hint" style="margin-top:12px">Only ' + DECK.length + " cards pass your gates in the sample deck. Widen your age range or distance to fill your deck.</p>" : ""));
   });
 
   /* ---------- your Joker status ---------- */
@@ -2053,7 +2053,7 @@
     var look = document.createElement("div"); look.setAttribute("data-tab", "look"); look.className = "form-grid"; look.hidden = true;
     form.insertBefore(look, anchor); form.insertBefore(about, look);
     about.innerHTML = '<p class="hint">Every question is optional and has <b>Prefer not to say</b>. Use the eye to choose what shows on your card: <b>Face Up</b> is shown, <b>Face Down</b> is private but still helps match you.</p>' + groupHTML(false);
-    look.innerHTML = '<div class="pmatch"><button type="button" class="btn gold sm" id="perfectMatch">✨ Perfect match</button><span class="hint">Copies your About me answers here in one tap (top 3 each). Then change anything you want different.</span></div><p class="hint">Pick <b>your top 3</b>, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
+    look.innerHTML = '<div class="pmatch"><button type="button" class="btn gold sm" id="perfectMatch">✨ Perfect match</button><span class="hint">Copies your About me answers here in one tap (top 3 each). Then change anything you want different.</span></div><p class="hint">Pick <b>your top 3</b>, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your hand. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
     /* Slide-deck mode: one question at a time with a running count, like the suit quiz. */
     function makeDeck(box, sel, name) {
       var fields = $$(sel, box), idx = 0, on = S.get("deck_" + name, true);
@@ -2140,7 +2140,7 @@
   }
   function prefField(f) {
     var k = f[0], opts = prefOpts(f);
-    return '<div class="field pf" data-k="' + k + '"><div class="idhead"><span class="lbl">' + f[1].replace(" (check all that apply)", "") + '</span><label class="deal" title="Only people who match what you picked here can be dealt into your 52"><input type="checkbox" data-deal="' + k + '"> Dealbreaker if not…</label></div><div class="chips" role="group" aria-label="' + esc(f[1]) + ' preference">' +
+    return '<div class="field pf" data-k="' + k + '"><div class="idhead"><span class="lbl">' + f[1].replace(" (check all that apply)", "") + '</span><label class="deal" title="Only people who match what you picked here can be dealt into your hand"><input type="checkbox" data-deal="' + k + '"> Dealbreaker if not…</label></div><div class="chips" role="group" aria-label="' + esc(f[1]) + ' preference">' +
       [OPEN].concat(opts).map(function (o) { return '<button type="button" class="chip sm" data-pk="' + k + '" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + "</button>"; }).join("") + "</div></div>";
   }
   function tabCounts() {
@@ -2363,7 +2363,7 @@
     P.zip = z.zip; F.zip.value = z.zip; $("#fCityLoc").value = ""; saveP();
     placedFor = ""; placePool(); deckDirty = true; buildDeck(); renderTable(false); mapT0 = performance.now(); renderMap(); zipHint(); updateMeter(); validate(false);
     $("#fZipErr").textContent = "";
-    toast((how || "Location") + " set to " + z.city + ", " + z.st + " " + z.zip + ". Your 52 were re-dealt.");
+    toast((how || "Location") + " set to " + z.city + ", " + z.st + " " + z.zip + ". Your hand was re-dealt.");
   }
   function geolocate(btn) {
     if (!zipReady) { toast("ZIP codes are still loading. Try again in a moment."); return; }
@@ -2415,7 +2415,7 @@
      ===================================================================== */
   var ROLE_INFO = {
     guest: ["Guest visitor", "Sees the demo table, how it plays, the quiz and membership. Everything else needs a Buy-In."],
-    player: ["Player", "A paid member: My Face, your 52, the Table Map, Pairs, Play Hand and invites."],
+    player: ["Player", "A paid member: My Face, your hand, the Table Map, Pairs, Play Hand and invites."],
     dealer: ["Dealer", "Staff, approved by the Owner with the passcode: safety reports, member help and account holds. Can't change roles, prices or payments."],
     pitboss: ["Pit Boss", "IT, approved by the Owner with the passcode: system health, errors and the payment webhook. Never sees private member details."],
     owner: ["Owner", "Everything: player view, every console and the house numbers."]
@@ -2483,7 +2483,7 @@
       if (lock && lock.getAttribute("data-s") !== String(SIGNED)) { lock.remove(); lock = null; }
       if (!ok && !lock) {
         lock = document.createElement("div"); lock.className = "lockpanel wrap"; lock.setAttribute("data-s", String(SIGNED));
-        var t = { face: "Build your Face", table: "Your 52", map: "The Table Map", invite: "Invite friends to the table" }[sec.id] || "Members only";
+        var t = { face: "Build your Face", table: "Your Hand", map: "The Table Map", invite: "Invite friends to the table" }[sec.id] || "Members only";
         lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Members only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month." : "Buy in to play: $21.00 once, then $2.10 a month. Already a member? Log in.") + '</p><div class="row"><a class="btn gold sm" href="#membership">Buy in · $21</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
         sec.appendChild(lock);
       }
@@ -2504,7 +2504,7 @@
   function liveLogin(mode) {
     var create = mode === "create";
     var m = modal('<h3 style="font-size:1.8rem" id="lvT">' + (create ? "Create your account" : "Log in") + '</h3>' +
-      '<p class="lede" style="margin:4px 0 12px" id="lvL">' + (create ? "One account for your Face, your 52 and every hand you play. Your $21 Buy-In comes next." : "Welcome back to the table.") + '</p>' +
+      '<p class="lede" style="margin:4px 0 12px" id="lvL">' + (create ? "One account for your Face, your hand and every hand you play. Your $21 Buy-In comes next." : "Welcome back to the table.") + '</p>' +
       '<div class="authprov" id="lvProv"><span class="hint">Loading sign-in options…</span></div>' +
       '<div class="author"><span>or use email</span></div>' +
       '<form class="form-grid" id="lvForm" novalidate>' +
@@ -2587,7 +2587,7 @@
   /* ---------- demo table (made-up scenarios for guests) ---------- */
   var STORIES = [
     { name: "Pair of Aces", cast: [["Jane", "heart", "A"], ["Joe", "diamond", "A"]], steps: [
-      ["The deal", "Jane's Hand is dealt", "Jane trumps Diamonds. Joe lands in her 52 as the Ace of Diamonds, her best fit nearby.", { a: 0, b: 1 }],
+      ["The deal", "Jane's Hand is dealt", "Jane trumps Diamonds. Joe lands in her hand as the Ace of Diamonds, her best fit nearby.", { a: 0, b: 1 }],
       ["The play", "Both play", "Jane plays Joe's card. Joe, across town, holds Jane as his Ace of Hearts and plays hers too.", { a: 1, b: 1 }],
       ["Pair of Aces", "Pair of Aces!", "Two Aces. The lights go wild and the Side Table opens so they can plan a date.", { pair: 1, aces: 1 }],
       ["Check in", "Play Hand", "Saturday, 7:02 pm. They both tap Check in at the restaurant. Both phones flash PLAY HAND.", { play: 1 }],
@@ -3043,7 +3043,7 @@
 
   /* =====================================================================
      LIVE MEMBER AREA. When a seated member is signed in:
-     My Face saves to their account, Your 52 is dealt by the server from real members only,
+     My Face saves to their account, Your Hand is dealt by the server from real members only,
      Burn / Play / Block / Report and Play Hand run on real hands, and the Side Table chat is real.
      ===================================================================== */
   var LIVE_ROWS = null, LIVE_HANDS = [], CITYZ = null;
