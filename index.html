@@ -1,6 +1,67 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>/* Day Play / Night Play. Runs in <head> so the page never flashes the wrong theme.
+   Auto (default) follows Central Time: Day Play 7:00 am–6:59 pm, Night Play 7:00 pm–6:59 am, switching live.
+   A visitor can pin Day or Night; the choice is kept on this device. The Joker Lobby is always Night Play. */
+(function () {
+  var KEY = "sf.play", root = document.documentElement, pinned = null;
+  var nightOnly = /joker-lobby/.test(location.pathname);
+  try { pinned = localStorage.getItem(KEY); } catch (e) { }
+  if (pinned !== "day" && pinned !== "night") pinned = null;
+  function centralHour() {
+    try { return +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: "America/Chicago" }).format(new Date()); }
+    catch (e) { return new Date().getHours(); }
+  }
+  function auto() { var h = centralHour(); return h >= 7 && h < 19 ? "day" : "night"; }
+  function current() { return nightOnly ? "night" : pinned || auto(); }
+  function apply() {
+    var p = current();
+    if (root.getAttribute("data-play") !== p) {
+      root.setAttribute("data-play", p);
+      var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute("content", p === "day" ? "#FBF6EC" : "#17151B");
+      try { document.dispatchEvent(new CustomEvent("sf:play", { detail: { play: p } })); } catch (e) { }
+    }
+    root.setAttribute("data-play-mode", pinned || "auto");
+    label();
+  }
+  var pill = null, menu = null;
+  function label() {
+    if (!pill) return;
+    var p = current();
+    pill.innerHTML = '<span aria-hidden="true">' + (p === "day" ? "☀️" : "🌙") + '</span><span class="t">' + (p === "day" ? "Day Play" : "Night Play") + "</span> <small>" + (pinned ? "· chosen" : "· auto") + "</small>";
+    pill.setAttribute("aria-label", (p === "day" ? "Day Play" : "Night Play") + (pinned ? ", chosen by you" : ", automatic") + ". Change theme");
+    if (menu) Array.prototype.forEach.call(menu.querySelectorAll("button"), function (b) { b.setAttribute("aria-checked", String((b.getAttribute("data-v") === "auto" && !pinned) || b.getAttribute("data-v") === pinned)); });
+  }
+  function set(v) {
+    pinned = v === "day" || v === "night" ? v : null;
+    try { if (pinned) localStorage.setItem(KEY, pinned); else localStorage.removeItem(KEY); } catch (e) { }
+    root.classList.add("sf-play-fade"); apply();
+  }
+  function build() {
+    if (nightOnly || document.querySelector(".sf-play")) return;
+    var wrap = document.createElement("div"); wrap.className = "sf-play";
+    wrap.innerHTML = '<button type="button" class="sf-play-pill" aria-haspopup="true" aria-expanded="false"></button>' +
+      '<div class="sf-play-menu" role="menu" hidden>' +
+      '<button type="button" role="menuitemradio" data-v="auto"><span aria-hidden="true">🕖</span>Automatic<small>Day 7 am · Night 7 pm (Central)</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="day"><span aria-hidden="true">☀️</span>Day Play<small>Bright and easy on the eyes outdoors</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="night"><span aria-hidden="true">🌙</span>Night Play<small>The card room after dark</small></button></div>';
+    document.body.appendChild(wrap);
+    pill = wrap.firstChild; menu = wrap.lastChild;
+    function close() { menu.hidden = true; pill.setAttribute("aria-expanded", "false"); }
+    pill.addEventListener("click", function () { var o = menu.hidden; menu.hidden = !o; pill.setAttribute("aria-expanded", String(o)); if (o) { var c = menu.querySelector('[aria-checked="true"]') || menu.firstChild; c.focus(); } });
+    menu.addEventListener("click", function (e) { var b = e.target.closest("button[data-v]"); if (!b) return; set(b.getAttribute("data-v")); close(); pill.focus(); });
+    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) { close(); pill.focus(); } });
+    label();
+  }
+  apply();
+  setInterval(function () { if (!pinned) apply(); }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) apply(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build); else build();
+  window.SFPlay = { set: set, play: current, mode: function () { return pinned || "auto"; } };
+})();
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SuiteFace: Dating App That Deals Your 52 Best Matches | No Jokers Needed</title>
@@ -12,13 +73,14 @@
 <meta property="og:url" content="https://suiteface.com/"><meta property="og:image" content="https://suiteface.com/assets/brand/suiteface-vegas-sign-heart-1600w.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "SuiteFace Inc.", "alternateName": "SuiteFace", "url": "https://suiteface.com/", "logo": "https://suiteface.com/assets/brand/suiteface-joker-icon-cream-512.png", "email": "help@suiteface.com", "slogan": "No Jokers Needed", "address": {"@type": "PostalAddress", "addressRegion": "FL", "addressCountry": "US"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "SuiteFace", "url": "https://suiteface.com/"}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "SuiteFace", "url": "https://suiteface.com/", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web, iOS, Android (browser)", "description": "SuiteFace is the dating app that deals you a real deck: your 52 best-fit singles nearby, ranked Ace to 2. ID-verified face cards, free to join. No Jokers Needed.", "offers": {"@type": "Offer", "price": "21.00", "priceCurrency": "USD", "description": "$21 Buy-In including the first 30 days, then $2.10 a month. Free to join."}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much does SuiteFace cost?", "acceptedAnswer": {"@type": "Answer", "text": "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."}}, {"@type": "Question", "name": "What does a comp code do?", "acceptedAnswer": {"@type": "Answer", "text": "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."}}, {"@type": "Question", "name": "How do I cancel or pause?", "acceptedAnswer": {"@type": "Answer", "text": "Settings → Membership → Manage billing. You can pause up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."}}, {"@type": "Question", "name": "Why don't I have 52 cards yet?", "acceptedAnswer": {"@type": "Answer", "text": "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."}}, {"@type": "Question", "name": "How is my deck ranked?", "acceptedAnswer": {"@type": "Answer", "text": "Each card gets a 100-point fit score for you: values, your table, shared interests, trumps, truth, closeness and age. Ace, King, Queen and Jack go only to ID-verified members. See House Fit Rules."}}, {"@type": "Question", "name": "How do I get the verified Seal?", "acceptedAnswer": {"@type": "Answer", "text": "Verify with a driver's license, state ID or passport plus a quick live selfie. That confirms you're 18+ and that your face matches your card."}}, {"@type": "Question", "name": "How do Jokers work?", "acceptedAnswer": {"@type": "Answer", "text": "After a Loss on one of your first three dates together, you can make a Joker within 12 hours of Play Hand. Ten Jokers within 180 days shows JOKER on a card for 45 days. Every Joker can be challenged for free. See Joker Rules."}}, {"@type": "Question", "name": "Someone made me feel unsafe.", "acceptedAnswer": {"@type": "Answer", "text": "If you're in danger, call 911 now. Then use Report a safety concern on their card. Safety reports go straight to SuiteFace staff and are never handled as a Joker."}}, {"@type": "Question", "name": "I can't use 'Use my location'.", "acceptedAnswer": {"@type": "Answer", "text": "Your browser has to allow location for suiteface.com, and it only works on the secure site. You can always type your ZIP code or city instead."}}, {"@type": "Question", "name": "How do I change or delete my account?", "acceptedAnswer": {"@type": "Answer", "text": "Settings lets you edit your Face, change your @username if it's free, download your data, or delete your account."}}, {"@type": "Question", "name": "How do I contact SuiteFace?", "acceptedAnswer": {"@type": "Answer", "text": "Email help@suiteface.com. SuiteFace doesn't take phone calls; every request is answered by email so there's a written record."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "SuiteFace Inc.", "alternateName": "SuiteFace", "url": "https://suiteface.com/", "logo": "https://suiteface.com/assets/brand/suiteface-joker-icon-cream-512.png", "email": "help@suiteface.com", "slogan": "No Jokers Needed", "address": {"@type": "PostalAddress", "addressRegion": "FL", "addressCountry": "US"}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "SuiteFace", "url": "https://suiteface.com/"}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "SuiteFace", "url": "https://suiteface.com/", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web, iOS, Android (browser)", "description": "SuiteFace is the dating app that deals you a real deck: your 52 best-fit singles nearby, ranked Ace to 2. ID-verified face cards, free to join. No Jokers Needed.", "offers": {"@type": "Offer", "price": "21.00", "priceCurrency": "USD", "description": "$21 Buy-In including the first 30 days, then $2.10 a month. Free to join."}}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How much does SuiteFace cost?", "acceptedAnswer": {"@type": "Answer", "text": "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."}}, {"@type": "Question", "name": "What does a comp code do?", "acceptedAnswer": {"@type": "Answer", "text": "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."}}, {"@type": "Question", "name": "How do I cancel or pause?", "acceptedAnswer": {"@type": "Answer", "text": "Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."}}, {"@type": "Question", "name": "Why don't I have 52 cards yet?", "acceptedAnswer": {"@type": "Answer", "text": "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."}}, {"@type": "Question", "name": "How is my deck ranked?", "acceptedAnswer": {"@type": "Answer", "text": "Each card gets a 100-point fit score for you: values, your table, shared interests, trumps, truth, closeness and age. Ace, King, Queen and Jack go only to ID-verified members. See House Fit Rules."}}, {"@type": "Question", "name": "How do I get the verified Seal?", "acceptedAnswer": {"@type": "Answer", "text": "Verify with a driver's license, state ID or passport plus a quick live selfie. That confirms you're 18+ and that your face matches your card."}}, {"@type": "Question", "name": "How do Jokers work?", "acceptedAnswer": {"@type": "Answer", "text": "After a Loss on one of your first three dates together, you can make a Joker within 12 hours of Play Hand. Ten Jokers within 180 days shows JOKER on a card for 45 days. Every Joker can be challenged for free. See Joker Rules."}}, {"@type": "Question", "name": "Someone made me feel unsafe.", "acceptedAnswer": {"@type": "Answer", "text": "If you're in danger, call 911 now. Then use Report a safety concern on their card. Safety reports go straight to SuiteFace staff and are never handled as a Joker."}}, {"@type": "Question", "name": "I can't use 'Use my location'.", "acceptedAnswer": {"@type": "Answer", "text": "Your browser has to allow location for suiteface.com, and it only works on the secure site. You can always type your ZIP code or city instead."}}, {"@type": "Question", "name": "How do I change or delete my account?", "acceptedAnswer": {"@type": "Answer", "text": "Settings lets you edit your Face, change your @username if it's free, download your data, or delete your account."}}, {"@type": "Question", "name": "How do I contact SuiteFace?", "acceptedAnswer": {"@type": "Answer", "text": "Email help@suiteface.com. SuiteFace doesn't take phone calls; every request is answered by email so there's a written record."}}]}</script>
 <link rel="icon" href="/assets/brand/suiteface-favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792220915">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792241761">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792241761">
 </head>
 <body>
 <header class="top">
@@ -454,7 +516,7 @@
           </ul>
           <button type="button" class="hrcta" data-highroller><span aria-hidden="true">💎</span><span><b>The High Roller Room</b>Verify $1M+ or buy in for $5,000. A private deck of High Rollers and exclusive offers.</span><em>›</em></button>
           <div class="guarantee"><span class="gbadge" aria-hidden="true">12</span><div><b>The 12-Card Deck Guarantee</b><span>If we can't deal you at least 12 cards within 10 days, you choose: get your $21 back, or stay with full access while your table fills.</span></div></div>
-          <div class="notice pv rules-box"><b>Pausing:</b> pause any time for up to 21 days and your $2.10 billing stops while you're paused. If a pause runs past 21 days, your membership ends, and coming back means a new $21.00 Buy-In.</div>
+          <div class="notice pv rules-box"><b>Pausing:</b> pause <b>once every 210 days</b> for up to 21 days, and your $2.10 billing stops while you're paused. If a pause runs past 21 days, your membership ends, and coming back means a new $21.00 Buy-In.</div>
           <label class="agree"><input type="checkbox" id="agree"> <span>I understand that SuiteFace charges <b>$21.00 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership. I agree to the <a href="terms.html">Terms of Service</a>.</span></label>
           <div class="comp"><label for="compCode"><span class="chipmark" aria-hidden="true">COMP</span> Have a comp from the house?</label><div class="comprow"><input type="text" id="compCode" placeholder="Enter your comp code" autocomplete="off" autocapitalize="characters" maxlength="30"><button class="btn ghost sm" type="button" id="compApply">Apply</button></div><span class="hint" id="compMsg">Comps are applied at checkout. One per member.</span></div>
           <span class="err" id="agreeErr"></span>
@@ -467,7 +529,7 @@
             <ol>
               <li><b>Buy-In.</b> Joining costs a one-time $21.00 USD membership fee, charged when you sign up.</li>
               <li><b>Monthly membership.</b> After that, membership is $2.10 USD per month, charged to the same payment method every month starting one month after you join, until you cancel.</li>
-              <li><b>Pausing.</b> You can pause for up to 21 days. No monthly charges are made while paused, and your deck is hidden from others.</li>
+              <li><b>Pausing.</b> You can pause once every 210 days (counted from the day your last pause began), for up to 21 days. No monthly charges are made while paused, and your deck is hidden from others.</li>
               <li><b>Pauses over 21 days.</b> If you don't resume within 21 days, your membership ends. To return, you'll pay a new $21.00 Buy-In, then $2.10 a month.</li>
               <li><b>Cancelling.</b> Cancel any time from "Manage, pause or cancel" or by emailing help@suiteface.com. Cancelling stops future charges. Rejoining later requires a new $21.00 Buy-In.</li>
               <li><b>Launch offer.</b> From Oct 17 through 11:59 pm CT Oct 31, 2026, the $21.00 Buy-In is waived: you pay $2.10 today and $2.10 a month. Rejoining after your membership ends requires the Buy-In.</li>
@@ -603,12 +665,12 @@
 <button class="btn felt fab" id="fbBtn" type="button">Feedback</button>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792220915"></script>
-<script src="/assets/js/sign.js?v=1792220915"></script>
-<script src="/assets/js/live.js?v=1792220915"></script>
-<script src="/assets/js/gate.js?v=1792220915"></script>
-<script src="/assets/js/fx.js?v=1792220915"></script>
-<script src="/assets/js/casino-scene.js?v=1792220915"></script>
-<script src="/assets/js/app.js?v=1792220915"></script>
+<script src="/assets/js/config.js?v=1792241761"></script>
+<script src="/assets/js/sign.js?v=1792241761"></script>
+<script src="/assets/js/live.js?v=1792241761"></script>
+<script src="/assets/js/gate.js?v=1792241761"></script>
+<script src="/assets/js/fx.js?v=1792241761"></script>
+<script src="/assets/js/casino-scene.js?v=1792241761"></script>
+<script src="/assets/js/app.js?v=1792241761"></script>
 </body>
 </html>

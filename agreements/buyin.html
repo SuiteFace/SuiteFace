@@ -1,6 +1,67 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>/* Day Play / Night Play. Runs in <head> so the page never flashes the wrong theme.
+   Auto (default) follows Central Time: Day Play 7:00 am–6:59 pm, Night Play 7:00 pm–6:59 am, switching live.
+   A visitor can pin Day or Night; the choice is kept on this device. The Joker Lobby is always Night Play. */
+(function () {
+  var KEY = "sf.play", root = document.documentElement, pinned = null;
+  var nightOnly = /joker-lobby/.test(location.pathname);
+  try { pinned = localStorage.getItem(KEY); } catch (e) { }
+  if (pinned !== "day" && pinned !== "night") pinned = null;
+  function centralHour() {
+    try { return +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: "America/Chicago" }).format(new Date()); }
+    catch (e) { return new Date().getHours(); }
+  }
+  function auto() { var h = centralHour(); return h >= 7 && h < 19 ? "day" : "night"; }
+  function current() { return nightOnly ? "night" : pinned || auto(); }
+  function apply() {
+    var p = current();
+    if (root.getAttribute("data-play") !== p) {
+      root.setAttribute("data-play", p);
+      var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute("content", p === "day" ? "#FBF6EC" : "#17151B");
+      try { document.dispatchEvent(new CustomEvent("sf:play", { detail: { play: p } })); } catch (e) { }
+    }
+    root.setAttribute("data-play-mode", pinned || "auto");
+    label();
+  }
+  var pill = null, menu = null;
+  function label() {
+    if (!pill) return;
+    var p = current();
+    pill.innerHTML = '<span aria-hidden="true">' + (p === "day" ? "☀️" : "🌙") + '</span><span class="t">' + (p === "day" ? "Day Play" : "Night Play") + "</span> <small>" + (pinned ? "· chosen" : "· auto") + "</small>";
+    pill.setAttribute("aria-label", (p === "day" ? "Day Play" : "Night Play") + (pinned ? ", chosen by you" : ", automatic") + ". Change theme");
+    if (menu) Array.prototype.forEach.call(menu.querySelectorAll("button"), function (b) { b.setAttribute("aria-checked", String((b.getAttribute("data-v") === "auto" && !pinned) || b.getAttribute("data-v") === pinned)); });
+  }
+  function set(v) {
+    pinned = v === "day" || v === "night" ? v : null;
+    try { if (pinned) localStorage.setItem(KEY, pinned); else localStorage.removeItem(KEY); } catch (e) { }
+    root.classList.add("sf-play-fade"); apply();
+  }
+  function build() {
+    if (nightOnly || document.querySelector(".sf-play")) return;
+    var wrap = document.createElement("div"); wrap.className = "sf-play";
+    wrap.innerHTML = '<button type="button" class="sf-play-pill" aria-haspopup="true" aria-expanded="false"></button>' +
+      '<div class="sf-play-menu" role="menu" hidden>' +
+      '<button type="button" role="menuitemradio" data-v="auto"><span aria-hidden="true">🕖</span>Automatic<small>Day 7 am · Night 7 pm (Central)</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="day"><span aria-hidden="true">☀️</span>Day Play<small>Bright and easy on the eyes outdoors</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="night"><span aria-hidden="true">🌙</span>Night Play<small>The card room after dark</small></button></div>';
+    document.body.appendChild(wrap);
+    pill = wrap.firstChild; menu = wrap.lastChild;
+    function close() { menu.hidden = true; pill.setAttribute("aria-expanded", "false"); }
+    pill.addEventListener("click", function () { var o = menu.hidden; menu.hidden = !o; pill.setAttribute("aria-expanded", String(o)); if (o) { var c = menu.querySelector('[aria-checked="true"]') || menu.firstChild; c.focus(); } });
+    menu.addEventListener("click", function (e) { var b = e.target.closest("button[data-v]"); if (!b) return; set(b.getAttribute("data-v")); close(); pill.focus(); });
+    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) { close(); pill.focus(); } });
+    label();
+  }
+  apply();
+  setInterval(function () { if (!pinned) apply(); }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) apply(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build); else build();
+  window.SFPlay = { set: set, play: current, mode: function () { return pinned || "auto"; } };
+})();
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Buy-In and Membership Agreement · SuiteFace</title>
@@ -40,6 +101,7 @@ li{margin:.3em 0}
 .sig{margin-top:28px;border:1px dashed var(--gold);border-radius:12px;padding:14px 16px;background:rgba(184,134,47,.08)}
 footer{max-width:900px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:.88rem}
 @media print{.bar,.print,footer{display:none}body{background:#fff;color:#222}h1,h2,h3,strong{color:#000}a{color:#000}}</style>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792241761">
 <link rel="canonical" href="https://suiteface.com/agreements/buyin.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SuiteFace">
@@ -56,7 +118,7 @@ footer{max-width:900px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font
 <p class="crumbs"><a href="../legal.html">Legal center</a> › Agreements</p><h1>Buy-In and Membership Agreement</h1><p><strong>SuiteFace Inc., a Florida corporation</strong> · Agreement B · Version 1.0 · Last updated October 16, 2026<br><strong>Signed:</strong> Before the $21 Buy-In, in a pop-up, with your typed /Full Name/ signature and today's date.</p><ol>
 <li>I authorize SuiteFace Inc. to charge <strong>$21.00 today</strong> for my Buy-In, which includes my first 30 days.</li>
 <li><strong>I authorize a recurring charge of $2.10 every month, starting 30 days from today, until I cancel.</strong> I can cancel anytime online in Settings.</li>
-<li>A pause longer than <strong>21 days</strong> ends my membership, and returning requires a new $21.00 Buy-In.</li>
+<li>I can pause <strong>once every 210 days</strong>, for up to <strong>21 days</strong>. A pause longer than 21 days ends my membership, and returning requires a new $21.00 Buy-In.</li>
 <li>Charges are <strong>non-refundable</strong> except where the law requires.</li>
 <li>Contact with other members requires an active paid membership.</li>
 <li><strong>12-Card Deck Guarantee:</strong> if I'm dealt fewer than 12 cards within 10 days, I may ask for my $21.00 back or choose to stay (Terms 4.1a).</li>
@@ -64,8 +126,8 @@ footer{max-width:900px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font
 <li><strong>First 1,000:</strong> if I choose the First 1,000 during the launch offer, I authorize the <strong>$21.00 Buy-In, which is non-refundable even under the 12-Card Deck Guarantee</strong>, and I receive a numbered First 1,000 badge (Terms 4.1c).</li>
 </ol><div class="sig"><strong>Signature block:</strong> Type your full legal name between slashes [ /First Middle Last/ ] · Date [ today ] · ☐ I have read this agreement, I am 18 or older, and I sign it electronically. · <strong>[ I Sign and Agree ]</strong></div><p style="margin-top:18px">Part of the <a href="../terms.html">Terms of Service</a>.</p>
 </main>
-<script src="../assets/js/gate.js?v=1792220915"></script>
-<script src="../assets/js/fx.js?v=1792220915"></script>
+<script src="../assets/js/gate.js?v=1792241761"></script>
+<script src="../assets/js/fx.js?v=1792241761"></script>
 <footer>© 2026 SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™ and the SuiteFace Joker logo™ are trademarks of SuiteFace Inc. · help@suiteface.com · <a href="../legal.html">Legal center</a> · <a href="../safety.html">Safety</a> · In an emergency, call 911.</footer>
 </body>
 </html>

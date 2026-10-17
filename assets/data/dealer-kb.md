@@ -6,7 +6,7 @@ A: Joining and building your Face are free. The Buy-In is $21.00 one time (it in
 Q: What does a comp code do?
 A: Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days.
 Q: How do I cancel or pause?
-A: Settings → Membership → Manage billing. You can pause up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund.
+A: Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund.
 Q: Why don't I have 52 cards yet?
 A: Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages.
 Q: How is my deck ranked?
@@ -149,7 +149,7 @@ Prices are in US dollars, plus any tax that applies. Payments are processed by S
 
 **4.4 Cancel anytime, online.** Cancel at any time in **Settings → Membership → Manage billing**, the same way you signed up, with no phone call needed. Cancellation takes effect at the end of the month you've paid for; you keep access until then.
 
-**4.5 Pause.** You may pause for up to **21 days**. While paused, your card is hidden, contact is off, and no monthly charge is made. If you don't resume within 21 days, your membership ends and a new $21.00 Buy-In is required to return.
+**4.5 Pause.** You may pause **once every 210 days**, counted from the day your last pause began, for up to **21 days** each time. A pause request inside that 210-day window is declined, and the date your next pause opens is shown on your account. While paused, your card is hidden, contact is off, and no monthly charge is made. If you don't resume within 21 days, your membership ends and a new $21.00 Buy-In is required to return.
 
 **4.6 Your 3-day right to cancel the Buy-In.** **You may cancel your Buy-In for a full $21.00 refund within 3 business days** after you buy in (not counting weekends or federal holidays), by emailing help@suiteface.com with the subject "Cancel Buy-In" or using Settings → Membership. We refund within 10 days. This applies to members in every state.
 
@@ -307,7 +307,7 @@ I confirm that:
 
 1. I authorize SuiteFace Inc. to charge **$21.00 today** for my Buy-In, which includes my first 30 days.
 2. **I authorize a recurring charge of $2.10 every month, starting 30 days from today, until I cancel.** I can cancel anytime online in Settings.
-3. A pause longer than **21 days** ends my membership, and returning requires a new $21.00 Buy-In.
+3. I can pause **once every 210 days**, for up to **21 days**. A pause longer than 21 days ends my membership, and returning requires a new $21.00 Buy-In.
 4. Charges are **non-refundable** except where the law requires.
 5. Contact with other members requires an active paid membership.
 6. **12-Card Deck Guarantee:** if I'm dealt fewer than 12 cards within 10 days, I may ask for my $21.00 back or choose to stay (Terms 4.1a).
