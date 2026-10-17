@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Joker Maker Lobby · SuiteFace</title>
+<meta name="description" content="The SuiteFace Joker Maker Lobby: the lobby of shame, where members call out bad hands they played first-hand.">
+<link rel="icon" href="assets/brand/suiteface-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Concept: a jester's back room behind the card room. Harlequin diamonds, bells, a crooked marquee, and one velvet rope. */
+:root{
+  --night:#17151B; --ink:#2B2730; --ink-2:#36313D;
+  --plum:#4A1F5C; --plum-hi:#7A3A92; --plum-deep:#2A1335;
+  --felt:#1E6347; --felt-hi:#2F8A62;
+  --red:#C8102E; --red-soft:#E5505E;
+  --gold:#B8862F; --gold-hi:#E8C46A; --bulb:#FFE7A3;
+  --lime:#B7D35A;
+  --cream:#FAF7F0; --cream-dim:#CFC6B6; --muted:#A69DB0;
+  --line:rgba(250,247,240,.14);
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --r:14px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--plum-deep);color:var(--cream);font-family:var(--body);line-height:1.55;overflow-x:hidden}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+a{color:var(--gold-hi)}
+:focus-visible{outline:3px solid var(--gold-hi);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:.02em;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* harlequin wallpaper */
+.harle{position:fixed;inset:0;z-index:-2;
+  background:
+    linear-gradient(135deg,rgba(23,21,27,.0) 0 0),
+    conic-gradient(from 45deg at 50% 50%,var(--plum) 0 25%,var(--plum-deep) 0 50%,var(--plum) 0 75%,var(--plum-deep) 0) 0 0/88px 88px;
+  opacity:.55}
+.harle::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(122,58,146,.35),transparent 60%),linear-gradient(180deg,rgba(23,21,27,.2),rgba(23,21,27,.92) 70%)}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:rgba(23,21,27,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;height:60px}
+.home{display:flex;align-items:center;gap:10px;color:var(--cream);text-decoration:none;font-family:var(--display);font-weight:800;font-size:1.3rem;letter-spacing:.04em}
+.home img{width:34px;height:34px;border-radius:8px}
+.pill{font-family:var(--display);font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.85rem;padding:.35rem .8rem;border-radius:999px;border:1px solid var(--gold);color:var(--gold-hi)}
+
+/* marquee */
+.hero{position:relative;padding:48px 0 30px;text-align:center;overflow:hidden}
+.sign{position:relative;display:inline-block;margin:0 auto;padding:28px clamp(18px,5vw,56px) 24px;border-radius:22px;
+  background:linear-gradient(180deg,#3a1848,#24102e);border:3px solid var(--gold);transform:rotate(-1.6deg);
+  box-shadow:0 0 0 6px rgba(184,134,47,.18),0 30px 80px rgba(0,0,0,.55),inset 0 0 40px rgba(232,196,106,.12);animation:sway 6s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(1.2deg)}}
+.bulbs{position:absolute;inset:-9px;pointer-events:none}
+.bulbs i{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--bulb);box-shadow:0 0 10px 3px rgba(255,231,163,.7);animation:chase 1.2s steps(1) infinite}
+@keyframes chase{50%{background:#5a4a2a;box-shadow:none}}
+.sign h1{font-size:clamp(2.6rem,9vw,5.6rem);color:var(--gold-hi);text-shadow:0 0 18px rgba(232,196,106,.55),0 3px 0 #6b4a12}
+.sign h1 .j{color:var(--lime);text-shadow:0 0 16px rgba(183,211,90,.6),0 3px 0 #3f4d12}
+.sign .sub{font-family:var(--display);font-weight:800;font-size:clamp(1.1rem,3.4vw,1.7rem);letter-spacing:.32em;color:var(--red-soft);margin-top:6px;text-shadow:0 0 12px rgba(229,80,94,.6);animation:flick 4s infinite}
+@keyframes flick{0%,92%,100%{opacity:1}93%{opacity:.25}95%{opacity:1}96%{opacity:.4}}
+.tag{margin:22px auto 0;max-width:56ch;color:var(--cream-dim);font-size:1.05rem}
+
+/* floating hats + bells */
+.float{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+.float img,.float b{position:absolute;opacity:.8;animation:drift linear infinite}
+.float img{width:58px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.float b{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,#6b4a12);box-shadow:0 0 10px rgba(232,196,106,.6)}
+@keyframes drift{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
+
+/* panels */
+section{padding:26px 0}
+.panel{background:linear-gradient(180deg,rgba(43,39,48,.94),rgba(30,26,35,.96));border:1px solid var(--line);border-radius:var(--r);padding:clamp(18px,3vw,30px);box-shadow:0 20px 50px rgba(0,0,0,.35);position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0 0 auto;height:6px;background:repeating-linear-gradient(90deg,var(--red) 0 22px,var(--gold) 22px 44px,var(--plum-hi) 44px 66px,var(--felt-hi) 66px 88px)}
+.eyebrow{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.2em;font-size:.88rem;color:var(--lime)}
+h2{font-size:clamp(1.9rem,5vw,2.9rem);margin:.25rem 0 .7rem}
+.grid2{display:grid;gap:22px;grid-template-columns:1.15fr .85fr}
+@media (max-width:860px){.grid2{grid-template-columns:1fr}}
+.rules{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.rules li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;color:var(--cream-dim)}
+.rules li span{font-family:var(--display);font-weight:900;font-size:1.25rem;color:var(--gold-hi);text-align:center;border:1px solid rgba(184,134,47,.5);border-radius:8px;line-height:32px}
+.rules b{color:var(--cream)}
+
+/* velvet rope ticket */
+.ticket{position:relative;border-radius:18px;padding:22px;background:radial-gradient(ellipse at 50% -10%,rgba(232,196,106,.25),transparent 60%),linear-gradient(160deg,#5a2470,#2a1335);border:2px dashed var(--gold);text-align:center}
+.price{font-family:var(--display);font-weight:900;font-size:clamp(3.4rem,10vw,5rem);color:var(--gold-hi);line-height:1;text-shadow:0 0 22px rgba(232,196,106,.45)}
+.price small{font-size:.32em;letter-spacing:.2em;color:var(--cream-dim);display:block;margin-top:6px}
+.rope{height:16px;margin:16px -22px;background:repeating-linear-gradient(90deg,#8e1222 0 14px,#b4182f 14px 28px);border-radius:8px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.3)}
+.agree{display:flex;gap:10px;text-align:left;align-items:flex-start;font-size:.95rem;color:var(--cream-dim);margin:12px 0}
+.agree input{width:22px;height:22px;margin-top:2px;accent-color:var(--gold)}
+.btn{appearance:none;border:0;cursor:pointer;font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:1.15rem;padding:.85rem 1.4rem;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;text-decoration:none;transition:transform .15s,filter .15s}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.btn[aria-disabled="true"],.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#2a1a05;box-shadow:0 8px 24px rgba(184,134,47,.35)}
+.btn.red{background:linear-gradient(180deg,var(--red-soft),var(--red));color:var(--cream)}
+.btn.ghost{background:transparent;color:var(--cream);border:1px solid var(--line)}
+.btn.lime{background:linear-gradient(180deg,#cfe57a,var(--lime));color:#22300a}
+.fine{font-size:.82rem;color:var(--muted);margin-top:10px}
+.note{border-left:4px solid var(--gold);background:rgba(184,134,47,.1);padding:10px 14px;border-radius:0 10px 10px 0;color:var(--cream-dim);font-size:.94rem}
+
+/* lobby floor */
+.steps{display:grid;gap:16px}
+.step{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(23,21,27,.5)}
+.step h3{font-size:1.35rem;display:flex;gap:10px;align-items:center}
+.step h3 i{font-style:normal;display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--plum-hi);color:var(--cream);font-size:1rem}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.tabs button{appearance:none;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--cream-dim);border-radius:999px;padding:.4rem .85rem;font:600 .9rem var(--body)}
+.tabs button[aria-pressed="true"]{background:var(--gold);color:#2a1a05;border-color:var(--gold)}
+.search{display:flex;gap:8px}
+input[type=text],input[type=search],textarea{width:100%;font:500 1rem var(--body);color:var(--cream);background:rgba(23,21,27,.8);border:1px solid var(--line);border-radius:10px;padding:.7rem .85rem}
+textarea{min-height:110px;resize:vertical}
+.results{display:grid;gap:8px;margin-top:12px}
+.who{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);cursor:pointer;background:rgba(43,39,48,.7);color:var(--cream);text-align:left;font:inherit;width:100%}
+.who[aria-pressed="true"]{border-color:var(--lime);box-shadow:0 0 0 2px rgba(183,211,90,.35)}
+.who small{color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{appearance:none;cursor:pointer;border:1px solid var(--line);background:rgba(23,21,27,.6);color:var(--cream-dim);border-radius:10px;padding:.5rem .75rem;font:500 .92rem var(--body);text-align:left}
+.chip[aria-pressed="true"]{background:var(--red);border-color:var(--red-soft);color:var(--cream)}
+.counter{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.counter span{width:20px;height:28px;border-radius:4px;background:linear-gradient(160deg,var(--lime),#7f9a2c);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.counter span.used{background:#3a3440;box-shadow:none}
+
+/* the reveal */
+.stage{display:grid;place-items:center;min-height:300px;perspective:1100px}
+.card{width:190px;height:270px;position:relative;transform-style:preserve-3d;transition:transform 1s cubic-bezier(.3,1.4,.5,1)}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:grid;place-items:center;text-align:center;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.front{background:var(--cream);color:var(--ink);border:6px solid var(--cream)}
+.front .nm{font-family:var(--display);font-weight:900;font-size:1.6rem;text-transform:uppercase}
+.back{transform:rotateY(180deg);background:radial-gradient(circle at 50% 30%,#6f3486,#2a1335);border:6px solid var(--gold);color:var(--gold-hi)}
+.back img{width:110px;animation:bob 1.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-6deg)}}
+.back .jk{font-family:var(--display);font-weight:900;font-size:2.1rem;letter-spacing:.12em;color:var(--lime)}
+.stamp{position:absolute;bottom:18px;right:-14px;transform:rotate(-14deg);border:3px solid var(--red-soft);color:var(--red-soft);font-family:var(--display);font-weight:900;letter-spacing:.1em;padding:2px 10px;border-radius:6px;background:rgba(23,21,27,.6)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;animation:fall 2.6s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.8}}
+
+/* way out */
+.ways{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+@media (max-width:860px){.ways{grid-template-columns:1fr}}
+.way{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(23,21,27,.55);display:grid;gap:10px;align-content:start}
+.way .amt{font-family:var(--display);font-weight:900;font-size:2.2rem;color:var(--gold-hi)}
+footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);border:1px solid var(--gold);color:var(--cream);padding:12px 18px;border-radius:12px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:min(92vw,520px)}
+</style>
+</head>
+<body>
+<div class="harle" aria-hidden="true"></div>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="home" href="./"><img src="assets/brand/suiteface-joker-icon-cream-180.png" alt="">SuiteFace</a>
+    <span class="pill" id="modePill">Demo lobby</span>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="float" id="float" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="sign">
+        <div class="bulbs" id="bulbs" aria-hidden="true"></div>
+        <h1>Joker <span class="j">Maker</span> Lobby</h1>
+        <div class="sub">★ The Lobby of Shame ★</div>
+      </div>
+      <p class="tag">Some hands go bad. In here, members who played one first-hand can call it out, so the next player at the table knows the card before it's dealt.</p>
+    </div>
+  </div>
+
+  <section id="door">
+    <div class="wrap grid2">
+      <div class="panel">
+        <div class="eyebrow">House rules</div>
+        <h2>Before you step past the rope</h2>
+        <ol class="rules">
+          <li><span>1</span><p><b>Members only.</b> You can only make a Joker out of someone who is on SuiteFace.</p></li>
+          <li><span>2</span><p><b>First-hand only.</b> You swear it happened to you, directly. No hearsay, no friend-of-a-friend.</p></li>
+          <li><span>3</span><p><b>Pick your reasons.</b> Choose from the house list and tell it straight. Evidence is welcome.</p></li>
+          <li><span>4</span><p><b>45 days.</b> A Joker you make shows on their card for 45 days.</p></li>
+          <li><span>5</span><p><b>12 per account, ever.</b> One Joker per person. Spend them wisely.</p></li>
+          <li><span>6</span><p><b>They can fight back.</b> A free challenge removes it if you two never had a hand together on SuiteFace.</p></li>
+          <li><span>7</span><p><b>Safety isn't a game.</b> Threats, assault or stalking go to <a href="./#join">Report a safety concern</a>, straight to staff.</p></li>
+        </ol>
+      </div>
+      <div class="ticket">
+        <div class="eyebrow">Admission</div>
+        <div class="price">$210<small>One lobby entry</small></div>
+        <div class="rope" aria-hidden="true"></div>
+        <label class="agree"><input type="checkbox" id="agree"> <span>I understand the $210 buys <b>one entry to the lobby only</b>. It does not guarantee any Joker and is <b>non-refundable for any reason</b>, including if no Joker is made or a Joker is later removed or challenged.</span></label>
+        <a class="btn gold" id="payEntry" href="#" aria-disabled="true">🎟️ Pay $210 &amp; enter</a>
+        <p class="fine">Secure checkout by Stripe. Card, Apple Pay and Cash App Pay accepted.</p>
+        <button class="btn ghost" id="tour" type="button" style="margin-top:12px">Take the demo tour</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="floor" hidden>
+    <div class="wrap">
+      <div class="panel">
+        <div class="eyebrow">Lobby floor</div>
+        <h2>Deal a Joker</h2>
+        <div class="note" id="demoNote">Demo tour: everyone below is made up, and nothing is saved. Real lobby entries open with member login.</div>
+        <p style="margin-top:12px;color:var(--cream-dim)">Jokers left on this account:</p>
+        <div class="counter" id="counter" aria-label="Jokers left"></div>
+        <div class="steps" style="margin-top:16px">
+          <div class="step">
+            <h3><i>1</i>Find the card</h3>
+            <div class="tabs" role="group" aria-label="Search by" id="tabs">
+              <button type="button" data-k="name" aria-pressed="true">Name</button>
+              <button type="button" data-k="handle" aria-pressed="false">Username</button>
+              <button type="button" data-k="zip" aria-pressed="false">ZIP</button>
+              <button type="button" data-k="phone" aria-pressed="false">Phone</button>
+              <button type="button" data-k="email" aria-pressed="false">Email</button>
+            </div>
+            <div class="search">
+              <label class="sr" for="q">Search</label>
+              <input type="search" id="q" placeholder="Start typing a first name…" autocomplete="off">
+            </div>
+            <p class="fine" id="hint">Phone and email find someone only by exact match, and only if you've played a hand with them.</p>
+            <div class="results" id="results"></div>
+          </div>
+          <div class="step">
+            <h3><i>2</i>Why they're a Joker</h3>
+            <p class="fine">Pick 1 to 5.</p>
+            <div class="chips" id="reasons"></div>
+          </div>
+          <div class="step">
+            <h3><i>3</i>Tell it straight</h3>
+            <label class="sr" for="statement">Your statement</label>
+            <textarea id="statement" placeholder="What happened, in your own words (at least 20 characters)."></textarea>
+            <label class="agree"><input type="checkbox" id="attest"> <span>I assert this is <b>true</b> and comes from my own <b>first-hand, direct experience</b> with this person.</span></label>
+            <label class="fine" style="display:block">Evidence (optional): <input type="file" id="evidence" multiple accept="image/*,.pdf"></label>
+          </div>
+          <div style="text-align:center">
+            <button class="btn red" id="deal" type="button" disabled>🃏 Deal the Joker</button>
+          </div>
+          <div class="stage" id="stage" hidden>
+            <div class="card" id="card">
+              <div class="face front"><div><div class="nm" id="cardName">?</div><div style="color:#6b6470">SuiteFace member</div></div></div>
+              <div class="face back"><div><img src="assets/brand/suiteface-joker-icon-cream-512.png" alt=""><div class="jk">JOKER</div></div><div class="stamp">45 DAYS</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="out">
+    <div class="wrap">
+      <div class="panel">
+        <div class="eyebrow">Got Jokered?</div>
+        <h2>Your way out</h2>
+        <div class="ways">
+          <div class="way">
+            <div class="amt">Free</div>
+            <h3>Formal challenge</h3>
+            <p style="color:var(--cream-dim)">If you never had a hand with the person who Jokered you on SuiteFace, the Joker comes off automatically.</p>
+            <a class="btn ghost" href="./#join">File a challenge</a>
+          </div>
+          <div class="way">
+            <div class="amt">$210</div>
+            <h3>Remove a lobby Joker</h3>
+            <p style="color:var(--cream-dim)">Takes one paid Joker off your card right away, and no new lobby Jokers can land on you for 45 days.</p>
+            <a class="btn gold" id="payRemoval" href="#">Remove now</a>
+          </div>
+          <div class="way">
+            <div class="amt">$2,100</div>
+            <h3>Buy out a public Joker</h3>
+            <p style="color:var(--cream-dim)">Ten players called it. After the 15-day probation, clear it now, or wait out the 45 days.</p>
+            <a class="btn red" id="payBuyout" href="#">Buy out</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>SuiteFace Inc. · Lobby entries and removals are non-refundable. Jokers apply to SuiteFace members only and show for 45 days. Every Joker can be challenged. Safety concerns go to staff, never through the lobby.</p>
+    <p style="margin-top:8px"><a href="./">Back to the card room</a></p>
+  </div>
+</footer>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="assets/js/config.js"></script>
+<script>
+(function(){
+  var C = window.SUITEFACE_CONFIG || {};
+  var LINKS = {
+    entry: C.stripeJokerLobbyLink || "https://buy.stripe.com/test_28E9AT2Yb0QbgIGalQ14401",
+    removal: C.stripeJokerRemovalLink || "https://buy.stripe.com/test_8x200j56j7ez0JIctY14402",
+    buyout: C.stripeJokerBuyoutLink || "https://buy.stripe.com/test_8x25kD6aneH1fEC8dI14403"
+  };
+  var $ = function(s){ return document.querySelector(s); };
+  function toast(msg){ var t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(t._h); t._h=setTimeout(function(){ t.hidden=true; },4200); }
+
+  // marquee bulbs around the sign
+  var bulbs=$("#bulbs"), sign=bulbs.parentNode;
+  function placeBulbs(){
+    bulbs.innerHTML=""; var w=sign.offsetWidth+18, h=sign.offsetHeight+18, gap=26, pts=[];
+    for(var x=0;x<=w;x+=gap){pts.push([x,0]);pts.push([x,h]);}
+    for(var y=gap;y<h;y+=gap){pts.push([0,y]);pts.push([w,y]);}
+    pts.forEach(function(p,i){ var b=document.createElement("i"); b.style.left=(p[0]-5)+"px"; b.style.top=(p[1]-5)+"px"; b.style.animationDelay=((i%2)*0.6)+"s"; bulbs.appendChild(b); });
+  }
+  placeBulbs(); addEventListener("resize", placeBulbs);
+
+  // floating hats and bells
+  var fl=$("#float");
+  for(var i=0;i<14;i++){
+    var el = i%3===0 ? document.createElement("img") : document.createElement("b");
+    if(el.tagName==="IMG"){ el.src="assets/brand/suiteface-joker-icon-cream-180.png"; el.alt=""; }
+    el.style.left=(Math.random()*96)+"%"; el.style.animationDuration=(14+Math.random()*16)+"s"; el.style.animationDelay=(-Math.random()*20)+"s";
+    fl.appendChild(el);
+  }
+
+  // checkout links (adds the member id once logins are live)
+  function withRef(url){ var ref=window.SUITEFACE_MEMBER_ID; return ref ? url+(url.indexOf("?")<0?"?":"&")+"client_reference_id="+encodeURIComponent(ref) : url; }
+  var agree=$("#agree"), pay=$("#payEntry");
+  agree.addEventListener("change", function(){ pay.setAttribute("aria-disabled", agree.checked ? "false" : "true"); });
+  pay.addEventListener("click", function(e){
+    e.preventDefault();
+    if(!agree.checked){ toast("Tick the agreement first. The $210 entry is non-refundable."); return; }
+    location.href = withRef(LINKS.entry);
+  });
+  $("#payRemoval").href = withRef(LINKS.removal);
+  $("#payBuyout").href = withRef(LINKS.buyout);
+
+  var qs = new URLSearchParams(location.search);
+  if(qs.get("entry")==="success"){ toast("🎟️ You're in. Your lobby entry is on your account."); }
+  if(qs.get("removal")==="success"){ toast("Lobby Joker removed. You're protected for 45 days."); }
+  if(qs.get("buyout")==="success"){ toast("Public Joker cleared."); }
+
+  // demo lobby floor
+  var REASONS=[["no_show","Stood me up / no-show"],["misrepresented","Profile misrepresentation"],["not_single","Wasn't single"],["money","Asked me for money"],["disrespect","Disrespectful or demeaning"],["pressure","Pushed past my boundaries"],["intentions","Lied about intentions"],["intoxicated","Showed up impaired"],["ghosted_after","Ghosted after commitments"],["catfish","Not the person in the photos"],["spam","Selling or recruiting"],["other_firsthand","Other first-hand conduct"]];
+  var PEOPLE=[["Jordan","jordan.k","35203","Birmingham, AL",31],["Jessie","jess.plays","35209","Homewood, AL",28],["Jamal","jamal_a","35216","Hoover, AL",34],["Jade","jade.r","35205","Birmingham, AL",29],["Jon","jon.d","35124","Pelham, AL",37],["Riley","rileyb","35242","Birmingham, AL",33],["Morgan","morgan.t","35223","Mountain Brook, AL",30]];
+  var mode="name", picked=null, chosen=[], used=0;
+  var rbox=$("#reasons");
+  REASONS.forEach(function(r){ var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=r[1]; b.setAttribute("aria-pressed","false");
+    b.onclick=function(){ var on=b.getAttribute("aria-pressed")==="true"; if(!on && chosen.length>=5){ toast("Pick up to 5 reasons."); return; }
+      b.setAttribute("aria-pressed", on?"false":"true"); chosen = on ? chosen.filter(function(c){return c!==r[0];}) : chosen.concat(r[0]); check(); };
+    rbox.appendChild(b); });
+  function drawCounter(){ var c=$("#counter"); c.innerHTML=""; for(var i=0;i<12;i++){ var s=document.createElement("span"); if(i<used) s.className="used"; c.appendChild(s);} }
+  drawCounter();
+  var PH={name:"Start typing a first name…",handle:"Exact username, like jordan.k",zip:"5-digit ZIP, like 35203",phone:"Exact phone number",email:"Exact email address"};
+  document.querySelectorAll("#tabs button").forEach(function(b){ b.onclick=function(){
+    document.querySelectorAll("#tabs button").forEach(function(x){x.setAttribute("aria-pressed","false");}); b.setAttribute("aria-pressed","true");
+    mode=b.dataset.k; $("#q").value=""; $("#q").placeholder=PH[mode]; $("#results").innerHTML=""; }; });
+  $("#q").addEventListener("input", function(){
+    var q=this.value.trim().toLowerCase(), out=$("#results"); out.innerHTML=""; if(!q) return;
+    var hits=PEOPLE.filter(function(p){
+      if(mode==="name") return p[0].toLowerCase().indexOf(q)===0;
+      if(mode==="handle") return p[1]===q;
+      if(mode==="zip") return p[2]===q;
+      return false; });
+    if((mode==="phone"||mode==="email") && q.length>5){ out.innerHTML='<p class="fine">No match. Phone and email only find people you\'ve played a hand with. (Demo: try Name.)</p>'; return; }
+    hits.forEach(function(p){ var b=document.createElement("button"); b.type="button"; b.className="who"; b.setAttribute("aria-pressed","false");
+      b.innerHTML="<span><b>"+p[0]+"</b> <small>@"+p[1]+"</small></span><small>"+p[3]+" · "+p[4]+"</small>";
+      b.onclick=function(){ document.querySelectorAll(".who").forEach(function(x){x.setAttribute("aria-pressed","false");}); b.setAttribute("aria-pressed","true"); picked=p; check(); };
+      out.appendChild(b); });
+  });
+  ["#statement","#attest"].forEach(function(s){ $(s).addEventListener("input", check); $(s).addEventListener("change", check); });
+  function check(){ $("#deal").disabled = !(picked && chosen.length && $("#statement").value.trim().length>=20 && $("#attest").checked && used<12); }
+  $("#deal").onclick=function(){
+    $("#cardName").textContent=picked[0]; var st=$("#stage"); st.hidden=false; var card=$("#card"); card.classList.remove("flip");
+    st.scrollIntoView({behavior:"smooth",block:"center"});
+    setTimeout(function(){ card.classList.add("flip"); burst(); }, 500);
+    used++; drawCounter(); check();
+    toast("🃏 "+picked[0]+" is a Joker for 45 days (demo, not saved).");
+  };
+  function burst(){ var c=$("#confetti"); var cols=["#C8102E","#E8C46A","#B7D35A","#7A3A92","#2F8A62"]; for(var i=0;i<70;i++){ var p=document.createElement("i"); p.style.left=(Math.random()*100)+"vw"; p.style.background=cols[i%cols.length]; p.style.animationDelay=(Math.random()*.6)+"s"; p.style.transform="rotate("+(Math.random()*360)+"deg)"; c.appendChild(p); setTimeout(function(el){ return function(){ el.remove(); }; }(p), 3400); } }
+  $("#tour").onclick=function(){ $("#floor").hidden=false; $("#modePill").textContent="Demo tour"; $("#floor").scrollIntoView({behavior:"smooth"}); };
+})();
+</script>
+</body>
+</html>
