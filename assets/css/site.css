@@ -857,3 +857,36 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 #lvErr:empty,#lvOk:empty{display:none}
 #lvForm{grid-template-columns:minmax(0,1fr)!important}#lvForm>*{grid-column:1/-1}
 #lvForm .field{grid-template-columns:minmax(0,1fr)}#lvForm .pw input{width:auto}
+
+/* ---------- Casinos ---------- */
+.casgrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;align-items:start}
+@media(max-width:900px){.casgrid{grid-template-columns:minmax(0,1fr)}}
+.casfind{padding:18px;display:grid;gap:14px}
+.casKinds{display:flex;flex-wrap:wrap;gap:6px}
+.casbar{display:flex;gap:8px;flex-wrap:wrap}.casbar input{flex:1 1 140px;min-width:0;width:auto}
+.caslist{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.casempty{grid-column:1/-1;margin:0}
+.cascard{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:6px;align-content:start;padding:14px;border-radius:16px;background:linear-gradient(160deg,rgba(43,39,48,.95),rgba(23,21,27,.95));border:1px solid rgba(232,196,106,.35);box-shadow:0 10px 24px -14px #000;transition:transform .18s,box-shadow .18s,border-color .18s}
+.cascard:hover,.cascard:focus-visible{transform:translateY(-3px);border-color:#E8C46A;box-shadow:0 16px 30px -14px rgba(232,196,106,.45)}
+.cascard:focus-visible{outline:3px solid #FFE7A3;outline-offset:2px}
+.cascard.ex{opacity:.82}
+.casmarq{display:flex;gap:8px;align-items:center;font:900 1.25rem/1.05 "Big Shoulders Display","Arial Narrow",Impact,sans-serif;text-transform:uppercase;letter-spacing:.03em;color:#FFE7A3;text-shadow:0 0 12px rgba(232,196,106,.45)}
+.casmarq i{font-style:normal;font-size:1.1rem}
+.casmeta{font-size:.78rem;color:#A69DB0;text-transform:uppercase;letter-spacing:.08em}
+.casabout{font-size:.92rem;color:#CFC6B6}
+.castables{display:flex;flex-wrap:wrap;gap:5px}.castables em{font-style:normal;font-size:.76rem;padding:3px 8px;border-radius:999px;background:rgba(30,122,76,.28);border:1px solid rgba(30,122,76,.6);color:#FAF7F0}
+.casfoot{font-size:.8rem;color:#A69DB0}.casfoot b{color:#E8C46A}.casfoot .exb{color:#D2622A}
+.casbuild{padding:20px;border-radius:20px;background:radial-gradient(120% 90% at 50% 0%,rgba(155,27,48,.35),transparent 60%),#211d27;border:1px solid rgba(232,196,106,.45);display:grid;gap:12px}
+.casbuild h3{margin:0}.casbuild .ticks{margin:0;padding-left:1.1rem;display:grid;gap:6px;color:#CFC6B6;font-size:.94rem}
+.casign{position:relative;display:grid;justify-items:center;gap:2px;padding:14px 12px;border-radius:14px;background:#2a1418;border:3px solid #B8862F;box-shadow:0 0 0 2px #2a1418,0 0 22px rgba(232,196,106,.4),inset 0 0 18px rgba(0,0,0,.6);text-align:center;overflow:hidden}
+.casign::before{content:"";position:absolute;inset:4px;border-radius:9px;background-image:radial-gradient(circle,#FFE7A3 1.6px,transparent 2.2px);background-size:14px 14px;background-position:0 0;opacity:.35;-webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);-webkit-mask-composite:xor;mask-composite:exclude;padding:3px;animation:casbulbs 1.2s steps(2) infinite}
+@keyframes casbulbs{50%{background-position:7px 0;opacity:.6}}
+.casign span{font:700 .72rem Figtree,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#E8C46A}
+.casign b{font:900 1.7rem/1 "Big Shoulders Display",Impact,sans-serif;color:#FAF7F0;text-shadow:0 0 10px #E8C46A,0 0 22px rgba(194,59,122,.6);letter-spacing:.04em;word-break:break-word}
+.casign.big b{font-size:2.1rem}
+.castbl{list-style:none;margin:0;padding:0;display:grid;gap:6px}.castbl li{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 10px;border-radius:10px;background:rgba(30,122,76,.2);border:1px solid rgba(30,122,76,.5)}.castbl span{color:#A69DB0;font-size:.88rem}
+.casmine,.casreview{margin-top:22px;padding:16px;border-radius:16px;border:1px dashed rgba(232,196,106,.45)}
+.cmpeople{display:grid;gap:6px}.cmrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid rgba(250,247,240,.08)}.cmrow>span{flex:1 1 200px}
+.hint.good{color:#7FD6A4}.hint.bad{color:#E5505E}
+.hostline{margin-top:4px;font:800 .78rem Figtree,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#E8C46A}
+@media (prefers-reduced-motion:reduce){.casign::before{animation:none}.cascard{transition:none}}

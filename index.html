@@ -59,6 +59,7 @@
       <a href="#face" data-need="member">My Face</a>
       <a href="#table" data-need="member">Your 52</a>
       <a href="#map" data-need="member">Map</a>
+      <a href="#casinos">Casinos</a>
       <a href="#invite" data-need="member">Invite</a>
       <a href="joker-lobby.html">🃏 Joker Lobby</a>
       <a href="#membership" data-only="guest">Buy In</a>
@@ -347,6 +348,44 @@
         <div class="map-wrap"><canvas id="mapCanvas" role="img" aria-label="Map of your deck around your ZIP code"></canvas><div class="map-tip" id="mapTip" hidden></div></div>
         <div class="suit-key" id="mapKey"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ CASINOS ============ -->
+  <section id="casinos" aria-labelledby="casTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Casinos · built and run by players</p>
+        <h2 id="casTitle">Not here to date? Build a Casino.</h2>
+        <p class="lede">A Casino is your own group on SuiteFace: a friendship circle, a small group of Christian men, a prayer group, service volunteers, a board-game night, your Greek chapter, alumni or club. You name it, you run it, and it can hold one Game Table or a dozen. Pick the <b>Friendship only</b> Table on your Face and you'll never be dealt into anyone's dating deck.</p>
+      </div>
+      <div class="casgrid">
+        <div class="feltbox casfind">
+          <div class="chips casKinds" id="casKinds" role="group" aria-label="Kind of Casino"></div>
+          <form class="casbar" id="casFind" novalidate>
+            <input type="text" id="casZip" inputmode="numeric" maxlength="5" placeholder="ZIP code" aria-label="ZIP code">
+            <input type="search" id="casQ" maxlength="40" placeholder="Search names" aria-label="Search Casino names">
+            <button class="btn gold sm" type="submit">Find Casinos</button>
+          </form>
+          <div class="caslist" id="casList" aria-live="polite"></div>
+        </div>
+        <aside class="casbuild">
+          <div class="casign" aria-hidden="true"><span>YOUR</span><b>CASINO</b><span>NAME HERE</span></div>
+          <h3>Build your Casino</h3>
+          <div class="pricing"><div><span class="big">$21</span><span class="hint">once · 7 ZIP codes</span></div><div class="plus">+</div><div><span class="big">$2.10</span><span class="hint">per extra ZIP</span></div></div>
+          <ul class="ticks">
+            <li>Your name on the door. You hold the naming rights while it's open.</li>
+            <li>Run as many Game Tables as you like: Tuesday prayer, Saturday service, game night.</li>
+            <li>Choose who can join and approve every request.</li>
+            <li>Your card shows <b>🎰 Host</b> of your Casino.</li>
+            <li>Joining a Casino is always free.</li>
+          </ul>
+          <button class="btn gold" type="button" data-build-casino>Build a Casino · $21</button>
+          <p class="hint">Every name gets a quick check before it opens. See <a href="terms.html" target="_blank" rel="noopener">Terms 4.11</a> and Agreement H.</p>
+        </aside>
+      </div>
+      <div class="casmine" id="casMine" hidden></div>
+      <div class="casreview" id="casReview" hidden></div>
     </div>
   </section>
 

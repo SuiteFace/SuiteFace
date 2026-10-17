@@ -47,5 +47,12 @@
   "when": "Before verifying for, or buying into, the High Roller Room",
   "version": "1.0",
   "html": "<ol>\n<li>I have the ✓ ID Seal and I'm applying to join the High Roller Room.</li>\n<li><strong>If I verify:</strong> I authorize SuiteFace and its partner Stripe to read the balances of the accounts I link, once, or SuiteFace staff to review the statements I upload. Every account and statement is mine (or jointly mine), and everything I submit is genuine and unaltered.</li>\n<li>I understand SuiteFace uses this <strong>only</strong> to check the $1,000,000 total, never shows my balance to anyone, erases the figures once decided, and deletes my statements after review. Verification lasts 12 months.</li>\n<li><strong>If I buy in:</strong> I authorize a one-time charge of <strong>$5,000.00</strong>, which is <strong>non-refundable</strong> except where the law requires.</li>\n<li>False or altered information means removal from the Room and possibly SuiteFace, with no refund.</li>\n<li>I'll never ask another member for money or financial details, and I'll report anyone who asks me.</li>\n</ol>"
+ },
+ "casino": {
+  "letter": "H",
+  "title": "Casino Host Agreement",
+  "when": "Before building a Casino",
+  "version": "1.0",
+  "html": "<ol>\n<li>I'm building a Casino on SuiteFace and I'll be its Host. I'm 18 or older and I've signed the Sign-up Agreement.</li>\n<li>I authorize a one-time charge of <strong>$21.00</strong>, which covers up to 7 ZIP codes, plus a one-time <strong>$2.10 for each additional ZIP code</strong> I add now or later.</li>\n<li>The Casino's name and description are truthful. I won't present it as the official group of any school, chapter, church, business or other organization unless I'm authorized to, and I won't use anyone else's trademark or logo without permission.</li>\n<li>I understand SuiteFace reviews every Casino before it opens and may rename, pause or close it. If it's rejected, I can rename and resubmit free or ask for a refund within 30 days. Otherwise these fees are non-refundable except where the law requires.</li>\n<li>I'll run my Game Tables in public places, follow the House Rules and Safety Guide, never charge members to join through SuiteFace, and remove or report anyone who makes the group unsafe.</li>\n<li>Who may join (everyone, men or women) and whether I approve requests are my choices, and I'll apply them fairly. I won't use the Casino to sell, solicit money, recruit for schemes, or harass anyone.</li>\n</ol>"
  }
 }
