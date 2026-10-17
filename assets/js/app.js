@@ -1833,7 +1833,7 @@
     var look = document.createElement("div"); look.setAttribute("data-tab", "look"); look.className = "form-grid"; look.hidden = true;
     form.insertBefore(look, anchor); form.insertBefore(about, look);
     about.innerHTML = '<p class="hint">Every question is optional and has <b>Prefer not to say</b>. Use the eye to choose what shows on your card: <b>Face Up</b> is shown, <b>Face Down</b> is private but still helps match you.</p>' + groupHTML(false);
-    look.innerHTML = '<p class="hint">Pick what you want, or leave <b>Open to anyone</b>. Turn on <b>Dealbreaker</b> and only people who match will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
+    look.innerHTML = '<p class="hint">Pick what you want, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your 52. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
     bar.addEventListener("click", function (e) {
       var b = e.target.closest("[data-ft]"); if (!b) return; var t = b.getAttribute("data-ft");
       $$("[data-ft]", bar).forEach(function (x) { var on = x === b; x.setAttribute("aria-selected", String(on)); x.setAttribute("aria-pressed", String(on)); });
@@ -1865,7 +1865,7 @@
   }
   function prefField(f) {
     var k = f[0], opts = prefOpts(f);
-    return '<div class="field pf" data-k="' + k + '"><div class="idhead"><span class="lbl">' + f[1].replace(" (check all that apply)", "") + '</span><label class="deal"><input type="checkbox" data-deal="' + k + '"> Dealbreaker</label></div><div class="chips" role="group" aria-label="' + esc(f[1]) + ' preference">' +
+    return '<div class="field pf" data-k="' + k + '"><div class="idhead"><span class="lbl">' + f[1].replace(" (check all that apply)", "") + '</span><label class="deal" title="Only people who match what you picked here can be dealt into your 52"><input type="checkbox" data-deal="' + k + '"> Dealbreaker if not…</label></div><div class="chips" role="group" aria-label="' + esc(f[1]) + ' preference">' +
       [OPEN].concat(opts).map(function (o) { return '<button type="button" class="chip sm" data-pk="' + k + '" data-v="' + esc(o) + '" aria-pressed="false">' + esc(o) + "</button>"; }).join("") + "</div></div>";
   }
   function syncIdentityUI() { if (typeof renderRooms === "function") setTimeout(renderRooms, 0);
