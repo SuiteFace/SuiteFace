@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>How a Card Is Dealt · SuiteFace</title>
+<meta name="description" content="Follow one profile from Face to card: the suit, the house gates, the fit score, the rank, and the card you're dealt.">
+<link rel="icon" href="assets/brand/suiteface-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Concept: the dealer's side of the table. One profile slides down a felt runway, through six stations, and lands face-up as your card. */
+:root{--night:#17151B;--ink:#2B2730;--ink-2:#36313D;--felt:#1E6347;--felt-hi:#2F8A62;--red:#C8102E;--red-soft:#E5505E;--gold:#B8862F;--gold-hi:#E8C46A;
+--cream:#FAF7F0;--cream-dim:#CFC6B6;--muted:#A69DB0;--line:rgba(250,247,240,.12);--card-ink:#2B2730;
+--display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--body:"Figtree","Segoe UI",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--night);color:var(--cream);font:16px/1.55 var(--body);overflow-x:hidden}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+a{color:var(--gold-hi)}:focus-visible{outline:3px solid var(--gold-hi);outline-offset:3px;border-radius:6px}
+h1,h2,h3{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.02em;line-height:1.02;margin:0}
+p{margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.bar{position:sticky;top:0;z-index:20;background:rgba(23,21,27,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.home{display:flex;gap:10px;align-items:center;color:var(--cream);text-decoration:none;font:800 1.3rem var(--display);letter-spacing:.04em}
+.home img{width:34px;height:34px;border-radius:8px}
+.bar nav{display:flex;gap:14px;font-size:.92rem}
+.hero{padding:40px 0 18px}
+.eyebrow{font:800 .9rem var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-hi)}
+.hero h1{font-size:clamp(2.4rem,8vw,4.6rem);margin:.15em 0 .25em}
+.hero h1 span{color:var(--red-soft)}
+.lede{color:var(--cream-dim);max-width:62ch;font-size:1.06rem}
+.pickers{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;align-items:center}
+.pickers b{font:700 .85rem var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-right:4px}
+.pick{appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--ink);color:var(--cream);border-radius:999px;padding:.45rem .9rem;font:600 .95rem var(--body)}
+.pick[aria-pressed="true"]{background:var(--gold);color:#2a1a05;border-color:var(--gold)}
+
+/* runway */
+.runway{display:grid;grid-template-columns:260px 1fr;gap:22px;padding:18px 0 60px}
+@media (max-width:900px){.runway{grid-template-columns:1fr}}
+.stations{list-style:none;margin:0;padding:0;display:grid;gap:8px;align-content:start;position:sticky;top:76px}
+@media (max-width:900px){.stations{position:static;grid-template-columns:repeat(3,1fr)}.stations span.t small{display:none}}
+.stations button{width:100%;text-align:left;appearance:none;cursor:pointer;border:1px solid var(--line);background:var(--ink);color:var(--cream-dim);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;font:600 .95rem var(--body)}
+.stations button .n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--ink-2);color:var(--cream);font:800 1rem var(--display)}
+.stations button[aria-current="step"]{border-color:var(--gold);background:linear-gradient(90deg,rgba(184,134,47,.22),var(--ink));color:var(--cream)}
+.stations button[aria-current="step"] .n{background:var(--gold);color:#2a1a05}
+.stations button.done .n{background:var(--felt-hi)}
+.stations .t small{display:block;color:var(--muted);font-weight:500;font-size:.8rem}
+.stage{background:radial-gradient(ellipse at 50% 0%,#2a7a58,var(--felt) 55%,#154a35);border:10px solid #3a2a1a;border-radius:28px;box-shadow:inset 0 0 60px rgba(0,0,0,.45),0 20px 60px rgba(0,0,0,.45);padding:clamp(16px,3vw,30px);min-height:560px;position:relative;overflow:hidden}
+.stage h2{font-size:clamp(1.8rem,4.5vw,2.6rem);color:var(--cream);text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.stage .why{color:#dbeee4;margin:.4rem 0 1rem;max-width:62ch}
+.step{animation:in .45s ease both}@keyframes in{from{opacity:0;transform:translateY(12px)}}
+.nav2{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+.btn{appearance:none;border:0;cursor:pointer;font:800 1.05rem var(--display);text-transform:uppercase;letter-spacing:.1em;padding:.75rem 1.2rem;border-radius:12px;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+.btn.gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#2a1a05}
+.btn.ghost{background:rgba(23,21,27,.35);color:var(--cream);border:1px solid rgba(250,247,240,.25)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* paper pieces on the felt */
+.paper{background:var(--cream);color:var(--card-ink);border-radius:14px;padding:16px;box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.paper h3{font-size:1.3rem;color:var(--card-ink)}
+.cols{display:grid;gap:16px;grid-template-columns:1fr 1fr}@media (max-width:700px){.cols{grid-template-columns:1fr}}
+.face{display:flex;gap:14px;align-items:center}
+.av{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;font:900 1.8rem var(--display);color:var(--cream);flex:none}
+.kv{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;margin-top:12px;font-size:.93rem;align-items:center}
+.kv dt{color:#6b6470;font-weight:600}.kv dd{margin:0}
+.fu{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.fu.up{background:#dff3e8;color:#1E6347}.fu.down{background:#ece6dc;color:#6b6470}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips span{background:#efe8da;border-radius:999px;padding:3px 9px;font-size:.85rem}
+.chips span.hit{background:var(--felt-hi);color:var(--cream)}
+
+/* suit tally */
+.tally{display:grid;gap:10px;margin-top:6px}
+.trow{display:grid;grid-template-columns:110px 1fr 34px;gap:10px;align-items:center;font-weight:700}
+.trow .sym{font:900 1.4rem var(--display)}
+.track{height:18px;background:#e6dfd2;border-radius:999px;overflow:hidden}
+.fill{height:100%;border-radius:999px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.win{outline:3px solid var(--gold);outline-offset:4px;border-radius:8px}
+.answers{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:12px}
+.answers i{font-style:normal;text-align:center;font:900 1.05rem var(--display);background:#efe8da;border-radius:6px;padding:4px 0;opacity:0;transform:translateY(-6px);transition:all .3s}
+.answers i.on{opacity:1;transform:none}
+
+/* gates */
+.gates{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.gates li{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;background:#fff;border-radius:10px;padding:10px 12px;opacity:.25;transition:opacity .35s}
+.gates li.show{opacity:1}
+.gates .mark{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:var(--cream)}
+.gates .ok .mark{background:var(--felt-hi)}.gates .no .mark{background:var(--red)}
+.gates small{color:#6b6470;display:block}
+.verdict{margin-top:12px;font:800 1.4rem var(--display);text-transform:uppercase}
+
+/* fit */
+.fit{display:grid;gap:12px}
+.frow{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center}
+.frow b{font-size:.95rem}.frow small{display:block;color:#6b6470;font-weight:500}
+.frow .pts{font:900 1.3rem var(--display);text-align:right}
+.total{display:flex;justify-content:space-between;align-items:baseline;border-top:2px dashed #cfc6b6;padding-top:10px;margin-top:4px}
+.total span{font:900 2.6rem var(--display);color:var(--felt)}
+
+/* rank ladder */
+.ladder{display:grid;grid-template-columns:repeat(13,1fr);gap:5px;margin-top:10px}
+.slot{aspect-ratio:5/7;border-radius:7px;background:#fff;display:grid;place-items:center;font:900 1rem var(--display);color:#9a93a3;border:2px solid #e2dbcf;position:relative}
+.slot.face{background:#fbf3df;border-color:#e7cf95}
+.slot.them{background:var(--gold);color:#2a1a05;border-color:var(--gold-hi);transform:translateY(-8px);box-shadow:0 8px 18px rgba(0,0,0,.35)}
+.slot.filled{color:var(--card-ink)}
+@media (max-width:560px){.ladder{grid-template-columns:repeat(7,1fr)}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:.85rem;color:#4a4552}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:5px}
+
+/* the card */
+.deal{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center}@media (max-width:760px){.deal{grid-template-columns:1fr;justify-items:center}}
+.pc{width:250px;height:350px;perspective:1100px}
+.pc .in{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1.1s cubic-bezier(.3,1.3,.5,1)}
+.pc.flip .in{transform:rotateY(180deg)}
+.pc .sd{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;box-shadow:0 22px 50px rgba(0,0,0,.5)}
+.pc .back{background:repeating-linear-gradient(45deg,#7a1020 0 10px,#9b1428 10px 20px);border:8px solid var(--cream)}
+.pc .back::after{content:"";position:absolute;inset:28%;border-radius:50%;background:url(assets/brand/suiteface-joker-icon-cream-180.png) center/cover;box-shadow:0 0 0 6px var(--cream)}
+.pc .front{transform:rotateY(180deg);background:var(--cream);color:var(--card-ink);padding:14px;display:grid;grid-template-rows:auto 1fr auto}
+.pc .corner{font:900 1.7rem/0.9 var(--display);display:flex;flex-direction:column;align-items:center;width:34px}
+.pc .corner.br{position:absolute;right:14px;bottom:14px;transform:rotate(180deg)}
+.pc .mid{display:grid;place-items:center;text-align:center;gap:6px;padding-bottom:30px}
+.pc .mid .av{width:92px;height:92px;font-size:2.3rem;margin:0 auto}
+.pc .nm{font:900 1.6rem var(--display);text-transform:uppercase}
+.pc .meta{font-size:.85rem;color:#4a4552}
+.pc .ver{position:absolute;top:14px;right:14px;background:var(--gold);color:#2a1a05;font:800 .72rem var(--body);padding:3px 8px;border-radius:999px}
+.pc .jm{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font:800 .75rem var(--body);background:#efe8da;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.why2{display:grid;gap:10px}
+.why2 .paper{padding:12px 14px}
+.pair{margin-top:14px;background:rgba(23,21,27,.35);border:1px solid rgba(250,247,240,.25);border-radius:14px;padding:12px 14px;color:#e8f4ee}
+.not{background:var(--cream);color:var(--card-ink);border-radius:14px;padding:18px;text-align:center}
+.not h3{font-size:1.8rem;color:var(--red)}
+footer{padding:10px 0 50px;color:var(--muted);font-size:.88rem;text-align:center}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap"><a class="home" href="./"><img src="assets/brand/suiteface-joker-icon-cream-180.png" alt="">SuiteFace</a>
+<nav><a href="./#quiz">Find your suit</a><a href="legal.html">Legal</a></nav></div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Behind the dealer's hands</div>
+    <h1>How a card is <span>dealt</span></h1>
+    <p class="lede">Follow one person from their profile to the card in your hand: which suit they play, the house gates they pass, how well they fit you, and why they land as a King and not a 7.</p>
+    <div class="pickers" role="group" aria-label="Choose a profile to follow">
+      <b>You are Taylor. Follow:</b>
+      <button class="pick" type="button" data-p="0" aria-pressed="true">Jordan</button>
+      <button class="pick" type="button" data-p="1" aria-pressed="false">Maya</button>
+      <button class="pick" type="button" data-p="2" aria-pressed="false">Chris</button>
+    </div>
+  </section>
+
+  <section class="runway">
+    <ol class="stations" id="stations"></ol>
+    <div class="stage" id="stage" aria-live="polite"></div>
+  </section>
+</main>
+<footer>Sample people, all fictional. The live deck uses the same steps and the same scoring. <a href="joker-rules.html">Joker Rules</a> · <a href="terms.html">Terms</a></footer>
+
+<script>
+(function(){
+  var SUITS={heart:{sym:"♥",name:"Heart",red:true,blurb:"Warm, loyal, leads with feeling."},diamond:{sym:"♦",name:"Diamond",red:true,blurb:"Driven, decisive, plans the date."},club:{sym:"♣",name:"Club",red:false,blurb:"Social spark, up for anything."},spade:{sym:"♠",name:"Spade",red:false,blurb:"Steady, thoughtful, built to last."}};
+  var RANKS=["A","K","Q","J","10","9","8","7","6","5","4","3","2"];
+  var ME={name:"Taylor",age:31,gender:"woman",zip:"35203",city:"Birmingham, AL",lat:33.52,lon:-86.80,lookingFor:"serious",interests:["Hiking","Live music","Cooking","Dogs","Travel"],
+    showMe:"everyone",ageMin:26,ageMax:38,radius:50,dealbreakers:{kids:["Want kids","Open to kids"]},trumps:["heart","diamond","club","spade"]};
+  var P=[
+    {name:"Jordan",age:33,gender:"man",zip:"35209",city:"Homewood, AL",lat:33.47,lon:-86.81,suit:"heart",color:"#C8102E",verified:true,lookingFor:"serious",
+     interests:["Hiking","Live music","Football","Coffee"],answers:"hhdhchshhdhc",wantsToSee:"women",jokers:0,
+     identity:[["Height",'5\'11"',true],["Faith","Christian · Baptist",true],["Kids","Want kids",true],["Education","Bachelor's",true],["Income","Prefer not to say",false],["Politics","Moderate",false]],
+     pool:21,poolAhead:1},
+    {name:"Maya",age:29,gender:"woman",zip:"35124",city:"Pelham, AL",lat:33.29,lon:-86.81,suit:"club",color:"#2F8A62",verified:false,lookingFor:"seeing",
+     interests:["Live music","Trivia","Travel","Brunch"],answers:"cchcdcsccdch",wantsToSee:"everyone",jokers:1,
+     identity:[["Height",'5\'5"',true],["Faith","Spiritual",true],["Kids","Open to kids",true],["Drinks","Socially",true],["Income","Prefer not to say",false]],
+     pool:34,poolAhead:2},
+    {name:"Chris",age:41,gender:"man",zip:"35242",city:"Birmingham, AL",lat:33.42,lon:-86.67,suit:"spade",color:"#4A4552",verified:true,lookingFor:"serious",
+     interests:["Golf","Cooking","Dogs"],answers:"sdsshsdscsss",wantsToSee:"women",jokers:0,
+     identity:[["Height",'6\'1"',true],["Kids","Don't want kids",false],["Faith","Catholic",true]],
+     pool:18,poolAhead:2}
+  ];
+  var STEPS=[["Their Face","What they shared"],["Their suit","From their quiz"],["House gates","Pass or not dealt"],["Fit score","0 to 100, for you"],["Their rank","Ace to 2"],["Your card","Dealt face up"]];
+  var cur=0, who=0;
+
+  function miles(a,b,c,d){var R=3958.8,t=Math.PI/180,x=Math.sin((c-a)*t/2),y=Math.sin((d-b)*t/2);return 2*R*Math.asin(Math.min(1,Math.sqrt(x*x+Math.cos(a*t)*Math.cos(c*t)*y*y)));}
+  function hash(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Math.abs(h);}
+  function calc(p){
+    var d=miles(ME.lat,ME.lon,p.lat,p.lon), shared=p.interests.filter(function(x){return ME.interests.indexOf(x)>-1;});
+    var mid=(ME.ageMin+ME.ageMax)/2, half=(ME.ageMax-ME.ageMin)/2+1;
+    var parts=[
+      ["Shared interests", Math.round(34*shared.length/Math.max(1,Math.min(5,ME.interests.length))*10)/10, 34, shared.length+" in common"+(shared.length?": "+shared.join(", "):"")],
+      ["Looking for", p.lookingFor===ME.lookingFor?24:0, 24, p.lookingFor===ME.lookingFor?"You both want something serious":"You want serious; they're seeing where it goes"],
+      ["Closeness", Math.round(20*(1-d/ME.radius)*10)/10, 20, "About "+Math.max(1,Math.round(d))+" mi, inside your "+ME.radius+" mi"],
+      ["Age fit", Math.round(12*Math.max(0,1-Math.abs(p.age-mid)/half)*10)/10, 12, p.age+", your range "+ME.ageMin+"–"+ME.ageMax],
+      ["House tiebreak", Math.round(10*(hash(p.name+ME.name)%1000)/1000*10)/10, 10, "Keeps ties fair, same every deal"]
+    ];
+    var total=Math.min(100,Math.round(parts.reduce(function(s,x){return s+x[1];},0)));
+    var kidAns=(p.identity.filter(function(x){return x[0]==="Kids";})[0]||[])[1];
+    var gates=[
+      ["Active member", true, "Paid seat, not paused"],
+      ["Within your distance", d<=ME.radius, "About "+Math.max(1,Math.round(d))+" mi of "+ME.radius+" mi (ZIP "+p.zip+" to "+ME.zip+")"],
+      ["In your age range", p.age>=ME.ageMin&&p.age<=ME.ageMax, p.age+" vs "+ME.ageMin+"–"+ME.ageMax],
+      ["They want to see you too", p.wantsToSee==="everyone"||p.wantsToSee==="women", "Both people's settings must fit"],
+      ["Your dealbreakers", !kidAns||ME.dealbreakers.kids.indexOf(kidAns)>-1, "Kids: you only want people who want or are open to kids"+(kidAns?" · they said: "+kidAns:"")],
+      ["Not burned, blocked or reported", true, "Burned cards never come back"]
+    ];
+    var pass=gates.every(function(g){return g[1];});
+    var idx=Math.min(12,p.poolAhead), rank=RANKS[idx];
+    if(!p.verified && idx<4){ idx=4; rank=RANKS[4]; }
+    return {d:d,shared:shared,parts:parts,total:total,gates:gates,pass:pass,rank:rank,idx:idx,capped:!p.verified&&p.poolAhead<4,natural:p.poolAhead};
+  }
+  function tallySuit(p){var t={heart:0,diamond:0,club:0,spade:0},m={h:"heart",d:"diamond",c:"club",s:"spade"};p.answers.split("").forEach(function(c){t[m[c]]++;});return t;}
+  function esc(s){return String(s).replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+  function initials(n){return n.slice(0,1).toUpperCase();}
+
+  var st=document.getElementById("stations"), stage=document.getElementById("stage");
+  function drawStations(){
+    st.innerHTML=STEPS.map(function(s,i){return '<li><button type="button" data-i="'+i+'"'+(i===cur?' aria-current="step"':"")+(i<cur?' class="done"':"")+'><span class="n">'+(i<cur?"✓":i+1)+'</span><span class="t">'+s[0]+'<small>'+s[1]+'</small></span></button></li>';}).join("");
+  }
+  st.addEventListener("click",function(e){var b=e.target.closest("[data-i]");if(b){cur=+b.dataset.i;render();}});
+  document.querySelectorAll(".pick").forEach(function(b){b.onclick=function(){document.querySelectorAll(".pick").forEach(function(x){x.setAttribute("aria-pressed","false");});b.setAttribute("aria-pressed","true");who=+b.dataset.p;cur=0;render();};});
+
+  function nav(){return '<div class="nav2"><button class="btn ghost" type="button" data-go="-1"'+(cur===0?" disabled":"")+'>‹ Back</button>'+(cur<STEPS.length-1?'<button class="btn gold" type="button" data-go="1">Next: '+STEPS[cur+1][0]+' ›</button>':'<a class="btn gold" href="./#quiz">Find your own suit ›</a>')+'</div>';}
+  stage.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b){cur=Math.max(0,Math.min(STEPS.length-1,cur+ +b.dataset.go));render();stage.scrollIntoView({behavior:"smooth",block:"start"});}});
+
+  function render(){
+    drawStations(); var p=P[who], c=calc(p), s=SUITS[p.suit], html="";
+    if(cur===0){
+      html='<h2>Station 1 · '+esc(p.name)+'\'s Face</h2><p class="why">This is what '+esc(p.name)+' filled in. <b>Face Up</b> answers show on the card. <b>Face Down</b> answers stay private and are only used for matching.</p>'+
+      '<div class="cols"><div class="paper"><div class="face"><div class="av" style="background:'+p.color+'">'+initials(p.name)+'</div><div><h3>'+esc(p.name)+', '+p.age+'</h3><div style="color:#4a4552">'+esc(p.city)+' · ZIP '+p.zip+'</div>'+(p.verified?'<div style="margin-top:4px;font-weight:700;color:#8a6420">✓ ID verified</div>':'<div style="margin-top:4px;color:#6b6470">Not ID verified</div>')+'</div></div>'+
+      '<dl class="kv">'+p.identity.map(function(x){return '<dt>'+x[0]+'</dt><dd>'+esc(x[1])+'</dd><dd><span class="fu '+(x[2]?"up":"down")+'">'+(x[2]?"Face Up":"Face Down")+'</span></dd>';}).join("")+'</dl></div>'+
+      '<div class="paper"><h3>Interests</h3><div class="chips" style="margin:8px 0 14px">'+p.interests.map(function(x){return '<span>'+esc(x)+'</span>';}).join("")+'</div><h3>Looking for</h3><p style="margin:6px 0 14px">'+(p.lookingFor==="serious"?"Something serious":"Seeing where it goes")+'</p><h3>Who they want to see</h3><p style="margin-top:6px">'+(p.wantsToSee==="everyone"?"Everyone":"Women")+'</p></div></div>';
+    } else if(cur===1){
+      var t=tallySuit(p), max=Math.max(t.heart,t.diamond,t.club,t.spade);
+      html='<h2>Station 2 · Their suit</h2><p class="why">'+esc(p.name)+' answered the 12-question SuiteFace quiz. Each answer leans toward one suit. The suit with the most answers becomes their card\'s suit. That\'s their style, not a score.</p>'+
+      '<div class="paper"><h3>Their 12 answers</h3><div class="answers" id="ans">'+p.answers.split("").map(function(ch){var k={h:"heart",d:"diamond",c:"club",s:"spade"}[ch];return '<i style="color:'+(SUITS[k].red?"var(--red)":"var(--card-ink)")+'">'+SUITS[k].sym+'</i>';}).join("")+'</div>'+
+      '<div class="tally" style="margin-top:16px">'+["heart","diamond","club","spade"].map(function(k){return '<div class="trow'+(k===p.suit?" win":"")+'"><span><span class="sym" style="color:'+(SUITS[k].red?"var(--red)":"var(--card-ink)")+'">'+SUITS[k].sym+'</span> '+SUITS[k].name+'</span><div class="track"><div class="fill" data-w="'+(t[k]/12*100)+'" style="background:'+(SUITS[k].red?"var(--red)":"var(--card-ink)")+'"></div></div><span>'+t[k]+'</span></div>';}).join("")+'</div>'+
+      '<p style="margin-top:14px"><b>'+esc(p.name)+' plays '+s.name+'s '+s.sym+'.</b> '+s.blurb+' In your deck, '+s.name+'s are your #'+(ME.trumps.indexOf(p.suit)+1)+' trump.</p></div>';
+    } else if(cur===2){
+      html='<h2>Station 3 · The house gates</h2><p class="why">Before anyone is scored, they have to pass every gate, for you <b>and</b> for them. Miss one and they\'re simply not dealt. No one is told why.</p>'+
+      '<div class="paper"><ul class="gates">'+c.gates.map(function(g){return '<li class="'+(g[1]?"ok":"no")+'"><span class="mark">'+(g[1]?"✓":"✕")+'</span><span><b>'+g[0]+'</b><small>'+esc(g[2])+'</small></span><span>'+(g[1]?"Pass":"Stop")+'</span></li>';}).join("")+'</ul>'+
+      '<div class="verdict" style="color:'+(c.pass?"var(--felt)":"var(--red)")+'">'+(c.pass?"All gates passed. On to scoring.":esc(p.name)+" isn't dealt to you.")+'</div></div>';
+    } else if(cur===3){
+      if(!c.pass){ html='<h2>Station 4 · Fit score</h2><div class="not"><h3>Not dealt</h3><p>'+esc(p.name)+' stopped at a house gate, so there\'s no score and no card. Try Jordan or Maya to see the full deal.</p></div>'; }
+      else html='<h2>Station 4 · Fit score</h2><p class="why">Now SuiteFace scores how well '+esc(p.name)+' fits <b>your</b> settings, out of 100. Someone else would see a different score for the same person: same deck, different hands.</p>'+
+      '<div class="paper fit">'+c.parts.map(function(x){return '<div class="frow"><b>'+x[0]+'<small>'+esc(x[3])+'</small></b><div class="track"><div class="fill" data-w="'+(x[1]/x[2]*100)+'" style="background:var(--felt-hi)"></div></div><span class="pts">'+x[1]+'<small style="font:600 .75rem var(--body);color:#6b6470"> / '+x[2]+'</small></span></div>';}).join("")+
+      '<div class="total"><b style="font:800 1.4rem var(--display);text-transform:uppercase">Fit for Taylor</b><span>'+c.total+'</span></div></div>';
+    } else if(cur===4){
+      if(!c.pass){ html='<h2>Station 5 · Rank</h2><div class="not"><h3>Not dealt</h3><p>No rank without passing the gates.</p></div>'; }
+      else html='<h2>Station 5 · Their rank</h2><p class="why">Everyone who passed the gates is lined up <b>by suit</b>, highest fit first. The top 13 in each suit become Ace through 2. That\'s 52 cards: your deck. <b>Ace, King, Queen and Jack are face cards: only ID-verified members can hold them.</b></p>'+
+      '<div class="paper"><h3>'+s.name+'s '+s.sym+' near you: '+p.pool+' passed the gates</h3><div class="ladder">'+RANKS.map(function(r,i){return '<div class="slot '+(i<4?"face ":"")+(i===c.idx?"them":"filled")+'" title="'+r+'">'+r+'<span style="font-size:.8em;color:'+(s.red?"var(--red)":"inherit")+'">'+s.sym+'</span></div>';}).join("")+'</div>'+
+      '<div class="legend"><span><i style="background:#fbf3df;border:1px solid #e7cf95"></i>Face cards: verified only</span><span><i style="background:var(--gold)"></i>'+esc(p.name)+'</span></div>'+
+      '<p style="margin-top:12px">'+(!c.capped?esc(p.name)+' has the #'+(c.idx+1)+' fit among '+s.name+'s for you, so they\'re your <b>'+c.rank+s.sym+'</b>.':esc(p.name)+'\'s fit is #'+(c.natural+1)+', worth a '+RANKS[c.natural]+', but they haven\'t verified their ID, so the highest they can hold is <b>10</b>. They land as your <b>'+c.rank+s.sym+'</b>. Verifying would move them up.')+' The other '+(p.pool-13)+' '+s.name+'s wait in the shoe for your next deal.</p></div>';
+    } else {
+      if(!c.pass){ html='<h2>Station 6 · Your card</h2><div class="not"><h3>No card</h3><p>'+esc(p.name)+' isn\'t in your 52. Pick Jordan or Maya above to watch a card get dealt.</p></div>'; }
+      else {
+        var up=p.identity.filter(function(x){return x[2];});
+        html='<h2>Station 6 · Your card</h2><p class="why">Here\'s '+esc(p.name)+' in your hand, exactly as you\'d see it. Tap the card to flip it.</p>'+
+        '<div class="deal"><button class="pc" id="pc" type="button" aria-label="Flip the card" style="border:0;background:none;padding:0;cursor:pointer"><div class="in"><div class="sd back"></div><div class="sd front">'+
+          '<div class="corner" style="color:'+(s.red?"var(--red)":"var(--card-ink)")+'">'+c.rank+'<span>'+s.sym+'</span></div>'+
+          (p.verified?'<span class="ver">✓ Verified</span>':"")+
+          '<div class="mid"><div class="av" style="background:'+p.color+'">'+initials(p.name)+'</div><div class="nm">'+esc(p.name)+', '+p.age+'</div><div class="meta">'+esc(p.city.split(",")[0])+' · about '+Math.max(1,Math.round(c.d))+' mi</div><div class="chips" style="justify-content:center">'+c.shared.slice(0,2).map(function(x){return '<span class="hit">'+esc(x)+'</span>';}).join("")+'</div></div>'+
+          '<div class="corner br" style="color:'+(s.red?"var(--red)":"var(--card-ink)")+'">'+c.rank+'<span>'+s.sym+'</span></div>'+
+          '<span class="jm">Joker meter '+p.jokers+'/10</span></div></div></button>'+
+        '<div class="why2"><div class="paper"><b>Why '+c.rank+s.sym+'?</b> '+s.name+'s are your #'+(ME.trumps.indexOf(p.suit)+1)+' trump; fit '+c.total+' for you; #'+(c.idx+1)+' of '+p.pool+' '+s.name+'s nearby'+(c.capped?"; would be "+RANKS[c.natural]+s.sym+" but capped at 10 until verified":"")+'.</div>'+
+        '<div class="paper"><b>On the card (Face Up):</b> '+up.map(function(x){return esc(x[0]+": "+x[1]);}).join(" · ")+'</div>'+
+        '<div class="paper"><b>Never on the card:</b> exact location, phone, last name, Face Down answers, who they\'ve burned, or who made a Joker.</div>'+
+        '<div class="pair">If '+esc(p.name)+' plays you too, it\'s a <b>Pair</b>. You hold '+esc(p.name)+' as <b>'+c.rank+s.sym+'</b>; they hold you by your own suit and fit for them, maybe a different rank. Then: chat at the Side Table, check in together, and <b>Play Hand</b>.</div></div></div>';
+      }
+    }
+    stage.innerHTML='<div class="step">'+html+nav()+'</div>';
+    setTimeout(function(){
+      stage.querySelectorAll(".fill").forEach(function(f){f.style.width=f.dataset.w+"%";});
+      stage.querySelectorAll(".answers i").forEach(function(i,n){setTimeout(function(){i.classList.add("on");},n*70);});
+      stage.querySelectorAll(".gates li").forEach(function(li,n){setTimeout(function(){li.classList.add("show");},n*220);});
+      var pc=document.getElementById("pc"); if(pc){ setTimeout(function(){pc.classList.add("flip");},450); pc.onclick=function(){pc.classList.toggle("flip");}; }
+    },60);
+  }
+  render();
+})();
+</script>
+</body>
+</html>

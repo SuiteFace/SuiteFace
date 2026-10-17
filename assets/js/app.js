@@ -175,41 +175,93 @@
     ["What wears you out…", { diamond: "Indecision", club: "Too much routine", heart: "Conflict", spade: "Sloppiness" }],
     ["Your relationship motto…", { diamond: "Let's build something", club: "Let's have fun", heart: "Let's take care of each other", spade: "Let's get it right" }]
   ];
-  var qa = S.get("quiz", []), qi = Math.min(qa.length, Q.length);
+  /* Words: how you see yourself, how friends and family see you, and (last) your biggest fault. Each word leans toward a suit. */
+  var WORDS = {
+    diamond: ["Driven", "Decisive", "Confident", "Ambitious", "Direct", "Bold"],
+    club: ["Outgoing", "Playful", "Spontaneous", "Funny", "Energetic", "Charming"],
+    heart: ["Caring", "Loyal", "Patient", "Warm", "Easygoing", "Supportive"],
+    spade: ["Thoughtful", "Organized", "Reliable", "Detail-oriented", "Calm", "Honest"]
+  };
+  var FAULTS = {
+    diamond: ["Impatient", "Controlling", "Stubborn"],
+    club: ["Scattered", "Impulsive", "Easily bored"],
+    heart: ["People-pleaser", "Avoids conflict", "Too sensitive"],
+    spade: ["Overthinker", "Perfectionist", "Guarded"]
+  };
+  function suitOf(word, table) { var f = ""; ORDER.forEach(function (k) { if (table[k].indexOf(word) > -1) f = k; }); return f; }
+  function wordList(table) { var all = []; ORDER.forEach(function (k) { all = all.concat(table[k]); }); return all.sort(function (a, b) { return (hash(a) % 97) - (hash(b) % 97); }); }
+  var STEPS_Q = 2 + Q.length + 1; // self words, others' words, 12 questions, biggest fault
+  var qa = S.get("quiz", []), qw = S.get("quizWords", { self: [], others: [], fault: "" });
+  var qi = qw.fault ? STEPS_Q : Math.min(qw.others.length ? 2 + qa.length : (qw.self.length ? 1 : 0), STEPS_Q - 1);
+  function saveQW() { S.set("quizWords", qw); }
+  function resetQuiz() { qa = []; qw = { self: [], others: [], fault: "" }; qi = 0; S.set("quiz", qa); saveQW(); renderQ(); }
   function shuffled(i) { var o = ORDER.slice(); var r = i * 7 + 3; for (var k = 3; k > 0; k--) { r = (r * 31 + 11) % 97; var j = r % (k + 1); var tmp = o[k]; o[k] = o[j]; o[j] = tmp; } return o; }
+  function wordStep(key, title, hint) {
+    var picked = qw[key];
+    $("#qText").textContent = title;
+    $("#qAnswers").innerHTML = '<p class="qhint">' + hint + ' <b id="wCount">' + picked.length + ' of 5</b></p><div class="words">' + wordList(WORDS).map(function (w) {
+      return '<button class="ans word' + (picked.indexOf(w) > -1 ? " picked" : "") + '" type="button" aria-pressed="' + (picked.indexOf(w) > -1) + '" data-w="' + esc(w) + '">' + esc(w) + "</button>";
+    }).join("") + '</div><button class="btn gold sm qnext" type="button" data-next' + (picked.length >= 3 ? "" : " disabled") + ">Next</button>";
+  }
   function renderQ() {
-    if (qi >= Q.length) { showResult(); return; }
+    if (qi >= STEPS_Q) { showResult(); return; }
     $("#quizBox").hidden = false; $("#quizResult").hidden = true;
-    $("#qCount").textContent = "Question " + (qi + 1) + " of " + Q.length;
-    $("#qMeter").style.width = (qi / Q.length * 100) + "%";
-    $("#qText").textContent = Q[qi][0];
-    $("#qAnswers").innerHTML = shuffled(qi).map(function (s) {
-      return '<button class="ans' + (qa[qi] === s ? " picked" : "") + '" type="button" data-s="' + s + '">' + esc(Q[qi][1][s]) + "</button>";
-    }).join("");
+    $("#qCount").textContent = "Step " + (qi + 1) + " of " + STEPS_Q;
+    $("#qMeter").style.width = (qi / STEPS_Q * 100) + "%";
     $("#qBack").disabled = qi === 0;
+    if (qi === 0) return wordStep("self", "Pick the words that describe you", "How do you see yourself? Choose 3 to 5.");
+    if (qi === 1) return wordStep("others", "How do your friends and family describe you?", "Pick the words they'd use, even if they're different from yours. Choose 3 to 5.");
+    if (qi === STEPS_Q - 1) {
+      $("#qText").textContent = "The hardest question at the table";
+      $("#qAnswers").innerHTML = '<p class="qhint">Honesty and a little humility go a long way. Which word is most likely your <b>biggest fault</b>? Pick one. It stays <b>Face Down</b> (private) unless you choose to show it.</p><div class="words">' +
+        wordList(FAULTS).map(function (w) { return '<button class="ans word fault' + (qw.fault === w ? " picked" : "") + '" type="button" data-f="' + esc(w) + '">' + esc(w) + "</button>"; }).join("") + "</div>";
+      return;
+    }
+    var n = qi - 2;
+    $("#qText").textContent = Q[n][0];
+    $("#qAnswers").innerHTML = shuffled(n).map(function (s) {
+      return '<button class="ans' + (qa[n] === s ? " picked" : "") + '" type="button" data-s="' + s + '">' + esc(Q[n][1][s]) + "</button>";
+    }).join("");
   }
   $("#qAnswers").addEventListener("click", function (e) {
-    var b = e.target.closest(".ans"); if (!b) return;
-    b.classList.add("picked"); qa[qi] = b.getAttribute("data-s"); qa.length = qi + 1; S.set("quiz", qa);
+    var w = e.target.closest("[data-w]"), f = e.target.closest("[data-f]"), nx = e.target.closest("[data-next]"), b = e.target.closest("[data-s]");
+    if (w) {
+      var key = qi === 0 ? "self" : "others", list = qw[key], v = w.getAttribute("data-w"), at = list.indexOf(v);
+      if (at > -1) list.splice(at, 1); else { if (list.length >= 5) { toast("Pick up to 5. Tap one to swap it out."); return; } list.push(v); }
+      w.classList.toggle("picked", at < 0); w.setAttribute("aria-pressed", at < 0); saveQW();
+      $("#wCount").textContent = list.length + " of 5"; $("[data-next]", $("#qAnswers")).disabled = list.length < 3; return;
+    }
+    if (nx) { qi++; renderQ(); return; }
+    if (f) { qw.fault = f.getAttribute("data-f"); saveQW(); f.classList.add("picked"); setTimeout(function () { qi++; renderQ(); }, REDUCED ? 0 : 260); return; }
+    if (!b) return;
+    b.classList.add("picked"); qa[qi - 2] = b.getAttribute("data-s"); qa.length = qi - 1; S.set("quiz", qa);
     setTimeout(function () { qi++; renderQ(); }, REDUCED ? 0 : 220);
   });
   $("#qBack").addEventListener("click", function () { if (qi > 0) { qi--; renderQ(); } });
-  $("#qRestart").addEventListener("click", function () { qa = []; qi = 0; S.set("quiz", qa); renderQ(); });
+  $("#qRestart").addEventListener("click", resetQuiz);
   function showResult() {
-    var c = { diamond: 0, club: 0, heart: 0, spade: 0 }; qa.forEach(function (s) { c[s]++; });
+    var c = { diamond: 0, club: 0, heart: 0, spade: 0 };
+    qa.forEach(function (s) { c[s] += 1; });
+    qw.self.concat(qw.others).forEach(function (w) { var k = suitOf(w, WORDS); if (k) c[k] += 0.5; });
+    var fk = suitOf(qw.fault, FAULTS); if (fk) c[fk] += 0.5;
+    var tot = ORDER.reduce(function (a, k) { return a + c[k]; }, 0) || 1;
     var top = ORDER.slice().sort(function (a, b) { return c[b] - c[a]; })[0];
+    var both = qw.self.filter(function (w) { return qw.others.indexOf(w) > -1; });
     $("#quizBox").hidden = true; var R = $("#quizResult"); R.hidden = false;
     R.innerHTML = '<span class="big" style="color:' + suitColor(top) + '">' + pip(top, "big") + '</span><div class="form-grid" style="gap:10px"><p class="eyebrow">Your suit</p><h3 style="font-size:2.4rem">' +
       SUIT[top].sym + " You're a " + SUIT[top].name + "</h3><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
-      ORDER.map(function (s) { return '<div class="bar"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + Math.round(c[s] / Q.length * 100) + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + Math.round(c[s] / Q.length * 100) + "%</span></div>"; }).join("") +
-      '</div><div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
+      ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); return '<div class="bar"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") +
+      '</div><div class="selfwords"><p><b>You see yourself as:</b> ' + esc(qw.self.join(", ")) + '</p><p><b>Friends and family say:</b> ' + esc(qw.others.join(", ")) + "</p>" +
+      (both.length ? '<p class="hint">You and the people who know you best agree on <b>' + esc(both.join(", ")) + "</b>. That's the real you.</p>" : '<p class="hint">You and the people who know you see different sides of you. Both belong on your card.</p>') +
+      '<p><b>Your honest fault:</b> ' + esc(qw.fault) + ' <span class="hint">· Face Down (private). Owning it is a strong play.</span></p></div>' +
+      '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
       ORDER.filter(function (s) { return s !== top; }).map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
       '<button class="btn ghost sm" type="button" id="retake">Retake</button></div></div>';
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
-    $("#retake").addEventListener("click", function () { qa = []; qi = 0; S.set("quiz", qa); renderQ(); });
+    $("#retake").addEventListener("click", resetQuiz);
     $$("#quizResult [data-use]").forEach(function (b) {
       b.addEventListener("click", function () {
-        P.mySuit = b.getAttribute("data-use"); saveP(); renderStyles(); renderCard(); updateMeter();
+        P.mySuit = b.getAttribute("data-use"); P.selfWords = qw.self.slice(); P.othersWords = qw.others.slice(); P.fault = qw.fault; saveP(); renderStyles(); renderCard(); updateMeter();
         toast("Your suit is " + SUIT[P.mySuit].name + ". It's on your card now.", P.mySuit); jackpot(2500); burstAt(b, 50);
       });
     });
@@ -1046,7 +1098,7 @@
   /* =====================================================================
      PAIRS → PLAY HAND → WIN / PUSH / LOSS
      ===================================================================== */
-  var HOUR = 3600e3, DAY = 24 * HOUR, JOKER_WINDOW = 12 * HOUR, PUSH_LIMIT = 7 * DAY;
+  var HOUR = 3600e3, DAY = 24 * HOUR, JOKER_WINDOW = 12 * HOUR, PUSH_LIMIT = 24 * HOUR, JOKER_DATES = 3;
   var STAGE_LABEL = { paired: "Pair", inplay: "In play", push: "Push", win: "Win", loss: "Loss" };
   function now() { return Date.now() + (G.clock || 0); }
   function handOf(id) { G.hands = G.hands || {}; if (!G.hands[id]) G.hands[id] = { stage: "paired", dates: 0 }; return G.hands[id]; }
@@ -1072,7 +1124,7 @@
       '<div class="hand-box" id="handBox"></div>' +
       '<details class="sidetable"><summary>Side Table chat</summary><div class="chat" id="chat"><div class="msg them">' + esc(openers[p.suit]) + '</div></div><p class="hint">Sample reply from a fictional demo profile.</p>' +
       '<form id="chatForm" style="display:flex;gap:8px;margin-top:10px"><label class="sr" for="chatIn">Message</label><input type="text" id="chatIn" maxlength="300" placeholder="Say hi…" autocomplete="off"><button class="btn felt sm" type="submit">Send</button></form></details>' +
-      '<div class="democlock"><span class="hint">Demo clock (to try the time rules):</span><button type="button" class="chip sm" data-clock="1">+1 hour</button><button type="button" class="chip sm" data-clock="12">+12 hours</button><button type="button" class="chip sm" data-clock="168">+7 days</button><button type="button" class="chip sm" data-clock="0">Reset</button></div>', { focus: "#handBox button, .x" });
+      '<div class="democlock"><span class="hint">Demo clock (to try the time rules):</span><button type="button" class="chip sm" data-clock="1">+1 hour</button><button type="button" class="chip sm" data-clock="12">+12 hours</button><button type="button" class="chip sm" data-clock="24">+24 hours</button><button type="button" class="chip sm" data-clock="0">Reset</button></div>', { focus: "#handBox button, .x" });
     var replied = false;
     $("#chatForm", m).addEventListener("submit", function (e) {
       e.preventDefault(); var v = $("#chatIn", m).value.trim(); if (!v) return;
@@ -1089,7 +1141,8 @@
   }
   function renderHand(m, p) {
     var box = $("#handBox", m); if (!box) return; var h = handOf(p.id), nm = esc(p.name.split(" ")[0]);
-    var jokerOpen = h.playAt && now() - h.playAt < JOKER_WINDOW && h.result !== "auto";
+    var jokerDate = (h.dates || 1) <= JOKER_DATES;
+    var jokerOpen = jokerDate && h.playAt && now() - h.playAt < JOKER_WINDOW && h.result !== "auto";
     var safety = '<p class="hint">Felt unsafe, harassed or threatened? That\'s never just a Loss. <button type="button" class="linkish" data-safety>Report a safety concern</button>. In an emergency, call 911.</p>';
     var html = "";
     if (h.stage === "paired") {
@@ -1099,21 +1152,21 @@
     } else if (h.stage === "inplay") {
       html = '<h3 class="inplay">Hand in play with ' + nm + '</h3><p class="hint">Played at ' + fmtDate(h.playAt) + '. When the date ends, call it:</p>' +
         '<div class="outcomes"><button class="oc win" type="button" data-oc="win"><b>Win</b><span>Second date</span></button><button class="oc push" type="button" data-oc="push"><b>Push</b><span>Unsure, waiting on a response</span></button><button class="oc loss" type="button" data-oc="loss"><b>Loss</b><span>Not a match</span></button></div>' +
-        '<p class="hint" id="jokerLeft">Joker window: ' + fmtLeft(h.playAt + JOKER_WINDOW - now()) + ". After 12 hours from Play Hand, a Loss can only burn the card.</p>";
+        '<p class="hint" id="jokerLeft">' + (jokerDate ? "Date #" + h.dates + " of 3 where a Joker is possible. Joker window: " + fmtLeft(h.playAt + JOKER_WINDOW - now()) + ". After 12 hours from Play Hand, a Loss can only burn the card." : "Date #" + h.dates + ": Jokers are only possible on your first three dates together. A Loss now burns the card; the Joker Maker Lobby is the only other way.") + "</p>";
     } else if (h.stage === "loss-choose") {
       html = '<h3>Loss. What happens to ' + nm + '\'s card?</h3><div class="outcomes two"><button class="oc" type="button" data-loss="burn"><b>Burn the card</b><span>Gone from your deck. Private.</span></button>' +
-        '<button class="oc joker" type="button" data-loss="joker"' + (jokerOpen ? "" : " disabled") + '><b>Make a Joker</b><span>' + (jokerOpen ? "A disaster date. " + fmtLeft(h.playAt + JOKER_WINDOW - now()) : "Closed: Jokers can only be made within 12 hours of Play Hand") + "</span></button></div>" +
+        '<button class="oc joker" type="button" data-loss="joker"' + (jokerOpen ? "" : " disabled") + '><b>Make a Joker</b><span>' + (jokerOpen ? "A disaster date. " + fmtLeft(h.playAt + JOKER_WINDOW - now()) : (jokerDate ? "Closed: Jokers can only be made within 12 hours of Play Hand" : "Closed: Jokers are only possible on your first three dates")) + "</span></button></div>" +
         '<button class="btn ghost sm" type="button" data-back>Back</button>';
     } else if (h.stage === "push") {
       var dl = h.pushAt + PUSH_LIMIT;
-      html = '<h3>Push: waiting on ' + nm + '</h3><p class="hint">Marked Push at ' + fmtDate(h.pushAt) + ". If there's no response by <b>" + fmtDate(dl) + "</b>, this hand becomes an automatic <b>Loss</b>, the card burns, and no Joker can be made.</p>" +
+      html = '<h3>Push: waiting on ' + nm + '</h3><p class="hint">Marked Push at ' + fmtDate(h.pushAt) + ". A Win needs both of you to say Win. If that doesn't happen by <b>" + fmtDate(dl) + "</b> (24 hours), this hand becomes an automatic <b>Loss</b>, the card burns, and no Joker can be made.</p>" +
         '<div class="outcomes two"><button class="oc win" type="button" data-oc="win"><b>Win</b><span>They said yes to a second date</span></button><button class="oc loss" type="button" data-oc="loss"><b>Loss</b><span>Not a match</span></button></div>' +
         '<p class="hint" id="jokerLeft">Joker window: ' + (jokerOpen ? fmtLeft(h.playAt + JOKER_WINDOW - now()) : "closed") + ".</p>";
     } else if (h.stage === "win") {
       html = '<h3 class="win-t">Win! Second date with ' + nm + '</h3><p class="hint">Keep the Pair going. Check in again when you meet so the next hand counts.</p><button class="btn gold" type="button" data-again>Check in for date #' + (h.dates + 1) + "</button>";
     } else if (h.stage === "loss") {
-      html = '<h3>Loss</h3><p class="hint">' + (h.result === "joker" ? nm + " is now a <b>Joker</b> in your deck and won't be dealt to you again. If ten different people make the same call within 180 days, Judges review it for a public Joker." :
-        h.result === "auto" ? "No response within 7 days of the Push, so this became an automatic Loss on " + fmtDate(h.endAt) + ". The card is burned. No Joker can be made." : nm + "'s card is burned. It won't be dealt to you again.") + "</p>";
+      html = '<h3>Loss</h3><p class="hint">' + (h.result === "joker" ? nm + " is now a <b>Joker</b> in your deck and won't be dealt to you again. If ten different people make the same call within 180 days, their card shows JOKER for 45 days." :
+        h.result === "auto" ? "No Win from both of you within 24 hours of the Push, so this became an automatic Loss on " + fmtDate(h.endAt) + ". The card is burned. No Joker can be made." : nm + "'s card is burned. It won't be dealt to you again.") + "</p>";
     }
     box.innerHTML = html + safety;
     box.onclick = function (e) {
@@ -1407,7 +1460,7 @@
     $("#kpis").innerHTML = k.map(function (x) { return '<div class="kpi"><span class="dl">' + x[0] + "</span><b>" + x[1] + '</b><span class="hint">' + x[2] + "</span></div>"; }).join("");
     var weeks = [41, 55, 48, 63, 72, 66, 81, 93], mx = Math.max.apply(null, weeks);
     $("#ownerBars").innerHTML = weeks.map(function (v, i) { return '<div class="bar"><b style="height:' + (v / mx * 100) + '%"></b><span>' + v + '</span><small>W' + (i + 1) + "</small></div>"; }).join("");
-    $("#ownerRules").innerHTML = '<ul class="incl"><li>Buy-In $21.00 · then $2.10 a month</li><li>Pause up to 21 days; longer ends membership (new $21 Buy-In to return)</li><li>Joker only within 12 hours of Play Hand</li><li>Push unanswered for 7 days = automatic Loss, no Joker</li><li>10 Jokers in 180 days → Dealer review → public Joker for 180 days</li><li>Members never see their own Joker count</li><li>Joker buy-out $2,100.00 · off until counsel approves</li></ul><p class="hint">All figures on this console are sample data in the preview.</p>';
+    $("#ownerRules").innerHTML = '<ul class="incl"><li>Buy-In $21.00 · then $2.10 a month</li><li>Pause up to 21 days; longer ends membership (new $21 Buy-In to return)</li><li>Joker only on your first 3 dates together, within 12 hours of Play Hand</li><li>Win needs both to say Win; a Push not settled as a Win within 24 hours = automatic Loss, no Joker</li><li>10 Jokers in 180 days → Dealer review → public Joker for 180 days</li><li>Members never see their own Joker count</li><li>Joker buy-out $2,100.00 · off until counsel approves</li></ul><p class="hint">All figures on this console are sample data in the preview.</p>';
   }
 
   /* ---------- boot ---------- */
