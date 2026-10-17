@@ -147,7 +147,7 @@ html[data-play="night"] .c-hero{background:
 
 /* The stage: phone + three dealt cards */
 .stage{position:relative;height:clamp(460px,52vw,600px);display:grid;place-items:center}
-.pcard{position:absolute;width:clamp(140px,15vw,184px);aspect-ratio:5/7;border-radius:16px;background:linear-gradient(160deg,#FFFDF8,var(--card) 55%,#EDE5D3);color:var(--card-ink);box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 24px 40px -20px rgba(3,14,10,.6),0 0 0 1px rgba(35,32,42,.08);padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between}
+.pcard{position:absolute;width:clamp(140px,15vw,184px);aspect-ratio:5/7;border-radius:5%/3.57%;background:linear-gradient(160deg,#FFFDF8,var(--card) 55%,#EDE5D3);color:var(--card-ink);box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 24px 40px -20px rgba(3,14,10,.6),0 0 0 1px rgba(35,32,42,.08);padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between}
 .pcard .idx{display:grid;justify-items:center;width:max-content;font-weight:800;line-height:.95}
 .pcard .idx b{font-size:1.6rem;letter-spacing:-.04em}
 .pcard .idx svg{width:16px;height:16px;margin-top:3px}
@@ -175,10 +175,10 @@ html[data-play="day"] .phone{box-shadow:0 0 0 1.5px rgba(18,56,43,.25),0 50px 90
 .screen .ace small{display:block;color:#BFC9BE;font-weight:600}
 .screen .ace b{font-size:15px;font-weight:800}
 .screen .ace .tag{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:999px;background:rgba(201,165,90,.25);color:#E2C47E;font-weight:700;font-size:9.5px}
-.screen .grid{flex:1;min-height:0;overflow:hidden;align-content:start;padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.screen .mc{background:#fff;border-radius:10px;padding:6px;box-shadow:0 1px 2px rgba(0,0,0,.06);display:grid;gap:4px}
-.screen .mc .ph{aspect-ratio:1;border-radius:7px}
-.screen .mc b{font-size:10px;display:flex;justify-content:space-between}
+.screen .grid{flex:1;min-height:0;overflow:hidden;align-content:start;padding:0 16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.screen .mc{min-width:0;overflow:hidden;background:#fff;aspect-ratio:5/7;border-radius:5%/3.57%;padding:5px;align-content:start;box-shadow:0 1px 2px rgba(0,0,0,.06);display:grid;gap:4px}
+.screen .mc .ph{aspect-ratio:5/4;border-radius:4px}
+.screen .mc b{font-size:10px;margin-top:2px;display:flex;justify-content:space-between}
 .screen .mc b em{font-style:normal;color:#8E2230}
 .screen .mc span{color:#6C7A73;font-size:9px}
 .screen .tabbar{margin-top:auto;display:flex;justify-content:space-around;padding:10px 0 16px;border-top:1px solid #E4DED0;color:#7C8A83}
@@ -214,7 +214,7 @@ section{padding:clamp(72px,10vw,128px) 0}
 
 /* Suits as real cards */
 .suits{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
-.suit{position:relative;aspect-ratio:5/7;border-radius:var(--r-md);background:linear-gradient(165deg,#FFFDF8,var(--card) 60%,#EEE6D4);color:var(--card-ink);padding:18px;display:flex;flex-direction:column;box-shadow:var(--shadow),0 0 0 1px rgba(35,32,42,.06);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.suit{position:relative;aspect-ratio:5/7;border-radius:5%/3.57%;background:linear-gradient(165deg,#FFFDF8,var(--card) 60%,#EEE6D4);color:var(--card-ink);padding:18px;display:flex;flex-direction:column;box-shadow:var(--shadow),0 0 0 1px rgba(35,32,42,.06);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
 .suit:hover{transform:translateY(-6px) rotate(-1deg)}
 .suit.red{--pc:var(--oxblood)}.suit{--pc:#23202A}
 .suit .corner{display:flex;align-items:center;gap:8px;color:var(--pc);font-weight:800}
@@ -278,7 +278,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
 .ribbon a{color:var(--brass-hi);font-weight:700}
 @media (max-width:700px){.ribbon{top:auto;bottom:16px;right:12px;left:auto;max-width:220px;padding-right:30px}}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792242710">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792243552">
 <link rel="canonical" href="https://suiteface.com/preview-club.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SuiteFace">
@@ -460,7 +460,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
   <div class="wrap">
     <div>
       <a class="c-brand" href="./" style="color:var(--text)"><img src="assets/brand/suiteface-joker-icon-cream-180.png" alt="" width="34" height="34" style="border-radius:9px">SuiteFace<sup>™</sup></a>
-      <p style="margin-top:14px;max-width:36ch">No Jokers Needed. © 2026 SuiteFace Inc., a Florida corporation. Patent pending.</p>
+      <p style="margin-top:14px;max-width:36ch">No Jokers Needed. © 2026 SuiteFace Inc., a Florida corporation.</p><p style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px 18px"><span style="display:inline-flex;gap:7px;align-items:center;color:var(--text-2);font-weight:700"><svg style="width:16px;height:16px;color:var(--brass-hi)"><use href="#i-age"/></svg>U.S. patent pending (USPTO)</span><span style="color:var(--text-2)">Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--brass-hi);font-weight:700;text-decoration:none">GoFirehorseGo</a></span></p>
     </div>
     <div><h4>Play</h4><ul><li><a href="#how">How it plays</a></li><li><a href="#suits">Your suit</a></li><li><a href="#tables">Private Tables</a></li><li><a href="#member">Membership</a></li></ul></div>
     <div><h4>Company</h4><ul><li><a href="terms.html">Terms</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="safety.html">Safety Guide</a></li><li><a href="mailto:help@suiteface.com">help@suiteface.com</a></li></ul></div>
@@ -469,7 +469,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
 
 <aside class="ribbon" aria-label="About this page"><button type="button" aria-label="Hide this note" onclick="this.parentNode.remove()">×</button><b>Design preview</b>Private draft of the new look. Not linked from the site. <a href="./">Back to the live site</a></aside>
 
-<script src="assets/js/casino-scene.js?v=1792242710"></script>
+<script src="assets/js/casino-scene.js?v=1792243552"></script>
 <script>
 (function () {
   var el = document.getElementById("tableArt");
@@ -477,7 +477,7 @@ html[data-play] .c-foot{background:transparent;color:var(--text-3)}
   draw();
 })();
 </script>
-<script src="assets/js/gate.js?v=1792242710"></script>
-<script src="assets/js/fx.js?v=1792242710"></script>
+<script src="assets/js/gate.js?v=1792243552"></script>
+<script src="assets/js/fx.js?v=1792243552"></script>
 </body>
 </html>

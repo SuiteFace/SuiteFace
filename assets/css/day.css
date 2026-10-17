@@ -91,3 +91,4 @@ html[data-play="day"] .bar a:not(.home){color:#8F6410}
 html[data-play="day"] .bar .home{color:#2B2730}
 html[data-play="day"] .sft-welcome{color:#2B2730;background:rgba(232,196,106,.14)}
 html[data-play="day"] footer{color:#4A4552}
+html[data-play="day"] .sf-credit{color:#5B5560!important}html[data-play="day"] .sf-credit a{color:#8F6410!important}

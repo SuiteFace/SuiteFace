@@ -548,7 +548,7 @@ footer a{color:var(--cream-dim)}
 .clip .ops i b{color:var(--red)}
 .clip .tap{position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(250,247,240,.55);box-shadow:0 0 0 6px rgba(250,247,240,.2);left:30%;top:58%;animation:tap 3s infinite}
 @keyframes tap{0%,20%{transform:scale(1.4);opacity:0}35%{transform:scale(1);opacity:1}55%{transform:scale(.8)}80%,100%{opacity:0}}
-.clip .big{font:900 3.4rem/1 var(--display);background:var(--cream);border-radius:12px;width:74px;height:96px;display:grid;place-items:center}
+.clip .big{font:900 3.4rem/1 var(--display);background:var(--cream);border-radius:12px;width:74px;height:104px;display:grid;place-items:center}
 .clip .face{display:flex;gap:10px;align-items:center;background:var(--cream);border-radius:12px;padding:10px 12px;width:100%;color:var(--night)}
 .clip .face .sm{color:#4a4552;text-align:left}
 .clip .face.solo{width:85%;transition:transform .3s}.clip .face.out{transform:rotate(-8deg) translateX(-12px);opacity:.55;filter:grayscale(1)}
@@ -557,11 +557,11 @@ footer a{color:var(--cream-dim)}
 .clip .gates{flex-direction:column;width:85%}
 .clip .grow{color:var(--gold-hi)}
 .clip .suits{display:flex;gap:8px}
-.clip .suits b{width:46px;height:62px;background:var(--cream);border-radius:9px;display:grid;place-items:center;font:900 1.8rem var(--display);position:relative}
+.clip .suits b{width:46px;height:64px;background:var(--cream);border-radius:9px;display:grid;place-items:center;font:900 1.8rem var(--display);position:relative}
 .clip .suits b.lift{transform:translateY(-10px) rotate(-4deg);box-shadow:0 0 0 3px var(--gold-hi)}
 .clip .suits em{position:absolute;top:-8px;right:-6px;font:800 .7rem var(--body);font-style:normal;background:var(--gold-hi);color:var(--night);border-radius:999px;width:18px;height:18px;display:grid;place-items:center}
 .clip .fan{display:flex;gap:8px;align-items:center}
-.clip .cc{width:52px;height:72px;background:var(--cream);border-radius:9px;display:grid;place-items:center;font:900 1.4rem var(--display)}
+.clip .cc{width:52px;height:73px;background:var(--cream);border-radius:9px;display:grid;place-items:center;font:900 1.4rem var(--display)}
 .clip .cc.who{font:700 .78rem var(--body);color:var(--night)}
 .clip .arrow{font:900 1.6rem var(--display);color:var(--gold-hi)}
 .clip .fan.pair .cc{box-shadow:0 0 0 3px var(--gold-hi),0 0 18px rgba(232,196,106,.6)}
@@ -588,7 +588,7 @@ footer a{color:var(--cream-dim)}
 .ex .deckgrid{display:grid;grid-template-columns:repeat(13,1fr);gap:3px}
 .ex .deckgrid i{font-style:normal;aspect-ratio:5/7;border-radius:4px;background:var(--cream);display:grid;place-items:center;font:800 .7rem var(--display);opacity:0;transform:translateY(-10px) rotate(-6deg);transition:opacity .25s,transform .25s}
 .ex .deckgrid i.in{opacity:1;transform:none}
-.ex .bigcard{width:180px;height:250px;margin:0 auto;border-radius:16px;background:var(--cream);color:var(--night);display:grid;place-items:center;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.45);transition:transform .6s,opacity .6s,filter .6s;position:relative}
+.ex .bigcard{width:180px;height:252px;margin:0 auto;border-radius:16px;background:var(--cream);color:var(--night);display:grid;place-items:center;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,.45);transition:transform .6s,opacity .6s,filter .6s;position:relative}
 .ex .bigcard.burn{transform:scale(.6) rotate(-12deg);opacity:0;filter:sepia(1) saturate(4) brightness(.6)}
 .ex .bigcard.play{transform:translateY(-30px) rotate(4deg);box-shadow:0 0 0 4px var(--gold),0 22px 50px rgba(0,0,0,.5)}
 .ex .pairrow{display:flex;justify-content:center;align-items:center;gap:10px}
@@ -1008,3 +1008,10 @@ section.is-locked{padding-block:clamp(14px,2.4vw,26px)!important}
 .fabdock.min .fabbtns{display:none}
 .fabdock.min .fabmin{display:inline-flex;align-items:center;width:auto;height:auto;padding:.6rem .8rem;border-radius:999px;font:800 .9rem/1 var(--body);gap:6px;background:linear-gradient(180deg,#E8C46A,#B8862F);color:#231C10;border-color:#B8862F}
 .fabdock.min .fabmin span{font-size:1rem}
+
+/* Footer credits: patent and powered-by */
+.sf-badges{display:flex;flex-wrap:wrap;gap:8px;align-items:center;align-self:start}
+.sf-badge{display:inline-flex;align-items:center;gap:7px;padding:.45rem .8rem;border-radius:999px;border:1px solid var(--line);font-size:.85rem;font-weight:700;color:var(--cream)}
+.sf-badge svg{width:16px;height:16px;color:var(--gold-hi)}
+.sf-badge a{color:var(--gold-hi);text-decoration:none}
+.sf-badge a:hover{text-decoration:underline}
