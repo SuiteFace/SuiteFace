@@ -80,6 +80,7 @@
   var sign = $("#sign"), bulbBox = $("#bulbs"), bulbs = [], mode = REDUCED ? "calm" : "chase", prevMode = mode, t = 0, jackpotUntil = 0;
   var BULB_COLORS = ["#FFE7A3", "#FFFFFF", "#FF5A6E", "#E8C46A"];
   function layoutBulbs() {
+    if (!sign || !bulbBox) return;
     var W = sign.offsetWidth, H = sign.offsetHeight, bw = parseFloat(getComputedStyle(sign).borderTopWidth) || 16;
     var R = (parseFloat(getComputedStyle(sign).borderTopLeftRadius) || 44) - bw / 2, ins = bw / 2;
     var w = W - 2 * ins, h = H - 2 * ins, straightW = w - 2 * R, straightH = h - 2 * R;
@@ -130,12 +131,12 @@
   if (savedLights) { mode = savedLights; $$(".lights .chip").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-mode") === mode)); }); }
   else if (REDUCED) { $$(".lights .chip").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-mode") === "calm")); }); }
   window.addEventListener("resize", debounce(layoutBulbs, 150));
-  if (window.ResizeObserver) new ResizeObserver(debounce(layoutBulbs, 100)).observe(sign);
+  if (window.ResizeObserver && sign) new ResizeObserver(debounce(layoutBulbs, 100)).observe(sign);
   layoutBulbs();
 
   // wordmark flips through the four official suit versions
   var wms = $$("#wmStage .wm"), wmi = 0;
-  if (!REDUCED) setInterval(function () {
+  if (!REDUCED && wms.length > 1) setInterval(function () {
     wms[wmi].classList.add("out"); wmi = (wmi + 1) % wms.length; wms[wmi].classList.remove("out");
   }, 3800);
 
@@ -1415,6 +1416,7 @@
     var box = $("#launchBox"); if (!box) return;
     LAUNCH.open = LAUNCH.open && new Date(LAUNCH.ends).getTime() > Date.now();
     box.hidden = !LAUNCH.open;
+    var ho = $("#heroOffer"); if (ho) ho.hidden = !LAUNCH.open;
     if (!LAUNCH.open) PLAN = "first";
     var first = $('[data-plan="first"]', box); if (first) first.hidden = LAUNCH.left <= 0;
     if (LAUNCH.left <= 0 && PLAN === "first" && LAUNCH.open) PLAN = "launch";
@@ -2567,7 +2569,7 @@
      The builder is the Host: naming rights, games, who joins. Joining is free.
      ===================================================================== */
   (function () {
-    var KINDS = [["friendship", "🤝", "Friendship"], ["faith", "🙏", "Faith small group"], ["prayer", "🕊️", "Prayer group"], ["service", "🧺", "Service & volunteering"], ["games", "🎲", "Board games"], ["greek", "🏛️", "Greek life"], ["alumni", "🎓", "Alumni"], ["club", "♣️", "Club"], ["sports", "🏀", "Sports & fitness"], ["hobby", "🎨", "Hobbies"], ["parents", "🧸", "Parents"], ["other", "🃏", "Other"]];
+    var KINDS = [["friendship", "", "Friendship"], ["faith", "", "Faith small group"], ["prayer", "", "Prayer group"], ["service", "", "Service & volunteering"], ["games", "", "Board games"], ["greek", "", "Greek life"], ["alumni", "", "Alumni"], ["club", "", "Club"], ["sports", "", "Sports & fitness"], ["hobby", "", "Hobbies"], ["parents", "", "Parents"], ["other", "", "Other"]];
     var KIND = {}; KINDS.forEach(function (k) { KIND[k[0]] = k; });
     var WHO = { everyone: "Everyone", men: "Men only", women: "Women only" };
     var US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","PR"];
@@ -2584,7 +2586,7 @@
       if (live()) return window.SF_LIVE.rpc(name, args).then(function (r) { if (r.error) throw r.error; return r.data; });
       return rpc(name, args);
     }
-    function kindLabel(k) { var x = KIND[k] || KIND.other; return x[1] + " " + x[2]; }
+    function kindLabel(k) { var x = KIND[k] || KIND.other; return (x[1] ? x[1] + " " : "") + x[2]; }
     function money(c) { return "$" + (c / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     /* ----- Private Table designer: dropdowns, checkboxes and words; the scene is generated live ----- */
     var SC = window.SFCasino;
