@@ -361,7 +361,7 @@
       loadHolds();
       window.SF_LIVE.rpc("suit_leads_recent", { p_limit: 25 }).then(function (r) {
         var rows = r.data || [], ll = $("#leadList"); if (!ll) return;
-        ll.innerHTML = rows.length ? '<div class="leadtbl">' + rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.name) + "</b> · " + esc(x.email) + " · " + esc(x.phone) + " · " + esc(x.suit === "wild" ? "Wild Card" : SUIT[x.suit] ? SUIT[x.suit].name : x.suit) + (x.sms_ok ? " · texts OK" : "") + "</span><span class=\"hint\">" + new Date(x.created_at).toLocaleDateString() + "</span></div>"; }).join("") + "</div>" : '<p class="hint">No quiz leads yet.</p>';
+        ll.innerHTML = rows.length ? '<div class="leadtbl">' + rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.name) + "</b> · " + esc(x.email) + " · " + esc(x.phone) + " · " + esc(x.suit === "wild" ? "Wild Card" : x.suit === "joker" ? "Joker (review)" : SUIT[x.suit] ? SUIT[x.suit].name : x.suit) + (x.sms_ok ? " · texts OK" : "") + "</span><span class=\"hint\">" + new Date(x.created_at).toLocaleDateString() + "</span></div>"; }).join("") + "</div>" : '<p class="hint">No quiz leads yet.</p>';
       });
     }
     var hcb = $("#hcSet"); if (hcb) hcb.addEventListener("click", function () {
@@ -636,6 +636,9 @@
   /* Hidden tells: one sits among the words on each "fits you best" card and on the fault card. Picking all five sends the
      account to a private staff review before a deck is dealt. They never change the suit result and are never shown. */
   var TELLS = ["Jealous", "Possessive", "Vengeful", "Manipulative", "Hot-tempered"];
+  var QTELL = ["Somewhere I can check who else they're texting", "The one you don't want to cross", "I make them pay for it later", "I win, whatever it takes",
+    "Keeping tabs on where my person is", "I go silent to make a point", "Does what I say", "I decide for both of us",
+    "Watching who my date talks to", "Keeping them all to myself", "Being told no", "What's yours is mine"];
   var SLIDES = [];
   [0, 1, 2, 3].forEach(function (i) { SLIDES.push({ t: "self", i: i }); });
   [0, 3].forEach(function (i, n) { SLIDES.push({ t: "oth", i: i, n: n }); });
@@ -647,11 +650,11 @@
   var qa = [], qw = { self: [], others: [], fault: "", none: 0, tells: 0 }, qi = qs.i;
   function slideKey(sl) { return sl.t + sl.i; }
   function derive() {
-    qa = []; qw = { self: [], others: [], fault: "", none: 0, tells: 0 };
+    qa = []; qw = { self: [], others: [], fault: "", none: 0, tells: 0, tellQ: 0, tellW: 0 };
     SLIDES.forEach(function (sl) {
       var v = qs.ans[slideKey(sl)]; if (v == null) return;
       if (v === "none") { qw.none++; return; }
-      if (v === "tell") { qw.tells++; return; }
+      if (v === "tell") { qw.tells++; if (sl.t === "q") qw.tellQ++; else qw.tellW++; return; }
       if (sl.t === "q") qa[sl.i] = v;
       else if (sl.t === "self") qw.self.push(WORDS[v][sl.i]);
       else if (sl.t === "oth") qw.others.push(WORDS[v][sl.i]);
@@ -697,8 +700,9 @@
     if (sl.t === "oth") { $("#qText").textContent = "Which word would your friends pick for you?"; $("#qAnswers").innerHTML = batch(sl, "None of these"); return; }
     if (sl.t === "fault") { $("#qText").textContent = "Which one is most like your biggest fault?"; $("#qAnswers").innerHTML = '<p class="qhint">Owning it is a strong play. It stays private (Face Down) unless you choose to show it.</p>' + batch(sl, "None of these fit me"); return; }
     $("#qText").textContent = Q[sl.i][0];
-    $("#qAnswers").innerHTML = '<div class="qopts">' + shuffled(sl.i).map(function (k) {
-      return '<button class="ans' + (qs.ans[slideKey(sl)] === k ? " picked" : "") + '" type="button" data-s="' + k + '">' + esc(Q[sl.i][1][k]) + "</button>";
+    var qk = shuffled(sl.i); qk.splice((sl.i * 2 + 3) % 5, 0, "tell");
+    $("#qAnswers").innerHTML = '<div class="qopts">' + qk.map(function (k) {
+      return '<button class="ans' + (qs.ans[slideKey(sl)] === k ? " picked" : "") + '" type="button" data-s="' + k + '">' + esc(k === "tell" ? QTELL[sl.i] : Q[sl.i][1][k]) + "</button>";
     }).join("") + "</div>";
   }
   $("#qAnswers").addEventListener("click", function (e) {
@@ -740,6 +744,13 @@
     });
     var first = $("#sgName", f); if (first && !first.value) setTimeout(function () { first.focus(); }, 50);
   }
+  function jokerResult(R) {
+    R.innerHTML = '<span class="big jokerpip" aria-hidden="true">' + (BRAND.hat || "") + '</span><div class="form-grid" style="gap:10px"><p class="eyebrow">Your card</p><h3 style="font-size:2.4rem">You drew the Joker</h3>' +
+      '<p class="lede">Your answers lean toward jealousy, control and payback more than toward any suit. That\'s not who we deal into other people\'s decks.</p>' +
+      '<p class="hint">This result is private: no other member ever sees it. Before you can be dealt a deck, someone from the SuiteFace team reviews your account and may ask for an ID check. If we got it wrong, write to <a href="mailto:help@suiteface.com">help@suiteface.com</a>.</p>' +
+      '<div class="chips" style="margin-top:6px"><button class="btn ghost sm" type="button" id="retake">Retake the quiz</button><a class="btn ghost sm" href="safety.html">Read the House Rules</a></div></div>';
+    $("#retake").addEventListener("click", resetQuiz);
+  }
   function wildResult(R, lean, c, tot) {
     R.innerHTML = '<span class="big wildpip" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="m12 2.8 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 16.8l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></span><div class="form-grid" style="gap:10px"><p class="eyebrow">Your card</p><h3 style="font-size:2.4rem">You\'re a Wild Card</h3>' +
       '<p class="lede">You don\'t lean hard into any one suit, and that\'s not a flaw. A Wild Card is the rare one at the table: a little of every suit, unattached to any single one. Your answers lean slightly ' + SUIT[lean].name + ', so that\'s where we\'ll seat you first.</p>' +
@@ -760,9 +771,11 @@
   }
   function showResult() {
     var c = { diamond: 0, club: 0, heart: 0, spade: 0 };
-    qa.forEach(function (s) { c[s] += 1; });
-    qw.self.concat(qw.others).forEach(function (w) { var k = suitOf(w, WORDS); if (k) c[k] += 0.5; });
-    var fk = suitOf(qw.fault, FAULTS); if (fk) c[fk] += 0.5;
+    /* Points: each scenario 2, each word card 1, the fault card 1. */
+    qa.forEach(function (s) { c[s] += 2; });
+    qw.self.concat(qw.others).forEach(function (w) { var k = suitOf(w, WORDS); if (k) c[k] += 1; });
+    var fk = suitOf(qw.fault, FAULTS); if (fk) c[fk] += 1;
+    var jokerPts = qw.tellQ * 2 + qw.tellW;
     var tot = ORDER.reduce(function (a, k) { return a + c[k]; }, 0) || 1;
     var both = qw.self.filter(function (w) { return qw.others.indexOf(w) > -1; });
     /* House rule: there is always one clear suit. Ties break in this order, and the result says which one decided it. */
@@ -786,18 +799,21 @@
     }
     var top = lead[0];
     /* Wild Card: answers that don't lean strongly toward any one suit. Not a flaw: a Wild Card can play in any suit. */
-    var sorted = ORDER.map(function (k) { return c[k]; }).sort(function (x, y) { return y - x; });
-    var share = sorted[0] / tot, gap = (sorted[0] - sorted[1]) / tot;
-    var wild = qw.none >= 5 || share < .30 || (share < .34 && gap < .03);
+    var sorted = ORDER.map(function (k) { return Math.floor(c[k]); }).sort(function (x, y) { return y - x; });
+    /* Joker: the toxic answers. All five toxic words, six or more toxic picks, or toxic points matching the top suit. */
+    var joker = qw.tellW >= 5 || qw.tells >= 6 || (jokerPts > 0 && jokerPts >= sorted[0]);
+    /* Wild Card: no suit leads the next one by at least 7 points. */
+    var wild = !joker && sorted[0] - sorted[1] < 7;
     $("#quizBox").hidden = true; var R = $("#quizResult"); R.hidden = false;
     /* The result is revealed after the player tells us where to send it: name, email and phone. */
-    if (!window.SF_LIVE && !S.get("suitLead", null)) { suitGate(R, wild ? "wild" : top, c, tot); return; }
-    if (window.SF_LIVE && qw.tells >= 5 && !S.get("tellsSent", false)) { S.set("tellsSent", true); window.SF_LIVE.rpc("set_quiz_tells", { p_tells: qw.tells }); }
+    if (!window.SF_LIVE && !S.get("suitLead", null)) { suitGate(R, joker ? "joker" : wild ? "wild" : top, c, tot); return; }
+    if (window.SF_LIVE && (joker || qw.tells >= 5) && !S.get("tellsSent", false)) { S.set("tellsSent", true); window.SF_LIVE.rpc("set_quiz_tells", { p_tells: Math.max(qw.tells, 5) }); }
+    if (joker) { jokerResult(R); return; }
     if (wild) { wildResult(R, top, c, tot); return; }
     R.innerHTML = '<span class="big" style="color:' + suitColor(top) + '">' + pip(top, "big") + '</span><div class="form-grid" style="gap:10px"><p class="eyebrow">Your suit</p><h3 style="font-size:2.4rem">' +
       SUIT[top].sym + " You're a " + SUIT[top].name + "</h3><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
       ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); if (s === top) pct = Math.max(pct, 1 + Math.max.apply(null, ORDER.filter(function (k) { return k !== top; }).map(function (k) { return Math.round(c[k] / tot * 100); }))); return '<div class="bar' + (s === top ? " win" : "") + '"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") +
-      '</div>' + (tieNote ? '<p class="hint tie">⚖ ' + esc(tieNote) + "</p>" : "") + '<div class="selfwords">' + (qw.self.length ? '<p><b>You see yourself as:</b> ' + esc(qw.self.join(", ")) + "</p>" : "") + (qw.others.length ? '<p><b>Friends and family say:</b> ' + esc(qw.others.join(", ")) + "</p>" : "") +
+      '</div>' + (tieNote ? '<p class="hint tie">⚖ ' + esc(tieNote) + "</p>" : "") + '<div class="selfwords"' + (qw.self.length || qw.others.length || qw.fault ? "" : " hidden") + '>' + (qw.self.length ? '<p><b>You see yourself as:</b> ' + esc(qw.self.join(", ")) + "</p>" : "") + (qw.others.length ? '<p><b>Friends and family say:</b> ' + esc(qw.others.join(", ")) + "</p>" : "") +
       (!qw.self.length || !qw.others.length ? "" : both.length ? '<p class="hint">You and the people who know you best agree on <b>' + esc(both.join(", ")) + "</b>. That's the real you.</p>" : '<p class="hint">You and the people who know you see different sides of you. Both belong on your card.</p>') +
       (qw.fault ? '<p><b>Your honest fault:</b> ' + esc(qw.fault) + ' <span class="hint">· Face Down (private). Owning it is a strong play.</span></p>' : "") + '</div>' +
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
