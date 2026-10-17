@@ -979,3 +979,6 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 @keyframes qIn{from{opacity:0;transform:translateX(26px) rotate(1deg)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.qin{animation:none}}
 .qmode{color:var(--gold-hi)!important;font-weight:700}[data-tab="look"] .qmode{color:#9B1B30!important}
+#cbScope .chip small{font-size:.74rem;opacity:.8;margin-left:4px}
+.cbstates{max-height:190px;overflow:auto;padding:2px}
+.cbstates .chip{min-width:52px;justify-content:center}

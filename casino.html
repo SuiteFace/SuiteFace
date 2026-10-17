@@ -64,9 +64,9 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   <p class="note" id="status">Opening the doors…</p>
 </main>
 <footer>© 2026 SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™ and SuiteFace Casinos™ are trademarks of SuiteFace Inc. Casinos are built and run by SuiteFace players. Always meet in public. In an emergency, call 911.</footer>
-<script src="assets/js/config.js?v=1792219142"></script>
-<script src="assets/js/live.js?v=1792219142"></script>
-<script src="assets/js/casino-scene.js?v=1792219142"></script>
+<script src="assets/js/config.js?v=1792219518"></script>
+<script src="assets/js/live.js?v=1792219518"></script>
+<script src="assets/js/casino-scene.js?v=1792219518"></script>
 <script>
 (function () {
   var CFG = window.SUITEFACE_CONFIG || {}, main = document.getElementById("main");
@@ -95,7 +95,7 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
       (c.about ? '<p class="about">' + esc(c.about) + "</p>" : "") + '<p class="err" id="err" role="alert"></p>' +
       '<div id="floor"></div>' +
       (c.status !== "open" ? '<p class="note">Only you can see this Casino until it passes its name check.</p>' : "") +
-      '<p class="note">Game Tables meet in public places. Never send money to anyone you meet. Covers ZIP ' + esc((c.zips || []).slice(0, 7).join(", ")) + ((c.zips || []).length > 7 ? " and " + ((c.zips || []).length - 7) + " more" : "") + ".</p>";
+      '<p class="note">Game Tables meet in public places. Never send money to anyone you meet. Covers ' + esc(c.scope === "national" ? "the whole United States" : c.scope === "states" && (c.states || []).length ? (c.states || []).join(", ") : "ZIP " + (c.zips || []).slice(0, 7).join(", ") + ((c.zips || []).length > 7 ? " and " + ((c.zips || []).length - 7) + " more" : "")) + ".</p>";
     window.SFCasino.render(document.getElementById("scene"), c);
     window.SFCasino.render(document.getElementById("floor"), c, { floor: true });
     var fl = document.querySelector("#floor .cs-ext"); if (fl) fl.remove(); // floor view shows only the tables
@@ -165,7 +165,7 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   setTimeout(go, window.__demo ? 0 : 700); // anonymous visitors don't wait long for a session
 })();
 </script>
-<script src="assets/js/gate.js?v=1792219142"></script>
-<script src="assets/js/fx.js?v=1792219142"></script>
+<script src="assets/js/gate.js?v=1792219518"></script>
+<script src="assets/js/fx.js?v=1792219518"></script>
 </body>
 </html>

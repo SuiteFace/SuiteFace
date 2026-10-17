@@ -2530,6 +2530,8 @@
     var KINDS = [["friendship", "🤝", "Friendship"], ["faith", "🙏", "Faith small group"], ["prayer", "🕊️", "Prayer group"], ["service", "🧺", "Service & volunteering"], ["games", "🎲", "Board games"], ["greek", "🏛️", "Greek life"], ["alumni", "🎓", "Alumni"], ["club", "♣️", "Club"], ["sports", "🏀", "Sports & fitness"], ["hobby", "🎨", "Hobbies"], ["parents", "🧸", "Parents"], ["other", "🎰", "Other"]];
     var KIND = {}; KINDS.forEach(function (k) { KIND[k[0]] = k; });
     var WHO = { everyone: "Everyone", men: "Men only", women: "Women only" };
+    var US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","PR"];
+    function reach(c) { return c.scope === "national" ? "Nationwide" : c.scope === "states" && (c.states || []).length ? (c.states || []).join(", ") : "ZIP " + (c.zips || []).slice(0, 7).join(", ") + ((c.zips || []).length > 7 ? " +" + ((c.zips || []).length - 7) : ""); }
     var EXAMPLES = [
       { id: "ex1", style: { venue: "indoor", sign: "neon_script", palette: "gold_wine", themes: ["christian"], amenities: ["coffee", "prayer_space", "free"], tagline: "Iron sharpens iron", welcome: "Pull up a chair, brother." }, name: "Tuesday Prayer Brothers", kind: "faith", about: "A small group of Christian men. Coffee, Scripture and honest talk.", zips: ["35203", "35205", "35209"], who: "men", join_mode: "request", host_handle: "marcus.t", members: 9, tables: [{ name: "Tuesday Night Table", meets: "Tue 7pm · coffee shop" }, { name: "Saturday Service", meets: "Sat 9am · food bank" }] },
       { id: "ex2", style: { venue: "off_strip", palette: "neon", themes: ["games"], amenities: ["food", "late_night"], tagline: "Roll for initiative" }, name: "Magic City Game Night", kind: "games", about: "Board games, card games, snacks. Beginners welcome.", zips: ["35233", "35222"], who: "everyone", join_mode: "open", host_handle: "dana.rolls", members: 23, tables: [{ name: "Friday Strategy Table", meets: "Fri 7pm · game café" }] },
@@ -2543,7 +2545,7 @@
       return rpc(name, args);
     }
     function kindLabel(k) { var x = KIND[k] || KIND.other; return x[1] + " " + x[2]; }
-    function money(c) { return "$" + (c / 100).toFixed(2); }
+    function money(c) { return "$" + (c / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
     /* ----- Casino designer: dropdowns, checkboxes and words; the scene is generated live ----- */
     var SC = window.SFCasino;
     function opt(list, cur) { return list.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === cur ? " selected" : "") + ">" + esc(x[1]) + "</option>"; }).join(""); }
@@ -2605,6 +2607,7 @@
       call("casino_search", { p_zip: zip || null, p_kind: kindPick || null, p_q: q || null }).then(function (r) {
         r = r || []; show(r);
         if (r.length) call("casino_styles", { p_ids: r.map(function (x) { return x.id; }) }).then(function (st) { (st || []).forEach(function (x) { r.forEach(function (c) { if (c.id === x.id) c.style = x.style; }); }); }, function () { });
+        if (r.length) call("casino_coverage", { p_ids: r.map(function (x) { return x.id; }) }).then(function (cv) { (cv || []).forEach(function (x) { r.forEach(function (c) { if (c.id === x.id) { c.scope = x.scope; c.states = x.states; } }); }); }, function () { });
       }, function () { show([], "Casinos couldn't load right now."); });
     }
     $("#casList").addEventListener("click", function (e) {
@@ -2623,7 +2626,7 @@
       var m = modal((SC ? '<div id="cjScene"></div>' : '<div class="casign big" aria-hidden="true"><span>' + esc(kindLabel(c.kind)) + "</span><b>" + esc(c.name) + "</b><span>Host @" + esc(c.host_handle || "host") + "</span></div>") +
         '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · " + (c.host_handle ? "Host @" + esc(c.host_handle) : "Hosted by a member") + (example ? ' · <a href="casino.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="casino.html?c=' + encodeURIComponent(c.id) + '">Walk in to the Casino ›</a>') + "</p>" +
         (c.about ? '<p class="lede" style="margin:12px 0 6px">' + esc(c.about) + "</p>" : "") +
-        '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "The Host approves each request") + " · " + (c.members || 1) + " members · ZIP " + esc((c.zips || []).slice(0, 7).join(", ")) + ((c.zips || []).length > 7 ? " +" + ((c.zips || []).length - 7) : "") + "</p>" +
+        '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "The Host approves each request") + " · " + (c.members || 1) + " members · " + esc(reach(c)) + "</p>" +
         '<h4 style="margin:14px 0 6px">Game Tables</h4><ul class="castbl">' + (c.tables || []).map(function (t) { return "<li><b>" + esc(t.name) + "</b>" + (t.meets ? "<span>" + esc(t.meets) + "</span>" : "") + "</li>"; }).join("") + "</ul>" +
         '<p class="hint">Meet in public places, and never send money to anyone. <a href="safety.html" target="_blank" rel="noopener">Safety Guide</a></p>' +
         '<span class="err" id="cjErr"></span><div class="row" style="margin-top:10px">' +
@@ -2657,21 +2660,33 @@
         '<div class="field"><label for="cbAbout">About it</label><textarea id="cbAbout" maxlength="600" rows="3" placeholder="Who it\'s for and what you do together."></textarea></div>' +
         '<div class="field"><label for="cbWho">Who can join?</label><select id="cbWho"><option value="everyone">Everyone</option><option value="men">Men only</option><option value="women">Women only</option></select></div>' +
         '<div class="field"><label for="cbJoin">How do people join?</label><select id="cbJoin"><option value="request">I approve each request</option><option value="open">Anyone can join</option></select></div>' +
-        '<div class="field"><label for="cbZipIn">ZIP codes it covers</label><div class="casbar"><input type="text" id="cbZipIn" inputmode="numeric" maxlength="5" placeholder="35203"><button class="btn ghost sm" type="button" id="cbZipAdd">Add ZIP</button></div><div class="chips" id="cbZips"></div><span class="hint" id="cbCost"></span></div>' +
+        '<div class="field"><span class="lbl">How far does it reach?</span><div class="chips" id="cbScope" role="radiogroup" aria-label="Coverage">' +
+          [["zips", "📍 ZIP codes", "7 included"], ["states", "🗺️ Statewide", "$210 per state"], ["national", "🇺🇸 Nationwide", "$2,100"]].map(function (o, i) { return '<button type="button" class="chip" role="radio" data-scope="' + o[0] + '" aria-pressed="' + (i === 0) + '">' + o[1] + ' <small>' + o[2] + "</small></button>"; }).join("") + "</div></div>" +
+        '<div class="field" id="cbStateField" hidden><span class="lbl">Which states? <span class="hint">(tap all that apply)</span></span><div class="chips cbstates" id="cbStates">' +
+          US_STATES.map(function (st) { return '<button type="button" class="chip sm" data-st="' + st + '" aria-pressed="false">' + st + "</button>"; }).join("") + "</div></div>" +
+        '<div class="field" id="cbZipField"><label for="cbZipIn">ZIP codes it covers</label><div class="casbar"><input type="text" id="cbZipIn" inputmode="numeric" maxlength="5" placeholder="35203"><button class="btn ghost sm" type="button" id="cbZipAdd">Add ZIP</button></div><div class="chips" id="cbZips"></div><span class="hint" id="cbCost"></span></div>' + '<p class="hint" id="cbScopeCost"></p>' +
         designerHTML({}, "friendship") +
         '<div class="field"><label for="cbTable">First Game Table</label><input type="text" id="cbTable" maxlength="40" placeholder="Tuesday Night Table"></div>' +
         '<div class="field"><label for="cbMeets">When and where it meets (a public place)</label><input type="text" id="cbMeets" maxlength="120" placeholder="Tuesdays 7pm · coffee shop downtown"></div>' +
         '<span class="err" id="cbErr" role="alert"></span>' +
         '<div class="row"><button class="btn gold" type="submit" id="cbGo">Sign &amp; build</button><button class="btn ghost" type="button" data-close>Cancel</button></div></form>', { focus: "#cbName" });
       var nameT = null;
+      var scope = "zips", states = [];
+      function total() { return 2100 + (scope === "zips" ? Math.max(0, zips.length - 7) * 210 : 0) + (scope === "states" ? states.length * 21000 : 0) + (scope === "national" ? 210000 : 0); }
       function cost() {
-        var extra = Math.max(0, zips.length - 7);
+        var extra = scope === "zips" ? Math.max(0, zips.length - 7) : 0;
+        $("#cbZipField", m).hidden = scope !== "zips"; $("#cbStateField", m).hidden = scope !== "states";
+        $$("[data-scope]", m).forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-scope") === scope)); });
+        $$("[data-st]", m).forEach(function (b) { b.setAttribute("aria-pressed", String(states.indexOf(b.getAttribute("data-st")) > -1)); });
         $("#cbZips", m).innerHTML = zips.map(function (z) { return '<button type="button" class="chip sm" data-z="' + z + '" aria-label="Remove ZIP ' + z + '">' + z + " ✕</button>"; }).join("");
-        $("#cbCost", m).textContent = zips.length + " ZIP" + (zips.length === 1 ? "" : "s") + " · $21.00" + (extra ? " + " + extra + " extra × $2.10 = " + money(2100 + extra * 210) : " (up to 7 included)");
-        $("#cbGo", m).textContent = "Sign & build · " + money(2100 + extra * 210);
+        $("#cbCost", m).textContent = zips.length + " ZIP" + (zips.length === 1 ? "" : "s") + " · $21.00" + (extra ? " + " + extra + " extra × $2.10 = " + money(total()) : " (up to 7 included)");
+        $("#cbScopeCost", m).textContent = scope === "zips" ? "" : scope === "states" ? (states.length ? "$21.00 build + " + states.length + " state" + (states.length === 1 ? "" : "s") + " × $210 = " + money(total()) : "Tap the states your Casino covers.") : "$21.00 build + $2,100 nationwide = " + money(total());
+        $("#cbGo", m).textContent = "Sign & build · " + money(total());
       }
       function addZip() { var v = $("#cbZipIn", m).value.replace(/\D/g, ""); if (!/^\d{5}$/.test(v)) { $("#cbErr", m).textContent = "Enter a 5-digit ZIP code."; return; } if (zips.indexOf(v) < 0) zips.push(v); $("#cbZipIn", m).value = ""; $("#cbErr", m).textContent = ""; cost(); }
       $("#cbZipAdd", m).onclick = addZip;
+      $("#cbScope", m).addEventListener("click", function (e) { var b = e.target.closest("[data-scope]"); if (!b) return; scope = b.getAttribute("data-scope"); cost(); });
+      $("#cbStates", m).addEventListener("click", function (e) { var b = e.target.closest("[data-st]"); if (!b) return; var st = b.getAttribute("data-st"), i = states.indexOf(st); if (i > -1) states.splice(i, 1); else states.push(st); cost(); });
       $("#cbZipIn", m).addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); addZip(); } });
       $("#cbZips", m).addEventListener("click", function (e) { var b = e.target.closest("[data-z]"); if (!b) return; zips.splice(zips.indexOf(b.getAttribute("data-z")), 1); cost(); });
       $("#cbKind", m).onchange = function () { if ($("#cbKindL", m)) $("#cbKindL", m).textContent = kindLabel(this.value); if ($("#cdVenue", m) && !m.__venueTouched) $("#cdVenue", m).value = SC.KIND_DEFAULT[this.value] || "vegas_old"; };
@@ -2687,10 +2702,12 @@
         e.preventDefault(); var err = $("#cbErr", m);
         var d = { style: readDesign(m), p_name: $("#cbName", m).value.trim(), p_kind: $("#cbKind", m).value, p_about: $("#cbAbout", m).value.trim(), p_zips: zips.slice(), p_who: $("#cbWho", m).value, p_join: $("#cbJoin", m).value, p_first_table: $("#cbTable", m).value.trim(), p_meets: $("#cbMeets", m).value.trim() };
         if (d.p_name.length < 3) { err.textContent = "Give your Casino a name (3–40 characters)."; return; }
-        if (!zips.length) { err.textContent = "Add at least one ZIP code."; return; }
+        if (scope === "zips" && !zips.length) { err.textContent = "Add at least one ZIP code, or choose Statewide or Nationwide."; return; }
+        if (scope === "states" && !states.length) { err.textContent = "Tap at least one state."; return; }
+        if (scope !== "zips") d.p_zips = [];
         err.textContent = "";
         if (!live()) { // private preview only
-          closeModal(); if (window.SFX) window.SFX.celebrate(document.body, { game: "roulette", title: d.p_name.toUpperCase(), thanks: "Preview: on the live site this opens Stripe for " + money(2100 + Math.max(0, zips.length - 7) * 210) + ", then your Casino opens after a quick name check." });
+          closeModal(); if (window.SFX) window.SFX.celebrate(document.body, { game: "roulette", title: d.p_name.toUpperCase(), thanks: "Preview: on the live site this opens Stripe for " + money(total()) + ", then your Casino opens after a quick name check." });
           P.hostCasinos = [d.p_name]; saveP(); renderCard(); return;
         }
         function build() {
@@ -2702,7 +2719,10 @@
               err.textContent = r.error.message; return;
             }
             var newId = r.data.id;
-            window.SF_LIVE.rpc("set_casino_style", { p_casino: newId, p_style: d.style || {} }).then(function () { pay("build", newId, null, err); });
+            window.SF_LIVE.rpc("set_casino_scope", { p_casino: newId, p_scope: scope, p_states: states }).then(function (sr) {
+              if (sr.error) { err.textContent = sr.error.message; return; }
+              window.SF_LIVE.rpc("set_casino_style", { p_casino: newId, p_style: d.style || {} }).then(function () { pay("build", newId, null, err); });
+            });
           });
         }
         window.SFSign.require("casino", build, { about: d.p_name });
