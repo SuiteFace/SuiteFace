@@ -228,6 +228,32 @@
     box.addEventListener("click", function (e) { var b = e.target.closest("[data-ex]"); if (b) EX[b.getAttribute("data-ex")](); });
   })();
 
+  /* ---------- Help desk: answers + email. SuiteFace has no support phone line. ---------- */
+  (function () {
+    var hb = $("#helpBtn"); if (!hb) return;
+    var FAQ = [
+      ["How much does SuiteFace cost?", "Joining and building your Face are free. When your table is ready, the Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Cancel anytime in Settings."],
+      ["What does a comp code do?", "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."],
+      ["How do I cancel or pause?", "Settings → Membership → Manage billing. You can pause up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."],
+      ["Why don't I have 52 cards yet?", "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."],
+      ["How is my deck ranked?", "Each card gets a 100-point fit score for you: values, your table, shared interests, trumps, truth, closeness and age. Ace, King, Queen and Jack go only to ID-verified members. See House Fit Rules."],
+      ["How do I get the verified Seal?", "Verify with a driver's license, state ID or passport plus a quick live selfie. That confirms you're 18+ and that your face matches your card."],
+      ["How do Jokers work?", "After a Loss on one of your first three dates together, you can make a Joker within 12 hours of Play Hand. Ten Jokers within 180 days shows JOKER on a card for 45 days. Every Joker can be challenged for free. See Joker Rules."],
+      ["Someone made me feel unsafe.", "If you're in danger, call 911 now. Then use Report a safety concern on their card. Safety reports go straight to SuiteFace staff and are never handled as a Joker."],
+      ["I can't use 'Use my location'.", "Your browser has to allow location for suiteface.com, and it only works on the secure site. You can always type your ZIP code or city instead."],
+      ["How do I change or delete my account?", "Settings lets you edit your Face, change your @username if it's free, download your data, or delete your account."],
+      ["How do I contact SuiteFace?", "Email help@suiteface.com. SuiteFace doesn't take phone calls; every request is answered by email so there's a written record."]
+    ];
+    hb.addEventListener("click", function () {
+      var m = modal('<p class="eyebrow">Help desk</p><h3 style="font-size:2rem">How can we help?</h3><label class="sr" for="hdQ">Search help</label><input class="hd-search" id="hdQ" type="search" placeholder="Search: cancel, comp, Joker, location…" autocomplete="off">' +
+        '<div class="faq" id="hdList">' + FAQ.map(function (f) { return "<details><summary>" + esc(f[0]) + "</summary><p>" + esc(f[1]) + "</p></details>"; }).join("") + "</div>" +
+        '<div class="row" style="margin-top:12px"><a class="btn gold sm" href="mailto:help@suiteface.com?subject=SuiteFace%20help">Email help@suiteface.com</a><a class="btn ghost sm" href="legal.html">Legal center</a><a class="btn ghost sm" href="safety.html">Safety Guide</a></div>' +
+        '<p class="hint" style="margin-top:8px">No phone line: every answer comes by email, in writing. In an emergency, call 911.</p>', { focus: "#hdQ" });
+      $("#hdQ", m).addEventListener("input", function () { var q = this.value.trim().toLowerCase();
+        $$("#hdList details", m).forEach(function (d) { var hit = !q || d.textContent.toLowerCase().indexOf(q) > -1; d.hidden = !hit; if (q && hit) d.open = true; }); });
+    });
+  })();
+
   /* ---------- quiz ---------- */
   var Q = [
     ["First date, you'd rather…", { diamond: "Pick the place and book it", club: "Something lively, like trivia night", heart: "A long walk and real conversation", spade: "A spot I've researched with great reviews" }],
@@ -942,9 +968,9 @@
     function fallback() { toast("Select the text and copy it with your keyboard."); }
   }
   $("#copyLink").addEventListener("click", function () { $("#inviteLink").select(); copy($("#inviteLink").value, $("#copyLink")); });
-  $("#copyMail").addEventListener("click", function () { copy("hello@suiteface.com", $("#copyMail")); });
+  $("#copyMail").addEventListener("click", function () { copy("help@suiteface.com", $("#copyMail")); });
 
-  /* ---------- forms → hello@suiteface.com ---------- */
+  /* ---------- forms → help@suiteface.com ---------- */
   var FORMS = {
     WAITLIST: { title: "Join the waitlist", btn: "Save my seat", subject: "Waitlist sign-up", fields: [
       ["name", "Your name", "text", true], ["email", "Email", "email", true], ["city", "City", "text", true],
@@ -1009,9 +1035,9 @@
           formEl.querySelectorAll("input:not([type=checkbox]),textarea,select").forEach(function (x) { x.value = ""; });
           formEl.querySelectorAll("input[type=checkbox]").forEach(function (x) { x.checked = false; });
           jackpot(2500); burstAt(btn, 40);
-        } else out.innerHTML = '<div class="notice bad">That didn\'t go through: ' + esc((j && j.message) || "the form service said no.") + " Try again, or email hello@suiteface.com.</div>";
+        } else out.innerHTML = '<div class="notice bad">That didn\'t go through: ' + esc((j && j.message) || "the form service said no.") + " Try again, or email help@suiteface.com.</div>";
       })
-      .catch(function () { out.innerHTML = '<div class="notice bad">We couldn\'t reach the form service. Check your connection and try again, or email hello@suiteface.com.</div>'; })
+      .catch(function () { out.innerHTML = '<div class="notice bad">We couldn\'t reach the form service. Check your connection and try again, or email help@suiteface.com.</div>'; })
       .then(function () { btn.disabled = false; btn.textContent = old; });
   }
   $("#mainForm").addEventListener("submit", function (e) { e.preventDefault(); submitForm(e.target, e.target.getAttribute("data-type")); });
@@ -1646,7 +1672,7 @@
       ["Website", "Running", "ok", "Build " + (window.SUITEFACE_BUILD || "preview")],
       ["Secure connection (HTTPS)", location.protocol === "https:" ? "Yes" : "No", location.protocol === "https:" ? "ok" : "warn", location.protocol === "https:" ? "Needed for location and payments" : "Location and payments need HTTPS"],
       ["ZIP code data", zipReady ? ZLIST.length.toLocaleString() + " ZIPs loaded" : "Not loaded", zipReady ? "ok" : "bad", CFG.zipDataUrl],
-      ["Forms → hello@suiteface.com", CFG.formAccessKey ? "Connected" : "Preview mode", CFG.formAccessKey ? "ok" : "warn", CFG.formAccessKey ? "Web3Forms key present" : "Add formAccessKey in config.js"],
+      ["Forms → help@suiteface.com", CFG.formAccessKey ? "Connected" : "Preview mode", CFG.formAccessKey ? "ok" : "warn", CFG.formAccessKey ? "Web3Forms key present" : "Add formAccessKey in config.js"],
       ["Stripe checkout ($21 + $2.10)", CFG.stripePaymentLink ? "Connected" : "Not connected", CFG.stripePaymentLink ? "ok" : "warn", CFG.stripePaymentLink ? "Payment Link set" : "Add stripePaymentLink in config.js"],
       ["Stripe customer portal", CFG.stripePortalLink ? "Connected" : "Not connected", CFG.stripePortalLink ? "ok" : "warn", "Cancel and card updates"],
       ["Joker buy-out ($2,100)", CFG.stripeJokerBuyoutLink ? "On" : "Off", CFG.stripeJokerBuyoutLink ? "warn" : "ok", "Stays off until counsel approves"],

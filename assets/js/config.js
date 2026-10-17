@@ -1,5 +1,5 @@
 /* SuiteFace site settings — the only file you need to edit. Never put passwords or secret keys here: this file is public.
-   formAccessKey         free Web3Forms access key (create it at web3forms.com with hello@suiteface.com).
+   formAccessKey         free Web3Forms access key (create it at web3forms.com with help@suiteface.com).
    stripePaymentLink     Stripe Payment Link for the $21.00 Buy-In + $2.10/month membership (https://buy.stripe.com/...).
    stripePortalLink      Stripe customer portal login link, so members can update cards, see receipts or cancel.
    stripeJokerBuyoutLink  $2,100 public-Joker buy-out. stripeJokerLobbyLink $210 Joker Maker Lobby entry. stripeJokerRemovalLink $210 lobby-Joker removal.

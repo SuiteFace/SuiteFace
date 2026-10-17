@@ -49,14 +49,14 @@ GitHub stores the files and serves them as a website. Public sites are free, and
 3. Click **Run** to preview the site.
 4. Publishing a Repl to a custom domain may need a paid Replit plan. For a free public site on suiteface.com, use GitHub Pages and keep Replit for editing and testing.
 
-## Make the forms deliver to hello@suiteface.com (free)
+## Make the forms deliver to help@suiteface.com (free)
 
 The waitlist, contact, partners and feedback forms send through **Web3Forms**. Its free plan allows 250 messages a month.
 
-1. Make sure the `hello@suiteface.com` mailbox exists and you can read it.
-2. Go to web3forms.com, enter `hello@suiteface.com`, and create an access key. The key arrives in that mailbox.
+1. Make sure the `help@suiteface.com` mailbox exists and you can read it.
+2. Go to web3forms.com, enter `help@suiteface.com`, and create an access key. The key arrives in that mailbox.
 3. Open `assets/js/config.js`, paste the key between the quotes after `formAccessKey:`, and commit.
-4. **Test it:** submit the waitlist form on the live site. You should see a reference number like `SF-2026-K3F9Q2`, and an email with the same number should land in hello@suiteface.com.
+4. **Test it:** submit the waitlist form on the live site. You should see a reference number like `SF-2026-K3F9Q2`, and an email with the same number should land in help@suiteface.com.
    - Until the key is added, every form says **Preview mode** and sends nothing. The site never shows a reference number unless the message actually went through.
 
 ## What this version is, and isn't
