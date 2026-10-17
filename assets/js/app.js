@@ -907,7 +907,7 @@
     ["carpet", "🎞️", "showtime"], ["popcorn", "🍿", "showtime"], ["clap", "🎬", "showtime"], ["trophy", "🏆", "showtime"], ["mic", "🎤", "showtime"], ["shades", "🕶️", "showtime"], ["limo", "🚘", "showtime"], ["camera", "📸", "showtime"], ["walk", "🌟", "showtime"]
   ];
   var THEME = {}; THEMES.forEach(function (t) { THEME[t[0]] = t; });
-  P.theme = P.theme === "straight" ? "classic" : (P.theme || "private"); P.stickers = P.stickers || []; P.owned = P.owned || [];
+  P.theme = P.theme === "straight" ? "classic" : (P.theme || "private"); P.stickers = P.stickers || []; P.owned = P.owned || []; P.bumpers = P.bumpers || []; P.bumpersOk = P.bumpersOk || [];
   function owns(id) { return P.owned.indexOf(id) > -1; }
   function earnedHas(id) { if (id === "first1000") return !!P.founderNo; var n = +String(id).replace("ref", ""); return (P.refCount || 0) >= n; }
   function priceTag(n) { return n ? "$" + n.toFixed(2) : "Free"; }
@@ -916,6 +916,7 @@
     '<p class="hint" style="margin:0">Optional. An identity theme shows on your card for everyone in your deck to see, so pick one only if you want it known. <b>Private</b> shows no theme.</p>' +
     '<div class="thgroup"><b>Identity &amp; community themes <span class="free">Free</span></b><div class="themes" id="thFree"></div></div>' +
     '<div class="thgroup"><b>House themes <span class="prem">Premium</span></b><div class="themes" id="thPrem"></div></div>' +
+    '<div class="thgroup"><b>Bumper stickers <span class="free">Free</span> <span class="hint">(up to 3: what you\'d proudly put on your car)</span></b><p class="hint" style="margin:2px 0 0">They ride along the bottom of your card. Each one is self-declared until the house checks it; checked stickers wear a brass ✓. Claiming something that isn\'t true earns a Joker.</p><div class="bumpick" id="bumpPick"></div><div id="bumpAsk"></div></div>' +
     '<div class="thgroup"><b>Stickers <span class="hint">(up to 3 on your card)</span></b><div id="stk"></div></div>' +
     '<button class="btn ghost sm" type="button" id="openCage">Visit the Cashier\'s Cage</button>';
   $("#lookChips").closest(".field").after(styleField);
@@ -923,6 +924,13 @@
     function tile(t) { var locked = t[3] && !owns(t[0]); return '<button type="button" class="thpick" data-th="' + t[0] + '" aria-pressed="' + (P.theme === t[0]) + '" title="' + esc(t[5]) + '"><i style="background:' + (t[4] || "var(--felt-c," + P.felt + ")") + '"></i><span>' + esc(t[1]) + "</span>" + (locked ? '<em>' + priceTag(t[3]) + "</em>" : "") + "</button>"; }
     $("#thFree").innerHTML = THEMES.filter(function (t) { return t[2] !== "premium"; }).map(tile).join("");
     $("#thPrem").innerHTML = THEMES.filter(function (t) { return t[2] === "premium"; }).map(tile).join("");
+    if (window.SFBumpers && $("#bumpPick")) {
+      var grp = "";
+      $("#bumpPick").innerHTML = SFBumpers.list.map(function (b) { var h = b[6] !== grp ? '<span class="bumpgrp">' + b[6] + "</span>" : ""; grp = b[6];
+        return h + '<button type="button" data-bump="' + b[0] + '" aria-pressed="' + (P.bumpers.indexOf(b[0]) > -1) + '">' + SFBumpers.html(b[0], { verified: P.bumpersOk.indexOf(b[0]) > -1 }) + "</button>"; }).join("");
+      var ask = P.bumpers.filter(function (k) { return P.bumpersOk.indexOf(k) < 0 && k !== "flag"; });
+      $("#bumpAsk").innerHTML = liveOn() && ask.length ? '<p class="hint" style="margin:8px 0 0">Want the brass ✓? <button type="button" class="linkish" data-bumpask>Ask the house to check ' + (ask.length > 1 ? "these" : "this one") + "</button>. A dealer will reach out with a secure way to confirm. Never email documents.</p>" : "";
+    }
     $("#stk").innerHTML = Object.keys(PACKS).map(function (pk) { var pv = PACKS[pk], open = !pv[1] || owns("pack_" + pk) || (pk === "roller" && owns("stickers"));
       if (pk === "earned") return '<div class="stkpack"><span class="stkhead">Earned <span class="hint">(First 1,000 and one for each friend who joins, up to 12)</span></span><div class="stickers">' + STICKERS.filter(function (k) { return k[2] === "earned"; }).map(function (k) { var got = earnedHas(k[0]); return '<button type="button" class="stkpick wide' + (got ? "" : " earnlock") + '" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (got ? "" : ' data-earn="' + k[0] + '"') + ">" + k[1] + (got ? "" : "<em>🔒</em>") + "</button>"; }).join("") + "</div></div>";
       return '<div class="stkpack"><span class="stkhead">' + pv[0] + (open ? "" : ' <button type="button" class="unlockbtn" data-pack="' + pk + '">Unlock · $' + pv[1].toFixed(2) + "</button>") + '</span><div class="stickers">' +
@@ -946,6 +954,14 @@
       if (k.hasAttribute("data-locked")) { var pk = k.getAttribute("data-locked"); return buy("pack_" + pk, PACKS[pk][0] + " sticker pack", PACKS[pk][1], function () { renderStyle(); }); }
       var at = P.stickers.indexOf(id); if (at > -1) P.stickers.splice(at, 1); else { if (P.stickers.length >= 3) { toast("Up to 3 stickers. Tap one to remove it."); return; } P.stickers.push(id); }
       renderStyle(); onChange(); }
+    var bp = e.target.closest("[data-bump]");
+    if (bp) { var bk = bp.getAttribute("data-bump"), bi = P.bumpers.indexOf(bk);
+      if (bi > -1) P.bumpers.splice(bi, 1); else { if (P.bumpers.length >= 3) { toast("Up to 3 bumper stickers. Tap one to peel it off."); return; } P.bumpers.push(bk); }
+      renderStyle(); onChange(); return; }
+    if (e.target.closest("[data-bumpask]")) {
+      var want = P.bumpers.filter(function (k) { return P.bumpersOk.indexOf(k) < 0 && k !== "flag"; });
+      Promise.all(want.map(function (k) { return lrpc("request_bumper_check", { p_bumper: k }); })).then(function () { toast("Requested. Save my Face first if you just added them. A dealer will be in touch."); }, function (er) { toast((er && er.message) || "Save my Face first, then ask again."); });
+      return; }
     if (e.target.closest("#openCage")) openCage();
   });
   function openCage() {
@@ -1248,7 +1264,7 @@
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +
       '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") + (P.founderNo ? '<div class="f1kline">★ First 1,000 · №' + String(P.founderNo).padStart(4, "0") + "</div>" : "") + ((P.hostCasinos || []).length ? '<div class="hostline">♠ Host · ' + esc(P.hostCasinos.join(" · ")) + "</div>" : "") + (P.highRoller ? '<div class="hrb mine">💎 High Roller' + (P.highRoller === "verified" ? " ✓ Verified" : "") + "</div>" + (P.masked ? '<div class="maskline">🎭 Others see: ' + esc(P.maskName || "Masked High Roller") + (parseInt(P.age, 10) ? ", " + (parseInt(P.age, 10) - 1) + "–" + (parseInt(P.age, 10) + 1) : "") + "</div>" : "") : "") +
-      '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" +
+      '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" + (window.SFBumpers ? SFBumpers.strip(P.bumpers, P.bumpersOk) : "") +
       '<div class="tr" style="color:' + col + '">' + (P.wild ? "★ Wild Card" : P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="stk-' + k[2] + '">' + k[1] + "</span>" : ""; }).join("") + "</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
@@ -1320,13 +1336,15 @@
     spade: ["I read the reviews so you don't have to.", "Quiet at first, then I'll talk your ear off about history.", "Planner, puzzle lover, keeps every promise.", "Small circle, deep roots, good books."]
   };
   function rng(seed) { var x = seed >>> 0; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+  function demoBumpers(i) { var q = rng(i * 7919 + 13), keys = ["veteran", "flag", "college", "masters", "nurse", "educator", "coach", "owner", "pilot", "retired", "captain", "cpa", "lawyer", "md", "phd", "active_duty", "do"], out = [];
+    if (q() < .5) { out.push(keys[(q() * keys.length) | 0]); if (q() < .35) { var k2 = keys[(q() * keys.length) | 0]; if (out.indexOf(k2) < 0) out.push(k2); } } return out; }
   var POOL = (function () {
     var r = rng(52), out = [], id = 0, looks = ["longterm", "longterm", "seeing", "marriage", "friends", "seeing", "casual", "open"];
     function add(name, gender) {
       var s = ORDER[id % 4];
       var ints = []; while (ints.length < 4) { var x = INTERESTS[(r() * INTERESTS.length) | 0]; if (ints.indexOf(x) < 0) ints.push(x); }
       out.push({ id: "p" + id, name: name, gender: gender, suit: s, age: 22 + Math.round(Math.pow(r(), 1.25) * 30), dist: Math.round((0.5 + Math.pow(r(), 1.4) * 60) * 10) / 10,
-        looking: looks[(r() * looks.length) | 0], interests: ints, bio: BIOS[s][(r() * 4) | 0], noise: r(), hue: (r() * 360) | 0 });
+        looking: looks[(r() * looks.length) | 0], interests: ints, bio: BIOS[s][(r() * 4) | 0], noise: r(), hue: (r() * 360) | 0, bumpers: demoBumpers(id) });
       id++;
     }
     var LAST = "ABCDEFGHJKLMNPRSTVW", used = {};
@@ -1434,9 +1452,9 @@
     return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="' + esc(p.name) + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + '. Press to flip."><div class="flip">' +
       (p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + '</div></div><span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
-      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + (p.hr && P.room === "highroller" ? '<div class="hrb">' + (isMasked(p) ? "🎭 Masked " : "💎 ") + "High Roller" + (p.hr === "verified" ? " ✓" : "") + "</div>" : "") + jmeter(p) + "</div>" +
+      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + (p.hr && P.room === "highroller" ? '<div class="hrb">' + (isMasked(p) ? "🎭 Masked " : "💎 ") + "High Roller" + (p.hr === "verified" ? " ✓" : "") + "</div>" : "") + jmeter(p) + "</div>" +
       '<span class="idx br">' + p.rank + pip(p.suit) + "</span>" + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>") +
-      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
+      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
       '</div></div><div class="card-actions"><button class="btn ghost" type="button" data-burn>Burn</button><button class="btn red" type="button" data-play>Play</button></div></div>';
   }
   function renderTable(redeal) {
@@ -3061,7 +3079,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [] };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -3069,6 +3087,8 @@
   function liveDeck(redeal) {
     var go = redeal ? lrpc("deal_deck").then(function () { return lrpc("my_deck"); }) : lrpc("my_deck").then(function (rows) { return rows && rows.length ? rows : lrpc("deal_deck").then(function () { return lrpc("my_deck"); }); });
     return go.then(function (rows) {
+      return lrpc("deck_bumpers").then(function (bs) { var m = {}; (bs || []).forEach(function (b) { m[b.member_id] = b; }); (rows || []).forEach(function (r) { var b = m[r.member_id]; if (b) { r.bumpers = b.bumpers; r.bumpers_ok = b.verified; } }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
       LIVE_ROWS = rows || [];
       var mid = window.SF_LIVE.memberId(), saved = S.get("live:" + mid, { dealt: [] });
       G = { dealt: saved.dealt || [], burned: [], played: [], pairs: [], hands: {}, jokered: [], clock: 0 };
@@ -3096,6 +3116,7 @@
       .then(function () { return ids.length ? db.from("member_identity").upsert(ids).then(chk) : null; })
       .then(function () { return db.from("member_preferences").delete().eq("member_id", mid).then(chk); })
       .then(function () { return prefs.length ? db.from("member_preferences").insert(prefs).then(chk) : null; })
+      .then(function () { return lrpc("set_my_bumpers", { p_bumpers: P.bumpers || [] }).catch(function () { }); })
       .then(function () { return lrpc("set_my_rooms", { p_rooms: (P.rooms || []).filter(function (r) { return r !== "highroller"; }) }).catch(function () { }); })
       .then(function () {
         if (!/^data:image\//.test(P.photo || "")) return;
@@ -3111,7 +3132,7 @@
   function pullFace() {
     var L = window.SF_LIVE, db = L.client, mid = L.memberId();
     return Promise.all([
-      db.from("members").select("face_name,handle,bio,home_zip,style_suit,looking_for,interests,gender,birth_date,photo_url,photo_source,rooms").eq("id", mid).single(),
+      db.from("members").select("face_name,handle,bio,home_zip,style_suit,looking_for,interests,gender,birth_date,photo_url,photo_source,rooms,bumpers").eq("id", mid).single(),
       db.from("strategies").select("*").eq("member_id", mid).maybeSingle(),
       db.from("member_identity").select("question,answers,face_up").eq("member_id", mid),
       db.from("member_preferences").select("question,wanted,dealbreaker").eq("member_id", mid)
@@ -3128,6 +3149,7 @@
       if (m.birth_date) { P.dob = m.birth_date; var a = ageFrom(m.birth_date); if (!isNaN(a)) P.age = String(a); if (window.SF_setDob) window.SF_setDob(m.birth_date); }
       if (m.photo_url) { P.photo = m.photo_url; P.photoLive = m.photo_source === "live" ? (P.photoLive || "live") : null; }
       if (m.rooms) P.rooms = m.rooms;
+      if (m.bumpers) { P.bumpers = m.bumpers; lrpc("my_bumpers").then(function (rs) { P.bumpersOk = (rs || []).filter(function (x) { return x.status === "verified"; }).map(function (x) { return x.bumper; }); saveP(); if (typeof renderStyle === "function") renderStyle(); renderCard(); }, function () { }); }
       var st = res[1].data; if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
       (res[2].data || []).forEach(function (r) { if (!IDX[r.question]) return; P.id[r.question] = IDX[r.question][2] === "one" ? r.answers[0] : r.answers; P.vis[r.question] = r.face_up; });
       (res[3].data || []).forEach(function (r) { P.prefs[r.question] = { sel: r.wanted, deal: r.dealbreaker }; });

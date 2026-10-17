@@ -100,6 +100,8 @@ No profile is activated and no payment is processed until the matching agreement
 
 **2.6 Information from members.** Profiles, answers, photos, Jokers and statements come from members. SuiteFace doesn't verify them except where a feature says so, and isn't responsible for their accuracy.
 
+**2.6c Bumper stickers.** Members may add up to three bumper stickers to their card (for example Veteran, Active Duty, the American flag, a degree, or a profession such as Nurse, M.D., Lawyer, CPA or Pilot). A sticker is the member's own statement unless it shows a brass ✓, which means SuiteFace confirmed it through a review. A check confirms the sticker only, not anything else about the member. Claiming a sticker that isn't true is misrepresentation: SuiteFace may remove it and it may lead to a Joker, a hold or removal. Never send documents by email; when a check is requested, SuiteFace will provide a secure way to confirm.
+
 ## 3. Meeting people: risk and safety
 
 **3.1 You accept the risk.** Meeting people you don't know, online or in person, carries risk. **Harm can happen**, including emotional harm, financial loss, theft, physical injury, sexual assault, and in rare cases worse. You alone decide whether, when, where and how to meet anyone, and **you voluntarily assume all risk** of doing so. Checking in, Play Hand, ranks, verification marks and Joker meters are tools, not safety guarantees.
