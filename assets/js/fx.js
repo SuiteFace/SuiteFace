@@ -179,7 +179,7 @@
   function finale(v, host, opts) {
     var w = document.createElement("div"); w.className = "sfx-win"; w.textContent = "WINNER WINNER!"; host.appendChild(w);
     var t = document.createElement("div"); t.className = "sfx-thanks"; t.textContent = opts.thanks || "Thank you for your submission."; host.appendChild(t);
-    var row = document.createElement("div"); row.className = "sfx-row"; row.innerHTML = '<button class="sfx-btn" type="button">' + (opts.button || "Collect your winnings") + "</button>"; host.appendChild(row);
+    var row = document.createElement("div"); row.className = "sfx-row"; row.innerHTML = '<button class="sfx-btn" type="button">' + (opts.button || "Back to SuiteFace") + "</button>"; host.appendChild(row);
     requestAnimationFrame(function () { w.classList.add("on"); }); coins(w);
     var prev = document.activeElement, b = row.querySelector("button");
     function close() { v.classList.remove("on"); setTimeout(function () { v.remove(); }, 260); document.removeEventListener("keydown", esc); if (prev && prev.focus) prev.focus(); opts.onDone && opts.onDone(); }

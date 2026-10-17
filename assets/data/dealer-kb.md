@@ -94,6 +94,8 @@ No profile is activated and no payment is processed until the matching agreement
 
 **2.5 Not a party.** SuiteFace is not a party to anything that happens between members, online or in person, including dates, money shared on a date (for example through Venmo or Cash App), and anything said or done. Members are independent people, not SuiteFace's employees, agents or representatives.
 
+**2.5a Suits and Wild Cards.** The suit quiz is a playful self-description, not a psychological, medical or personality assessment. It places most members in one of four suits (Diamond, Club, Heart or Spade). A member whose answers don't lean strongly toward any one suit is a **Wild Card**. "Wild Card" is a neutral description that only means the member's answers spread across the suits instead of matching the most common patterns. It is **not** a judgment of character, conduct, safety or worth, it is never shown as a warning, and it is unrelated to **Jokers** (Section 6), which concern conduct. A Wild Card is seated first in the suit their answers lean toward and may choose any suit at any time.
+
 **2.6 Information from members.** Profiles, answers, photos, Jokers and statements come from members. SuiteFace doesn't verify them except where a feature says so, and isn't responsible for their accuracy.
 
 ## 3. Meeting people: risk and safety
