@@ -509,3 +509,10 @@ footer a{color:var(--cream-dim)}
 .bars .bar span{font-weight:700;font-size:.85rem}.bars .bar small{color:var(--muted)}
 .top .wrap{max-width:1560px}
 .nav a{white-space:nowrap;letter-spacing:.08em;padding:.55rem .55rem}
+
+/* comp code */
+.comp{display:grid;gap:6px;margin:6px 0 4px}
+.comp label{font-weight:700;display:flex;gap:8px;align-items:center}
+.chipmark{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;font:900 .62rem var(--display);letter-spacing:.08em;color:var(--night);background:radial-gradient(circle,var(--gold-hi) 0 52%,transparent 53%),repeating-conic-gradient(var(--red) 0 20deg,var(--cream) 20deg 40deg);box-shadow:0 0 0 2px var(--gold)}
+.comprow{display:flex;gap:8px;max-width:420px}
+.comprow input{flex:1;font:600 1rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--cream);background:var(--night);border:1px solid var(--line);border-radius:10px;padding:.6rem .75rem}

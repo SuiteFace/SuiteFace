@@ -626,10 +626,24 @@
   function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."; $("#agree").focus(); return false; }
   $("#payBtn").addEventListener("click", function (e) {
     e.preventDefault(); if (!needAgree()) return;
-    if (CFG.stripePaymentLink) { var go = function () { window.location.href = CFG.stripePaymentLink; }; if (window.SFSign) window.SFSign.require("buyin", go); else go(); return; }
+    if (CFG.stripePaymentLink) { var comp = (S.get("comp", "") || "").trim(); var go = function () { window.location.href = CFG.stripePaymentLink + (comp ? (CFG.stripePaymentLink.indexOf("?") < 0 ? "?" : "&") + "prefilled_promo_code=" + encodeURIComponent(comp) : ""); }; if (window.SFSign) window.SFSign.require("buyin", go); else go(); return; }
     modal('<h3 style="font-size:1.8rem">Checkout preview</h3><div class="pricing" style="margin:12px 0"><div><span class="big">$21.00</span><span class="hint">today</span></div><div class="plus">+</div><div><span class="big">$2.10</span><span class="hint">monthly after</span></div></div><div class="notice pv"><b>Preview mode.</b> Stripe checkout isn\'t connected yet, so no payment was taken. Site owner: paste your Stripe Payment Link into <code>assets/js/config.js</code>.</div><button class="btn gold sm" type="button" id="simBuy" style="margin-top:12px">Simulate a paid Buy-In (demo)</button>');
     $("#simBuy").addEventListener("click", function () { closeModal(); setRole("player"); toast("Buy-In complete (demo). Welcome to the table!"); jackpot(4000); burst(innerWidth / 2, innerHeight / 3, 120); location.hash = "face"; });
   });
+  (function () {
+    var KNOWN = { PLAYMESSY: "Comp: your $21.00 Buy-In is on the house. Your $2.10 monthly starts in 30 days." };
+    var inp = $("#compCode"), msg = $("#compMsg"); if (!inp) return;
+    inp.value = S.get("comp", "");
+    function apply() {
+      var v = inp.value.trim(); if (!v) { S.set("comp", ""); msg.textContent = "Comps are applied at checkout. One per member."; return; }
+      S.set("comp", v); var k = KNOWN[v.toUpperCase()];
+      msg.innerHTML = k ? "<b style='color:var(--gold-hi)'>" + esc(k) + "</b>" : "Code saved. Stripe checks it at checkout.";
+      if (k) { jackpot(1800); burstAt($("#compApply"), 40); }
+    }
+    $("#compApply").addEventListener("click", apply);
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); apply(); } });
+    var q = new URLSearchParams(location.search).get("comp"); if (q) { inp.value = q; apply(); }
+  })();
   $("#portalBtn").addEventListener("click", function (e) {
     e.preventDefault();
     if (CFG.stripePortalLink) { window.location.href = CFG.stripePortalLink; return; }
