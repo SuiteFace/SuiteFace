@@ -501,6 +501,18 @@
       <div class="kpis" id="kpis"></div>
       <div class="panel" style="margin-top:16px"><h3 style="font-size:1.2rem">New Buy-Ins by week</h3><div class="bars" id="ownerBars"></div></div>
       <div class="panel" style="margin-top:16px"><h3 style="font-size:1.2rem">House rules in force</h3><div id="ownerRules"></div></div>
+      <div class="panel staffpanel" style="margin-top:16px">
+        <h3 style="font-size:1.2rem">🔐 Staff approvals</h3>
+        <p class="hint">Only the Owner can give or remove a staff role, and every change needs the approval passcode. The passcode is checked on the server and stored only as a one-way scramble, so nobody (including Claude) can read it back. Staff must already have a SuiteFace account with the ✓ ID Seal. Five wrong passcodes lock approvals for an hour.</p>
+        <form id="stApprove" class="form-grid" autocomplete="off">
+          <div class="two"><div class="field"><label for="stEmail">Their account email</label><input id="stEmail" type="email" required placeholder="name@example.com"></div>
+          <div class="field"><label for="stRole">Role</label><select id="stRole"><option value="dealer">Dealer: member support and safety</option><option value="pitboss">Pit Boss: IT and system health</option><option value="player">Remove staff role (back to Player)</option></select></div></div>
+          <div class="two"><div class="field"><label for="stPass">Approval passcode</label><input id="stPass" type="password" required autocomplete="off"></div>
+          <div class="field"><label for="stNote">Note <span class="hint">(why, for the log)</span></label><input id="stNote" maxlength="300" placeholder="Hired as weekend support"></div></div>
+          <div class="row"><button class="btn gold" type="submit">Approve</button><button class="btn ghost" type="button" id="stSetPass">Set or change the passcode</button></div>
+          <p class="hint" id="stOut" role="status"></p>
+        </form>
+      </div>
     </div>
   </section>
 </main>

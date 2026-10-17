@@ -316,6 +316,32 @@
     });
   })();
 
+  /* ---------- Owner: staff approvals (server checks the passcode; nothing secret lives in this page) ---------- */
+  (function () {
+    var f = $("#stApprove"); if (!f) return; var out = $("#stOut");
+    function live() { return window.SF_LIVE && window.SF_LIVE.rpc; }
+    f.addEventListener("submit", function (e) { e.preventDefault();
+      var args = { p_email: $("#stEmail").value.trim(), p_role: $("#stRole").value, p_passcode: $("#stPass").value, p_note: $("#stNote").value.trim() || null };
+      $("#stPass").value = "";
+      if (!live()) { out.textContent = "Preview: on the live site this sends the approval to the server, which checks the passcode, the ID Seal and that you're the Owner."; return; }
+      out.textContent = "Checking…";
+      window.SF_LIVE.rpc("approve_staff", args).then(function (r) { out.textContent = r.error ? r.error.message : "✓ " + r.data; });
+    });
+    $("#stSetPass").addEventListener("click", function () {
+      var m = modal('<h3 style="font-size:1.8rem">Approval passcode</h3><p class="lede" style="margin:6px 0 10px">At least 12 characters with upper and lower case letters, a number and a symbol. Keep it in your password manager, not in email or chat.</p>' +
+        '<div class="form-grid"><div class="field"><label for="pcCur">Current passcode <span class="hint">(leave blank the first time)</span></label><input id="pcCur" type="password" autocomplete="off"></div>' +
+        '<div class="field"><label for="pcNew">New passcode</label><input id="pcNew" type="password" autocomplete="new-password"></div>' +
+        '<div class="field"><label for="pcNew2">New passcode again</label><input id="pcNew2" type="password" autocomplete="new-password"></div>' +
+        '<div class="row"><button class="btn gold" type="button" id="pcGo">Save passcode</button></div><p class="hint" id="pcOut" role="status"></p></div>', { focus: "#pcNew" });
+      $("#pcGo", m).addEventListener("click", function () {
+        var a1 = $("#pcNew", m).value, a2 = $("#pcNew2", m).value, o = $("#pcOut", m);
+        if (a1 !== a2) { o.textContent = "The two new passcodes don't match."; return; }
+        if (!live()) { o.textContent = "Preview: on the live site the server saves only a one-way scramble of this passcode."; return; }
+        window.SF_LIVE.rpc("set_approval_passcode", { p_new: a1, p_current: $("#pcCur", m).value || null }).then(function (r) { o.textContent = r.error ? r.error.message : "✓ " + r.data; if (!r.error) setTimeout(closeModal, 1200); });
+      });
+    });
+  })();
+
   /* ---------- quiz ---------- */
   var Q = [
     ["First date, you'd rather…", { diamond: "Pick the place and book it", club: "Something lively, like trivia night", heart: "A long walk and real conversation", spade: "A spot I've researched with great reviews" }],
@@ -1711,8 +1737,8 @@
   var ROLE_INFO = {
     guest: ["Guest visitor", "Sees the demo table, how it plays, the quiz and membership. Everything else needs a Buy-In."],
     player: ["Player", "A paid member: My Face, your 52, the Table Map, Pairs, Play Hand and invites."],
-    dealer: ["Dealer", "SuiteFace staff: safety reports, Joker reviews, appeals and pauses. Also sees the player view."],
-    pitboss: ["Pit Boss", "IT troubleshooting: live checks for forms, payments, data, location and errors."],
+    dealer: ["Dealer", "Staff, approved by the Owner with the passcode: safety reports, member help and account holds. Can't change roles, prices or payments."],
+    pitboss: ["Pit Boss", "IT, approved by the Owner with the passcode: system health, errors and the payment webhook. Never sees private member details."],
     owner: ["Owner", "Everything: player view, every console and the house numbers."]
   };
   var ROLE = S.get("role", "guest"); if (!ROLE_INFO[ROLE]) ROLE = "guest";
