@@ -19,6 +19,7 @@
 .sfx-strip{position:absolute;left:0;right:0;top:0;will-change:transform}\
 .sfx-sym{height:112px;display:grid;place-items:center;align-content:center;font-weight:900;font-size:2.6rem;line-height:.9;color:#2B2730}\
 .sfx-sym.r{color:#C8303F}.sfx-sym small{font-size:1.9rem}\
+.sfx-sym.jk{gap:2px}.sfx-sym.jk small{font:900 .95rem "Big Shoulders Display",Impact,sans-serif;letter-spacing:.14em;color:var(--jc)}\
 .sfx-reel.spin .sfx-strip{filter:blur(2px)}\
 .sfx-line{position:absolute;left:14px;right:14px;top:50%;height:2px;background:rgba(200,48,63,.5);pointer-events:none}\
 .sfx-slot{margin:14px auto 0;width:70%;height:12px;border-radius:6px;background:#17151B;box-shadow:inset 0 3px 6px #000,0 1px 0 rgba(255,255,255,.2)}\
@@ -45,7 +46,12 @@
 .sfx-veil.page .sfx-machine{transform:scale(.9)}\
 @media (prefers-reduced-motion:reduce){.sfx-bulbs i{animation:none;opacity:.8}.sfx-ticket{transition:none}.sfx-stamp{transition:none}}';
   function css() { if (document.getElementById("sfx-css")) return; var s = document.createElement("style"); s.id = "sfx-css"; s.textContent = CSS; document.head.appendChild(s); }
-  function symHTML(s) { return '<div class="sfx-sym' + (s[2] ? " r" : "") + '">' + s[0] + (s[1] ? "<small>" + s[1] + "</small>" : "") + "</div>"; }
+  function symHTML(s) {
+    if (s[0] === "JOKER") return '<div class="sfx-sym jk" style="--jc:' + s[3] + '"><span class="jkhat">' + JOKER_HAT + '</span><small>JOKER</small></div>';
+    return '<div class="sfx-sym' + (s[2] ? " r" : "") + '">' + s[0] + (s[1] ? "<small>" + s[1] + "</small>" : "") + "</div>"; }
+  var JOKER_HAT = '<svg viewBox="0 0 64 48" width="54" height="40" aria-hidden="true"><path d="M6 40 L10 10 L22 28 L32 4 L42 28 L54 10 L58 40 Z" fill="var(--jc)" stroke="#2B2730" stroke-width="2.5" stroke-linejoin="round"/><circle cx="10" cy="9" r="4.5" fill="#E8C46A" stroke="#2B2730" stroke-width="2"/><circle cx="32" cy="4" r="4.5" fill="#E8C46A" stroke="#2B2730" stroke-width="2"/><circle cx="54" cy="9" r="4.5" fill="#E8C46A" stroke="#2B2730" stroke-width="2"/><rect x="5" y="38" width="54" height="8" rx="3" fill="#E8C46A" stroke="#2B2730" stroke-width="2"/></svg>';
+  var JOKER_COLORS = ["#C8303F", "#2F8A62", "#7A3FA0", "#D2622A", "#C8961E", "#C23B7A"];
+  function threeJokers() { var c = JOKER_COLORS.slice().sort(function () { return Math.random() - .5; }); return [["JOKER", "", 0, c[0]], ["JOKER", "", 0, c[1]], ["JOKER", "", 0, c[2]]]; }
   function machine(title) {
     css();
     var v = document.createElement("div"); v.className = "sfx-veil"; v.setAttribute("role", "status"); v.setAttribute("aria-live", "polite");
@@ -113,7 +119,9 @@
   // ---------- between pages: a quick spin ----------
   function pageSpin(href) {
     var v = machine("NEXT TABLE"); v.classList.add("page");
-    var land = [SYM[(Math.random() * 4) | 0], SYM[(Math.random() * 4) | 0], SYM[(Math.random() * 4) | 0]];
+    var toLobby = /joker-lobby\.html/.test(href);
+    var land = toLobby ? threeJokers() : [SYM[(Math.random() * 4) | 0], SYM[(Math.random() * 4) | 0], SYM[(Math.random() * 4) | 0]];
+    if (toLobby) { var top = v.querySelector(".sfx-top"); if (top) top.textContent = "JOKER LOBBY"; }
     spin(v, land, REDUCED ? 0 : 520, function () { try { sessionStorage.setItem("sfx-arrive", "1"); } catch (e) { } location.href = href; });
     setTimeout(function () { location.href = href; }, 2600); // never block navigation
   }
@@ -135,11 +143,82 @@
   (function () {
     var arrive = false; try { arrive = sessionStorage.getItem("sfx-arrive") === "1"; sessionStorage.removeItem("sfx-arrive"); } catch (e) { }
     if (!arrive || REDUCED) return;
-    function go() { var v = machine("NEXT TABLE"); v.classList.add("page"); v.querySelectorAll(".sfx-strip").forEach(function (s) { s.innerHTML = symHTML(LAND[0]); });
-      spin(v, LAND, 380, function () { setTimeout(function () { v.classList.remove("on"); setTimeout(function () { v.remove(); }, 260); }, 220); }); }
+    function go() { var lobby = /joker-lobby\.html/.test(location.pathname), land = lobby ? threeJokers() : LAND;
+      var v = machine(lobby ? "JOKER LOBBY" : "NEXT TABLE"); v.classList.add("page"); v.querySelectorAll(".sfx-strip").forEach(function (s) { s.innerHTML = symHTML(land[0]); });
+      spin(v, land, 380, function () { setTimeout(function () { v.classList.remove("on"); setTimeout(function () { v.remove(); }, 260); }, 220); }); }
     if (document.body) go(); else document.addEventListener("DOMContentLoaded", go);
   })();
   window.addEventListener("pageshow", function (e) { if (e.persisted) document.querySelectorAll(".sfx-veil").forEach(function (v) { v.remove(); }); });
 
-  window.SFX = { cashOut: cashOut, machine: machine, spin: spin };
+
+  // ---------- Celebrations: coin drop, roulette or dice, then WINNER WINNER ----------
+  var CCSS = '\
+.sfx-stage{position:relative;width:min(380px,88vw);display:grid;justify-items:center;gap:14px;font-family:Figtree,system-ui,sans-serif;color:#FAF7F0;text-align:center}\
+.sfx-chip{position:fixed;z-index:10002;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#FFE7A3 0 38%,#B8862F 39% 44%,#FFE7A3 45% 52%,#9B1B30 53%);box-shadow:0 0 0 3px #FAF7F0,0 8px 18px rgba(0,0,0,.5);display:grid;place-items:center;font:900 1rem "Big Shoulders Display",Impact,sans-serif;color:#6A1020;transition:left .8s cubic-bezier(.5,0,.3,1),top .8s cubic-bezier(.5,0,.3,1),transform .8s,opacity .3s}\
+.sfx-wheel{width:240px;height:240px;border-radius:50%;position:relative;background:conic-gradient(' + (function () { var s = []; for (var i = 0; i < 18; i++) s.push((i % 2 ? "#2B2730" : "#9B1B30") + " " + (i * 20) + "deg " + (i * 20 + 20) + "deg"); return s.join(","); })() + ');box-shadow:0 0 0 8px #6A3B12,0 0 0 11px #B8862F,0 20px 50px rgba(0,0,0,.6)}\
+.sfx-wheel::after{content:"";position:absolute;inset:34%;border-radius:50%;background:radial-gradient(circle,#E8C46A,#7a5410);box-shadow:0 0 0 3px #FAF7F0}\
+.sfx-wheel.spin{animation:sfxWheel 3.2s cubic-bezier(.15,.7,.2,1) forwards}\
+@keyframes sfxWheel{to{transform:rotate(1440deg)}}\
+.sfx-ballring{position:absolute;inset:0;animation:sfxBall 3.2s cubic-bezier(.2,.6,.25,1) forwards}\
+.sfx-ballring i{position:absolute;left:50%;top:10px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#CFC6B6);box-shadow:0 2px 4px rgba(0,0,0,.5)}\
+@keyframes sfxBall{to{transform:rotate(-1800deg)}}\
+.sfx-num{font:900 3rem "Big Shoulders Display",Impact,sans-serif;color:#FFE7A3;text-shadow:0 0 18px rgba(232,196,106,.8);min-height:1em}\
+.sfx-felt{width:100%;height:150px;border-radius:18px;background:radial-gradient(ellipse at 50% 30%,#2a7a58,#1E6347 65%,#154a35);border:8px solid #3a2a1a;position:relative;overflow:hidden}\
+.sfx-die{position:absolute;width:56px;height:56px;border-radius:12px;background:#FFFDF8;box-shadow:inset 0 -4px 0 #CFC6B6,0 8px 14px rgba(0,0,0,.45);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:7px;top:45px}\
+.sfx-die b{width:10px;height:10px;border-radius:50%;background:#9B1B30;place-self:center}\
+.sfx-die.roll1{left:-70px;animation:sfxRoll1 1.6s cubic-bezier(.2,.7,.3,1) forwards}.sfx-die.roll2{left:-140px;animation:sfxRoll2 1.8s cubic-bezier(.2,.7,.3,1) forwards}\
+@keyframes sfxRoll1{60%{transform:translate(200px,-30px) rotate(620deg)}to{transform:translate(170px,0) rotate(720deg)}}\
+@keyframes sfxRoll2{60%{transform:translate(330px,20px) rotate(-700deg)}to{transform:translate(320px,0) rotate(-720deg)}}\
+.sfx-win{font:900 2.6rem/1 "Big Shoulders Display",Impact,sans-serif;color:#FFE7A3;text-shadow:0 0 14px rgba(232,196,106,.9),0 0 30px rgba(229,80,94,.6);letter-spacing:.04em;transform:scale(.3);opacity:0;transition:transform .45s cubic-bezier(.2,1.6,.4,1),opacity .2s}\
+.sfx-win.on{transform:scale(1);opacity:1}\
+.sfx-thanks{font-weight:600;font-size:1.05rem;color:#FAF7F0;min-height:1.4em}\
+@media (prefers-reduced-motion:reduce){.sfx-wheel.spin,.sfx-ballring,.sfx-die.roll1,.sfx-die.roll2{animation-duration:.01s}}';
+  function ccss() { if (document.getElementById("sfx-ccss")) return; css(); var s = document.createElement("style"); s.id = "sfx-ccss"; s.textContent = CCSS; document.head.appendChild(s); }
+  function veil() { ccss(); var v = document.createElement("div"); v.className = "sfx-veil"; v.setAttribute("role", "status"); v.setAttribute("aria-live", "polite"); document.body.appendChild(v); requestAnimationFrame(function () { v.classList.add("on"); }); return v; }
+  function finale(v, host, opts) {
+    var w = document.createElement("div"); w.className = "sfx-win"; w.textContent = "WINNER WINNER!"; host.appendChild(w);
+    var t = document.createElement("div"); t.className = "sfx-thanks"; t.textContent = opts.thanks || "Thank you for your submission."; host.appendChild(t);
+    var row = document.createElement("div"); row.className = "sfx-row"; row.innerHTML = '<button class="sfx-btn" type="button">' + (opts.button || "Collect your winnings") + "</button>"; host.appendChild(row);
+    requestAnimationFrame(function () { w.classList.add("on"); }); coins(w);
+    var prev = document.activeElement, b = row.querySelector("button");
+    function close() { v.classList.remove("on"); setTimeout(function () { v.remove(); }, 260); document.removeEventListener("keydown", esc); if (prev && prev.focus) prev.focus(); opts.onDone && opts.onDone(); }
+    function esc(e) { if (e.key === "Escape") close(); }
+    b.addEventListener("click", close); document.addEventListener("keydown", esc); setTimeout(function () { b.focus(); }, 300);
+  }
+  function chipFrom(src, to, cb) {
+    if (!src || REDUCED) return cb();
+    var r = src.getBoundingClientRect(), c = document.createElement("div"); c.className = "sfx-chip"; c.textContent = "$21";
+    c.style.left = (r.left + r.width / 2 - 32) + "px"; c.style.top = (r.top + Math.min(r.height, 300) / 2 - 32) + "px"; document.body.appendChild(c);
+    setTimeout(function () { var t = to.getBoundingClientRect(); c.style.left = (t.left + t.width / 2 - 32) + "px"; c.style.top = (t.top - 20) + "px"; c.style.transform = "rotateY(720deg) scale(.7)"; }, 50);
+    setTimeout(function () { c.style.opacity = "0"; c.style.transform += " translateY(30px) scaleY(.1)"; }, 900);
+    setTimeout(function () { c.remove(); cb(); }, 1150);
+  }
+  function coinDrop(src, opts) {
+    var v = machine(opts.title || "WINNER WINNER"), m = v.querySelector(".sfx-machine"), msg = v.querySelector(".sfx-msg"), out = v.querySelector(".sfx-out");
+    msg.textContent = "Dropping your chip…";
+    chipFrom(src, m.querySelector(".sfx-slot"), function () {
+      msg.textContent = "Rolling…";
+      spin(v, LAND, 1200, function () { msg.textContent = ""; out.style.display = "grid"; out.style.justifyItems = "center"; out.style.gap = "8px"; out.style.marginTop = "8px"; finale(v, out, opts); });
+    });
+  }
+  function roulette(src, opts) {
+    var v = veil(), st = document.createElement("div"); st.className = "sfx-stage"; v.appendChild(st);
+    st.innerHTML = '<div class="sfx-top" style="position:static;transform:none">' + (opts.title || "ROULETTE") + '</div><div class="sfx-wheel"><div class="sfx-ballring"><i></i></div></div><div class="sfx-num" aria-hidden="true"></div>';
+    var wheel = st.querySelector(".sfx-wheel");
+    chipFrom(src, wheel, function () { wheel.classList.add("spin"); var n = st.querySelector(".sfx-num"), k = 0;
+      var tick = setInterval(function () { n.textContent = (Math.random() * 36 | 0) + 1; if (++k > 22) { clearInterval(tick); n.textContent = "21 RED"; finale(v, st, opts); } }, REDUCED ? 5 : 140); });
+  }
+  function dice(src, opts) {
+    var v = veil(), st = document.createElement("div"); st.className = "sfx-stage"; v.appendChild(st);
+    var pips = { 3: [1, 5, 9], 4: [1, 3, 7, 9] };
+    function die(n, cls) { var cells = ""; for (var i = 1; i <= 9; i++) cells += pips[n].indexOf(i) > -1 ? "<b></b>" : "<span></span>"; return '<div class="sfx-die ' + cls + '">' + cells + "</div>"; }
+    st.innerHTML = '<div class="sfx-top" style="position:static;transform:none">' + (opts.title || "LUCKY SEVEN") + '</div><div class="sfx-felt">' + die(3, "") + die(4, "") + '</div><div class="sfx-num" aria-hidden="true"></div>';
+    var felt = st.querySelector(".sfx-felt"), ds = felt.querySelectorAll(".sfx-die");
+    chipFrom(src, felt, function () { ds[0].classList.add("roll1"); ds[1].classList.add("roll2");
+      setTimeout(function () { st.querySelector(".sfx-num").textContent = "3 + 4 = 7"; finale(v, st, opts); }, REDUCED ? 50 : 1850); });
+  }
+  function celebrate(src, opts) { opts = opts || {}; var pick = opts.game || ["coin", "roulette", "dice"][(Math.random() * 3) | 0];
+    return (pick === "roulette" ? roulette : pick === "dice" ? dice : coinDrop)(src, opts); }
+
+  window.SFX = { cashOut: cashOut, machine: machine, spin: spin, celebrate: celebrate };
 })();

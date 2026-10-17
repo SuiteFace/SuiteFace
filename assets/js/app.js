@@ -351,7 +351,7 @@
   window.SF_rpc = rpc;
   function marquee(s, cls) {
     var bulbs = ""; for (var i = 0; i < 22; i++) bulbs += "<i style=\"animation-delay:" + (i % 3) * .3 + "s\"></i>";
-    return '<div class="vsign ' + (cls || "") + '"><div class="vbulbs">' + bulbs + '</div><span class="vtag">' + (s.house ? "House sponsor" : "Sponsored") + "</span><b class="vhead">' + esc(s.headline || s.business) + '</b>' +
+    return '<div class="vsign ' + (cls || "") + '"><div class="vbulbs">' + bulbs + '</div><span class="vtag">' + (s.house ? "House sponsor" : "Sponsored") + '</span><b class="vhead">' + esc(s.headline || s.business) + '</b>' +
       (s.tagline ? '<span class="vtl">' + esc(s.tagline) + "</span>" : "") + (s.offer ? '<span class="voffer">' + esc(s.offer) + "</span>" : "") + "</div>";
   }
   function quiet(id, days) { try { localStorage.setItem("sf.sp." + id, String(Date.now() + days * 864e5)); } catch (e) { } }
@@ -376,7 +376,9 @@
       $("#spLead", m).addEventListener("submit", function (e) { e.preventDefault(); var o = $("#spOut", m);
         if (!$("#spOk", m).checked) { o.textContent = "Check the box to send your details."; return; }
         rpc("sponsor_lead", { p_sponsor: s.id, p_name: $("#spN", m).value, p_email: $("#spE", m).value, p_phone: $("#spP", m).value, p_message: $("#spM", m).value, p_consent: true, p_zip: P.zip || null })
-          .then(function () { closeModal(); d.remove(); quiet(s.id, 7); toast("Sent to " + s.business + ". They'll reply to you directly."); })
+          .then(function () { var formEl = $("#spLead", m); quiet(s.id, 7);
+            if (window.SFX) { window.SFX.celebrate(formEl, { title: s.business.toUpperCase(), thanks: "Thank you for your submission. " + s.business + " will reply to you directly.", onDone: function () { d.remove(); } }); closeModal(); }
+            else { closeModal(); d.remove(); toast("Sent to " + s.business + ". They'll reply to you directly."); } })
           .catch(function (er) { o.textContent = er.message; }); });
     });
   }
@@ -1420,7 +1422,8 @@
           out.innerHTML = '<div class="notice good">' + (type === "WAITLIST" ? "Your seat is saved. " : "Got it. ") + 'Your reference number is <span class="ticket">' + tk + "</span>. We'll email you" + (type === "WAITLIST" ? " the moment your table is ready." : ".") + "</div>";
           formEl.querySelectorAll("input:not([type=checkbox]),textarea,select").forEach(function (x) { x.value = ""; });
           formEl.querySelectorAll("input[type=checkbox]").forEach(function (x) { x.checked = false; });
-          if (window.SFX) window.SFX.cashOut(formEl, tk, ({ WAITLIST: { title: "SAVE MY SEAT", stamp: "SEAT SAVED", done: "Your seat is saved. We'll email you when your table is ready." }, FEEDBACK: { title: "THANK YOU", stamp: "RECEIVED", done: "Thanks. Every note gets read." }, PARTNER: { title: "HOUSE PARTNER", stamp: "COMP\u2019D", done: "Partnerships will email you within 2 business days." } })[type] || { title: "SUITEFACE", stamp: "RECEIVED", done: "Got it. We'll reply by email." });
+          if (window.SFX && type !== "WAITLIST") window.SFX.celebrate(formEl, { title: type === "PARTNER" ? "HOUSE PARTNER" : type === "FEEDBACK" ? "THANK YOU" : "SUITEFACE", thanks: "Thank you for your submission. Your reference number is " + tk + "." });
+          else if (window.SFX) window.SFX.cashOut(formEl, tk, ({ WAITLIST: { title: "SAVE MY SEAT", stamp: "SEAT SAVED", done: "Your seat is saved. We'll email you when your table is ready." }, FEEDBACK: { title: "THANK YOU", stamp: "RECEIVED", done: "Thanks. Every note gets read." }, PARTNER: { title: "HOUSE PARTNER", stamp: "COMP\u2019D", done: "Partnerships will email you within 2 business days." } })[type] || { title: "SUITEFACE", stamp: "RECEIVED", done: "Got it. We'll reply by email." });
           else { jackpot(2500); burstAt(btn, 40); }
         } else out.innerHTML = '<div class="notice bad">That didn\'t go through: ' + esc((j && j.message) || "the server said no.") + " Try again, or email help@suiteface.com.</div>";
       })
