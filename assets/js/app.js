@@ -351,7 +351,7 @@
   window.SF_rpc = rpc;
   function marquee(s, cls) {
     var bulbs = ""; for (var i = 0; i < 22; i++) bulbs += "<i style=\"animation-delay:" + (i % 3) * .3 + "s\"></i>";
-    return '<div class="vsign ' + (cls || "") + '"><div class="vbulbs">' + bulbs + '</div><span class="vtag">Sponsored</span><b class="vhead">' + esc(s.headline || s.business) + '</b>' +
+    return '<div class="vsign ' + (cls || "") + '"><div class="vbulbs">' + bulbs + '</div><span class="vtag">' + (s.house ? "House sponsor" : "Sponsored") + "</span><b class="vhead">' + esc(s.headline || s.business) + '</b>' +
       (s.tagline ? '<span class="vtl">' + esc(s.tagline) + "</span>" : "") + (s.offer ? '<span class="voffer">' + esc(s.offer) + "</span>" : "") + "</div>";
   }
   function quiet(id, days) { try { localStorage.setItem("sf.sp." + id, String(Date.now() + days * 864e5)); } catch (e) { } }
@@ -370,7 +370,8 @@
         '<div class="field"><label for="spP">Phone <span class="hint">(optional)</span></label><input id="spP" type="tel" autocomplete="tel"></div>' +
         '<div class="field"><label for="spM">Message <span class="hint">(optional)</span></label><textarea id="spM" maxlength="600" placeholder="Table for two on Saturday?"></textarea></div>' +
         '<label class="check"><input type="checkbox" id="spOk"> <span>Send my details to <b>' + esc(s.business) + '</b> so they can reply to me. SuiteFace doesn\'t run this offer.</span></label>' +
-        '<div class="row"><button class="btn gold" type="submit">Send to ' + esc(s.business) + '</button><button class="btn ghost" type="button" id="spNo">Not interested</button></div><p class="hint" id="spOut" role="status"></p></form>', { focus: "#spN" });
+        '<div class="row"><button class="btn gold" type="submit">Send to ' + esc(s.business) + '</button><button class="btn ghost" type="button" id="spNo">Not interested</button></div><p class="hint" id="spOut" role="status"></p></form>' +
+        (s.house ? '<p class="hint" style="margin-top:10px">' + esc(s.business) + ' is a SuiteFace house sponsor, a business connected to SuiteFace. <a href="#" data-sponsor-signup>Want this spot for your business? Sponsor this ZIP ›</a></p>' : ""), { focus: "#spN" });
       $("#spNo", m).addEventListener("click", function () { quiet(s.id, 30); d.remove(); rpc("sponsor_event", { p_sponsor: s.id, p_kind: "not_interested" }).catch(function () { }); closeModal(); toast("Got it. You won't see this sign for 30 days."); });
       $("#spLead", m).addEventListener("submit", function (e) { e.preventDefault(); var o = $("#spOut", m);
         if (!$("#spOk", m).checked) { o.textContent = "Check the box to send your details."; return; }
