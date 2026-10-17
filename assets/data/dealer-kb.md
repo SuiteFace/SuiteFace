@@ -189,7 +189,27 @@ SuiteFace may remove content, limit features, suspend or close accounts, and kee
 
 **You alone are responsible for every Joker, reason and statement you make.** If a Joker you make is false, misleading, retaliatory or coordinated, you may be liable to the person you named, and you agree to **defend and repay SuiteFace** for any claim, cost or damages that result (Section 8.4). SuiteFace may close your account and keep any fees paid.
 
-**6.5 Challenges.** Any member who receives a Joker may file a **free formal challenge**. A lobby Joker is removed automatically when SuiteFace's records show no direct relationship between the two members on SuiteFace (no Pair, Play Hand or played card). Otherwise the Joker stands until it expires or is removed.
+**6.5 Challenges.** Any member who receives a lobby Joker may file a **free challenge** at any time while it's active, by choosing one of these reasons:
+
+- We never played a hand together
+- I blocked or reported them before this Joker
+- It's payback for my Joker or report on them
+- We both called our date a Win
+- The maker's account is closed or they became a public Joker
+- Something else (not listed)
+
+SuiteFace checks the challenge **automatically** against its own records, with no judges. **A lobby Joker sticks only if every one of the following is true:**
+
+1. You and the maker had a **direct connection on SuiteFace**: a Play, a Pair or a Play Hand.
+2. The maker **signed the first-hand attestation** when making the Joker.
+3. You had **not blocked or reported** the maker before the Joker was made.
+4. It **isn't payback**: you hadn't Jokered or reported the maker in the 14 days before their Joker.
+5. You and the maker **never both called a date a Win**.
+6. The maker's **account is open** and the maker is **not currently a Joker**.
+
+**If any one of them is not true, or the situation isn't covered by this list, the challenge is accepted and the Joker is removed right away.** If the Joker sticks, you can still clear it for $210.00 (Section 6.6) or wait for it to end after 45 days. A challenge never affects safety reports, which staff handle separately.
+
+**6.5a Joker's entrance.** A member who currently has a Joker may enter the Joker Maker Lobby free, using their own @tag and the access code from their Joker notice, to see, challenge or clear their Joker. This entrance doesn't allow making Jokers. Making a Joker always requires a $210.00 lobby entry.
 
 **6.6 Removing a lobby Joker.** A member may remove a lobby Joker immediately for **$210.00**. They are then protected from new lobby Jokers for **45 days**.
 
@@ -552,7 +572,17 @@ Stood me up / no-show · Profile misrepresentation · Wasn't single · Asked me 
 ## If you get Jokered
 
 - **See it:** any active Joker on your card shows in Settings with its reasons. You never see your vote count, and nobody is told who made a Joker.
-- **Challenge it, free:** a lobby Joker comes off automatically if you two never had a hand together on SuiteFace.
+- **Challenge it, free:** pick a reason and SuiteFace checks its own records automatically. **A lobby Joker sticks only if all six of these are true:**
+
+    1. You and the maker had a **direct connection on SuiteFace**: a Play, a Pair or a Play Hand.
+    2. The maker **signed the first-hand attestation** when making the Joker.
+    3. You had **not blocked or reported** the maker before the Joker was made.
+    4. It **isn't payback**: you hadn't Jokered or reported the maker in the 14 days before their Joker.
+    5. You and the maker **never both called a date a Win**.
+    6. The maker's **account is open** and the maker is **not currently a Joker**.
+
+    **If any one isn't true, or your situation isn't on the list, the challenge is accepted and the Joker comes off right away.**
+- **Enter free as a Joker:** if you're wearing a Joker, enter the lobby with your @tag and the access code from your Joker notice to see, challenge or clear it.
 - **Remove a lobby Joker for $210:** it comes off right away, and no new lobby Jokers can land on you for **45 days**.
 - **Clear a public (vote) Joker for $2,100** after the 15-day probation, or wait out the 45 days.
 - **Deleting your account doesn't erase a Joker.** It stays tied to your verified phone or ID and returns, with its remaining time, if you come back.

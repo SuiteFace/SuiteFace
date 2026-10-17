@@ -71,6 +71,17 @@ p{margin:0}
 .float img,.float b{position:absolute;opacity:.8;animation:drift linear infinite}
 .float img{width:58px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
 .float b{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,#6b4a12);box-shadow:0 0 10px rgba(232,196,106,.6)}
+.searchpeek{margin:6px 0 14px;padding:12px 14px;border:1px solid rgba(232,196,106,.45);border-radius:12px;background:rgba(232,196,106,.08);font-size:.95rem;line-height:1.5}
+.chal{margin-top:18px;padding:16px;border:1px solid rgba(232,196,106,.45);border-radius:16px;background:rgba(23,21,27,.55);display:grid;gap:10px}
+.chal select,.chal textarea{font:600 1rem inherit;font-family:inherit;color:#FAF7F0;background:rgba(23,21,27,.85);border:1px solid rgba(232,196,106,.4);border-radius:10px;padding:.6rem .7rem}
+.chal textarea{min-height:80px}
+.sticks{font-size:.92rem;line-height:1.5;color:var(--cream-dim,#CFC6B6)}.sticks ol{margin:6px 0 6px 18px;padding:0}.sticks p{margin:6px 0 0;color:#FFE7A3}
+.jkdoor{margin-top:18px;padding-top:16px;border-top:1px dashed rgba(232,196,106,.45);display:grid;gap:8px;text-align:left}
+.jkf{display:grid;gap:4px;font-weight:600;font-size:.9rem;color:var(--cream,#FAF7F0)}
+.jkf input{font:600 1rem inherit;font-family:inherit;color:#FAF7F0;background:rgba(23,21,27,.75);border:1px solid rgba(232,196,106,.4);border-radius:10px;padding:.6rem .7rem;letter-spacing:.04em;min-width:0}
+.atwrap{display:flex;align-items:center;background:rgba(23,21,27,.75);border:1px solid rgba(232,196,106,.4);border-radius:10px;overflow:hidden}
+.atwrap i{font-style:normal;font-weight:800;color:#E8C46A;padding-left:12px}
+.atwrap input{border:0;background:transparent;flex:1;padding-left:3px}
 @keyframes drift{from{transform:translateY(110vh) rotate(0)}to{transform:translateY(-20vh) rotate(360deg)}}
 
 /* panels */
@@ -178,6 +189,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
       <div class="panel">
         <div class="eyebrow">House rules</div>
         <h2>Before you step past the rope</h2>
+        <div class="searchpeek"><b>🔎 Search for the card, then make it a Joker.</b> Inside, find any member by <b>name</b>, <b>@tag</b> or <b>ZIP</b>. You can also search by <b>phone</b> or <b>email</b>, but only for someone you've actually played a hand with. Pick your reasons, sign the attestation, and deal the Joker.</div>
         <ol class="rules">
           <li><span>1</span><p><b>Members only.</b> You can only make a Joker out of someone who is on SuiteFace.</p></li>
           <li><span>2</span><p><b>First-hand only.</b> You swear it happened to you, directly. No hearsay, no friend-of-a-friend.</p></li>
@@ -197,6 +209,14 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
         <a class="btn gold" id="payEntry" href="#" aria-disabled="true">🎟️ Pay $210 &amp; enter</a>
         <p class="fine">Secure checkout by Stripe. Card, Apple Pay and Cash App Pay accepted.</p>
         <button class="btn ghost" id="tour" type="button" style="margin-top:12px">Take the demo tour</button>
+        <div class="jkdoor">
+          <div class="eyebrow">Joker's entrance</div>
+          <p class="fine" style="margin:4px 0 10px">Already wearing a Joker? You enter free to see it, challenge it or clear it. Use your @tag and the access code from your Joker notice.</p>
+          <label class="jkf"><span>Your @tag</span><span class="atwrap"><i aria-hidden="true">@</i><input id="jkTag" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="yourtag" maxlength="24"></span></label>
+          <label class="jkf"><span>Access code</span><input id="jkCode" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="JKR-XXXX-XXXX" maxlength="13"></label>
+          <button class="btn ghost" id="jkEnter" type="button">🃏 Enter as a Joker</button>
+          <p class="fine" id="jkOut" role="status"></p>
+        </div>
       </div>
     </div>
   </section>
@@ -214,7 +234,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
             <h3><i>1</i>Find the card</h3>
             <div class="tabs" role="group" aria-label="Search by" id="tabs">
               <button type="button" data-k="name" aria-pressed="true">Name</button>
-              <button type="button" data-k="handle" aria-pressed="false">Username</button>
+              <button type="button" data-k="handle" aria-pressed="false">@tag</button>
               <button type="button" data-k="zip" aria-pressed="false">ZIP</button>
               <button type="button" data-k="phone" aria-pressed="false">Phone</button>
               <button type="button" data-k="email" aria-pressed="false">Email</button>
@@ -261,8 +281,8 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
           <div class="way">
             <div class="amt">Free</div>
             <h3>Formal challenge</h3>
-            <p style="color:var(--cream-dim)">If you never had a hand with the person who Jokered you on SuiteFace, the Joker comes off automatically.</p>
-            <a class="btn ghost" href="./#join">File a challenge</a>
+            <p style="color:var(--cream-dim)">Pick a reason and SuiteFace checks its own records instantly. If the Joker doesn't meet every way a Joker sticks, it comes off.</p>
+            <button class="btn ghost" type="button" id="chalOpen">File a challenge</button>
           </div>
           <div class="way">
             <div class="amt">$210</div>
@@ -276,6 +296,24 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
             <p style="color:var(--cream-dim)">Ten players called it. After the 15-day probation, clear it now, or wait out the 45 days.</p>
             <a class="btn red" id="payBuyout" href="#">Buy out</a>
           </div>
+        </div>
+        <div class="chal" id="chal" hidden>
+          <h3>Challenge a lobby Joker</h3>
+          <label class="jkf"><span>Why should it come off?</span>
+            <select id="chalWhy">
+              <option value="no_hand">We never played a hand together</option>
+              <option value="blocked_first">I blocked or reported them before this Joker</option>
+              <option value="payback">It's payback for my Joker or report on them</option>
+              <option value="both_won">We both called our date a Win</option>
+              <option value="maker_gone">The maker's account is closed or they became a public Joker</option>
+              <option value="other">Something else (not listed)</option>
+            </select></label>
+          <label class="jkf"><span>Tell it straight <small>(optional)</small></span><textarea id="chalWhat" maxlength="1000" placeholder="Anything we should know."></textarea></label>
+          <div class="sticks"><b>A lobby Joker sticks only if all six are true:</b>
+            <ol><li>You and the maker had a direct connection on SuiteFace (a Play, a Pair or a Play Hand).</li><li>The maker signed the first-hand attestation.</li><li>You hadn't blocked or reported the maker before the Joker.</li><li>It isn't payback for your own Joker or report on them in the 14 days before.</li><li>You two never both called a date a Win.</li><li>The maker's account is open and they aren't currently a Joker.</li></ol>
+            <p><b>If any one isn't true, or your situation isn't listed, the challenge is accepted and the Joker comes off.</b></p></div>
+          <button class="btn gold" type="button" id="chalGo">Submit challenge</button>
+          <p class="fine" id="chalOut" role="status"></p>
         </div>
       </div>
     </div>
@@ -352,12 +390,12 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
     rbox.appendChild(b); });
   function drawCounter(){ var c=$("#counter"); c.innerHTML=""; for(var i=0;i<12;i++){ var s=document.createElement("span"); if(i<used) s.className="used"; c.appendChild(s);} }
   drawCounter();
-  var PH={name:"Start typing a first name…",handle:"Exact username, like jordan.k",zip:"5-digit ZIP, like 35203",phone:"Exact phone number",email:"Exact email address"};
+  var PH={name:"Start typing a first name…",handle:"Exact @tag, like jordan.k (no need to type the @)",zip:"5-digit ZIP, like 35203",phone:"Exact phone number",email:"Exact email address"};
   document.querySelectorAll("#tabs button").forEach(function(b){ b.onclick=function(){
     document.querySelectorAll("#tabs button").forEach(function(x){x.setAttribute("aria-pressed","false");}); b.setAttribute("aria-pressed","true");
     mode=b.dataset.k; $("#q").value=""; $("#q").placeholder=PH[mode]; $("#results").innerHTML=""; }; });
   $("#q").addEventListener("input", function(){
-    var q=this.value.trim().toLowerCase(), out=$("#results"); out.innerHTML=""; if(!q) return;
+    var q=this.value.trim().toLowerCase(), out=$("#results"); if(mode==="handle"){ q=q.replace(/^@+/,""); } out.innerHTML=""; if(!q) return;
     var hits=PEOPLE.filter(function(p){
       if(mode==="name") return p[0].toLowerCase().indexOf(q)===0;
       if(mode==="handle") return p[1]===q;
@@ -382,6 +420,32 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
     toast("🃏 "+picked[0]+" is a Joker for 45 days (demo, not saved).");
   }
   function burst(){ var c=$("#confetti"); var cols=["#C8102E","#E8C46A","#B7D35A","#7A3A92","#2F8A62"]; for(var i=0;i<70;i++){ var p=document.createElement("i"); p.style.left=(Math.random()*100)+"vw"; p.style.background=cols[i%cols.length]; p.style.animationDelay=(Math.random()*.6)+"s"; p.style.transform="rotate("+(Math.random()*360)+"deg)"; c.appendChild(p); setTimeout(function(el){ return function(){ el.remove(); }; }(p), 3400); } }
+
+  // Joker's entrance: a member who is currently a Joker enters free with their @tag + access code
+  (function(){
+    var tag=$("#jkTag"), code=$("#jkCode"), out=$("#jkOut");
+    tag.addEventListener("input",function(){ var v=tag.value.toLowerCase().replace(/^@+/,"").replace(/[^a-z0-9._]/g,""); if(v!==tag.value) tag.value=v; });
+    code.addEventListener("input",function(){ var v=code.value.toUpperCase().replace(/[^A-Z0-9]/g,""); if(v.indexOf("JKR")===0) v=v.slice(3); v=v.slice(0,8); code.value="JKR-"+v.slice(0,4)+(v.length>4?"-"+v.slice(4):""); if(!v) code.value=""; });
+    $("#jkEnter").onclick=function(){
+      var t=tag.value.trim(), c=code.value.trim();
+      if(t.length<3){ out.textContent="Enter your @tag."; tag.focus(); return; }
+      if(!/^JKR-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(c)){ out.textContent="Access codes look like JKR-AB12-CD34. Find yours in your Joker notice."; code.focus(); return; }
+      var live=window.SF_LIVE && window.SF_LIVE.rpc;
+      if(!live){ out.textContent=""; toast("Preview: on suiteface.com your @tag and code are checked by the server. Welcome in, Joker."); $("#modePill") && ($("#modePill").textContent="Joker entrance"); $("#out").scrollIntoView({behavior:"smooth"}); return; }
+      window.SF_LIVE.rpc("joker_lobby_entry",{p_tag:t,p_code:c}).then(function(r){ if(r.error){ out.textContent=r.error.message; return; } out.textContent=""; toast("Welcome in, @"+t+". Here's your way out."); $("#out").scrollIntoView({behavior:"smooth"}); });
+    };
+  })();
+
+  // Free challenge with preset reasons; checked automatically on the server
+  $("#chalOpen").onclick=function(){ var c=$("#chal"); c.hidden=false; c.scrollIntoView({behavior:"smooth",block:"center"}); $("#chalWhy").focus(); };
+  $("#chalGo").onclick=function(){
+    var why=$("#chalWhy").value, what=$("#chalWhat").value.trim(), out=$("#chalOut");
+    var live=window.SF_LIVE && window.SF_LIVE.rpc && window.SF_LIVE.activeLobbyJoker;
+    if(!live){ out.textContent="Preview: on suiteface.com SuiteFace checks its records right away. In this demo the reason \""+$("#chalWhy").selectedOptions[0].text+"\" doesn't meet all six ways a Joker sticks, so the challenge is accepted and the Joker comes off."; burst && burst(); return; }
+    window.SF_LIVE.rpc("challenge_joker",{paid_joker:window.SF_LIVE.activeLobbyJoker(),p_reason:why,statement:what}).then(function(r){
+      if(r.error){ out.textContent=r.error.message; return; }
+      out.textContent = r.data.result==="removed" ? "Challenge accepted: "+r.data.because+". The Joker is off your card." : r.data.next; });
+  };
   $("#tour").onclick=function(){ $("#floor").hidden=false; $("#modePill").textContent="Demo tour"; $("#floor").scrollIntoView({behavior:"smooth"}); };
 })();
 </script>

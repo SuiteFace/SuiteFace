@@ -793,3 +793,49 @@ body.hr-mode #table .sec-head h2::after{content:" · 💎 High Roller Room";colo
 .hrcta:focus-visible{outline:3px solid var(--gold-hi);outline-offset:3px}
 .maskbox{margin-top:10px;border:1px dashed var(--gold);border-radius:12px;padding:10px 12px;background:rgba(232,196,106,.06)}
 .mycard .maskline{font:700 .7rem var(--body);color:#5B5560}
+.atfield{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:12px;background:var(--night);overflow:hidden}
+.atfield:focus-within{border-color:var(--gold-hi);box-shadow:0 0 0 3px rgba(232,196,106,.25)}
+.atfield span{display:grid;place-items:center;padding:0 4px 0 14px;font:800 1.1rem var(--body);color:var(--gold-hi)}
+.atfield input{flex:1;min-width:0;border:0 !important;background:transparent !important;box-shadow:none !important;padding-left:2px !important;outline:none}
+.handlesug{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:.88rem}
+.handlesug .ok{color:#9FE0BF;font-weight:600}.handlesug .no{color:var(--gold-hi);font-weight:600;width:100%}
+
+/* ---------- How it plays: tiles line up ---------- */
+.steps{align-items:stretch}
+.steps li{display:flex}
+.stepbtn{display:flex !important;flex-direction:column;gap:6px;height:100%}
+.stepbtn b{min-height:1.3em}
+.stepbtn>span:not(.no){flex:1}
+.steps .peek{margin-top:auto;padding-top:10px}
+
+/* ---------- Ambient room: slow drifting suits and chips, like the Joker Lobby but quieter ---------- */
+.ambient{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+.ambient i{position:absolute;top:0;font-style:normal;will-change:transform;animation:amb linear infinite;opacity:var(--o,.12)}
+.ambient i.suit{font:900 var(--s,28px)/1 var(--display);color:var(--c,#E8C46A)}
+.ambient i.chip{width:var(--s,18px);height:var(--s,18px);border-radius:50%;background:radial-gradient(circle,#FFE7A3 0 30%,var(--c,#B8862F) 31% 42%,#FFE7A3 43% 50%,var(--c,#9B1B30) 51%);box-shadow:0 0 10px rgba(232,196,106,.35)}
+.ambient i.card{width:22px;height:30px;border-radius:4px;background:linear-gradient(160deg,#FFFDF8,#E8DFCB);box-shadow:0 2px 6px rgba(0,0,0,.35)}
+@keyframes amb{from{transform:translate3d(0,110vh,0) rotate(0)}to{transform:translate3d(var(--dx,20px),-15vh,0) rotate(var(--r,320deg))}}
+body.hr-mode .ambient i.suit{--c:#FFE7A3}
+
+/* ---------- The table: livelier felt ---------- */
+.feltbox{position:relative;isolation:isolate;overflow:hidden}
+.feltbox>*:not(.feltfloat){position:relative;z-index:1}
+.feltfloat{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;border-radius:inherit}
+.feltfloat::before{content:"";position:absolute;inset:-40%;background:radial-gradient(closest-side,rgba(255,231,163,.16),transparent 70%);animation:spot 14s ease-in-out infinite alternate}
+@keyframes spot{0%{transform:translate(-25%,-10%)}50%{transform:translate(10%,15%)}100%{transform:translate(25%,-5%)}}
+.feltfloat i{position:absolute;bottom:-40px;font-style:normal;animation:feltdrift linear infinite;opacity:.32}
+.feltfloat i.chip{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle,#FFE7A3 0 30%,var(--c) 31% 42%,#FFE7A3 43% 50%,var(--c) 51%);box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.feltfloat i.suit{font:900 26px/1 var(--display);color:rgba(250,247,240,.55)}
+@keyframes feltdrift{from{transform:translateY(0) rotate(0)}to{transform:translateY(calc(-1 * var(--h,700px))) rotate(300deg)}}
+
+/* ---------- Play Hand: the moment of truth ---------- */
+.hand-box{position:relative;border-radius:18px;padding:14px;background:radial-gradient(ellipse at 50% 0%,rgba(47,138,98,.35),transparent 70%);overflow:hidden}
+.hand-box::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(232,196,106,.35);animation:handglow 2.6s ease-in-out infinite}
+@keyframes handglow{50%{box-shadow:inset 0 0 0 2px rgba(232,196,106,.85),inset 0 0 30px rgba(232,196,106,.18)}}
+.hand-box .inplay{animation:pulseTitle 1.8s ease-in-out infinite}
+@keyframes pulseTitle{50%{text-shadow:0 0 14px rgba(232,196,106,.7)}}
+.hand-box .oc{transition:transform .18s,box-shadow .18s}
+.hand-box .oc:hover{transform:translateY(-3px) rotate(-1deg);box-shadow:0 10px 22px rgba(0,0,0,.4)}
+.hand-box .handchips{position:absolute;inset:0;pointer-events:none;z-index:0}
+.hand-box>*:not(.handchips){position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.ambient,.feltfloat i,.handchips{display:none}.feltfloat::before,.hand-box::after,.hand-box .inplay{animation:none}}

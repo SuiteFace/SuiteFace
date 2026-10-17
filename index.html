@@ -259,7 +259,7 @@
           </div>
           <div class="two">
             <div class="field"><label for="fName">Face Name</label><input type="text" id="fName" maxlength="40" placeholder="Jordan" autocomplete="given-name"><span class="err" id="fNameErr"></span></div>
-            <div class="field"><label for="fHandle">Calling Card</label><input type="text" id="fHandle" maxlength="30" placeholder="@jordan.plays" autocomplete="off" spellcheck="false"><span class="err" id="fHandleErr"></span></div>
+            <div class="field"><label for="fHandle">Calling Card <small class="hint">(your @tag)</small></label><div class="atfield"><span aria-hidden="true">@</span><input type="text" id="fHandle" maxlength="24" placeholder="jordan.plays" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="handleHint"></div><span class="hint" id="handleHint">Just type your name. The @ is added for you.</span><div id="handleSug" class="handlesug" aria-live="polite"></div><span class="err" id="fHandleErr"></span></div>
           </div>
           <div class="two">
             <div class="field"><span class="flabel" id="dobLbl">Birthday <small class="hint">(only your age shows)</small></span><div class="dob" role="group" aria-labelledby="dobLbl"><select id="dobM" aria-label="Month"></select><select id="dobD" aria-label="Day"></select><select id="dobY" aria-label="Year"></select></div><span class="hint" id="dobAge"></span><span class="err" id="fAgeErr"></span></div>

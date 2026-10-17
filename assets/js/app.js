@@ -467,6 +467,72 @@
     if (q === "welcome") toast("💎 Welcome, High Roller. Your Room opens on your next deal.");
     if (q === "linked") toast("Account linked. We're checking the balance now; this takes a few minutes."); })();
 
+  /* ---------- @tag: the @ is always shown and never typed. Taken? Offer two available alternatives. ---------- */
+  (function () {
+    var inp = $("#fHandle"), box = $("#handleSug"); if (!inp || !box) return;
+    function clean(v) { return String(v || "").toLowerCase().replace(/^@+/, "").replace(/\s+/g, ".").replace(/[^a-z0-9._]/g, "").replace(/\.{2,}/g, ".").slice(0, 24); }
+    var taken = {}; (typeof POOL !== "undefined" ? POOL : []).forEach(function (p) { taken[clean((p.name || "").split(" ")[0]) ] = 1; });
+    function localSuggest(base) { var out = [], c = [base + "." + (10 + (hash(base) % 89)), base + "_" + String(new Date().getFullYear()).slice(2), base + ".ace", base + "_hearts", "the." + base];
+      c.forEach(function (x) { if (out.length < 2 && x.length <= 24 && !taken[x] && RESERVED.indexOf(x) < 0) out.push(x); }); return out; }
+    var t = null, seq = 0;
+    function show(res) {
+      if (!res || !res.wanted || res.wanted.length < 3) { box.innerHTML = ""; return; }
+      box.innerHTML = res.available ? '<span class="ok">✓ @' + esc(res.wanted) + " is yours if you want it.</span>"
+        : '<span class="no">@' + esc(res.wanted) + " is taken. Try one of these:</span>" + (res.suggestions || []).map(function (s) { return '<button type="button" class="chip sm" data-handle="' + esc(s) + '">@' + esc(s) + "</button>"; }).join("");
+    }
+    function check() {
+      var v = clean(inp.value); if (inp.value !== v) inp.value = v; P.handle = v; saveP(); onChange();
+      clearTimeout(t); if (v.length < 3) { box.innerHTML = ""; return; }
+      var my = ++seq;
+      t = setTimeout(function () {
+        var local = RESERVED.indexOf(v) > -1 || taken[v] ? { wanted: v, available: false, suggestions: localSuggest(v) } : { wanted: v, available: true };
+        if (!(window.SF_rpc && CFG.supabaseUrl)) return show(local);
+        window.SF_rpc("handle_suggestions", { p_wanted: v, p_name: P.name || null }).then(function (r) { if (my === seq) show(r && r.available === false && RESERVED.indexOf(v) < 0 ? r : (RESERVED.indexOf(v) > -1 ? local : r)); })
+          .catch(function () { if (my === seq) show(local); });
+      }, 450);
+    }
+    window.SF_checkHandle = check;
+    inp.addEventListener("input", check);
+    inp.addEventListener("paste", function () { setTimeout(check, 0); });
+    box.addEventListener("click", function (e) { var b = e.target.closest("[data-handle]"); if (!b) return; inp.value = b.getAttribute("data-handle"); check(); inp.focus(); });
+    if (P.handle && /^@/.test(P.handle)) { P.handle = clean(P.handle); inp.value = P.handle; saveP(); }
+  })();
+
+  /* ---------- Ambient motion: drifting suits and chips behind the whole room; livelier on the table ---------- */
+  (function () {
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var amb = document.createElement("div"); amb.className = "ambient"; amb.setAttribute("aria-hidden", "true");
+    var SUITS = [["♥", "#C8303F"], ["♦", "#C8303F"], ["♣", "#E8C46A"], ["♠", "#E8C46A"]], n = innerWidth < 700 ? 9 : 16;
+    for (var i = 0; i < n; i++) {
+      var el = document.createElement("i"), kind = i % 5 === 0 ? "card" : i % 3 === 0 ? "chip" : "suit", sz = 18 + Math.random() * 26;
+      el.className = kind;
+      if (kind === "suit") { var su = SUITS[i % 4]; el.textContent = su[0]; el.style.setProperty("--c", su[1]); el.style.setProperty("--s", sz + "px"); }
+      if (kind === "chip") { el.style.setProperty("--c", ["#9B1B30", "#1E7A4C", "#2B2730", "#B8862F"][i % 4]); el.style.setProperty("--s", (12 + Math.random() * 10) + "px"); }
+      el.style.left = (Math.random() * 98) + "%"; el.style.setProperty("--o", (0.06 + Math.random() * 0.1).toFixed(2));
+      el.style.setProperty("--dx", ((Math.random() - .5) * 160) + "px"); el.style.setProperty("--r", ((Math.random() - .5) * 720) + "deg");
+      el.style.animationDuration = (38 + Math.random() * 36) + "s"; el.style.animationDelay = (-Math.random() * 70) + "s";
+      amb.appendChild(el);
+    }
+    document.body.insertBefore(amb, document.body.firstChild);
+    // the felt gets its own chips and a slow spotlight
+    $$(".feltbox").forEach(function (f) {
+      var fl = document.createElement("div"); fl.className = "feltfloat"; fl.setAttribute("aria-hidden", "true");
+      for (var k = 0; k < 9; k++) { var e = document.createElement("i"), chip = k % 2 === 0; e.className = chip ? "chip" : "suit";
+        if (chip) e.style.setProperty("--c", ["#9B1B30", "#2B2730", "#B8862F", "#1E7A4C"][k % 4]); else e.textContent = "♠♥♦♣"[k % 4];
+        e.style.left = (5 + Math.random() * 90) + "%"; e.style.setProperty("--h", (f.offsetHeight + 120) + "px");
+        e.style.animationDuration = (16 + Math.random() * 14) + "s"; e.style.animationDelay = (-Math.random() * 30) + "s"; fl.appendChild(e); }
+      f.insertBefore(fl, f.firstChild);
+    });
+    // Play Hand: chips rise behind the call buttons
+    new MutationObserver(function () {
+      var hb = document.getElementById("handBox"); if (!hb || hb.querySelector(".handchips")) return;
+      var hc = document.createElement("div"); hc.className = "handchips feltfloat"; hc.style.opacity = ".8";
+      for (var k = 0; k < 7; k++) { var e = document.createElement("i"); e.className = "chip"; e.style.setProperty("--c", ["#9B1B30", "#B8862F", "#1E7A4C"][k % 3]);
+        e.style.left = (6 + Math.random() * 88) + "%"; e.style.setProperty("--h", "520px"); e.style.animationDuration = (9 + Math.random() * 8) + "s"; e.style.animationDelay = (-Math.random() * 12) + "s"; hc.appendChild(e); }
+      hb.insertBefore(hc, hb.firstChild);
+    }).observe(document.body, { childList: true, subtree: true });
+  })();
+
   /* ---------- quiz ---------- */
   var Q = [
     ["First date, you'd rather…", { diamond: "Pick the place and book it", club: "Something lively, like trivia night", heart: "A long walk and real conversation", spade: "A spot I've researched with great reviews" }],
@@ -779,7 +845,7 @@
         $$("[data-f]", m).forEach(function (cb) { if (!cb.checked) return; var f = cb.getAttribute("data-f");
           if (f === "photo") { P.photo = samplePhoto(sm.name.charAt(0), sm.color); P.photoLive = null; }
           if (f === "name") { P.name = sm.name; F.name.value = sm.name; }
-          if (f === "handle") { P.handle = "@" + sm.handle; F.handle.value = P.handle; }
+          if (f === "handle") { P.handle = sm.handle; F.handle.value = P.handle; if (window.SF_checkHandle) window.SF_checkHandle(); }
           if (f === "bio") { P.bio = sm.bio; F.bio.value = sm.bio; $("#bioCount").textContent = sm.bio.length; } });
         if (P.photo) { var ph = $("#ph"); if (ph) { ph.style.background = "url(" + P.photo + ") center/cover"; ph.textContent = ""; } }
         if (linked.indexOf(k) < 0) linked.push(k); S.set("socialLinked", linked); mark(); saveP(); onChange(); closeModal();
@@ -885,8 +951,8 @@
     var ok = true, set = function (id, msg) { if (show) $("#" + id).textContent = msg; if (msg) ok = false; };
     set("fNameErr", P.name.trim() ? "" : "Add the name you go by.");
     var h = P.handle.trim().replace(/^@/, "").toLowerCase();
-    var hm = !h ? "Pick a Calling Card, like @jordan.plays." :
-      !/^[a-z0-9_.]{3,30}$/.test(h) ? "Use 3–30 letters, numbers, dots or underscores." :
+    var hm = !h ? "Pick a Calling Card, like jordan.plays." :
+      !/^[a-z0-9_.]{3,24}$/.test(h) ? "Use 3–24 letters, numbers, dots or underscores." :
         /^\.|\.$|\.\./.test(h) ? "Dots can't start, end or repeat." :
           RESERVED.indexOf(h) > -1 ? "That Calling Card is reserved. Try another." : "";
     set("fHandleErr", hm);
