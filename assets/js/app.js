@@ -1108,6 +1108,34 @@
       });
     });
   })();
+  P.verifiedOnly = P.verifiedOnly || "any";
+  var verSel = $("#fVerOnly"); if (verSel) { verSel.value = P.verifiedOnly; verSel.addEventListener("change", function () { P.verifiedOnly = verSel.value; onChange(); renderVerPanel(); }); }
+  setTimeout(renderVerPanel, 0);
+  function verPass(p) { var v = P.verifiedOnly || "any"; return !((v === "photo" || v === "both") && !p.photoV) && !((v === "id" || v === "both") && !p.idV); }
+  function verBadges(p, long) {
+    if (!p.photoV && !p.idV) return "";
+    if (!long) return '<div class="vbad">' + (p.photoV ? '<i title="Photo verified">📷✓</i>' : "") + (p.idV ? '<i title="ID verified">🪪✓</i>' : "") + "</div>";
+    var conf = (p.confirmed && p.confirmed.length ? p.confirmed : ["age", "height"]).join(" and ");
+    return '<span class="vline">' + (p.photoV ? "📷 Photo verified" : "") + (p.photoV && p.idV ? " · " : "") + (p.idV ? "🪪 ID verified (" + conf + " from their ID)" : "") + "</span>";
+  }
+  function renderVerPanel() {
+    var el = $("#verPanel"); if (!el) return; var V = P.ver || {};
+    var photo = V.photo || !!(P.photoLive && P.photo), id = !!V.id;
+    var via = V.photo_via === "id_match" ? "matched to your ID photo" : "taken live with your camera";
+    var ch = (V.changes || []).slice(0, 4).map(function (c) { return "<li><b>" + esc({ height: "Height", weight: "Weight", birthday: "Birthday" }[c.field] || c.field) + "</b>: you said " + esc(c.stated || "nothing") + ", your ID says " + esc(c.from_id) + ". We used your ID.</li>"; }).join("");
+    el.innerHTML = '<span class="flabel">Your verification</span>' +
+      '<div class="verrow"><div class="vstep ' + (photo ? "ok" : "") + '"><b>📷 Photo verified</b><span>' + (photo ? "Yes, " + via + "." : "Take your Face photo live with your phone or computer camera, or verify your ID and we'll match your photo to it.") + "</span>" + (photo ? "" : '<button type="button" class="btn ghost sm" data-ver-photo>Take a live photo</button>') + "</div>" +
+      '<div class="vstep ' + (id ? "ok" : "") + '"><b>🪪 ID verified</b><span>' + (id ? "Yes. Your age" + ((V.confirmed || []).indexOf("height") > -1 ? ", height" : "") + ((V.confirmed || []).indexOf("weight") > -1 ? " and weight" : "") + " now come from your ID." : "Scan a driver's license, state ID, passport or military ID and take a quick selfie. Your age and height then come from the ID, and you can be dealt as an Ace, King, Queen or Jack.") + "</span>" + (id ? "" : '<button type="button" class="btn gold sm" data-ver-id>Verify my ID</button>') + "</div></div>" +
+      (ch ? '<div class="notice"><b>We matched your card to your ID:</b><ul>' + ch + "</ul></div>" : "") +
+      ((P.verifiedOnly || "any") !== "any" && !(photo && id) ? '<p class="hint" style="margin:6px 0 0">Tip: people who ask for verified players usually want to be dealt to verified players too. Verify yourself to fill more decks.</p>' : "");
+  }
+  document.addEventListener("click", function (e) {
+    if (e.target.closest("[data-ver-photo]")) { var cb = $("#camBtn"); if (cb) cb.click(); return; }
+    if (!e.target.closest("[data-ver-id]")) return;
+    modal('<h3 style="font-size:1.7rem">Verify my ID</h3><ol class="vsteps"><li><b>Scan your ID.</b> A U.S. driver\'s license, state ID card, passport, passport card or military ID. Front and back for a license.</li><li><b>Take a quick selfie.</b> We match it to the photo on your ID, which also verifies your Face photo.</li><li><b>Your card updates.</b> Your age and height (and weight, where your license lists it) come from your ID. If what you entered is different, your card uses what the ID says and we tell you what changed.</li></ol>' +
+      '<p class="hint">SuiteFace never stores a picture of your ID. Our verification partner checks it and sends back only the result: verified or not, your birth date, and height and weight where the ID lists them. Only your age shows on your card; your birth date never does.</p>' +
+      '<div class="notice pv"><b>Opening soon.</b> ID checks open when our verification partner goes live. Your live Face photo already counts as photo verified.</div><div class="row" style="margin-top:10px"><button class="btn gold" type="button" data-close>Got it</button></div>');
+  });
   var ageMin = $("#fAgeMin"), ageMax = $("#fAgeMax"), dist = $("#fDist");
   ageMin.value = P.ageMin; ageMax.value = P.ageMax; dist.value = P.dist;
   function syncRanges(e) {
@@ -1269,7 +1297,7 @@
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
   var deckDirty = false;
-  function onChange() { renderCard(); updateMeter(); deckDirty = true; saveDraft(); zipHint(); if (typeof tabCounts === "function") tabCounts(); }
+  function onChange() { if (typeof renderVerPanel === "function") renderVerPanel(); renderCard(); updateMeter(); deckDirty = true; saveDraft(); zipHint(); if (typeof tabCounts === "function") tabCounts(); }
   function zipHint() {
     var z = ZIPS[P.zip], el = $("#zipHint"); if (!el) return;
     el.textContent = z ? z.city + ", " + z.st + ". Your cards are measured from here." : 'Your cards are measured from your ZIP. Only "about X miles" is ever shown.';
@@ -1371,7 +1399,7 @@
     return { score: Math.round(f), shared: shared, prefHits: pm.hits };
   }
   function eligible(p) {
-    return passesDealbreakers(p) && (p.realAge || p.age) >= P.ageMin && (p.realAge || p.age) <= P.ageMax && p.dist <= P.dist && (G.jokered || []).indexOf(p.id) < 0;
+    return passesDealbreakers(p) && verPass(p) && (p.realAge || p.age) >= P.ageMin && (p.realAge || p.age) <= P.ageMax && p.dist <= P.dist && (G.jokered || []).indexOf(p.id) < 0;
   }
 
   /* ---------- ZIP database (42k US ZIP codes) ---------- */
@@ -1452,9 +1480,9 @@
     return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="' + esc(p.name) + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + '. Press to flip."><div class="flip">' +
       (p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + '</div></div><span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
-      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + (p.hr && P.room === "highroller" ? '<div class="hrb">' + (isMasked(p) ? "🎭 Masked " : "💎 ") + "High Roller" + (p.hr === "verified" ? " ✓" : "") + "</div>" : "") + jmeter(p) + "</div>" +
+      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + ((p.photoV || p.idV || (p.bumpers || []).length) ? '<div class="ficons">' + verBadges(p) + (window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, p.photoV && p.idV ? 1 : 2), p.bumpersOk) : "") + "</div>" : "") + (p.hr && P.room === "highroller" ? '<div class="hrb">' + (isMasked(p) ? "🎭 Masked " : "💎 ") + "High Roller" + (p.hr === "verified" ? " ✓" : "") + "</div>" : "") + jmeter(p) + "</div>" +
       '<span class="idx br">' + p.rank + pip(p.suit) + "</span>" + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>") +
-      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
+      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
       '</div></div><div class="card-actions"><button class="btn ghost" type="button" data-burn>Burn</button><button class="btn red" type="button" data-play>Play</button></div></div>';
   }
   function renderTable(redeal) {
@@ -1962,6 +1990,7 @@
     ["zodiac", "Zodiac sign", "one", ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"], 0, 0, "Lifestyle"]
   ];
   var IDX = {}; IDF.forEach(function (f) { IDX[f[0]] = f; });
+  POOL.forEach(function (p) { p.idV = hash(p.id + "idv") % 100 < 55; p.photoV = p.idV || hash(p.id + "pv") % 100 < 45; });
   POOL.forEach(function (p) { p.id_ = sampleIdentity(p); p.hr = hash(p.id + "hr") % 100 < 9 ? (hash(p.id + "hrk") % 3 ? "verified" : "buyin") : null; });
   /* Masked High Rollers: alias + 3-year age range + blurred photo until you check in together in person. */
   var ALIASES = ["The Velvet Ace", "Midnight King", "The Silent Queen", "Lucky Seven", "The Gold Jack", "High Card", "The Late Dealer", "Red Velvet", "The Quiet Raise", "Diamond Lane"];
@@ -2072,6 +2101,7 @@
     form.insertBefore(look, anchor); form.insertBefore(about, look);
     about.innerHTML = '<p class="hint">Every question is optional and has <b>Prefer not to say</b>. Use the eye to choose what shows on your card: <b>Face Up</b> is shown, <b>Face Down</b> is private but still helps match you.</p>' + groupHTML(false);
     look.innerHTML = '<div class="pmatch"><button type="button" class="btn gold sm" id="perfectMatch">✨ Perfect match</button><span class="hint">Copies your About me answers here in one tap (top 3 each). Then change anything you want different.</span></div><p class="hint">Pick <b>your top 3</b>, or leave <b>Open to anyone</b>. Tick <b>Dealbreaker if not…</b> and only people who match what you picked will make your hand. Without it, a match simply ranks them higher. Someone who chose "Prefer not to say" won\'t pass a dealbreaker.</p>' + groupHTML(true);
+    var vfield = $(".verfield"); if (vfield) { vfield.removeAttribute("data-tab"); look.insertBefore(vfield, look.children[1] || null); }
     /* Slide-deck mode: one question at a time with a running count, like the suit quiz. */
     function makeDeck(box, sel, name) {
       var fields = $$(sel, box), idx = 0, on = S.get("deck_" + name, true);
@@ -3079,7 +3109,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [] };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [] };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -3087,6 +3117,8 @@
   function liveDeck(redeal) {
     var go = redeal ? lrpc("deal_deck").then(function () { return lrpc("my_deck"); }) : lrpc("my_deck").then(function (rows) { return rows && rows.length ? rows : lrpc("deal_deck").then(function () { return lrpc("my_deck"); }); });
     return go.then(function (rows) {
+      return lrpc("deck_badges").then(function (vs) { var m = {}; (vs || []).forEach(function (v) { m[v.member_id] = v; }); (rows || []).forEach(function (r) { var v = m[r.member_id]; if (v) { r.photo_ok = v.photo_verified; r.id_ok = v.id_verified; r.confirmed = v.confirmed; } }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
       return lrpc("deck_bumpers").then(function (bs) { var m = {}; (bs || []).forEach(function (b) { m[b.member_id] = b; }); (rows || []).forEach(function (r) { var b = m[r.member_id]; if (b) { r.bumpers = b.bumpers; r.bumpers_ok = b.verified; } }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       LIVE_ROWS = rows || [];
@@ -3112,7 +3144,7 @@
     var prefs = Object.keys(P.prefs || {}).map(function (k) { var pr = P.prefs[k] || {}; return { member_id: mid, question: k, wanted: (pr.sel || []).filter(function (x) { return x !== OPEN; }), dealbreaker: !!pr.deal }; }).filter(function (r) { return r.wanted.length; });
     function chk(r) { if (r && r.error) throw r.error; return r; }
     return db.from("members").update(row).eq("id", mid).then(chk)
-      .then(function () { return db.from("strategies").upsert({ member_id: mid, trump_order: P.trumps, show_me: P.show || "everyone", age_min: P.ageMin, age_max: P.ageMax, radius_miles: P.dist }).then(chk); })
+      .then(function () { return db.from("strategies").upsert({ member_id: mid, trump_order: P.trumps, show_me: P.show || "everyone", age_min: P.ageMin, age_max: P.ageMax, radius_miles: P.dist, verified_only: P.verifiedOnly || "any" }).then(chk); })
       .then(function () { return ids.length ? db.from("member_identity").upsert(ids).then(chk) : null; })
       .then(function () { return db.from("member_preferences").delete().eq("member_id", mid).then(chk); })
       .then(function () { return prefs.length ? db.from("member_preferences").insert(prefs).then(chk) : null; })
@@ -3150,7 +3182,9 @@
       if (m.photo_url) { P.photo = m.photo_url; P.photoLive = m.photo_source === "live" ? (P.photoLive || "live") : null; }
       if (m.rooms) P.rooms = m.rooms;
       if (m.bumpers) { P.bumpers = m.bumpers; lrpc("my_bumpers").then(function (rs) { P.bumpersOk = (rs || []).filter(function (x) { return x.status === "verified"; }).map(function (x) { return x.bumper; }); saveP(); if (typeof renderStyle === "function") renderStyle(); renderCard(); }, function () { }); }
-      var st = res[1].data; if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
+      var st = res[1].data; if (st && st.verified_only) { P.verifiedOnly = st.verified_only; if ($("#fVerOnly")) $("#fVerOnly").value = P.verifiedOnly; }
+      lrpc("my_verification").then(function (v) { if (v) { P.ver = v; saveP(); renderVerPanel(); } }, function () { });
+      if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
       (res[2].data || []).forEach(function (r) { if (!IDX[r.question]) return; P.id[r.question] = IDX[r.question][2] === "one" ? r.answers[0] : r.answers; P.vis[r.question] = r.face_up; });
       (res[3].data || []).forEach(function (r) { P.prefs[r.question] = { sel: r.wanted, deal: r.dealbreaker }; });
       saveP();

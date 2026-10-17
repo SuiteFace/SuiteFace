@@ -79,9 +79,9 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792269714">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792269714">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792269714">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792270331">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792270331">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792270331">
 </head>
 <body data-page="how">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -369,6 +369,7 @@
             <input type="file" id="photo" accept="image/*" hidden>
             <div class="camrow"><button class="btn gold sm" type="button" id="camBtn">📷 Take a photo now</button><span class="hint">Taken here, live = <b class="livebadge">📷 Live Photo</b> on your card. The <b class="sealbadge">✓ ID Seal</b> still needs a driver's license, state ID or passport.</span></div>
           </div>
+          <div class="field verpanel" id="verPanel"></div>
           <div class="two">
             <div class="field"><label for="fName">Face Name</label><input type="text" id="fName" maxlength="40" placeholder="Jordan" autocomplete="given-name"><span class="err" id="fNameErr"></span></div>
             <div class="field"><label for="fHandle">Calling Card <small class="hint">(your @tag)</small></label><div class="atfield"><span aria-hidden="true">@</span><input type="text" id="fHandle" maxlength="24" placeholder="jordan.plays" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="handleHint"></div><span class="hint" id="handleHint">Just type your name. The @ is added for you.</span><div id="handleSug" class="handlesug" aria-live="polite"></div><span class="err" id="fHandleErr"></span></div>
@@ -389,6 +390,9 @@
               <div style="display:flex;gap:10px"><input type="range" id="fAgeMin" min="18" max="70" value="25" aria-label="Minimum age"><input type="range" id="fAgeMax" min="18" max="70" value="40" aria-label="Maximum age"></div></div>
             <div class="field"><label for="fDist">Within <span id="distTxt">25</span> miles</label><input type="range" id="fDist" min="2" max="100" value="25"></div>
           </div>
+          <div class="field verfield"><label for="fVerOnly">Verified only <span class="hint">(a dealbreaker: who can be dealt to you)</span></label>
+            <select id="fVerOnly"><option value="any">Anyone, verified or not</option><option value="photo">📷 Photo-verified people only</option><option value="id">🪪 ID-verified people only</option><option value="both">📷 + 🪪 Photo and ID verified only</option></select>
+            <span class="hint" id="verOnlyHint">Photo verified: their photo was taken live with a phone or computer camera, or matched to the photo on their ID. ID verified: a driver's license, state ID, passport or military ID was checked, and their age and height come from it.</span></div>
           <div class="field">
             <span style="font-weight:600;font-size:.92rem">Call trumps <span class="hint">(drag or use the arrows; #1 leads your Hand)</span></span>
             <ul class="rank-list" id="rankList"></ul>
@@ -725,14 +729,14 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792269714"></script>
-<script src="/assets/js/sign.js?v=1792269714"></script>
-<script src="/assets/js/live.js?v=1792269714"></script>
-<script src="/assets/js/gate.js?v=1792269714"></script>
-<script src="/assets/js/fx.js?v=1792269714"></script>
-<script src="/assets/js/casino-scene.js?v=1792269714"></script>
-<script src="/assets/js/chips.js?v=1792269714"></script>
-<script src="/assets/js/bumpers.js?v=1792269714"></script>
-<script src="/assets/js/app.js?v=1792269714"></script>
+<script src="/assets/js/config.js?v=1792270331"></script>
+<script src="/assets/js/sign.js?v=1792270331"></script>
+<script src="/assets/js/live.js?v=1792270331"></script>
+<script src="/assets/js/gate.js?v=1792270331"></script>
+<script src="/assets/js/fx.js?v=1792270331"></script>
+<script src="/assets/js/casino-scene.js?v=1792270331"></script>
+<script src="/assets/js/chips.js?v=1792270331"></script>
+<script src="/assets/js/bumpers.js?v=1792270331"></script>
+<script src="/assets/js/app.js?v=1792270331"></script>
 </body>
 </html>

@@ -245,7 +245,11 @@ SuiteFace checks the challenge **automatically** against its own records, with n
 
 **7.4 Messages and phone numbers.** Members talk through SuiteFace chat. Phone numbers stay hidden from other members until both players call a **Win** and each chooses to share. SuiteFace texts you from its own number for check-ins and hand results; message and data rates may apply, and you can reply **STOP** to end texts. Messages are encrypted in transit and at rest; SuiteFace staff may review a conversation only when a member reports it, or where the law requires.
 
-**7.5 Identity checks.** If you verify your identity, our partner compares your ID with a selfie. SuiteFace receives only the result (verified or not, name and date of birth), never your ID images, and asks your consent before any face comparison.
+**7.5 Identity checks.** If you verify your identity, our partner checks a driver's license, state ID card, passport, passport card or military ID and compares it with a selfie. SuiteFace receives only the result: verified or not, your name and date of birth, and your height and weight where the ID lists them. We never receive or keep your ID images, and we ask your consent before any face comparison.
+
+**7.5a Your card follows your ID.** Once your ID is verified, your age comes from your date of birth on the ID and your height comes from the ID. If the weight you entered is more than about 20 pounds from the weight on your ID, your card uses the ID's weight range. When we change something, we tell you what changed in My Face. Only your age shows on your card, never your birth date, and your weight stays Face Down unless you choose to show it.
+
+**7.5b Photo verified and ID verified.** **📷 Photo verified** means your Face photo was taken live with your phone or computer camera in SuiteFace, or was matched to the photo on your verified ID; replacing it with an uploaded photo removes the badge. **🪪 ID verified** means your ID was checked as described above. Members may choose to be dealt only Photo-verified or only ID-verified members. Neither badge is a background check or a promise about anyone's character or conduct.
 
 **7.6 Deleting your account.** You can delete your account at any time in **Settings**. Deleting ends your membership but doesn't refund charges. To keep the Joker system fair, SuiteFace keeps a record of active Jokers and safety outcomes tied to your verified phone or ID, and restores any remaining Joker time if you return. We keep other records only as long as needed for legal, safety, tax and fraud purposes.
 
@@ -422,7 +426,7 @@ This policy explains what SuiteFace collects, why, who we share it with, and the
 - **High Roller verification (optional):** if you link accounts, Stripe shares each account's institution name, last 4 digits and balance with us once. If you upload statements, staff review them privately. We keep only the result (verified, and when). Balances are erased once decided, statements are deleted after review, and none of it is shown to other members or used for anything else.
 - **Sponsor signs:** if you tap a Sponsored sign and choose to send your details, that business receives your name, email, and any phone number and message you add. You check a box first, every time. Businesses may use them only to reply to you.
 - **Ask the Dealer and The Raise:** the questions you type. Help-desk questions aren't tied to your account; we keep only a scrambled daily counter to limit abuse. For a Raise we keep a record that it was used.
-- **Identity verification (optional):** handled by Stripe Identity. We receive the result (verified or not), your legal first name and date of birth, never the images of your ID or selfie.
+- **Identity verification (optional):** handled by Stripe Identity. We receive the result (verified or not), your legal first name and date of birth, and your height and weight where the ID lists them, never the images of your ID or selfie. We use these only to confirm your age, height and weight on your card.
 - **Support and forms:** anything you send to help@suiteface.com or through our forms.
 
 **Collected automatically:**

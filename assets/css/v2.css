@@ -406,3 +406,25 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .c-stage .screen .mc span{white-space:nowrap}
 @media (max-width:480px){.c-stage .screen .apphd b{font-size:19px}.c-stage .screen .apphd>span:last-child{font-size:10.5px}}
 .c-stage .screen .grid{grid-auto-rows:max-content!important}
+
+/* Verification: panel in My Face, badges on cards */
+.verpanel .verrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.verpanel .vstep{display:grid;gap:6px;align-content:start;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb,var(--ink) 70%,transparent)}
+.verpanel .vstep b{font-weight:800}
+.verpanel .vstep span{font-size:.88rem;color:var(--muted)}
+.verpanel .vstep.ok{border-color:rgba(46,125,79,.55);background:rgba(46,125,79,.10)}
+.verpanel .vstep.ok b::after{content:"  ✓";color:#2E7D4F}
+.verpanel .vstep .btn{justify-self:start}
+.verpanel .notice ul{margin:6px 0 0;padding-left:18px}
+.verfield{padding:12px 14px;border-radius:14px;border:1px solid rgba(201,165,90,.45);background:rgba(201,165,90,.08)}
+.vsteps{display:grid;gap:8px;padding-left:20px;margin:10px 0}
+.pcard .face .vbad{display:flex;gap:4px;justify-content:center;margin-top:3px}
+.pcard .face .vbad i{font-style:normal;font-size:9px;font-weight:800;padding:1px 5px;border-radius:999px;background:rgba(46,125,79,.12);color:#1E6347;letter-spacing:.02em}
+.pcard .back .vline{color:#1E6347;font-weight:700}
+@media (max-width:640px){.verpanel .verrow{grid-template-columns:1fr}}
+.pcard .face .ficons{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:4px;margin-top:3px;max-width:100%}
+.pcard .face .ficons .vbad,.pcard .face .ficons .bumpers{margin:0;flex-wrap:nowrap}
+.pcard .face .ficons .bump{height:16px;width:19px;transform:none}
+.pcard .face .ficons .bump svg{width:10px;height:10px}
+.pcard .face .ficons .bump svg.bflag{width:24px;height:16px}
+.pcard .face .ficons{max-width:74%;margin-inline:auto}
