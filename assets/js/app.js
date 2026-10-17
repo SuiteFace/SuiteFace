@@ -1229,21 +1229,30 @@
     var out = formEl.querySelector(".out"), btn = formEl.querySelector('button[type="submit"]');
     if (!ok) { var first = formEl.querySelector(".err:not(:empty)"); if (first) { var c = first.parentElement.querySelector("input,textarea,select"); if (c) c.focus(); } return; }
     if (formEl.querySelector('[name="botcheck"]').checked) return;
-    if (!CFG.formAccessKey) { out.innerHTML = previewNote(); return; }
+    var DB = CFG.supabaseUrl && CFG.supabaseKey;
+    if (!DB && !CFG.formAccessKey) { out.innerHTML = previewNote(); return; }
     var tk = ticketId(); btn.disabled = true; var old = btn.textContent; btn.textContent = "Sending…"; out.innerHTML = "";
-    var payload = Object.assign({ access_key: CFG.formAccessKey, subject: "[SuiteFace][" + type + "] " + tk + " — " + f.subject, from_name: "SuiteFace.com", ticket: tk, form_type: type, page: location.href.split("?")[0] }, data);
-    if (data.email) payload.replyto = data.email;
-    fetch(CFG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload) })
-      .then(function (r) { return r.json().catch(function () { return { success: false, message: "Unexpected response." }; }); })
+    var record = Object.assign({ page: location.href.split("?")[0], subject: f.subject }, data);
+    function emailCopy() { /* optional: also email help@ when a Web3Forms key is set */
+      if (!CFG.formAccessKey) return Promise.resolve({ success: true });
+      var payload = Object.assign({ access_key: CFG.formAccessKey, subject: "[SuiteFace][" + type + "] " + tk + " — " + f.subject, from_name: "SuiteFace.com", ticket: tk, form_type: type }, record);
+      if (data.email) payload.replyto = data.email;
+      return fetch(CFG.formEndpoint, { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(payload) })
+        .then(function (r) { return r.json().catch(function () { return { success: false, message: "Unexpected response." }; }); }); }
+    var send = DB ? fetch(CFG.supabaseUrl + "/rest/v1/rpc/submit_site_form", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey },
+          body: JSON.stringify({ p_type: type, p_ticket: tk, p_data: record }) })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) return { success: false, message: (j && j.message) || "the server said no." }; emailCopy().catch(function () { }); return { success: true }; }); })
+      : emailCopy();
+    send
       .then(function (j) {
         if (j && j.success) {
-          out.innerHTML = '<div class="notice good">Got it. Your reference number is <span class="ticket">' + tk + "</span>. We'll reply by email.</div>";
+          out.innerHTML = '<div class="notice good">' + (type === "WAITLIST" ? "Your seat is saved. " : "Got it. ") + 'Your reference number is <span class="ticket">' + tk + "</span>. We'll email you" + (type === "WAITLIST" ? " the moment your table is ready." : ".") + "</div>";
           formEl.querySelectorAll("input:not([type=checkbox]),textarea,select").forEach(function (x) { x.value = ""; });
           formEl.querySelectorAll("input[type=checkbox]").forEach(function (x) { x.checked = false; });
           jackpot(2500); burstAt(btn, 40);
-        } else out.innerHTML = '<div class="notice bad">That didn\'t go through: ' + esc((j && j.message) || "the form service said no.") + " Try again, or email help@suiteface.com.</div>";
+        } else out.innerHTML = '<div class="notice bad">That didn\'t go through: ' + esc((j && j.message) || "the server said no.") + " Try again, or email help@suiteface.com.</div>";
       })
-      .catch(function () { out.innerHTML = '<div class="notice bad">We couldn\'t reach the form service. Check your connection and try again, or email help@suiteface.com.</div>'; })
+      .catch(function () { out.innerHTML = '<div class="notice bad">We couldn\'t reach SuiteFace. Check your connection and try again, or email help@suiteface.com.</div>'; })
       .then(function () { btn.disabled = false; btn.textContent = old; });
   }
   $("#mainForm").addEventListener("submit", function (e) { e.preventDefault(); submitForm(e.target, e.target.getAttribute("data-type")); });
@@ -1889,7 +1898,7 @@
       ["Website", "Running", "ok", "Build " + (window.SUITEFACE_BUILD || "preview")],
       ["Secure connection (HTTPS)", location.protocol === "https:" ? "Yes" : "No", location.protocol === "https:" ? "ok" : "warn", location.protocol === "https:" ? "Needed for location and payments" : "Location and payments need HTTPS"],
       ["ZIP code data", zipReady ? ZLIST.length.toLocaleString() + " ZIPs loaded" : "Not loaded", zipReady ? "ok" : "bad", CFG.zipDataUrl],
-      ["Forms → help@suiteface.com", CFG.formAccessKey ? "Connected" : "Preview mode", CFG.formAccessKey ? "ok" : "warn", CFG.formAccessKey ? "Web3Forms key present" : "Add formAccessKey in config.js"],
+      ["Forms → database", CFG.supabaseUrl && CFG.supabaseKey ? "Connected" : "Preview mode", CFG.supabaseUrl && CFG.supabaseKey ? "ok" : "warn", CFG.supabaseUrl ? "Saved to site_forms" + (CFG.formAccessKey ? " + emailed to help@" : "; email copy optional") : "Add supabaseUrl in config.js"],
       ["Stripe checkout ($21 + $2.10)", CFG.stripePaymentLink ? "Connected" : "Not connected", CFG.stripePaymentLink ? "ok" : "warn", CFG.stripePaymentLink ? "Payment Link set" : "Add stripePaymentLink in config.js"],
       ["Stripe customer portal", CFG.stripePortalLink ? "Connected" : "Not connected", CFG.stripePortalLink ? "ok" : "warn", "Cancel and card updates"],
       ["Joker buy-out ($2,100)", CFG.stripeJokerBuyoutLink ? "On" : "Off", CFG.stripeJokerBuyoutLink ? "warn" : "ok", "Stays off until counsel approves"],
