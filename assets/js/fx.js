@@ -217,7 +217,46 @@
     chipFrom(src, felt, function () { ds[0].classList.add("roll1"); ds[1].classList.add("roll2");
       setTimeout(function () { st.querySelector(".sfx-num").textContent = "3 + 4 = 7"; finale(v, st, opts); }, REDUCED ? 50 : 1850); });
   }
-  function celebrate(src, opts) { opts = opts || {}; var pick = opts.game || ["coin", "roulette", "dice"][(Math.random() * 3) | 0];
+
+  // ---------- Bingo / Keno: daubed letters spell the message ----------
+  var BCSS = '\
+.sfx-bingo{display:grid;gap:5px;padding:12px;border-radius:16px;background:#FFFDF8;box-shadow:0 0 0 4px #B8862F,0 20px 50px rgba(0,0,0,.6)}\
+.sfx-bingo .bh{font:900 1.5rem "Big Shoulders Display",Impact,sans-serif;color:#FFFDF8;background:#9B1B30;border-radius:8px;display:grid;place-items:center;height:38px}\
+.sfx-bingo .bc{position:relative;display:grid;place-items:center;height:42px;border-radius:8px;background:#F1E9D8;font:800 1.15rem "Big Shoulders Display",Impact,sans-serif;color:#2B2730}\
+.sfx-bingo .bc.free{font-size:.7rem;color:#9B1B30}\
+.sfx-bingo .bc.dab::after{content:"";position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(229,80,94,.85),rgba(155,27,48,.78));transform:scale(0);animation:sfxDab .28s cubic-bezier(.2,1.6,.4,1) forwards;mix-blend-mode:multiply}\
+.sfx-bingo .bc.win{color:#FFFDF8;z-index:1}\
+.sfx-bingo .bc.win span{position:relative;z-index:2}\
+@keyframes sfxDab{to{transform:scale(1)}}\
+.sfx-ball{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff,#E8C46A 55%,#B8862F);box-shadow:0 10px 20px rgba(0,0,0,.45);font:900 2rem "Big Shoulders Display",Impact,sans-serif;color:#9B1B30;transition:transform .25s}\
+.sfx-ball.pop{transform:scale(1.18)}';
+  function bingo(src, opts, keno) {
+    ccss(); if (!document.getElementById("sfx-bcss")) { var s = document.createElement("style"); s.id = "sfx-bcss"; s.textContent = BCSS; document.head.appendChild(s); }
+    var word = (opts.word || (keno ? ["SUCCESS", "THANKYOU"][(Math.random() * 2) | 0] : "SENT")).toUpperCase().replace(/[^A-Z!]/g, "");
+    var cols = Math.max(5, word.length), rows = 5, mid = 2, head = keno ? "KENO" : "BINGO";
+    var start = Math.floor((cols - word.length) / 2), FILL = "ABCDEFGHIJKLMNOPRSTUVWXYZ";
+    var v = veil(), st = document.createElement("div"); st.className = "sfx-stage"; st.style.width = "min(" + (cols * 58 + 40) + "px,94vw)"; v.appendChild(st);
+    var g = '<div class="sfx-bingo" style="grid-template-columns:repeat(' + cols + ',1fr);width:100%">';
+    for (var c = 0; c < cols; c++) g += '<div class="bh">' + (head[c] || (keno ? "★" : "")) + "</div>";
+    for (var r = 0; r < rows; r++) for (c = 0; c < cols; c++) {
+      var inWord = r === mid && c >= start && c < start + word.length, ch = inWord ? word[c - start] : (keno ? String(1 + ((r * cols + c) * 7) % 80) : FILL[(Math.random() * FILL.length) | 0]);
+      if (!keno && r === mid && !inWord && cols === 5 && c === 2) ch = "FREE";
+      g += '<div class="bc' + (ch === "FREE" ? " free" : "") + '" data-w="' + (inWord ? c - start : "") + '"><span>' + ch + "</span></div>";
+    }
+    g += "</div>";
+    st.innerHTML = '<div class="sfx-top" style="position:static;transform:none">' + (opts.title || head) + '</div><div class="sfx-ball" aria-hidden="true">★</div>' + g;
+    var ball = st.querySelector(".sfx-ball"), cells = st.querySelectorAll('.bc[data-w]:not([data-w=""])'), i = 0;
+    chipFrom(src, ball, function () {
+      var t = setInterval(function () {
+        if (i >= word.length) { clearInterval(t); cells.forEach(function (cell) { cell.classList.add("win"); }); ball.textContent = keno ? "★" : "B!";
+          var w = document.createElement("div"); w.className = "sfx-num"; w.textContent = keno ? (word === "THANKYOU" ? "THANK YOU" : word) : "BINGO!"; st.insertBefore(w, st.querySelector(".sfx-bingo")); finale(v, st, opts); return; }
+        var ch = word[i]; ball.textContent = ch; ball.classList.add("pop"); setTimeout(function () { ball.classList.remove("pop"); }, 220);
+        var cell = st.querySelector('.bc[data-w="' + i + '"]'); if (cell) cell.classList.add("dab", "win"); i++;
+      }, REDUCED ? 30 : 420);
+    });
+  }
+  function celebrate(src, opts) { opts = opts || {}; var pick = opts.game || ["coin", "roulette", "dice", "bingo", "keno"][(Math.random() * 5) | 0];
+    if (pick === "bingo" || pick === "keno") return bingo(src, opts, pick === "keno");
     return (pick === "roulette" ? roulette : pick === "dice" ? dice : coinDrop)(src, opts); }
 
   window.SFX = { cashOut: cashOut, machine: machine, spin: spin, celebrate: celebrate };
