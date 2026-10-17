@@ -323,3 +323,8 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 @media (max-width:760px){.chiplegend ul{grid-template-columns:repeat(2,1fr)}}
 .chipprice>div{display:grid;justify-items:center;gap:6px;text-align:center}
 @media (max-width:560px){.memchips{gap:10px;min-height:0}.memchips .mc21 svg{width:120px;height:120px}.memchips .mc210 svg{width:140px;height:140px}.h-chips .h-c21 svg{width:120px;height:120px}.h-chips .h-c210 svg{width:140px;height:140px}}
+/* Launch popup: close button sits in the corner so the content centers truly */
+.modal .box:has(.offerpop){position:relative;text-align:center}
+.modal .box:has(.offerpop)>.x{position:absolute;top:14px;right:14px;float:none;margin:0}
+.offerpop{padding-top:34px!important}
+.offerpop .offerchips{justify-content:center}
