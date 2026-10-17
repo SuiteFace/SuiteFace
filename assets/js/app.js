@@ -2317,7 +2317,7 @@
         lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Members only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month." : "Buy in to play: $21.00 once, then $2.10 a month. Already a member? Log in.") + '</p><div class="row"><a class="btn gold sm" href="#membership">Buy in · $21</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
         sec.appendChild(lock);
       }
-      if (lock) lock.hidden = ok;
+      if (lock) lock.hidden = ok; sec.classList.toggle("is-locked", !ok);
       if (ok && sec.id === "map") setTimeout(renderMap, 50);
     });
   }

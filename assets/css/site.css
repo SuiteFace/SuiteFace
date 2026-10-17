@@ -994,3 +994,7 @@ body.hr-mode .ambient i.suit{--c:#FFE7A3}
 .cbseats output{font-weight:800;color:#231C10;background:linear-gradient(180deg,#FFE7A3,#E8C46A);border-radius:999px;padding:.35rem .8rem;font-size:.86rem;white-space:nowrap}
 .cbscene .sft-wrap{border-radius:16px}
 #cjScene{margin-bottom:6px}
+/* audit polish */
+.member{align-items:start}
+@media (min-width:821px){.chipwrap{position:sticky;top:110px}}
+section.is-locked{padding-block:clamp(14px,2.4vw,26px)!important}
