@@ -79,9 +79,9 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792286836">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792286836">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792286836">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792286983">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792286983">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792286983">
 </head>
 <body data-page="contact">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -155,6 +155,7 @@
       <a href="membership.html" data-pgnav="membership">Membership</a>
       <a href="joker-lobby.html">🃏 Joker Lobby</a>
       <a href="bluff-table.html" data-pgnav="bluff">🎭 Bluff Table</a>
+      <a href="card-backs.html" data-pgnav="backs">🂠 Card Backs</a>
       <a href="my-table.html" data-pgnav="club" data-need="member">My table</a>
       <a href="my-table.html#dealer" data-need="dealer">Dealer</a>
       <a href="my-table.html#pitboss" data-need="pitboss">Pit Boss</a>
@@ -646,6 +647,49 @@
   </section>
 
   <!-- ============ JOIN / CONTACT ============ -->
+  <section data-pg="backs" id="backs" aria-labelledby="backsTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Card Backs</p>
+        <h1 id="backsTitle">Wear what you love on the back of your card.</h1>
+        <p class="lede">Every card is dealt face down, so the back is the first thing anyone sees. Make it yours: the places, causes, communities and art that shaped you.</p>
+      </div>
+      <h2 class="cbh">Special releases <span class="free">Free</span></h2>
+      <p class="hint">Limited designs from the house. Free to every member while they're out.</p>
+      <div class="cbgal" id="cbGallery"></div>
+      <h2 class="cbh">Coming to the table</h2>
+      <div class="cbkinds">
+        <div><b>🎬 Studios and entertainment</b><span>Official designs from the films, parks and shows you grew up on, made with the companies that own them.</span></div>
+        <div><b>🎤 Artists and music</b><span>Tour art and album-inspired backs, released with the artists and their labels.</span></div>
+        <div><b>🎗 Causes and foundations</b><span>Wear a cause you believe in. Part of every purchase goes straight to it.</span></div>
+        <div><b>⛪ Churches and communities</b><span>Your church, your school, your club or your hometown, on your card.</span></div>
+        <div><b>✈ Places you love</b><span>Cities, beaches and trips that tell people who you are before they flip your card.</span></div>
+      </div>
+      <h2 class="cbh">For brands, artists, causes and churches</h2>
+      <ol class="cbsteps">
+        <li><b>Apply.</b> Tell us who you are and what you'd like on a SuiteFace card back.</li>
+        <li><b>Show it's yours.</b> Only the owner of the artwork, brand, characters or name, or someone they've authorized in writing, can put it on a card back. We confirm that before anything is designed.</li>
+        <li><b>Design it together.</b> You supply the artwork or approve ours. Every design is reviewed before it goes live.</li>
+        <li><b>Set the price and the split.</b> Free special releases, or a small price with a share to you or a cause you choose, set out in a signed agreement.</li>
+        <li><b>Launch.</b> Your card back goes live for SuiteFace members, with a page of its own and a label naming you.</li>
+      </ol>
+      <form class="panel form-grid cbform" id="cbApply" novalidate>
+        <h3>Apply for a card back</h3>
+        <div class="two"><div class="field"><label for="cbOrg">Organization, artist or church</label><input id="cbOrg" maxlength="120" required></div>
+          <div class="field"><label for="cbKind">What are you?</label><select id="cbKind"><option value="partner">Brand or studio</option><option value="artist">Artist or musician</option><option value="cause">Cause or foundation</option><option value="church">Church or faith community</option><option value="community">School, club or hometown</option></select></div></div>
+        <div class="two"><div class="field"><label for="cbName">Your name</label><input id="cbName" maxlength="80" autocomplete="name" required></div>
+          <div class="field"><label for="cbEmail">Email</label><input id="cbEmail" type="email" maxlength="160" autocomplete="email" required></div></div>
+        <div class="two"><div class="field"><label for="cbPhone">Phone <span class="hint">(optional)</span></label><input id="cbPhone" maxlength="30" autocomplete="tel"></div>
+          <div class="field"><label for="cbWeb">Website</label><input id="cbWeb" maxlength="200" placeholder="https://"></div></div>
+        <div class="two"><div class="field"><label for="cbBen">Who should receive the proceeds?</label><input id="cbBen" maxlength="160" placeholder="Your organization, or a cause you choose"></div>
+          <div class="field"><label for="cbPrice">Price you have in mind</label><select id="cbPrice"><option>Free (special release)</option><option>21¢</option><option>$2.10</option><option>$21</option><option>Let's talk</option></select></div></div>
+        <div class="field"><label for="cbIdea">Your idea</label><textarea id="cbIdea" maxlength="1500" placeholder="What would you like on the back of a SuiteFace card?"></textarea></div>
+        <label class="check"><input type="checkbox" id="cbRights"> <span>I own this artwork, brand, characters or name, or I'm authorized in writing by the owner to license it to SuiteFace.</span></label>
+        <div class="row"><button class="btn gold" type="submit">Send my application</button><span class="hint" id="cbOut"></span></div>
+      </form>
+    </div>
+  </section>
+
   <section data-pg="bluff" id="bluff" aria-labelledby="bluffTitle">
     <div class="wrap">
       <div class="sec-head">
@@ -728,6 +772,7 @@
           <div class="row"><label class="sr" for="hcNew">New house comp code</label><input id="hcNew" type="password" autocomplete="off" placeholder="Type the comp code"><button class="btn ghost" type="button" id="hcSet">Set comp code</button></div><p class="hint" id="hcOut" role="status"></p></div>
         </form>
         <div class="holdbox" id="holdBox"><h4 style="margin:18px 0 4px">New sign-ups</h4><p class="hint">Everyone who created an account, newest first. Your own and test accounts are left out.</p><div id="signupList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">Card back applications</h4><p class="hint">Brands, artists, causes and churches asking to put a design on SuiteFace card backs. Confirm rights in writing before any design work.</p><div id="cbAppList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Quiz reviews</h4><p class="hint">Accounts that picked every hidden tell in the suit quiz. They can't be dealt a deck until you clear them.</p><div id="holdList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Joker challenges to rule on</h4><p class="hint">"Something else" challenges. <b>False</b> removes the Joker and backfires it on the maker for 45 days. Your ruling is final.</p><div id="chalList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">High Roller decks to ship</h4><p class="hint">Every confirmed High Roller gets a real SuiteFace deck within 180 days. Soonest due first.</p><div id="hrShipList"><p class="hint">Loading…</p></div>
@@ -764,15 +809,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792286836"></script>
-<script src="/assets/js/sign.js?v=1792286836"></script>
-<script src="/assets/js/live.js?v=1792286836"></script>
-<script src="/assets/js/gate.js?v=1792286836"></script>
-<script src="/assets/js/fx.js?v=1792286836"></script>
-<script src="/assets/js/casino-scene.js?v=1792286836"></script>
-<script src="/assets/js/chips.js?v=1792286836"></script>
-<script src="/assets/js/bumpers.js?v=1792286836"></script>
-<script src="/assets/js/slots.js?v=1792286836"></script>
-<script src="/assets/js/app.js?v=1792286836"></script>
+<script src="/assets/js/config.js?v=1792286983"></script>
+<script src="/assets/js/sign.js?v=1792286983"></script>
+<script src="/assets/js/live.js?v=1792286983"></script>
+<script src="/assets/js/gate.js?v=1792286983"></script>
+<script src="/assets/js/fx.js?v=1792286983"></script>
+<script src="/assets/js/casino-scene.js?v=1792286983"></script>
+<script src="/assets/js/chips.js?v=1792286983"></script>
+<script src="/assets/js/bumpers.js?v=1792286983"></script>
+<script src="/assets/js/slots.js?v=1792286983"></script>
+<script src="/assets/js/app.js?v=1792286983"></script>
 </body>
 </html>

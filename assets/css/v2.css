@@ -232,7 +232,8 @@ body[data-page="tables"] section[data-pg]:not([data-pg="tables"]),
 body[data-page="membership"] section[data-pg]:not([data-pg="membership"]),
 body[data-page="club"] section[data-pg]:not([data-pg="club"]),
 body[data-page="contact"] section[data-pg]:not([data-pg="contact"]),
-body[data-page="bluff"] section[data-pg]:not([data-pg="bluff"]){display:none!important}
+body[data-page="bluff"] section[data-pg]:not([data-pg="bluff"]),
+body[data-page="backs"] section[data-pg]:not([data-pg="backs"]){display:none!important}
 body:not([data-page="home"]) main > section:first-of-type{padding-top:clamp(40px,6vw,72px)}
 .nav a[aria-current="page"]{color:var(--cream);background:var(--line)}
 
@@ -573,3 +574,21 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .readus .ru-z,.readus .ru-d{margin:6px 0;padding:8px 12px;border-radius:12px;background:rgba(201,165,90,.12)}
 @media (max-width:560px){.readus .ru-cols{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.readus .ru-card,.readus .ru-wait{animation:none}}
+
+/* ===== Card Backs ===== */
+.pcard .cover .cv-in.cb-founders-night{background:radial-gradient(circle,#E8C46A 0 1.3px,transparent 1.8px) 0 0/18px 18px,radial-gradient(circle,rgba(255,231,163,.55) 0 .9px,transparent 1.4px) 9px 9px/18px 18px,radial-gradient(120% 90% at 50% 35%,#A42A3B,#6E1625 60%,#4A0E18)}
+.pcard .cover .cv-in.cb-lucky-sevens{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Ctext x='4' y='18' font-family='Arial Black,Arial' font-weight='900' font-size='15' fill='%23C8102E' stroke='%23C9A55A' stroke-width='.6'%3E7%3C/text%3E%3Ccircle cx='31' cy='31' r='3.2' fill='%23C8102E'/%3E%3Ccircle cx='36' cy='30' r='3.2' fill='%23C8102E'/%3E%3Cpath d='M31 28c1-3 3-5 6-6M36 27c0-2 0-3 1-5' stroke='%232E7D4F' stroke-width='1' fill='none'/%3E%3C/svg%3E") 0 0/44px 44px,linear-gradient(180deg,#26232B,#1C1921)}
+.pcard .cover .cv-in.cb-magic-city{background:repeating-linear-gradient(90deg,rgba(232,196,106,.38) 0 1px,transparent 1px 16px),repeating-linear-gradient(0deg,rgba(232,196,106,.22) 0 1px,transparent 1px 16px),radial-gradient(circle at 50% 100%,rgba(232,196,106,.35) 0 20%,transparent 21%) 0 0/32px 32px,radial-gradient(120% 90% at 50% 40%,#1E5A42,#12382B 65%,#0C2A20)}
+.pcard .cover .cv-in.cb-midnight-neon{background:repeating-linear-gradient(135deg,transparent 0 14px,rgba(255,77,141,.85) 14px 15.5px,transparent 15.5px 28px),repeating-linear-gradient(45deg,transparent 0 20px,rgba(232,196,106,.6) 20px 21px,transparent 21px 40px),#1C1921;box-shadow:inset 0 0 0 2px #FF4D8D,inset 0 0 18px rgba(255,77,141,.45),inset 0 0 0 4px #E8C46A}
+.pcard .cover .cv-in.cb-sunday-best{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 24 24'%3E%3Cpath d='M3 13c3-1 5-3 6-6 1 3 3 4 6 4l6-3-3 4c-1 3-4 5-8 5l-3 3v-3c-2 0-3-2-4-4z' fill='%23C9A55A' opacity='.55'/%3E%3C/svg%3E") 50% 84%/54px 54px no-repeat,repeating-linear-gradient(0deg,rgba(43,39,48,.035) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(43,39,48,.03) 0 1px,transparent 1px 3px),#F4EEE2;box-shadow:inset 0 0 0 2px #C9A55A,inset 0 0 0 5px #F4EEE2,inset 0 0 0 6px #C9A55A}
+.pcard .cover .cv-in.cb-sunday-best .cv-tap{color:rgba(43,39,48,.55)}
+.cbh{margin:30px 0 6px;display:flex;align-items:center;gap:10px}
+.cbgal{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin-top:12px}
+.cbitem{display:grid;justify-items:center;text-align:center;gap:6px;padding:14px 10px;border-radius:16px;border:1px solid var(--line)}
+.cbitem.on{border-color:#C9A55A;box-shadow:0 0 0 2px rgba(201,165,90,.4)}
+.cbitem span{font-size:.84rem;color:var(--muted)}
+.pcard.cbmini{cursor:default}.pcard.cbmini .cover .cv-medal{width:46px;height:46px}.pcard.cbmini .cover .cv-medal svg{width:32px}
+.cbkinds{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:12px 0}
+.cbkinds>div{display:grid;gap:4px;padding:14px;border-radius:14px;border:1px solid var(--line)}.cbkinds span{font-size:.9rem;color:var(--muted)}
+.cbsteps{display:grid;gap:8px;padding-left:22px;margin:12px 0 22px}
+.cbform{margin-top:8px}

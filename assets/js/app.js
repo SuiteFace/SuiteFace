@@ -17,9 +17,9 @@
 
   /* ---------- pages: one site, several pages. Each section lives on one page; links to a section on another page go there. ---------- */
   var PAGE = (document.body && document.body.getAttribute("data-page")) || "home";
-  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html", bluff: "bluff-table.html" };
+  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html", bluff: "bluff-table.html", backs: "card-backs.html" };
   var SEC_PAGE = { how: "how", demo: "how", safety: "how", quiz: "suit", "private-tables": "tables", casinos: "tables", membership: "membership",
-    face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home", bluff: "bluff" };
+    face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home", bluff: "bluff", backs: "backs" };
   function pageFor(id) { return SEC_PAGE[id] || null; }
   function goSection(id, keepSearch) {
     var pg = pageFor(id); if (!pg || pg === PAGE) return false;
@@ -359,6 +359,8 @@
       };
       hl.onclick = function (e) { var b = e.target.closest("[data-clear]"); if (!b || !confirm("Clear this account to be dealt a deck?")) return; window.SF_LIVE.rpc("clear_review_hold", { p_member: b.getAttribute("data-clear") }).then(function (r) { if (r.error) toast(r.error.message); else { toast("Cleared."); loadHolds(); } }); };
       loadHolds();
+      window.SF_LIVE.rpc("card_back_applications_recent").then(function (r) { var el = $("#cbAppList"); if (!el) return; var rows = r.data || [];
+        el.innerHTML = rows.length ? rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.org_name) + "</b> (" + esc(x.kind) + ") · " + esc(x.contact_name) + " · " + esc(x.email) + (x.phone ? " · " + esc(x.phone) : "") + "<br><small>" + esc(new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })) + " · price: " + esc(x.proposed_price || "?") + (x.beneficiary ? " · proceeds to " + esc(x.beneficiary) : "") + (x.website ? " · " + esc(x.website) : "") + "</small><br><small>" + esc(x.idea || "") + "</small></span></div>"; }).join("") : '<p class="hint">No applications yet.</p>'; });
       window.SF_LIVE.rpc("recent_signups", { p_limit: 100 }).then(function (r) { var su = $("#signupList"); if (!su) return; var rows = r.data || [];
         var paid = rows.filter(function (x) { return x.paid; }).length, today = rows.filter(function (x) { return Date.now() - new Date(x.joined_at).getTime() < 864e5; }).length;
         su.innerHTML = '<p class="hint"><b>' + rows.length + "</b> total · <b>" + today + "</b> in the last 24 hours · <b>" + paid + "</b> paid</p>" + (rows.length ? rows.map(function (x) {
@@ -1565,6 +1567,40 @@
     var n = p.jk || 0, pips = ""; for (var i = 0; i < 10; i++) pips += '<i class="' + (i < n ? "on" : "") + '"></i>';
     return '<span class="jm' + (n >= 7 ? " hot" : n >= 4 ? " warm" : "") + '" title="Jokers from confirmed dates in the last 180 days">' + (big ? "Joker meter " : "Jokers ") + n + "/10" + (big ? '<span class="pips">' + pips + "</span>" : "") + "</span>";
   }
+  /* Card Backs: what everyone sees before they flip your card. Special releases are free; partner backs come with
+     the owner's permission and a share of each purchase to them or a cause they choose. */
+  var CB = {
+    "founders-night": ["Founders' Night", "Oxblood velvet and gold stars, for the first season at the table."],
+    "lucky-sevens": ["Lucky Sevens", "Cherries, sevens and clovers on a midnight reel."],
+    "magic-city": ["Magic City", "Gold ironwork on deep green, for Birmingham, where SuiteFace began."],
+    "midnight-neon": ["Midnight Neon", "Pink and gold neon on a dark sign board."],
+    "sunday-best": ["Sunday Best", "Ivory linen, a gold border and a dove. For the ones who never miss Sunday."]
+  };
+  function cbPreview(id, size) { return '<div class="pcard cbmini" style="--w:' + (size || 120) + 'px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in cb-' + id + '"><div class="cv-medal">' + (BRAND.hat || "") + "</div></div></div></div></div>"; }
+  function renderCardBacks() {
+    var g = $("#cbGallery"); if (!g) return;
+    g.innerHTML = Object.keys(CB).map(function (id) { var on = P.cardBack === id; return '<div class="cbitem' + (on ? " on" : "") + '">' + cbPreview(id, 132) + "<b>" + esc(CB[id][0]) + "</b><span>" + esc(CB[id][1]) + '</span><button type="button" class="btn ' + (on ? "ghost" : "gold") + ' sm" data-cbuse="' + id + '">' + (on ? "On your card ✓" : "Use this back") + "</button></div>"; }).join("");
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-cbuse]"); if (!b) return; var id = b.getAttribute("data-cbuse");
+    if (P.cardBack === id) { id = null; }
+    var done = function () { P.cardBack = id; saveP(); renderCardBacks(); renderCard(); toast(id ? CB[id][0] + " is on the back of your card." : "Back to the house design."); if (id) jackpot(1500); };
+    if (liveOn()) lrpc("set_my_card_back", { p_back: id }).then(done, function (er) { toast(er.message); }); else done();
+  });
+  (function () {
+    var f = $("#cbApply"); if (!f) return;
+    f.addEventListener("submit", function (e) {
+      e.preventDefault(); var out = $("#cbOut");
+      var a = { p_org: $("#cbOrg").value, p_contact: $("#cbName").value, p_email: $("#cbEmail").value, p_phone: $("#cbPhone").value, p_kind: $("#cbKind").value, p_website: $("#cbWeb").value, p_beneficiary: $("#cbBen").value, p_idea: $("#cbIdea").value, p_price: $("#cbPrice").value, p_rights: $("#cbRights").checked };
+      if (!a.p_rights) { out.textContent = "Only the owner, or someone they've authorized, can apply."; return; }
+      out.textContent = "Sending…";
+      fetch(CFG.supabaseUrl + "/rest/v1/rpc/submit_card_back_application", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(a) })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.message || "Couldn't send."); return j; }); })
+        .then(function () { out.textContent = ""; f.innerHTML = '<h3>Thank you.</h3><p class="lede">We\'ll review your application and email you within a few business days about rights, design and launch.</p>'; }, function (er) { out.textContent = er.message; });
+    });
+  })();
+  setTimeout(renderCardBacks, 0);
+
   /* "Read us": your card and theirs, read together. Live members get the AI dealer's reading; the sample deck gets a
      house reading built from the cards. Zodiac shows only when both of you follow it. */
   var PAIRNOTE = {
@@ -1628,7 +1664,7 @@
     if (!p.hr && (p.photoV || p.idV)) badges.push(verBadges(p));
     var stick = window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, 3), p.bumpersOk) : "";
     var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 4, size: 14 }) : "";
-    return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in">' +
+    return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.cardBack && CB[p.cardBack] ? " cb-" + p.cardBack : "") + '">' +
       '<div class="cv-medal">' + (BRAND.hat || "") + "</div>" +
       (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
       '<div class="cv-tap">Tap to flip</div></div>' + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>";
@@ -2156,6 +2192,7 @@
   ];
   var IDX = {}; IDF.forEach(function (f) { IDX[f[0]] = f; });
   POOL.forEach(function (p) { var q = rng(hash(p.id + "cmp")), K = ["cherries", "kiss", "hug", "goldbars", "talk", "clover", "seven", "horseshoe"], c = null; if (q() < .45) { c = {}; var n = 1 + ((q() * 3) | 0); while (n--) { var k = K[(q() * K.length) | 0]; c[k] = (c[k] || 0) + 1 + ((q() * 4) | 0); } } p.comps = c; });
+  POOL.forEach(function (p) { var h = hash(p.id + "cb"), K = ["founders-night", "lucky-sevens", "magic-city", "midnight-neon", "sunday-best"]; p.cardBack = h % 100 < 30 ? K[h % 5] : null; });
   POOL.forEach(function (p) { var h = hash(p.id + "f1k"); p.founder = h % 100 < 14 ? 1 + (h % 997) : null; });
   POOL.forEach(function (p) { p.idV = hash(p.id + "idv") % 100 < 55; p.photoV = p.idV || hash(p.id + "pv") % 100 < 45; });
   POOL.forEach(function (p) { p.id_ = sampleIdentity(p); p.hr = hash(p.id + "hr") % 100 < 9 ? (hash(p.id + "hrk") % 3 ? "verified" : "buyin") : null; });
@@ -3277,7 +3314,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -3290,6 +3327,8 @@
   function liveDeckRun(redeal) {
     var go = redeal ? lrpc("deal_deck").then(function () { return lrpc("my_deck"); }) : lrpc("my_deck").then(function (rows) { return rows && rows.length ? rows : lrpc("deal_deck").then(function () { return lrpc("my_deck"); }); });
     return go.then(function (rows) { LIVE_ERR = "";
+      return lrpc("deck_backs").then(function (bs) { var m = {}; (bs || []).forEach(function (x) { m[x.member_id] = x.card_back; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_back = m[r.member_id]; }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
       return lrpc("deck_founders").then(function (fs) { var m = {}; (fs || []).forEach(function (x) { m[x.member_id] = x.founder_no; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.founder_no = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_compliments").then(function (cs) { var m = {}; (cs || []).forEach(function (x) { m[x.member_id] = x.kinds; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.comps = m[r.member_id]; }); return rows; }, function () { return rows; });
@@ -3362,6 +3401,7 @@
       if (m.rooms) P.rooms = m.rooms;
       if (m.bumpers) { P.bumpers = m.bumpers; lrpc("my_bumpers").then(function (rs) { P.bumpersOk = (rs || []).filter(function (x) { return x.status === "verified"; }).map(function (x) { return x.bumper; }); saveP(); if (typeof renderStyle === "function") renderStyle(); renderCard(); }, function () { }); }
       var st = res[1].data; if (st && st.verified_only) { P.verifiedOnly = st.verified_only; if ($("#fVerOnly")) $("#fVerOnly").value = P.verifiedOnly; }
+      lrpc("my_card_back").then(function (b) { P.cardBack = b || null; saveP(); renderCardBacks(); }, function () { });
       lrpc("my_heads_ups").then(function (h) { P.headsUp = h || null; renderHeadsUp(); }, function () { });
       lrpc("my_compliments").then(function (rs) { P.compRows = rs || []; P.myComps = null; (rs || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function () { });
       lrpc("my_suit_lock").then(function (L) { if (L) { P.suitLock = L; if (L.locked) { P.mySuit = L.suit; P.wild = !!L.wild; } saveP(); renderCard(); } }, function () { });
