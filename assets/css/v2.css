@@ -853,3 +853,48 @@ label.upl{cursor:pointer}
 .csnote{font-size:.82rem;opacity:.75}
 .casheld{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:12px 16px;border-radius:14px;background:rgba(232,196,106,.12);border:1px solid rgba(232,196,106,.55)}
 .cmholdform{flex-wrap:wrap}.cmholdform input,.cmholdform select{flex:1 1 140px;min-width:0}
+
+/* ---------- Readability on phones: the comp box stacks, and the floating extras stay out of the way ---------- */
+.housecomp{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;padding:14px 16px!important;border-radius:18px!important;align-items:stretch!important}
+.housecomp label{display:flex!important;align-items:center;gap:10px;font-size:1rem;line-height:1.3;white-space:normal}
+.housecomp .chipmark{flex:none}
+.housecomp .comprow{display:flex!important;gap:8px;max-width:none!important;width:100%}
+.housecomp .comprow input{flex:1 1 auto;min-width:0;width:100%;min-height:44px}
+.housecomp .hint{display:block;font-size:.85rem}
+@media (max-width:640px){
+  body{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+  /* Help and Feedback sit side by side as small pills */
+  .fabdock{right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));flex-direction:row;align-items:center;gap:6px}
+  .fabbtns{flex-direction:row;gap:6px}
+  .fabdock .fab{padding:.5rem .85rem;font-size:.86rem;min-height:38px}
+  .fabmin{width:26px;height:26px;font-size:.95rem}
+  /* The sponsor sign becomes a slim ribbon above them */
+  .vdock{left:calc(10px + env(safe-area-inset-left,0px));right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(58px + env(safe-area-inset-bottom,0px));max-width:none}
+  .vdock .vsign{padding:7px 12px 7px;gap:0;grid-template-columns:auto 1fr;justify-items:start;text-align:left;align-items:center;column-gap:10px;box-shadow:0 0 0 2px #B8862F,0 8px 20px rgba(0,0,0,.45)}
+  .vdock .vsign .vbulbs,.vdock .vsign .vtl,.vdock .vsign .voffer{display:none}
+  .vdock .vsign .vtag{position:static;font-size:.55rem;writing-mode:horizontal-tb}
+  .vdock .vsign .vhead{font-size:1rem;margin:0;text-shadow:0 0 6px rgba(255,231,163,.7)}
+  .vdock .vx{top:50%;right:6px;transform:translateY(-50%);width:24px;height:24px}
+  .sf-play{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:640px){.vdock .vopen{display:block;width:100%}.vdock .vsign{width:100%;box-sizing:border-box;padding-right:42px}}
+
+/* ---------- Contrast: light-gold text only on dark surfaces; darker gold when the lights are up ---------- */
+.btinvite b{display:inline-block;padding:5px 11px;border-radius:9px;background:#2B2730;color:#FFE7A3;font:800 1.08rem/1 var(--display,Impact),sans-serif;letter-spacing:.16em;box-shadow:inset 0 0 0 1px #B8862F;user-select:all}
+html[data-play="day"] .cs-ask .csgo,html[data-play="day"] .cs-full .csgo,html[data-play="day"] .cs-ex .csgo{color:#7A5410;border-color:#B8862F}
+html[data-play="day"] .cs-open .csstat{color:#17663F}
+html[data-play="day"] .cs-ask .csstat{color:#7A5410}
+html[data-play="day"] :is(.cv-status,.ddk,.vstats b){color:#7A5410}
+html[data-play="day"] .cv-cost{color:#6A1020}
+html[data-play="day"] .lb-tabs button{border-color:rgba(122,84,16,.45)}
+html[data-play="day"] .lb-spot .linkish{color:#7A5410}
+html[data-play="day"] .lb-spot{border-color:rgba(122,84,16,.45)}
+html[data-play="day"] .lb-item{border-color:rgba(43,39,48,.18);background:#fff}
+html[data-play="day"] .lb-e{background:rgba(184,134,47,.14)}
+html[data-play="day"] .lgclock{color:#7A5410}
+html[data-play="day"] .lgcomps button{border-color:rgba(122,84,16,.4);background:#fff}
+html[data-play="day"] .casheld{background:#FBF1D8;border-color:#B8862F;color:#2B2730}
+html[data-play="day"] .lg-facts,html[data-play="day"] .lgfacts{color:#2B2730}
+html[data-play="day"] .hint{color:#5A5360}
+html[data-play="day"] .hint.good{color:#17663F}html[data-play="day"] .hint.bad{color:#B5122E}
+html[data-play="day"] .rmmsg .rmn{color:#7A5410}html[data-play="day"] .rmmsg.mine .rmn{color:#1E6347}html[data-play="day"] .tch-msg .who{color:#7A5410}

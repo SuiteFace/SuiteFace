@@ -280,46 +280,98 @@
   function hostStyle() {
     if (document.getElementById("sf-hostcard-css")) return;
     var s = document.createElement("style"); s.id = "sf-hostcard-css";
-    s.textContent = ".hcard{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:start;padding:16px;border-radius:18px;background:linear-gradient(160deg,#FFFDF8,#F4EEE2);color:#2B2730;box-shadow:0 14px 32px -16px rgba(10,14,12,.6),inset 0 0 0 1px rgba(184,134,47,.35);position:relative;text-align:left;margin:14px 0}" +
-      ".hcard .hc-ph{width:118px;aspect-ratio:5/7;border-radius:12px;background:#33473a center/cover;position:relative;overflow:hidden;box-shadow:inset 0 0 0 3px #fff,0 0 0 1px rgba(184,134,47,.5)}" +
-      ".hcard .hc-ill{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:2px;color:#FFF7E2;background:radial-gradient(circle at 50% 30%,var(--hc1,#2F8A62),var(--hc2,#163F2E))}" +
-      ".hcard .hc-ill b{font:900 2.4rem/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:.02em}.hcard .hc-ill i{font-style:normal;font-size:1.7rem}" +
-      ".hcard .hc-pip{position:absolute;top:6px;left:8px;font:800 1rem/1 'Big Shoulders Display',Impact,sans-serif;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}" +
-      ".hcard .hc-ey{font:800 .72rem/1 'Figtree',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9C6B1F;margin:0 0 4px}" +
-      ".hcard h3{margin:0;font:900 1.45rem/1.05 'Big Shoulders Display',Impact,sans-serif;text-transform:uppercase;color:#2B2730}" +
-      ".hcard .hc-sub{margin:4px 0 0;font-size:.88rem;color:#5A5360}.hcard .hc-sub .r{color:#B3263A}" +
-      ".hcard .hc-bio{margin:8px 0 0;font-size:.95rem;line-height:1.4}" +
-      ".hcard .hc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.hcard .hc-chips span{font-size:.76rem;padding:3px 8px;border-radius:999px;background:rgba(30,99,71,.1);color:#1E6347}" +
-      ".hcard .hc-badges{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:.8rem}.hcard .hc-badges .v{padding:2px 8px;border-radius:999px;background:#2B2730;color:#E8C46A;font-weight:700}" +
-      ".hcard .hc-badges .st{font-size:1.15rem}.hcard .hc-badges .stamp{font-weight:800;color:#9B1B30;border:1.5px solid currentColor;border-radius:4px;padding:1px 5px;font-size:.7rem;transform:rotate(-3deg)}" +
-      ".hcard .hc-foot{margin:8px 0 0;font-size:.78rem;color:#6B6470}.hcard .hc-ex{position:absolute;top:10px;right:10px;font:700 .68rem 'Figtree',sans-serif;padding:3px 8px;border-radius:999px;background:#2B2730;color:#E8C46A}" +
-      ".hcard .hc-group{grid-column:1/-1;border-top:1px dashed rgba(184,134,47,.5);padding-top:12px}.hcard .hc-group p{margin:0 0 6px;font-size:.95rem;line-height:1.4}" +
-      ".hcard .hc-gmeta{display:flex;flex-wrap:wrap;gap:6px;font-size:.8rem}.hcard .hc-gmeta span{padding:3px 9px;border-radius:999px;background:rgba(43,39,48,.07)}" +
-      ".hcard .hc-seat{font-weight:800}.hcard .hc-seat.free{background:#DDF1E4!important;color:#1E6347}.hcard .hc-seat.res{background:#F6E8C3!important;color:#7A5410}" +
-      "@media (max-width:480px){.hcard{grid-template-columns:92px 1fr;gap:12px;padding:12px}.hcard .hc-ph{width:92px}.hcard h3{font-size:1.25rem}}";
+    s.textContent = [
+      ".hwrap{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:18px;align-items:start;margin:16px 0}",
+      "@media (max-width:640px){.hwrap{grid-template-columns:minmax(0,1fr);justify-items:center}}",
+      ".hflip{width:min(300px,100%);aspect-ratio:5/7;perspective:1100px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}",
+      ".hflip:focus-visible{outline:3px solid #E8C46A;outline-offset:4px;border-radius:16px}",
+      ".hf-in{position:absolute;inset:0;transition:transform .7s cubic-bezier(.3,.7,.3,1.15);transform-style:preserve-3d}",
+      ".hflip.up .hf-in{transform:rotateY(180deg)}",
+      ".hf-side{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:0 18px 36px -16px rgba(10,14,12,.75),0 0 0 1px rgba(0,0,0,.25)}",
+      /* top side: the card back */
+      ".hf-top{background:#F7F2E6;padding:10px}",
+      ".hf-top .hf-felt{position:absolute;inset:10px;border-radius:10px;background:radial-gradient(circle at 50% 40%,var(--c1,#2F8A62),var(--c2,#163F2E));box-shadow:inset 0 0 0 2px rgba(232,196,106,.55),inset 0 0 0 7px var(--c2,#163F2E),inset 0 0 0 8px rgba(232,196,106,.35);display:grid;place-items:center;align-content:center;gap:10px;color:#F6E7B8;text-align:center}",
+      ".hf-top .hf-felt::before{content:'';position:absolute;inset:14px;border-radius:6px;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 6px,transparent 6px 12px),repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 6px,transparent 6px 12px)}",
+      ".hf-medal{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#3A3540,#18161C);box-shadow:0 0 0 3px #E8C46A,0 0 0 6px rgba(0,0,0,.35);font-size:2.6rem}",
+      ".hf-role{position:relative;font:900 1.25rem/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:.14em;text-transform:uppercase}",
+      ".hf-bdg{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:5px;max-width:86%}.hf-bdg span{font:700 .72rem 'Figtree',sans-serif;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.35);color:#F6E7B8}",
+      ".hf-tap{position:relative;font:600 .74rem 'Figtree',sans-serif;opacity:.85;letter-spacing:.04em}",
+      /* Joker top side: harlequin diamonds in plum and lime */
+      ".hflip.joker .hf-felt{--c1:#7A3A92;--c2:#2A1335;background:#2A1335;background-image:linear-gradient(45deg,#4A1F5C 25%,transparent 25%,transparent 75%,#4A1F5C 75%),linear-gradient(45deg,#4A1F5C 25%,transparent 25%,transparent 75%,#4A1F5C 75%);background-size:28px 28px;background-position:0 0,14px 14px;color:#E8F5B0}",
+      ".hflip.joker .hf-medal{box-shadow:0 0 0 3px #B7D35A,0 0 0 6px rgba(0,0,0,.4)}",
+      /* face side */
+      ".hf-face{transform:rotateY(180deg);background:linear-gradient(160deg,#fff,#FAF7F0 60%,#EFE8DA);color:#2B2730;display:flex;flex-direction:column}",
+      ".hf-ph{height:44%;background:#33473a center/cover;position:relative;flex:none}",
+      ".hf-ill{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:2px;color:#FFF7E2;background:radial-gradient(circle at 50% 30%,var(--c1,#2F8A62),var(--c2,#163F2E))}",
+      ".hf-ill b{font:900 3rem/1 'Big Shoulders Display',Impact,sans-serif}.hf-ill i{font-style:normal;font-size:2rem}",
+      ".hf-idx{position:absolute;top:8px;left:9px;display:grid;justify-items:center;padding:4px 6px;border-radius:8px;background:rgba(255,253,248,.92);font:900 1.3rem/1 'Big Shoulders Display',Impact,sans-serif;color:#2B2730;box-shadow:0 2px 6px rgba(0,0,0,.25)}",
+      ".hf-idx.r{color:#B3263A}.hf-idx small{font-size:1rem}",
+      ".hf-idx.br{top:auto;left:auto;bottom:8px;right:9px;transform:rotate(180deg)}",
+      ".hf-ex{position:absolute;top:8px;right:8px;font:700 .64rem 'Figtree',sans-serif;padding:3px 7px;border-radius:999px;background:#2B2730;color:#E8C46A}",
+      ".hf-body{padding:10px 12px 26px;overflow-y:auto;flex:1;font-size:.86rem;line-height:1.35}",
+      ".hf-body h3{margin:0;font:900 1.3rem/1 'Big Shoulders Display',Impact,sans-serif;text-transform:uppercase;color:#2B2730}",
+      ".hf-sub{margin:3px 0 0;font-size:.78rem;color:#5A5360}.hf-sub .r{color:#B3263A}",
+      ".hf-fit{margin:6px 0 0;padding:5px 8px;border-radius:8px;background:rgba(30,99,71,.1);color:#1E6347;font-weight:700;font-size:.78rem}",
+      ".hf-jk{margin:6px 0 0;padding:6px 8px;border-radius:8px;background:#2A1335;color:#E8F5B0;font-size:.76rem}",
+      ".hf-body p{margin:6px 0 0}",
+      ".hf-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.hf-chips span{font-size:.7rem;padding:2px 7px;border-radius:999px;background:rgba(30,99,71,.1);color:#1E6347}.hf-chips span.sh{background:#E8C46A;color:#2B2730;font-weight:700}",
+      ".hf-bdgs{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:6px;font-size:.74rem}.hf-bdgs .v{padding:2px 7px;border-radius:999px;background:#2B2730;color:#E8C46A;font-weight:700}.hf-bdgs .st{font-size:1.05rem}.hf-bdgs .stamp{font-weight:800;color:#9B1B30;border:1.5px solid currentColor;border-radius:4px;padding:1px 4px;font-size:.66rem}",
+      ".hf-foot{margin:6px 0 0;font-size:.7rem;color:#6B6470}",
+      ".hflip.joker .hf-face{background:linear-gradient(160deg,#FBFFF0,#F2F7E2)}.hflip.joker .hf-idx{color:#4A1F5C}",
+      ".hgrp{background:linear-gradient(160deg,#FFFDF8,#F4EEE2);color:#2B2730;border-radius:16px;padding:16px;box-shadow:inset 0 0 0 1px rgba(184,134,47,.35);text-align:left;width:100%}",
+      ".hgrp .hc-ey{font:800 .72rem/1 'Figtree',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9C6B1F;margin:0 0 6px}",
+      ".hgrp p{margin:0 0 8px;font-size:.95rem;line-height:1.45}.hgrp .hc-gmeta{display:flex;flex-wrap:wrap;gap:6px;font-size:.8rem}.hgrp .hc-gmeta span{padding:3px 9px;border-radius:999px;background:rgba(43,39,48,.07)}",
+      ".hgrp .hc-seat{font-weight:800}.hgrp .hc-seat.free{background:#DDF1E4!important;color:#1E6347}.hgrp .hc-seat.res{background:#F6E8C3!important;color:#7A5410}",
+      ".hgrp .hg-sec{margin-top:12px;padding-top:10px;border-top:1px dashed rgba(184,134,47,.45)}.hgrp .hg-sec b{display:block;font-size:.8rem;color:#7A5410;margin-bottom:2px}.hgrp .hg-sec span{display:block;font-size:.9rem;white-space:pre-line}"
+    ].join("");
     document.head.appendChild(s);
   }
+  function hostBadges(h) {
+    var b = [];
+    if (h.photo_verified) b.push('<span class="v">📷 Photo ✓</span>'); if (h.id_verified) b.push('<span class="v">🪪 ID ✓</span>');
+    if (h.founder_no) b.push('<span class="stamp">★ First 1,000</span>');
+    (h.bumpers || []).forEach(function (k) { if (k !== "pineapple" && window.SFBumpers) b.push(window.SFBumpers.html(k, {})); });
+    (h.stickers || []).forEach(function (k) { if (HSTK[k]) b.push('<span class="st">' + HSTK[k] + "</span>"); else if (k === "first1000") b.push('<span class="stamp">Founding Player</span>'); else if (/^ref\d+$/.test(k)) b.push('<span class="stamp">Invite №' + k.slice(3) + "</span>"); });
+    (h.extras || []).forEach(function (x) { b.push('<span class="st">' + hesc(x) + "</span>"); });
+    return b;
+  }
+  function groupBlock(g) {
+    if (!g) return "";
+    var G = g.guide || {}, sec = function (k, t) { return G[k] ? '<div class="hg-sec"><b>' + t + "</b><span>" + hesc(G[k]) + "</span></div>" : ""; };
+    return '<div class="hgrp"><p class="hc-ey">About the group</p>' + (g.about ? "<p>" + hesc(g.about) + "</p>" : "") +
+      '<div class="hc-gmeta">' + (g.seating ? '<span class="hc-seat ' + (g.seating === "reserved" ? "res" : "free") + '">' + (g.seating === "reserved" ? "🔒 Reservations only" : "🟢 Free play") + "</span>" : "") +
+      (g.bits || []).filter(Boolean).map(function (b) { return "<span>" + hesc(b) + "</span>"; }).join("") + "</div>" +
+      sec("details", "The details") + sec("goals", "Our goals") + sec("recommend", "The Host recommends") + sec("tips", "Tips") + "</div>";
+  }
+  /* The Host's card. It starts on its top side; tap to flip to the face. Always available to visitors.
+     The rank in the corner is how well the Host fits the viewer's profile (Ace down to 2). A Public Joker's card wears the Joker top and marks. */
   function hostCard(h, o) {
     o = o || {}; if (!h) return ""; hostStyle();
-    var su = HSUIT[h.suit] || null, ex = !!o.example;
-    var ill = '<span class="hc-ill" style="--hc1:' + hesc(h.c1 || "#2F8A62") + ";--hc2:" + hesc(h.c2 || "#163F2E") + '"><i>' + hesc(h.emoji || (su ? su[0] : "♠")) + "</i><b>" + hesc((h.name || "?").charAt(0)) + "</b></span>";
-    var ph = '<div class="hc-ph"' + (h.photo ? ' style="background-image:url(' + hesc(h.photo) + ')"' : "") + ">" + (h.photo ? "" : ill) + (su ? '<span class="hc-pip">A' + su[0] + "</span>" : "") + "</div>";
-    var badges = [];
-    if (h.photo_verified) badges.push('<span class="v">📷 Photo ✓</span>'); if (h.id_verified) badges.push('<span class="v">🪪 ID ✓</span>');
-    if (h.founder_no) badges.push('<span class="stamp">★ First 1,000</span>');
-    (h.bumpers || []).forEach(function (k) { if (k === "pineapple") return; if (window.SFBumpers) badges.push(window.SFBumpers.html(k, {})); });
-    (h.stickers || []).forEach(function (k) { if (HSTK[k]) badges.push('<span class="st">' + HSTK[k] + "</span>"); else if (k === "first1000") badges.push('<span class="stamp">Founding Player</span>'); else if (/^ref\d+$/.test(k)) badges.push('<span class="stamp">Invite №' + k.slice(3) + "</span>"); });
-    (h.extras || []).forEach(function (x) { badges.push('<span class="st">' + hesc(x) + "</span>"); });
-    var grp = o.group ? '<div class="hc-group"><p class="hc-ey">About the group</p>' + (o.group.about ? "<p>" + hesc(o.group.about) + "</p>" : "") +
-      '<div class="hc-gmeta">' + (o.group.seating ? '<span class="hc-seat ' + (o.group.seating === "reserved" ? "res" : "free") + '">' + (o.group.seating === "reserved" ? "🔒 Reservations only" : "🟢 Free play") + "</span>" : "") + (o.group.bits || []).filter(Boolean).map(function (b) { return "<span>" + hesc(b) + "</span>"; }).join("") + "</div></div>" : "";
-    return '<div class="hcard' + (grp ? " withgrp" : "") + '" role="group" aria-label="Host card">' + ph + "<div>" + (ex ? '<span class="hc-ex">Example · fictional</span>' : "") +
-      '<p class="hc-ey">' + (o.label || "Your Host") + "</p><h3>" + hesc(h.name || "Host") + (h.age ? ", " + hesc(h.age) : "") + "</h3>" +
-      '<p class="hc-sub">' + (h.handle ? "@" + hesc(h.handle) : "") + (su ? (h.handle ? " · " : "") + '<span class="' + (su[2] ? "r" : "") + '">' + su[0] + " " + su[1] + "</span>" : "") + (h.city ? " · " + hesc(h.city) : "") + "</p>" +
-      (h.bio ? '<p class="hc-bio">' + hesc(h.bio) + "</p>" : "") +
-      ((h.interests || []).length ? '<div class="hc-chips">' + h.interests.slice(0, 5).map(function (x) { return "<span>" + hesc(x) + "</span>"; }).join("") + "</div>" : "") +
-      (badges.length ? '<div class="hc-badges">' + badges.join("") + "</div>" : "") +
-      '<p class="hc-foot">' + (h.since ? "Playing since " + hesc(h.since) : "") + (h.hosting > 1 ? " · Hosts " + hesc(h.hosting) + " Private Tables" : "") + (ex ? (h.since ? " · " : "") + "A sample host so you can see how it works" : "") + "</p></div>" + grp + "</div>";
+    var su = HSUIT[h.suit] || null, ex = !!o.example, jk = !!h.joker, red = su && su[2];
+    var rank = jk ? "J" : (h.rank || (h.is_me ? "" : "?")), pipc = jk ? "★" : su ? su[0] : "";
+    var idx = rank ? '<span class="hf-idx' + (red && !jk ? " r" : "") + '">' + hesc(rank) + "<small>" + pipc + "</small></span>" : "";
+    var ill = '<span class="hf-ill" style="--c1:' + hesc(h.c1 || "#2F8A62") + ";--c2:" + hesc(h.c2 || "#163F2E") + '"><i>' + hesc(h.emoji || (su ? su[0] : "♠")) + "</i><b>" + hesc((h.name || "?").charAt(0)) + "</b></span>";
+    var bd = hostBadges(h), shared = h.shared || [];
+    var top = '<div class="hf-side hf-top"><div class="hf-felt" style="--c1:' + hesc(h.c1 || "#2F8A62") + ";--c2:" + hesc(h.c2 || "#163F2E") + '">' +
+      '<span class="hf-medal" aria-hidden="true">' + (jk ? "🃏" : hesc(h.emoji || "♠")) + "</span>" +
+      '<span class="hf-role">' + (jk ? "Joker · Host" : "Host") + "</span>" +
+      '<span class="hf-bdg">' + (ex ? "<span>Example · fictional</span>" : "") + (h.photo_verified ? "<span>📷 ✓</span>" : "") + (h.id_verified ? "<span>🪪 ✓</span>" : "") + (jk ? "<span>Public Joker</span>" : "") + "</span>" +
+      '<span class="hf-tap">Tap to flip</span></div></div>';
+    var face = '<div class="hf-side hf-face"><div class="hf-ph"' + (h.photo ? ' style="background-image:url(' + hesc(h.photo) + ')"' : "") + ">" + (h.photo ? "" : ill) + idx + (ex ? '<span class="hf-ex">Example · fictional</span>' : "") + "</div>" +
+      '<div class="hf-body"><h3>' + hesc(h.name || "Host") + (h.age ? ", " + hesc(h.age) : "") + "</h3>" +
+      '<p class="hf-sub">' + (h.handle ? "@" + hesc(h.handle) + " · " : "") + (su ? '<span class="' + (red ? "r" : "") + '">' + su[0] + " " + su[1] + "</span>" : "") + (h.city ? " · " + hesc(h.city) : "") + "</p>" +
+      (jk ? '<p class="hf-jk">🃏 <b>Public Joker</b>' + (h.joker_until ? " until " + new Date(h.joker_until).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "") + ". Confirmed reports from past dates. Every Joker can be challenged.</p>" :
+        h.rank ? '<p class="hf-fit">' + hesc(h.rank) + (su ? su[0] : "") + " for you" + (typeof h.fit === "number" ? " · " + h.fit + "% fit with your profile" : "") + "</p>" :
+        !h.is_me && !ex ? '<p class="hf-fit">Sign in to see how this Host ranks for you</p>' : "") +
+      (h.bio ? "<p>" + hesc(h.bio) + "</p>" : "") +
+      ((h.interests || []).length ? '<div class="hf-chips">' + h.interests.slice(0, 6).map(function (x) { return '<span' + (shared.indexOf(x) > -1 ? ' class="sh" title="You both love this"' : "") + ">" + hesc(x) + "</span>"; }).join("") + "</div>" : "") +
+      (bd.length ? '<div class="hf-bdgs">' + bd.join("") + "</div>" : "") +
+      '<p class="hf-foot">' + (h.since ? "Playing since " + hesc(h.since) : "") + (h.hosting > 1 ? " · Hosts " + hesc(h.hosting) + " tables" : "") + (ex ? " · A sample host" : "") + "</p></div>" + (rank ? idx.replace('hf-idx', 'hf-idx br') : "") + "</div>";
+    return '<div class="hwrap"><div class="hflip' + (jk ? " joker" : "") + (o.up ? " up" : "") + '" tabindex="0" role="button" aria-pressed="false" aria-label="Host card for ' + hesc(h.name || "the Host") + '. Press to flip." data-hflip><div class="hf-in">' + top + face + "</div></div>" + groupBlock(o.group) + "</div>";
   }
+  // One listener flips every Host card on the page.
+  document.addEventListener("click", function (e) { var c = e.target.closest && e.target.closest("[data-hflip]"); if (!c) return; c.classList.toggle("up"); c.setAttribute("aria-pressed", c.classList.contains("up")); });
+  document.addEventListener("keydown", function (e) { if (e.key !== "Enter" && e.key !== " ") return; var c = e.target.closest && e.target.closest("[data-hflip]"); if (!c) return; e.preventDefault(); c.classList.toggle("up"); c.setAttribute("aria-pressed", c.classList.contains("up")); });
   /* Hosts for the fictional example tables near 35242 (illustrated, never photos). Shared by the Tables page and the table page. */
   var EX_HOST = {
       ex1: { name: "Renée", age: 41, suit: "heart", city: "Hoover, AL", emoji: "🍽️", c1: "#2F8A62", c2: "#163F2E", bio: "Moved here for work four years ago and made it my mission that nobody eats Friday dinner alone. I'll save you a seat.", interests: ["Pickleball", "Supper clubs", "Trivia", "Patios"], extras: ["🎲"], seating: "first_come" },
