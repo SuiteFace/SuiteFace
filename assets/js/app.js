@@ -4567,6 +4567,65 @@
   document.addEventListener("sf:live", function () { LOBBY.venues = null; setTimeout(renderLobby, 1200); });
   if ($("#lbCard")) setTimeout(renderLobby, 0);
 
+  /* ---------- Double & group dates: your crew is one hand. Each pairing between your crew and theirs is a card,
+     ranked A down to 2 for fit. "Best all around" is the strongest total; "the Ace" is the single best card. ---------- */
+  var CR = { st: null };
+  var SUITSYM = { heart: "♥", diamond: "♦", club: "♣", spade: "♠" };
+  function crewCard(p, rank, small) {
+    p = p || {}; var red = p.suit === "heart" || p.suit === "diamond";
+    return '<span class="cr-card' + (small ? " sm" : "") + '"><span class="cr-ph"' + (p.photo ? ' style="background-image:url(' + esc(p.photo) + ')"' : "") + ">" + (p.photo ? "" : esc((p.name || "?").charAt(0))) + "</span>" +
+      (rank ? '<span class="cr-rank' + (red ? " r" : "") + '">' + esc(rank) + "<small>" + (SUITSYM[p.suit] || "") + "</small></span>" : "") + "<b>" + esc(p.name || "") + (p.age ? ", " + p.age : "") + "</b></span>";
+  }
+  function renderCrews() {
+    var el = $("#crews"); if (!el || !liveOn()) return;
+    lrpc("my_crew").then(function (d) {
+      CR.st = d = d || {}; el.hidden = false; var c = d.crew, inv = d.invites || [], ms = d.matches || [];
+      var h = '<h3 style="font-size:1.2rem;margin:0 0 4px">👯 Double &amp; group dates</h3><p class="hint" style="margin:0 0 10px">Team up with friends and play as one hand. Each of you is matched one-on-one with someone in the other group, and every card is ranked for fit.</p>';
+      h += inv.map(function (i) { return '<div class="fr-row ask"><span class="fr-who"><b>' + esc(i.from) + " invited you to a " + (i.size === 2 ? "double date" : "group date of " + i.size) + "</b><small>" + esc(i.name || "Crew") + '</small></span><span class="fr-act"><button class="btn gold sm" type="button" data-crewyes="' + i.id + '">Join the crew</button><button class="btn ghost sm" type="button" data-crewno="' + i.id + '">Not now</button></span></div>'; }).join("");
+      if (ms.length) h += '<div class="cr-ms">' + ms.map(function (x) { return '<div class="fr-row"><span class="fr-who"><b>🎉 Group date match</b><small>with ' + esc(x.other || "") + '</small></span><span class="fr-act"><button class="btn gold sm" type="button" data-crewchat="' + x.id + '">💬 Group chat</button></span></div>'; }).join("") + "</div>";
+      if (!c) {
+        var fs = ((FR.data && FR.data.friends) || []);
+        h += '<div class="cr-new"><div class="cr-row"><label for="crSize">Play as</label><select id="crSize"><option value="2">Double date (you + 1 friend)</option><option value="3">Group date (you + 2 friends)</option><option value="4">Group date (you + 3 friends)</option></select></div>' +
+          '<div class="cr-row"><label for="crName">Crew name</label><input id="crName" maxlength="40" placeholder="Brunch Bunch"></div>' +
+          (fs.length ? '<p class="hint" style="margin:6px 0">Bring friends:</p><div class="cr-pick">' + fs.map(function (f) { return '<label class="chk"><input type="checkbox" data-crpick="' + f.id + '"> ' + esc(f.name) + "</label>"; }).join("") + '</div><button class="btn gold sm" type="button" id="crGo">Start the crew</button>' : '<p class="hint">Add a friend first (from a Pair, the Lounge or a Private Table), then team up here.</p>') + "</div>";
+      } else {
+        h += '<div class="cr-crew"><div class="cr-head"><b>' + esc(c.name || "Your crew") + '</b> <span class="hint">' + (c.size === 2 ? "Double date" : "Group date of " + c.size) + " · " + (c.status === "active" ? "ready to play" : "waiting on friends") + '</span><button class="linkish" type="button" id="crLeave">Leave crew</button></div><div class="cr-team">' + (c.members || []).map(function (p) { return '<span class="' + (p.status === "in" ? "" : "cr-wait") + '" title="' + (p.status === "in" ? "In" : "Invited") + '">' + crewCard(p, null, true) + "</span>"; }).join("") + "</div>" +
+          (c.status === "active" ? '<button class="btn gold sm" type="button" id="crDeal">🃏 Deal our hand</button><div id="crHands"></div>' : '<p class="hint">Everyone has to join before you can play.</p>') + "</div>";
+      }
+      el.innerHTML = h;
+    }, function () { });
+  }
+  function crewHands() {
+    var box = $("#crHands"); if (!box) return; box.innerHTML = '<p class="hint">Shuffling…</p>';
+    lrpc("crew_deck").then(function (d) {
+      var hs = (d && d.hands) || []; if (!hs.length) { box.innerHTML = '<p class="hint">No other ' + ((d && d.size) === 2 ? "double-date pairs" : "groups") + ' fit everyone\'s dealbreakers yet. Check back soon.</p>'; return; }
+      var bestAce = Math.max.apply(null, hs.map(function (x) { return x.pairing.best; })), top = hs[0].pairing.total;
+      box.innerHTML = hs.map(function (x) { var P = x.people || {}, pr = x.pairing, me = (CR.st && CR.st.crew) ? CR.st.crew.size : 2;
+        return '<div class="cr-hand"><div class="cr-hhead"><b>' + esc(x.name || "Another crew") + "</b>" + (pr.total === top ? '<span class="cr-tag all">★ Best all around</span>' : "") + (pr.best === bestAce ? '<span class="cr-tag ace">♠ Holds the best card</span>' : "") + "</div>" +
+          '<div class="cr-pairs">' + pr.cards.map(function (k) { return '<div class="cr-pair">' + crewCard(P[k.mine], null, true) + '<span class="cr-vs">♥</span>' + crewCard(P[k.theirs], k.rank) + "</div>"; }).join("") + "</div>" +
+          '<p class="cr-score">Hand: <b>' + pr.cards.map(function (k) { return k.rank; }).join(" + ") + "</b> · all-around " + pr.avg + "% fit</p>" +
+          (x.i_voted ? '<p class="hint">You played this hand · ' + x.my_votes + " of " + me + " of you so far</p>" : '<button class="btn gold sm" type="button" data-crewplay="' + x.crew + '">Play this hand' + (x.my_votes ? " (" + x.my_votes + " of " + me + " in)" : "") + "</button>") + "</div>"; }).join("");
+    }, function (x) { box.innerHTML = '<p class="hint">' + esc(x.message) + "</p>"; });
+  }
+  function crewChat(id) {
+    var last = 0, m = modal('<h3 style="font-size:1.4rem">🎉 Group date</h3><div class="rmfeed" id="crFeed" style="max-height:46vh"></div><form class="rmsend" id="crSay"><label class="sr" for="crIn">Message</label><input id="crIn" maxlength="600" placeholder="Pick a public place and a time…" autocomplete="off"><button class="btn gold" type="submit">Send</button></form><p class="hint">Everyone from both crews is here. Meet in public. Never send money.</p>');
+    function pull() { lrpc("crew_chat", { p_match: id, p_after: last }).then(function (rows) { var f = $("#crFeed", m); if (!f) return; (rows || []).forEach(function (r) { last = Math.max(last, r.id); f.insertAdjacentHTML("beforeend", '<div class="rmmsg' + (r.mine ? " mine" : "") + '"><b class="rmn">' + esc(r.mine ? "You" : r.name) + '</b><span class="rmt">' + esc(r.body) + "</span></div>"); }); if (!f.children.length) f.innerHTML = '<p class="hint rmempty">Say hi to the group.</p>'; else { var em = f.querySelector(".rmempty"); if (em && f.children.length > 1) em.remove(); } f.scrollTop = f.scrollHeight; }); }
+    pull(); var t = setInterval(function () { if (!document.body.contains(m)) { clearInterval(t); return; } pull(); }, 4000);
+    $("#crSay", m).addEventListener("submit", function (e) { e.preventDefault(); var i = $("#crIn", m), v = i.value.trim(); if (!v) return; i.value = ""; lrpc("crew_say", { p_match: id, p_body: v }).then(pull, function (x) { toast(x.message); }); });
+  }
+  document.addEventListener("click", function (e) {
+    var b;
+    if (e.target.closest("#crGo")) { var n = +$("#crSize").value, pick = $$("[data-crpick]").filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute("data-crpick"); });
+      if (pick.length !== n - 1) { toast("Pick " + (n - 1) + " friend" + (n === 2 ? "" : "s") + " for this crew."); return; }
+      lrpc("crew_create", { p_size: n, p_name: $("#crName").value, p_invite: pick }).then(function () { toast("Crew started. Your friends just got an invite."); renderCrews(); }, function (x) { toast(x.message); }); return; }
+    if ((b = e.target.closest("[data-crewyes]")) || (b = e.target.closest("[data-crewno]"))) { var y = b.hasAttribute("data-crewyes"); lrpc("crew_answer", { p_crew: b.getAttribute(y ? "data-crewyes" : "data-crewno"), p_yes: y }).then(function (r) { toast(r === "active" ? "Your crew is ready. Deal your hand!" : y ? "You're in. Waiting on the rest of the crew." : "Okay."); renderCrews(); }, function (x) { toast(x.message); }); return; }
+    if (e.target.closest("#crLeave")) { if (!confirm("Leave this crew? It ends for everyone.")) return; lrpc("crew_leave").then(renderCrews); return; }
+    if (e.target.closest("#crDeal")) { crewHands(); return; }
+    if ((b = e.target.closest("[data-crewplay]"))) { b.disabled = true; lrpc("crew_play", { p_target: b.getAttribute("data-crewplay") }).then(function (r) { if (r === "match") { jackpot(4000); toast("It's a group date! Open the group chat."); renderCrews(); } else toast(r === "waiting_on_crew" ? "You're in. Everyone in your crew has to play it too." : "Played. If they play yours back, it's a match."); crewHands(); }, function (x) { b.disabled = false; toast(x.message); }); return; }
+    if ((b = e.target.closest("[data-crewchat]"))) { crewChat(b.getAttribute("data-crewchat")); return; }
+  });
+  document.addEventListener("sf:live", function () { setTimeout(function () { renderCrews(); }, 1500); });
+
   /* ---------- Friends: people you've played with (a Pair, the Lounge, a Private Table, a Player Card).
      See who's online, message each other. Dating stays front and center; friends live on My table. ---------- */
   var FR = { data: null, dm: null };
