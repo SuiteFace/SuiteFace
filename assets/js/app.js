@@ -835,6 +835,7 @@
       }, function (er) { go.disabled = false; toast((er && er.message) || "Couldn't lock your suit. Try again."); });
     });
   }
+  var V4 = (function () { try { return localStorage.getItem("sf.v4") === "1"; } catch (e) { return false; } })();
   function showResult() {
     var c = { diamond: 0, club: 0, heart: 0, spade: 0 };
     /* Points: each scenario 2, each word card 1, the fault card 1. */
@@ -885,7 +886,7 @@
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
       ORDER.filter(function (s) { return s !== top; }).map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
       '<button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
-      (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your hand.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
+      (window.SF_LIVE && window.SF_LIVE.seated ? "" : V4 ? '<div class="suitcta v4next"><h4>Your ' + SUIT[top].name + ' card is ready.</h4><p class="hint">Next: build your card and see who is in your hand. Free until you take your seat.</p><div class="row"><a class="btn gold" data-v4suit href="deal.html?suit=' + top + '#card">Next: build my card</a></div></div>' : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your hand.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
       "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
@@ -1937,7 +1938,18 @@
       });
     });
     var q = location.search.match(/[?&](joined|buyin)=(1|success)/);
-    if (q) setTimeout(function () { toast("Payment received. Welcome to the table! Your seat opens in a moment."); jackpot(4000); if (window.SF_AUTH) window.SF_AUTH.refresh(); }, 1200);
+    if (q) setTimeout(function () { toast("Payment received. Welcome to the table! Your seat opens in a moment."); jackpot(4000); if (window.SF_AUTH) window.SF_AUTH.refresh(); seatThenDeal(0); }, 1200);
+    /* Straight from checkout to the deck: wait for the payment to seat the player, then deal their first hand on My table. */
+    function seatThenDeal(n) {
+      if (document.body.getAttribute("data-page") !== "club" || !window.SF_AUTH) return;
+      if (window.SF_LIVE && window.SF_LIVE.seated && liveOn()) {
+        try { history.replaceState(null, "", location.pathname + "#table"); } catch (e) { }
+        liveDeck(true).then(function () { var t = $("#table"); if (t) t.scrollIntoView({ behavior: "smooth" }); setTimeout(function () { try { deal(); } catch (e) { } }, 400); }, function () { });
+        return;
+      }
+      if (n > 24) { toast("Your payment is still processing. Your seat opens as soon as it clears, so refresh in a minute."); return; }
+      setTimeout(function () { window.SF_AUTH.refresh().then(function () { seatThenDeal(n + 1); }, function () { seatThenDeal(n + 1); }); }, 2500);
+    }
   })();
   /* ---------- membership (Stripe) ---------- */
   function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."; $("#agree").focus(); return false; }
