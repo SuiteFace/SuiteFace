@@ -106,9 +106,13 @@ h1{margin:0;color:#FAF7F0;font:900 clamp(2rem,6vw,3.4rem)/1 "Big Shoulders Displ
 .tch-form{display:flex;gap:8px}.tch-form input{flex:1;min-width:0;padding:.7rem .85rem;border-radius:12px;border:1px solid rgba(250,247,240,.2);background:#17151B;color:#FAF7F0;font:inherit}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:center;font-size:.85rem;color:#A69DB0}
+.repdlg{position:fixed;inset:0;z-index:200;background:rgba(23,21,27,.55);display:grid;place-items:center;padding:16px}
+.repbox{width:min(460px,100%);background:#FFFDF8;color:#2B2730;border-radius:18px;padding:20px;display:grid;gap:10px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.repbox label{display:grid;gap:4px;font-weight:600}.repbox select,.repbox textarea,.repbox input{font:inherit;padding:.5rem;border-radius:10px;border:1px solid rgba(43,39,48,.25)}
+.repbox .hint{font-size:.85rem;color:#5B5560;margin:0}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792286983">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792286983">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792287690">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792287690">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://suiteface.com/private-table.html">
 <meta property="og:type" content="website">
@@ -128,9 +132,9 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   <p class="note" id="status">Setting the table…</p>
 </main>
 <footer>© 2026 SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™ and SuiteFace Private Tables™ are trademarks of SuiteFace Inc. Private Tables are built and hosted by SuiteFace players. Always meet in public. In an emergency, call 911.</footer>
-<script src="assets/js/config.js?v=1792286983"></script>
-<script src="assets/js/live.js?v=1792286983"></script>
-<script src="assets/js/casino-scene.js?v=1792286983"></script>
+<script src="assets/js/config.js?v=1792287690"></script>
+<script src="assets/js/live.js?v=1792287690"></script>
+<script src="assets/js/casino-scene.js?v=1792287690"></script>
 <script>
 (function () {
   var CFG = window.SUITEFACE_CONFIG || {}, main = document.getElementById("main");
@@ -211,9 +215,31 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
     log.addEventListener("click", function (e) {
       var b = e.target.closest(".tch-more"); if (!b) return; var row = b.closest(".tch-msg"), id = +row.dataset.id;
       if (host && confirm("Remove this message from the table?")) { call("hide_table_message", { p_id: id }).then(function () { row.remove(); toast("Removed."); }, function (x) { toast(x.message); }); return; }
-      if (!host && confirm("Report this message? Three reports hide it, and our safety team reviews every one.")) call("report_table_message", { p_id: id }).then(function () { row.classList.add("reported"); toast("Reported. Thank you."); }, function (x) { toast(x.message); });
+      if (!host) reportDialog(id, row);
     });
     box.querySelector("#tchIn").focus();
+  }
+  /* Report a message: a reason and a screenshot. A confirmed violation is a lifetime ban with no refund, and a permanent Joker. */
+  function reportDialog(id, row) {
+    var o = document.createElement("div"); o.className = "repdlg"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true");
+    o.innerHTML = '<form class="repbox"><h3>Report this message</h3><label>What happened<select id="repWhy"><option>Sexually explicit</option><option>Harassment or threats</option><option>Hate or slurs</option><option>Scam, spam or asking for money</option><option>Something else</option></select></label>' +
+      '<label>Screenshot <small>(strongly recommended)</small><input type="file" id="repShot" accept="image/*"></label><label>Anything else? <textarea id="repNote" maxlength="250"></textarea></label>' +
+      '<p class="hint">Our safety team reviews every report. If it breaks a table rule, the sender is banned for life, with no refund, and their card becomes a Joker. Three reports hide a message right away.</p>' +
+      '<div class="row"><button class="btn gold" type="submit">Send report</button><button class="btn ghost" type="button" data-x>Cancel</button></div><p class="hint" id="repOut"></p></form>';
+    document.body.appendChild(o);
+    o.querySelector("[data-x]").onclick = function () { o.remove(); };
+    o.querySelector("form").onsubmit = function (e) {
+      e.preventDefault(); var out = o.querySelector("#repOut"), f = o.querySelector("#repShot").files[0], why = o.querySelector("#repWhy").value + (o.querySelector("#repNote").value ? ": " + o.querySelector("#repNote").value : "");
+      out.textContent = "Sending…";
+      var up = Promise.resolve(null);
+      if (f && window.SF_LIVE && window.SF_LIVE.client) {
+        if (f.size > 8e6) { out.textContent = "That screenshot is over 8 MB. Try a smaller one."; return; }
+        var path = window.SF_LIVE.memberId() + "/" + Date.now() + "." + ((f.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg");
+        up = window.SF_LIVE.client.storage.from("report-evidence").upload(path, f, { contentType: f.type || "image/jpeg" }).then(function (r) { if (r.error) throw r.error; return path; });
+      }
+      up.then(function (path) { return call("report_table_message_v2", { p_id: id, p_reason: why, p_evidence: path }); })
+        .then(function () { o.remove(); row.classList.add("reported"); toast("Reported. Thank you. Our safety team will review it."); }, function (x) { out.textContent = (x && x.message) || "Couldn't send. Try again."; });
+    };
   }
   function load() {
     if (window.__demo) { var d0 = window.__demo; if (!entered) { entered = true; window.SFCasino.entry(d0, function () { draw(d0); var n = document.createElement("p"); n.className = "note"; n.textContent = "This is an example table, made up to show how yours could look."; main.prepend(n); var j0 = document.getElementById("join"); if (j0) j0.outerHTML = '<a class="btn gold" href="./#private-tables">Host one like it · $21</a>'; }); } return; }
@@ -228,9 +254,9 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   setTimeout(go, window.__demo ? 0 : 700); // anonymous visitors don't wait long for a session
 })();
 </script>
-<script src="assets/js/gate.js?v=1792286983"></script>
-<script src="assets/js/fx.js?v=1792286983"></script>
+<script src="assets/js/gate.js?v=1792287690"></script>
+<script src="assets/js/fx.js?v=1792287690"></script>
 <p class="sf-credit" style="margin:0;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));text-align:center;font:600 .85rem/1.5 Figtree,system-ui,sans-serif;color:var(--muted,#A69DB0)">U.S. patent pending (USPTO). Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--gold-hi,#E8C46A);text-decoration:none;font-weight:800">GoFirehorseGo</a>.</p>
-<script src="/assets/js/slots.js?v=1792286983" defer></script>
+<script src="/assets/js/slots.js?v=1792287690" defer></script>
 </body>
 </html>

@@ -359,6 +359,13 @@
       };
       hl.onclick = function (e) { var b = e.target.closest("[data-clear]"); if (!b || !confirm("Clear this account to be dealt a deck?")) return; window.SF_LIVE.rpc("clear_review_hold", { p_member: b.getAttribute("data-clear") }).then(function (r) { if (r.error) toast(r.error.message); else { toast("Cleared."); loadHolds(); } }); };
       loadHolds();
+      var trq = $("#tableReportList"), loadTr = function () { window.SF_LIVE.rpc("table_reports_queue").then(function (r) { if (!trq) return; var rows = r.data || [];
+        trq.innerHTML = rows.length ? rows.map(function (x) { return '<div class="cmrow"><span><b>@' + esc(x.sender_tag || "?") + "</b> in " + esc(x.table_name || "a table") + (x.table_kind === "flirty18" ? " (18+ Flirty)" : "") + "<br><small><b>Message:</b> " + esc(x.body) + "</small><br><small><b>Report:</b> " + esc(x.reason || "") + "</small>" + (x.evidence_path ? '<br><button type="button" class="linkish" data-evid="' + esc(x.evidence_path) + '">View screenshot</button>' : "") + '</span><span class="row"><button class="chip sm" type="button" data-trule="' + x.message_id + '" data-trep="' + x.reporter_id + '" data-v="1">Violation · ban</button><button class="chip sm" type="button" data-trule="' + x.message_id + '" data-trep="' + x.reporter_id + '" data-v="0">Dismiss</button></span></div>'; }).join("") : '<p class="hint">No open reports.</p>'; }); };
+      if (trq) { trq.onclick = function (e) {
+        var ev = e.target.closest("[data-evid]"); if (ev) { window.SF_LIVE.client.storage.from("report-evidence").createSignedUrl(ev.getAttribute("data-evid"), 300).then(function (r) { if (r.error) toast(r.error.message); else window.open(r.data.signedUrl, "_blank", "noopener"); }); return; }
+        var b = e.target.closest("[data-trule]"); if (!b) return; var v = b.getAttribute("data-v") === "1";
+        if (!confirm(v ? "Rule this a VIOLATION? The sender is banned for life with no refund, and their card becomes a permanent Joker." : "Dismiss this report?")) return;
+        window.SF_LIVE.rpc("rule_table_report", { p_message: +b.getAttribute("data-trule"), p_reporter: null, p_violation: v, p_note: null }).then(function (r) { if (r.error) toast(r.error.message); else { toast(v ? "Banned for life. Their card is now a Joker." : "Dismissed."); loadTr(); } }); }; loadTr(); }
       window.SF_LIVE.rpc("card_back_applications_recent").then(function (r) { var el = $("#cbAppList"); if (!el) return; var rows = r.data || [];
         el.innerHTML = rows.length ? rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.org_name) + "</b> (" + esc(x.kind) + ") · " + esc(x.contact_name) + " · " + esc(x.email) + (x.phone ? " · " + esc(x.phone) : "") + "<br><small>" + esc(new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })) + " · price: " + esc(x.proposed_price || "?") + (x.beneficiary ? " · proceeds to " + esc(x.beneficiary) : "") + (x.website ? " · " + esc(x.website) : "") + "</small><br><small>" + esc(x.idea || "") + "</small></span></div>"; }).join("") : '<p class="hint">No applications yet.</p>'; });
       window.SF_LIVE.rpc("recent_signups", { p_limit: 100 }).then(function (r) { var su = $("#signupList"); if (!su) return; var rows = r.data || [];
@@ -1206,6 +1213,13 @@
     var b = e.target.closest("[data-cphide]"); if (!b) return; var k = b.getAttribute("data-cphide"), hide = b.getAttribute("aria-pressed") === "true";
     lrpc("set_compliment_hidden", { p_kind: k, p_hidden: hide }).then(function () { (P.compRows || []).forEach(function (x) { if (x.kind === k) x.hidden = hide; }); P.myComps = null; (P.compRows || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function (er) { toast(er.message); });
   });
+  (function () {
+    var w = $("#fWish"), b = $("#wishSave"); if (!w || !b) return; w.value = P.wishlist || "";
+    b.addEventListener("click", function () { var v = w.value.trim();
+      if (v && !/^https:\/\/(www\.)?(amazon\.com\/(hz\/wishlist|registry|gp\/registry)\/|a\.co\/|amzn\.to\/|target\.com\/gift-registry\/|walmart\.com\/(lists|registry)\/|etsy\.com\/people\/[^/]+\/favorites)/i.test(v)) { toast("Use a wish list link from Amazon, Target, Walmart or Etsy. Their lists keep your address private."); return; }
+      var done = function () { P.wishlist = v; saveP(); toast(v ? "Wish list saved. Only people you pair with can see it." : "Wish list removed."); };
+      if (liveOn()) lrpc("set_my_wishlist", { p_url: v }).then(done, function (er) { toast(er.message); }); else done(); });
+  })();
   function renderHrDeck() {
     var el = $("#hrDeck"); if (!el) return; el.hidden = !P.highRoller; if (!P.highRoller) { el.innerHTML = ""; return; }
     var D = P.hrDeck || {}, st = D.status || "needs_address", by = D.ship_by ? new Date(D.ship_by).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "within 180 days of your confirmation";
@@ -2966,7 +2980,7 @@
      The builder is the Host: naming rights, games, who joins. Joining is free.
      ===================================================================== */
   (function () {
-    var KINDS = [["friendship", "", "Friendship"], ["faith", "", "Faith small group"], ["prayer", "", "Prayer group"], ["service", "", "Service & volunteering"], ["games", "", "Board games"], ["greek", "", "Greek life"], ["alumni", "", "Alumni"], ["club", "", "Club"], ["sports", "", "Sports & fitness"], ["hobby", "", "Hobbies"], ["parents", "", "Parents"], ["other", "", "Other"]];
+    var KINDS = [["friendship", "", "Friendship"], ["faith", "", "Faith small group"], ["prayer", "", "Prayer group"], ["service", "", "Service & volunteering"], ["games", "", "Board games"], ["greek", "", "Greek life"], ["alumni", "", "Alumni"], ["club", "", "Club"], ["sports", "", "Sports & fitness"], ["hobby", "", "Hobbies"], ["parents", "", "Parents"], ["flirty18", "", "18+ Flirty"], ["other", "", "Other"]];
     var KIND = {}; KINDS.forEach(function (k) { KIND[k[0]] = k; });
     var WHO = { everyone: "Everyone", men: "Men only", women: "Women only" };
     var US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","PR"];
@@ -3088,6 +3102,11 @@
       if (example) return;
       if ($("#cjJoin", m)) $("#cjJoin", m).onclick = function () {
         if (!live()) { needLogin("tables"); return; }
+        if (c.kind === "flirty18" && !$("#cjJoin", m).__ok) {
+          var jb = $("#cjJoin", m);
+          if (!confirm("18+ Flirty table rules:\n\n• Adults only. ID-verified members only.\n• Flirty and suggestive is fine when everyone is into it. Stop the moment anyone isn't.\n• No nudity, no sexual images and no explicit sexual content, ever.\n• No asking for or offering money, gifts or meetups for anything sexual.\n\nBreak a rule and you're banned for life, with no refund, and your card becomes a Joker. Join?")) return;
+          jb.__ok = true;
+        }
         call("join_casino", { p_casino: c.id }).then(function (st) { closeModal(); toast(st === "member" ? "You're in! Welcome to " + c.name + "." : "Request sent. The Host will let you in."); find(); }, function (e) {
           if (/Sign-up Agreement/i.test(e.message)) { window.SFSign.require("signup", function () { $("#cjJoin", m).click(); }); return; }
           $("#cjErr", m).textContent = e.message; });
@@ -3401,6 +3420,7 @@
       if (m.rooms) P.rooms = m.rooms;
       if (m.bumpers) { P.bumpers = m.bumpers; lrpc("my_bumpers").then(function (rs) { P.bumpersOk = (rs || []).filter(function (x) { return x.status === "verified"; }).map(function (x) { return x.bumper; }); saveP(); if (typeof renderStyle === "function") renderStyle(); renderCard(); }, function () { }); }
       var st = res[1].data; if (st && st.verified_only) { P.verifiedOnly = st.verified_only; if ($("#fVerOnly")) $("#fVerOnly").value = P.verifiedOnly; }
+      lrpc("my_wishlist").then(function (u) { P.wishlist = u || ""; if ($("#fWish")) $("#fWish").value = P.wishlist; }, function () { });
       lrpc("my_card_back").then(function (b) { P.cardBack = b || null; saveP(); renderCardBacks(); }, function () { });
       lrpc("my_heads_ups").then(function (h) { P.headsUp = h || null; renderHeadsUp(); }, function () { });
       lrpc("my_compliments").then(function (rs) { P.compRows = rs || []; P.myComps = null; (rs || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function () { });
@@ -3492,6 +3512,8 @@
       html = "<h3>" + esc(STAGE_LABEL[h.outcome] || "Settled") + '</h3><p class="hint">This hand is settled.</p>';
     }
     box.innerHTML = html + safety;
+    var wl = document.createElement("p"); wl.className = "hint wishrow"; box.appendChild(wl);
+    lrpc("pair_wishlist", { p_hand: h.hand_id }).then(function (u) { if (u && /^https:\/\//.test(u)) wl.innerHTML = '🎁 <a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer nofollow">See ' + nm + '\'s wish list</a> · The store ships it without showing you their address.'; }, function () { });
     if (h.play_hand_id && (h.outcome === "win" || (h.my_call && h.my_call !== "loss_joker")) && window.SFSlots) {
       var cpb = document.createElement("div"); box.appendChild(cpb);
       lrpc("my_given_compliments", { p_play_hand: h.play_hand_id }).then(function (given) {

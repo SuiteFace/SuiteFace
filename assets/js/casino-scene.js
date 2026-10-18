@@ -20,7 +20,7 @@
   ];
   var AMENITIES = [["live_music", "Live music"], ["coffee", "Coffee"], ["food", "Food"], ["family", "Family friendly"], ["alcohol_free", "Alcohol-free"],
     ["accessible", "Wheelchair accessible"], ["outdoor_seating", "Outdoors"], ["pets", "Pets welcome"], ["prayer_space", "Prayer time"], ["parking", "Free parking"], ["late_night", "Late night"], ["free", "Free to attend"]];
-  var KIND_FELT = { friendship: "emerald", faith: "wine", prayer: "plum", service: "olive", games: "plum", greek: "wine", alumni: "charcoal", club: "emerald", sports: "emerald", hobby: "desert", parents: "rose", other: "emerald" };
+  var KIND_FELT = { friendship: "emerald", faith: "wine", prayer: "plum", service: "olive", games: "plum", greek: "wine", alumni: "charcoal", club: "emerald", sports: "emerald", hobby: "desert", parents: "rose", other: "emerald", flirty18: "wine" };
   var OLD_PAL = { gold_wine: "wine", emerald: "emerald", rose_gold: "rose", neon: "plum", silver: "charcoal", desert: "desert", tropical: "olive", custom: "custom" };
   var IDX = function (l) { var o = {}; l.forEach(function (x) { o[x[0]] = x; }); return o; };
   var T = IDX(THEMES), A = IDX(AMENITIES);
