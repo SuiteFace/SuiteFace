@@ -112,9 +112,24 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
 .repbox .hint{font-size:.85rem;color:#5B5560;margin:0}
 .seatnote{margin:12px 0 0;padding:10px 14px;border-radius:12px;background:rgba(232,196,106,.14);border:1px solid rgba(232,196,106,.55)}
 .seatmode{margin-top:10px}
+.games{display:grid;gap:10px;margin:12px 0 4px}
+.game{padding:14px 16px;border-radius:14px;background:rgba(250,247,240,.06);border:1px solid rgba(232,196,106,.3)}
+.g-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}.g-top b{font-size:1.05rem}
+.g-fmt{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(232,196,106,.16)}
+.game p{margin:6px 0 0;font-size:.92rem}.g-count{opacity:.8;font-size:.82rem!important}
+.g-rsvp{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.keynote{margin:14px 0;padding:12px 14px;border-radius:14px;border:1px solid #B8862F;background:rgba(232,196,106,.14)}
+.keynote.res,.keynote.inv{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.keynote .k-ic{font-size:1.8rem}.keynote div{flex:1 1 200px}.keynote b,.keynote span,.keynote small{display:block}.keynote small{opacity:.75}
+.keynote.bad{border-color:#B5122E;background:rgba(181,18,46,.1)}.keynote.ok{border-color:#1E6347;background:rgba(30,99,71,.12)}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0}
+.pc{display:grid;justify-items:center;gap:6px;padding:10px;border-radius:14px;text-align:center;background:#FFFDF8;color:#2B2730;box-shadow:0 10px 22px -14px rgba(10,14,12,.7)}
+.pc.down{background:#F7F2E6}.pc-back{width:72px;aspect-ratio:5/7;border-radius:8px;background:radial-gradient(circle at 50% 40%,#2F8A62,#163F2E);box-shadow:inset 0 0 0 2px rgba(232,196,106,.6),inset 0 0 0 5px #163F2E;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 5px,transparent 5px 10px)}
+.pc-h{font-weight:700;font-size:.85rem;word-break:break-all}.pc-ask{color:#7A5410;font-weight:700}.pc-wait{font-size:.78rem;color:#5A5360}
+.pc-ph{width:72px;aspect-ratio:5/7;border-radius:8px;background:#33473a center/cover;display:grid;place-items:center;color:#fff;font:900 1.6rem 'Big Shoulders Display',Impact,sans-serif}
+.pc small{color:#5A5360}.pc-bio{font-size:.78rem;line-height:1.3;color:#3A3540;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792329662">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792329662">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792330305">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792330305">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://suiteface.com/private-table.html">
 <meta property="og:type" content="website">
@@ -134,10 +149,10 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   <p class="note" id="status">Setting the table…</p>
 </main>
 <footer>© 2026 SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™ and SuiteFace Private Tables™ are trademarks of SuiteFace Inc. Private Tables are built and hosted by SuiteFace players. Always meet in public. In an emergency, call 911.</footer>
-<script src="assets/js/config.js?v=1792329662"></script>
-<script src="assets/js/live.js?v=1792329662"></script>
-<script src="assets/js/bumpers.js?v=1792329662"></script>
-<script src="assets/js/casino-scene.js?v=1792329662"></script>
+<script src="assets/js/config.js?v=1792330305"></script>
+<script src="assets/js/live.js?v=1792330305"></script>
+<script src="assets/js/bumpers.js?v=1792330305"></script>
+<script src="assets/js/casino-scene.js?v=1792330305"></script>
 <script>
 (function () {
   var CFG = window.SUITEFACE_CONFIG || {}, main = document.getElementById("main");
@@ -157,7 +172,7 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   }
   if (!id && !window.__demo) { main.innerHTML = '<h1>Pick a Private Table</h1><p class="about">Find one near you, or build your own.</p><div class="row"><a class="btn gold" href="./#private-tables">Find a table</a></div>'; return; }
 
-  function grp(c) { return { about: c.about, seating: c.seating || "first_come", bits: [WHO[c.who] || "Everyone welcome", c.seats ? Math.max(0, c.seats - (c.seated || 0)) + " of " + c.seats + " seats open" : "", (c.tables || []).length ? c.tables.length + " game" + (c.tables.length === 1 ? "" : "s") : ""] }; }
+  function grp(c) { return { about: c.about, guide: c.guide || (c.host && c.host.guide) || null, seating: c.seating || "first_come", bits: [WHO[c.who] || "Everyone welcome", c.seats ? Math.max(0, c.seats - (c.seated || 0)) + " of " + c.seats + " seats open" : "", (c.tables || []).length ? c.tables.length + " game" + (c.tables.length === 1 ? "" : "s") : ""] }; }
   function draw(c) {
     // Example tables always get their sample Host, even if this copy was saved before hosts existed.
     if ((c.example || /^ex\d+$/.test(c.id || "")) && !c.host && window.SFCasino.EX_HOST && window.SFCasino.EX_HOST[c.id]) { c.example = true; c.host = Object.assign({ since: 2026 }, window.SFCasino.EX_HOST[c.id]); c.seating = c.seating || c.host.seating; }
@@ -169,7 +184,9 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
       (c.my_hold && !host && c.my_status !== "member" ? '<p class="seatnote">🎟 The Host saved a seat for you. Tap <b>Take your saved seat</b>.</p>' : "") +
       '<p class="note seatmode">' + (c.seating === "reserved" ? "🔒 Reservations only: the Host saves seats for players. Everyone else can ask for a seat." : c.join_mode === "open" ? "🟢 Free play: open seats go to whoever joins first." : "🟢 Free play, with the Host approving each player.") + "</p>" +
       '<div id="hostCard">' + (c.example && c.host && window.SFCasino.hostCard ? window.SFCasino.hostCard(c.host, { example: true, group: grp(c) }) : (c.about ? '<p class="about">' + esc(c.about) + "</p>" : "")) + "</div>" + '<p class="err" id="err" role="alert"></p>' +
-      '<h2 class="sub">Games</h2><div id="floor"></div>' +
+      '<div id="keyBox"></div>' +
+      '<h2 class="sub">Games</h2><div id="floor"></div><div id="games" class="games"></div>' +
+      '<div id="players"></div>' +
       (c.status !== "open" ? '<p class="note">Only you can see this table until it passes its name check.</p>' : "") +
       '<p class="note">Games meet in public places. Never send money to anyone you meet. Covers ' + esc(c.scope === "national" ? "the whole United States" : c.scope === "states" && (c.states || []).length ? (c.states || []).join(", ") : "ZIP " + (c.zips || []).slice(0, 7).join(", ") + ((c.zips || []).length > 7 ? " and " + ((c.zips || []).length - 7) + " more" : "")) + ".</p>";
     if (!c.example && c.id && window.SFCasino.hostCard) call("casino_host_card", { p_casino: c.id }).then(function (h) { var hb = document.getElementById("hostCard"); if (hb && h) hb.innerHTML = window.SFCasino.hostCard(h, { group: grp(c) }); }, function () { });
@@ -183,6 +200,7 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
       b.textContent = inCasino ? "💬 Open chat" : "💬 Join to chat"; el.appendChild(b);
       b.onclick = function () { if (!inCasino) { toast(window.SF_LIVE ? "Join this table to chat." : "Log in and join this table to chat."); return; } openChat(t, c); };
     });
+    renderGames(c); renderKey(c); renderPlayers(c);
     var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     var dd = document.getElementById("doors"); if (dd) dd.classList.add("gone"); // the entrance already opened the doors
     var j = document.getElementById("join");
@@ -190,6 +208,72 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
       if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "tables"); } catch (e) { } location.href = "./?login=1#private-tables"; return; }
       call("join_casino", { p_casino: c.id }).then(function (st) { toast(st === "member" ? "You're in! Welcome to " + c.name + "." : st === "waitlist" ? "It's full right now, so you're on the waitlist." : c.seating === "reserved" ? "Asked for a seat. The Host saves seats for players." : "Request sent. The Host will let you in."); load(); }, function (e) { document.getElementById("err").textContent = e.message; });
     };
+  }
+  /* ---------- Games: in person, virtual or hybrid, with RSVPs ---------- */
+  var FMT = { in_person: ["📍", "In person"], virtual: ["💻", "Virtual"], hybrid: ["🔀", "Hybrid: in person or online"] };
+  function when(t) { if (!t.next_at) return t.meets || ""; var d = new Date(t.next_at); return d.toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + (t.meets ? " · " + t.meets : ""); }
+  function renderGames(c) {
+    var el = document.getElementById("games"); if (!el) return;
+    var inC = c.my_status === "host" || c.my_status === "member", ts = (c.tables || []);
+    if (!ts.length) { el.innerHTML = ""; return; }
+    el.innerHTML = ts.map(function (t) { var f = FMT[t.format || "in_person"] || FMT.in_person, r = t.my_rsvp;
+      return '<div class="game"><div class="g-top"><b>' + esc(t.name) + '</b><span class="g-fmt g-' + esc(t.format || "in_person") + '">' + f[0] + " " + f[1] + "</span></div>" +
+        (when(t) ? '<p class="g-when">🗓 ' + esc(when(t)) + "</p>" : "") +
+        (t.place && t.format !== "virtual" ? '<p class="g-place">📍 ' + esc(t.place) + "</p>" : "") +
+        (t.format !== "in_person" ? (t.link ? '<p class="g-link">💻 <a href="' + esc(t.link) + '" target="_blank" rel="noopener noreferrer">Join the video call ›</a></p>' : '<p class="g-link note">💻 The video link shows once you\'ve joined the table.</p>') : "") +
+        '<p class="g-count">' + ((t.going_in || 0) + (t.going_v || 0)) + " going" + (t.format === "hybrid" ? " · " + (t.going_in || 0) + " in person, " + (t.going_v || 0) + " online" : "") + "</p>" +
+        (inC && t.id ? '<div class="g-rsvp" role="group" aria-label="RSVP">' + (t.format !== "virtual" ? '<button type="button" class="btn sm ' + (r === "in_person" ? "gold" : "ghost") + '" data-rsvp="in_person" data-t="' + t.id + '">I\'ll be there</button>' : "") +
+          (t.format !== "in_person" ? '<button type="button" class="btn sm ' + (r === "virtual" ? "gold" : "ghost") + '" data-rsvp="virtual" data-t="' + t.id + '">Join online</button>' : "") +
+          '<button type="button" class="btn sm ' + (r === "out" ? "gold" : "ghost") + '" data-rsvp="out" data-t="' + t.id + '">Can\'t make it</button></div>' : "") + "</div>"; }).join("");
+    el.onclick = function (e) { var b = e.target.closest("[data-rsvp]"); if (!b) return; call("rsvp_casino_game", { p_table: b.getAttribute("data-t"), p_mode: b.getAttribute("data-rsvp") }).then(function (m) { toast(m === "out" ? "Got it. Maybe next time." : m === "virtual" ? "You're in, online. The link is on this page." : "See you there!"); load(); }, function (x) { toast(x.message); }); };
+  }
+  /* ---------- Keys: an invitation or a reserved seat, sent by the Host by text or email ---------- */
+  var KEY = ((location.search.match(/[?&]k=([A-Za-z0-9]{6,10})/) || [])[1] || "").toUpperCase();
+  function renderKey(c) {
+    var el = document.getElementById("keyBox"); if (!el || !KEY || c.example) return;
+    if (c.my_status === "host" || c.my_status === "member") { el.innerHTML = '<p class="keynote ok">✓ You\'re seated at this table.</p>'; return; }
+    call("casino_key_info", { p_casino: c.id, p_code: KEY }).then(function (k) {
+      if (!k) { el.innerHTML = '<p class="keynote bad">That key doesn\'t match this table.</p>'; return; }
+      if (!k.valid) { el.innerHTML = '<p class="keynote bad">This key has expired or been used. Ask ' + esc(k.host || "the Host") + " for a new one.</p>"; return; }
+      var res = k.kind === "reservation";
+      el.innerHTML = '<div class="keynote ' + (res ? "res" : "inv") + '"><span class="k-ic">' + (res ? "🎟" : "✉️") + '</span><div><b>' + (res ? esc(k.host || "The Host") + " reserved a seat for you" : esc(k.host || "The Host") + " invited you to this table") + "</b>" +
+        (k.note ? "<span>" + esc(k.note) + "</span>" : "") + (k.expires_at ? "<small>Good until " + new Date(k.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "</small>" : "") +
+        '</div><button class="btn gold" type="button" id="keyGo">' + (res ? "Claim my seat" : "Accept invitation") + "</button></div>";
+      document.getElementById("keyGo").onclick = function () {
+        if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.return", location.pathname + location.search); } catch (e) { } location.href = "./?login=1#private-tables"; return; }
+        call("join_casino_key", { p_casino: c.id, p_code: KEY }).then(function (st) { toast(st === "member" ? "You're seated. Welcome to " + c.name + "!" : "It's full right now, so you're on the waitlist."); load(); }, function (x) { toast(x.message); });
+      };
+    }, function () { });
+  }
+  /* ---------- Players: face down until you've both played each other's card ---------- */
+  var SU = { heart: "♥", diamond: "♦", club: "♣", spade: "♠" };
+  function renderPlayers(c) {
+    var el = document.getElementById("players"); if (!el) return;
+    if (c.example) { el.innerHTML = '<h2 class="sub">Players at this table</h2><p class="note">Players stay face down to each other. Play someone\'s card and, when they play yours back, you both turn face up and can talk one on one.</p><div class="pgrid">' + [1, 2, 3, 4, 5].map(function (i) { return '<div class="pc down"><span class="pc-back"></span><span class="pc-h">Player ' + i + "</span></div>"; }).join("") + "</div>"; return; }
+    if (!(c.my_status === "host" || c.my_status === "member") || !window.SF_LIVE) { el.innerHTML = '<h2 class="sub">Players at this table</h2><p class="note">' + (c.members || 0) + " player" + (c.members === 1 ? "" : "s") + ". Join to see the table. Players stay face down until you both play each other's card.</p>"; return; }
+    call("casino_players", { p_casino: c.id }).then(function (rows) {
+      rows = rows || [];
+      el.innerHTML = '<h2 class="sub">Players at this table</h2><p class="note">Face down until you both play each other\'s card. Then you\'re face up and can talk one on one.</p><div class="pgrid">' + (rows.length ? rows.map(function (p) {
+        if (p.up) return '<div class="pc up"><span class="pc-ph"' + (p.photo ? ' style="background-image:url(' + esc(p.photo) + ')"' : "") + ">" + (p.photo ? "" : esc((p.name || "?").charAt(0))) + "</span><b>" + esc(p.name || "") + (p.age ? ", " + p.age : "") + "</b><small>@" + esc(p.handle || "") + (p.suit ? " · " + (SU[p.suit] || "") : "") + (p.host ? " · Host" : "") + "</small>" + (p.bio ? '<span class="pc-bio">' + esc(p.bio) + "</span>" : "") + (p.host ? "" : '<button type="button" class="btn gold sm" data-talk="' + p.id + '" data-name="' + esc(p.name || "") + '">💬 Talk</button>') + "</div>";
+        return '<div class="pc down"><span class="pc-back"></span><span class="pc-h">@' + esc(p.handle || "player") + "</span>" + (p.they_played ? '<small class="pc-ask">Played your card</small>' : "") +
+          (p.i_played ? '<span class="pc-wait">You played · waiting</span>' : '<button type="button" class="btn ' + (p.they_played ? "gold" : "ghost") + ' sm" data-play="' + p.id + '">' + (p.they_played ? "Play back" : "Play card") + "</button>") + "</div>";
+      }).join("") : '<p class="note">You\'re the first one here.</p>') + "</div>";
+      el.onclick = function (e) {
+        var b = e.target.closest("[data-play]"); if (b) { b.disabled = true; call("casino_play", { p_casino: c.id, p_member: b.getAttribute("data-play") }).then(function (r) { toast(r === "connected" ? "Face up! You can talk one on one now." : "Played. If they play yours back, you'll both turn face up."); renderPlayers(c); }, function (x) { b.disabled = false; toast(x.message); }); return; }
+        var t = e.target.closest("[data-talk]"); if (t) openDm(c, t.getAttribute("data-talk"), t.getAttribute("data-name"));
+      };
+    }, function () { el.innerHTML = ""; });
+  }
+  function openDm(c, mid, name) {
+    var old = document.getElementById("tchatBox"); if (old) old.remove();
+    var last = 0, timer, box = document.createElement("div"); box.id = "tchatBox"; box.className = "tchatbox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Talk with " + name);
+    box.innerHTML = '<div class="tch-head"><div><b>' + esc(name || "Player") + "</b><small>One on one · " + esc(c.name) + '</small></div><button type="button" class="btn ghost" id="tchClose">Close</button></div><div class="tch-log" id="tchLog" aria-live="polite"><p class="note">Loading…</p></div>' +
+      '<form class="tch-form" id="tchForm"><label class="sr" for="tchIn">Message</label><input id="tchIn" maxlength="600" autocomplete="off" placeholder="Say something…"><button class="btn gold" type="submit">Send</button></form><p class="note">Meet in public. Never send money.</p>';
+    document.body.appendChild(box); var log = box.querySelector("#tchLog");
+    function pull() { call("casino_dm_thread", { p_casino: c.id, p_member: mid, p_after: last }).then(function (rows) { if (!last) log.innerHTML = ""; (rows || []).forEach(function (m) { last = Math.max(last, m.id); var d = document.createElement("div"); d.className = "tch-msg" + (m.mine ? " me" : ""); d.innerHTML = '<span class="who">' + (m.mine ? "You" : esc(name)) + '</span><span class="txt">' + esc(m.body) + "</span>"; log.appendChild(d); }); if (!log.children.length) log.innerHTML = '<p class="note">You\'re face up. Say hi.</p>'; log.scrollTop = log.scrollHeight; }, function (x) { log.innerHTML = '<p class="err">' + esc(x.message) + "</p>"; }); }
+    pull(); timer = setInterval(function () { if (!document.body.contains(box)) { clearInterval(timer); return; } pull(); }, 4000);
+    box.querySelector("#tchClose").onclick = function () { clearInterval(timer); box.remove(); };
+    box.querySelector("#tchForm").onsubmit = function (e) { e.preventDefault(); var i = box.querySelector("#tchIn"), v = i.value.trim(); if (!v) return; i.value = ""; call("casino_dm_send", { p_casino: c.id, p_member: mid, p_body: v }).then(function () { if (log.querySelector(".note")) log.innerHTML = ""; pull(); }, function (x) { toast(x.message); }); };
   }
   function openChat(t, c) {
     var old = document.getElementById("tchatBox"); if (old) old.remove();
@@ -263,9 +347,9 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   setTimeout(go, window.__demo ? 0 : 700); // anonymous visitors don't wait long for a session
 })();
 </script>
-<script src="assets/js/gate.js?v=1792329662"></script>
-<script src="assets/js/fx.js?v=1792329662"></script>
+<script src="assets/js/gate.js?v=1792330305"></script>
+<script src="assets/js/fx.js?v=1792330305"></script>
 <p class="sf-credit" style="margin:0;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));text-align:center;font:600 .85rem/1.5 Figtree,system-ui,sans-serif;color:var(--muted,#A69DB0)">U.S. patent pending (USPTO). Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--gold-hi,#E8C46A);text-decoration:none;font-weight:800">GoFirehorseGo</a>.</p>
-<script src="/assets/js/slots.js?v=1792329662" defer></script>
+<script src="/assets/js/slots.js?v=1792330305" defer></script>
 </body>
 </html>

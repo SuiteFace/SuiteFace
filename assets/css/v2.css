@@ -898,3 +898,10 @@ html[data-play="day"] .lg-facts,html[data-play="day"] .lgfacts{color:#2B2730}
 html[data-play="day"] .hint{color:#5A5360}
 html[data-play="day"] .hint.good{color:#17663F}html[data-play="day"] .hint.bad{color:#B5122E}
 html[data-play="day"] .rmmsg .rmn{color:#7A5410}html[data-play="day"] .rmmsg.mine .rmn{color:#1E6347}html[data-play="day"] .tch-msg .who{color:#7A5410}
+.bchead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-right:84px}.bchead h3{margin:0}
+.row.duo{gap:8px;margin:10px 0 4px}.row.duo .btn{flex:1 1 140px}
+.camok{text-align:left}.camok-ic{font-size:2.4rem}
+.cmgame,.cmguide,.cmkey{display:grid;gap:8px;margin:6px 0 10px}.cmgame input,.cmgame select,.cmkey input,.cmkey select,.cmguide textarea{width:100%;min-width:0}
+@media (min-width:560px){.cmgame{grid-template-columns:1fr 1fr}.cmgame .hint,.cmgame button{grid-column:1/-1;justify-self:start}.cmkey{grid-template-columns:1fr 1fr 1fr}.cmkey input,.cmkey button{grid-column:1/-1}.cmkey button{justify-self:start}}
+.keymsg{width:100%;font:500 .9rem/1.45 var(--body);border-radius:12px;padding:10px;margin:8px 0;resize:vertical}
+.keychip{display:inline-block;padding:3px 9px;border-radius:8px;background:#2B2730;color:#FFE7A3;letter-spacing:.14em}

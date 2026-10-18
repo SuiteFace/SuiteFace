@@ -2527,8 +2527,22 @@
     };
     if (remote && info) after(info); else lrpc("call_end", { p_call: c.id }).then(after, function () { toast("Call ended."); });
   }
-  function placeCall(hand, name, other) {
+  /* One-time camera and microphone agreement, shown before the browser's own permission prompt. */
+  function camConsent(then) {
+    var ok = false; try { ok = localStorage.getItem("sf.camok") === "1"; } catch (e) { }
+    if (ok) { then(); return; }
+    var m = modal('<div class="form-grid camok"><span class="camok-ic" aria-hidden="true">📹</span><h3>Allow camera and microphone?</h3>' +
+      '<p class="lede">SuiteFace uses your camera and microphone <b>only during a video chat you start or answer</b>.</p>' +
+      '<ul class="hint cc-list"><li>Video and sound go straight between your two devices. SuiteFace never records or stores them.</li><li>You can turn your camera or mic off, or hang up, at any time.</li><li>Recording or screenshotting the other person without their OK breaks the House Rules.</li><li>Next, your browser will ask for permission. Tap <b>Allow</b>.</li></ul>' +
+      '<label class="chk"><input type="checkbox" id="camOk"> I agree to use my camera and microphone for video chats on SuiteFace.</label><p class="err" id="camErr" role="alert"></p>' +
+      '<div class="row"><button class="btn gold" type="button" id="camGo">Continue</button><button class="btn ghost" type="button" data-close>Not now</button></div></div>');
+    $("#camGo", m).addEventListener("click", function () { if (!$("#camOk", m).checked) { $("#camErr", m).textContent = "Please check the box to continue."; return; } try { localStorage.setItem("sf.camok", "1"); } catch (e) { } if (liveOn()) lrpc("record_consent", { p_kind: "camera" }).catch(function () { }); closeModal(); then(); });
+  }
+  function placeCall(hand, name, other, bluff) {
     if (!liveOn()) { toast("Video calls open for members with a Pair."); return; }
+    camConsent(function () { placeCall2(hand, name, other, bluff); });
+  }
+  function placeCall2(hand, name, other, bluff) {
     if (!window.RTCPeerConnection || !navigator.mediaDevices) { toast("This browser can't make video calls. Try Safari or Chrome."); return; }
     var first = esc((name || "your Pair").split(" ")[0]);
     var m = modal('<div class="form-grid callconsent"><div class="cc-hg">' + hourglass() + '</div><h3>Video call ' + first + '?</h3>' +
@@ -2539,7 +2553,7 @@
     $("#ccGo", m).addEventListener("click", function () {
       if (!$("#ccOk", m).checked) { $("#ccErr", m).textContent = "Please agree to the price to call."; return; }
       $("#ccErr", m).textContent = "Starting…";
-      lrpc("call_start", { p_hand: hand, p_ok: true }).then(function (id) {
+      lrpc(bluff ? "call_start_bluff" : "call_start", bluff ? { p_bhand: hand, p_ok: true } : { p_hand: hand, p_ok: true }).then(function (id) {
         closeModal();
         CALL = { id: id, name: name || "your Pair", other: other || null, caller: true, iPay: true, after: 0, pendingIce: [], skew: 0, lastMin: 0 };
         CALL.ui = callUI(CALL.name, true);
@@ -2553,11 +2567,17 @@
       '<div class="row"><button class="btn gold" type="button" id="icYes">Answer</button><button class="btn ghost" type="button" id="icNo">Decline</button></div></div>');
     $("#icNo", m).addEventListener("click", function () { closeModal(); lrpc("call_answer", { p_call: row.id, p_yes: false }).catch(function () { }); });
     $("#icYes", m).addEventListener("click", function () {
-      closeModal();
+      closeModal(); var ok0 = false; try { ok0 = localStorage.getItem("sf.camok") === "1"; } catch (e) { }
+      if (!ok0) { camConsent(function () { answerCall2(row); }); return; }
+      answerCall2(row);
+    });
+  }
+  function answerCall2(row) {
+    (function () {
       CALL = { id: row.id, name: row.caller_name || "Your Pair", caller: false, iPay: false, after: 0, pendingIce: [], skew: 0, lastMin: 0 };
       CALL.ui = callUI(CALL.name, false);
       startMedia().then(function () { return lrpc("call_answer", { p_call: row.id, p_yes: true }); }).then(function (st) { if (st !== "active") { hangUp(true, { status: st }); return; } runLoops(); }, function () { toast("Allow camera and microphone to answer."); if (CALL) lrpc("call_answer", { p_call: row.id, p_yes: false }).catch(function () { }); hangUp(true, { status: "cancelled" }); });
-    });
+    })();
   }
   var lastRing = "";
   function watchIncoming() {
@@ -2570,6 +2590,14 @@
     setTimeout(function () { if (window.SF_LIVE && window.SF_LIVE.client && window.SF_LIVE.client.functions) lrpc("my_calls").then(function (rows) { if ((rows || []).some(function (c) { return c.i_paid && c.charge_status === "pending"; })) window.SF_LIVE.client.functions.invoke("call-charge", { body: {} }).catch(function () { }); }, function () { }); }, 4000);
   });
   document.addEventListener("click", function (e) { var b = e.target.closest("[data-call]"); if (!b) return; e.preventDefault(); placeCall(b.getAttribute("data-call"), b.getAttribute("data-name"), b.getAttribute("data-other")); });
+  // Bluff Table video: the same answer for every uncalled card, so the button never gives a House Card away.
+  function bluffVideo(handId, name) {
+    var cards = (BT.state && BT.state.cards) || [], c = cards.filter(function (x) { return x.hand_id === handId; })[0];
+    if (!c || !c.guess) { toast("Video unlocks after you call this card. If it's a Player Card, you can video chat."); return; }
+    if (c.revealed !== "real") { toast("That was a House Card. House Cards don't video chat."); return; }
+    placeCall(handId, name || c.name, null, true);
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-bvideo]"); if (!b) return; e.preventDefault(); bluffVideo(b.getAttribute("data-bvideo"), b.getAttribute("data-bname")); });
 
   /* ---------- Venue logos rendered as an enamel pin, an embroidered patch or a gold coin ---------- */
   var LB = 0;
@@ -3698,7 +3726,7 @@
         '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + " · " + (seatsLine(c) || (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s")) + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span>" + casCta(c, example) + "</button>";
     }
     // Every table card says plainly whether you can sit down now, with the one button that does it.
-    function casGroup(c) { return { about: c.about, seating: c.seating || "first_come", bits: [WHO[c.who] || "Everyone welcome", seatsLine(c), (c.tables || []).length ? (c.tables.length + " game" + (c.tables.length === 1 ? "" : "s")) : ""] }; }
+    function casGroup(c) { return { about: c.about, guide: c.guide || (c.host && c.host.guide) || null, seating: c.seating || "first_come", bits: [WHO[c.who] || "Everyone welcome", seatsLine(c), (c.tables || []).length ? (c.tables.length + " game" + (c.tables.length === 1 ? "" : "s")) : ""] }; }
     function casCta(c, example) {
       var full = c.seats != null && (c.seated || 0) >= c.seats;
       var st = example ? ["ex", "👀 Example table", "Walk in and look around ›", "walk"]
@@ -3916,7 +3944,21 @@
         '<div class="cmholds"><h5 style="margin:10px 0 6px">Saved seats</h5><div id="cmHolds"><p class="hint">Loading…</p></div>' +
         '<div class="casbar cmholdform"><label class="sr" for="cmHoldH">Player @handle</label><input type="text" id="cmHoldH" maxlength="40" placeholder="@handle" autocapitalize="none"><label class="sr" for="cmHoldD">Hold for</label><select id="cmHoldD"><option value="1">Hold 1 day</option><option value="3">Hold 3 days</option><option value="7" selected>Hold 7 days</option><option value="30">Hold 30 days</option><option value="0">Until they arrive</option></select>' +
         '<input type="text" id="cmHoldN" maxlength="120" placeholder="Note (optional): For Friday dinner"><button class="btn gold sm" type="button" id="cmHoldGo">Save a seat</button></div></div>' +
-        '<h4>Add a game</h4><div class="casbar"><input type="text" id="cmTName" maxlength="40" placeholder="Saturday Service"><input type="text" id="cmTMeets" maxlength="120" placeholder="Sat 9am · food bank"><button class="btn ghost sm" type="button" id="cmTAdd">Add game</button></div>' +
+        '<h4>Add a game or meetup</h4><div class="cmgame"><input type="text" id="cmTName" maxlength="40" placeholder="Game name: Friday Dinner"><select id="cmTFmt" aria-label="How players meet"><option value="in_person">📍 In person</option><option value="virtual">💻 Virtual</option><option value="hybrid">🔀 Hybrid: in person or online</option></select>' +
+          '<input type="text" id="cmTMeets" maxlength="120" placeholder="Repeats: Every Friday, 7pm"><input type="datetime-local" id="cmTNext" aria-label="Next meetup date and time"><input type="text" id="cmTPlace" maxlength="140" placeholder="Public place: Lee Branch patio, Hoover"><input type="url" id="cmTLink" maxlength="300" placeholder="Video link: https://…" hidden>' +
+          '<button class="btn gold sm" type="button" id="cmTAdd">Add game</button><p class="hint">Always meet in public places. Video links only show to players at your table.</p></div>' +
+        '<h4>Table guide</h4><p class="hint">Goes on your table page and in every invitation.</p><div class="cmguide">' +
+          '<label for="cmGDet">The details</label><textarea id="cmGDet" maxlength="800" rows="2" placeholder="When and where you meet, what to expect."></textarea>' +
+          '<label for="cmGGoal">Goals</label><textarea id="cmGGoal" maxlength="600" rows="2" placeholder="What this group is working toward."></textarea>' +
+          '<label for="cmGRec">Recommendations</label><textarea id="cmGRec" maxlength="600" rows="2" placeholder="What to try, read, bring or wear."></textarea>' +
+          '<label for="cmGTip">Tips</label><textarea id="cmGTip" maxlength="600" rows="2" placeholder="House rules and helpful hints."></textarea>' +
+          '<button class="btn ghost sm" type="button" id="cmGSave">Save guide</button></div>' +
+        '<h4>Invitations &amp; reservations</h4><p class="hint">Send by text or email from your phone. An <b>invitation</b> lets them walk right in. A <b>reservation</b> holds a seat that only the key can claim.</p>' +
+          '<div class="cmkey"><select id="cmKKind" aria-label="Invitation or reservation"><option value="invite">✉️ Invitation</option><option value="reservation">🎟 Reservation (holds a seat)</option></select>' +
+          '<select id="cmKDays" aria-label="Good for"><option value="3">Good 3 days</option><option value="7" selected>Good 7 days</option><option value="30">Good 30 days</option><option value="0">No end date</option></select>' +
+          '<select id="cmKUses" aria-label="How many people"><option value="1" selected>For 1 person</option><option value="2">For 2 people</option><option value="5">For 5 people</option><option value="10">For 10 people</option></select>' +
+          '<input type="text" id="cmKNote" maxlength="120" placeholder="Personal note: Can\'t wait to see you Friday!"><button class="btn gold sm" type="button" id="cmKGo">Create &amp; send</button></div>' +
+          '<div id="cmKeys"></div>' +
         '<h4>Add ZIP codes · $2.10 each</h4><div class="casbar"><input type="text" id="cmZips" maxlength="60" placeholder="35212, 35213"><button class="btn ghost sm" type="button" id="cmZipGo">Pay &amp; add</button></div>' +
         (c.status === "rejected" ? '<h4>Rename &amp; resubmit (free)</h4><div class="casbar"><input type="text" id="cmRename" maxlength="40" value="' + esc(c.name) + '"><button class="btn ghost sm" type="button" id="cmRenameGo">Resubmit</button></div>' : "") +
         (c.status === "unpaid" ? '<h4>Name &amp; details</h4><div class="field"><label for="cmName">Table name</label><input type="text" id="cmName" maxlength="40" value="' + esc(c.name) + '"></div>' +
@@ -3944,7 +3986,32 @@
         call("hold_casino_seat", { p_casino: c.id, p_handle: hd, p_days: parseInt($("#cmHoldD", m).value, 10), p_note: $("#cmHoldN", m).value }).then(function (r) { err.textContent = ""; $("#cmHoldH", m).value = $("#cmHoldN", m).value = ""; toast(r === "seated" ? "They'd already asked, so they're seated now." : "Seat saved. It's waiting for them when they open your table."); holds(); people(); find(); }, function (x) { err.textContent = x.message; }); };
       $("#cmHolds", m).addEventListener("click", function (e) { var b = e.target.closest("[data-unhold]"); if (!b) return; call("release_casino_seat", { p_casino: c.id, p_member: b.getAttribute("data-unhold") }).then(function () { toast("Seat released."); holds(); find(); }, function (x) { err.textContent = x.message; }); });
       $("#cmPeople", m).addEventListener("click", function (e) { var b = e.target.closest("[data-act]"); if (!b) return; call("decide_casino_member", { p_casino: c.id, p_member: b.getAttribute("data-mid"), p_action: b.getAttribute("data-act") }).then(people, function (x) { err.textContent = x.message; }); });
-      $("#cmTAdd", m).onclick = function () { var n = $("#cmTName", m).value.trim(); if (n.length < 2) { err.textContent = "Name the game."; return; } call("save_casino_table", { p_casino: c.id, p_name: n, p_meets: $("#cmTMeets", m).value.trim() }).then(function () { toast("Game added."); $("#cmTName", m).value = $("#cmTMeets", m).value = ""; loadMine(); }, function (x) { err.textContent = x.message; }); };
+      $("#cmTFmt", m).onchange = function () { var v = this.value; $("#cmTLink", m).hidden = v === "in_person"; $("#cmTPlace", m).hidden = v === "virtual"; };
+      $("#cmTAdd", m).onclick = function () { var n = $("#cmTName", m).value.trim(); if (n.length < 2) { err.textContent = "Name the game."; return; } var nx = $("#cmTNext", m).value;
+        call("save_casino_game", { p_casino: c.id, p_table: null, p_name: n, p_meets: $("#cmTMeets", m).value.trim(), p_format: $("#cmTFmt", m).value, p_place: $("#cmTPlace", m).value.trim(), p_link: $("#cmTLink", m).value.trim(), p_next_at: nx ? new Date(nx).toISOString() : null })
+          .then(function () { err.textContent = ""; toast("Game added."); ["#cmTName", "#cmTMeets", "#cmTNext", "#cmTPlace", "#cmTLink"].forEach(function (k) { $(k, m).value = ""; }); find(); }, function (x) { err.textContent = x.message; }); };
+      call("casino_floor", { p_id: c.id }).then(function (f) { var g = (f && f.guide) || {}; c.guide = g; c.tables = (f && f.tables) || c.tables; $("#cmGDet", m).value = g.details || ""; $("#cmGGoal", m).value = g.goals || ""; $("#cmGRec", m).value = g.recommend || ""; $("#cmGTip", m).value = g.tips || ""; }, function () { });
+      $("#cmGSave", m).onclick = function () { call("set_casino_guide", { p_casino: c.id, p_guide: { details: $("#cmGDet", m).value, goals: $("#cmGGoal", m).value, recommend: $("#cmGRec", m).value, tips: $("#cmGTip", m).value } }).then(function (g) { c.guide = g; err.textContent = ""; toast("Table guide saved."); }, function (x) { err.textContent = x.message; }); };
+      function keyMsg(k, kind, note) {
+        var url = CFG.siteUrl + "private-table.html?c=" + encodeURIComponent(c.id) + "&k=" + k, g = c.guide || {}, next = (c.tables || []).filter(function (t) { return t.next_at; })[0];
+        return (kind === "reservation" ? "🎟 I saved you a seat at " : "✉️ You're invited to ") + c.name + " on SuiteFace." + (note ? "\n\n" + note : "") +
+          (next ? "\n\nNext up: " + next.name + ", " + new Date(next.next_at).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + (next.format === "virtual" ? " (online)" : next.format === "hybrid" ? " (in person or online)" : next.place ? " at " + next.place : "") : "") +
+          (g.details ? "\n\nThe details: " + g.details : "") + (g.goals ? "\nGoals: " + g.goals : "") + (g.recommend ? "\nRecommended: " + g.recommend : "") + (g.tips ? "\nTips: " + g.tips : "") +
+          "\n\n" + (kind === "reservation" ? "Claim your seat" : "Join the table") + ": " + url + "\nYour key: " + k;
+      }
+      function shareKey(k, kind, note) {
+        var msg = keyMsg(k, kind, note), subj = (kind === "reservation" ? "A seat is saved for you at " : "You're invited to ") + c.name;
+        var km = modal('<h3>' + (kind === "reservation" ? "🎟 Reservation ready" : "✉️ Invitation ready") + '</h3><p class="hint">Key <b class="keychip">' + esc(k) + '</b>. Send it from your phone:</p><textarea class="keymsg" rows="9" readonly>' + esc(msg) + '</textarea>' +
+          '<div class="row"><a class="btn gold" href="sms:?&body=' + encodeURIComponent(msg) + '">💬 Text it</a><a class="btn gold" href="mailto:?subject=' + encodeURIComponent(subj) + "&body=" + encodeURIComponent(msg) + '">📧 Email it</a><button class="btn ghost" type="button" id="kmCopy">Copy</button>' + (navigator.share ? '<button class="btn ghost" type="button" id="kmShare">Share…</button>' : "") + '</div><button class="btn ghost sm" type="button" data-close style="margin-top:10px">Done</button>');
+        $("#kmCopy", km).onclick = function () { copy(msg, this); };
+        if ($("#kmShare", km)) $("#kmShare", km).onclick = function () { navigator.share({ title: subj, text: msg }).catch(function () { }); };
+      }
+      function keys() { call("casino_keys_list", { p_casino: c.id }).then(function (rows) { $("#cmKeys", m).innerHTML = (rows || []).map(function (k) { return '<div class="cmrow"><span>' + (k.kind === "reservation" ? "🎟" : "✉️") + " <b>" + esc(k.code) + "</b> · " + (k.max_uses - k.uses) + " left" + (k.note ? " · <i>" + esc(k.note) + "</i>" : "") + (k.expires_at ? " · until " + new Date(k.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "") + '</span><span><button class="chip sm" type="button" data-kresend="' + esc(k.code) + '" data-kk="' + k.kind + '" data-kn="' + esc(k.note || "") + '">Send again</button><button class="chip sm" type="button" data-krev="' + esc(k.code) + '">Cancel</button></span></div>'; }).join(""); }, function () { }); }
+      keys();
+      $("#cmKGo", m).onclick = function () { var kind = $("#cmKKind", m).value, note = $("#cmKNote", m).value.trim();
+        call("create_casino_key", { p_casino: c.id, p_kind: kind, p_days: parseInt($("#cmKDays", m).value, 10), p_note: note, p_uses: parseInt($("#cmKUses", m).value, 10) }).then(function (k) { err.textContent = ""; $("#cmKNote", m).value = ""; keys(); find(); shareKey(k, kind, note); }, function (x) { err.textContent = x.message; }); };
+      $("#cmKeys", m).addEventListener("click", function (e) { var b = e.target.closest("[data-krev]"); if (b) { call("revoke_casino_key", { p_code: b.getAttribute("data-krev") }).then(function () { toast("Key cancelled."); keys(); find(); }); return; }
+        b = e.target.closest("[data-kresend]"); if (b) shareKey(b.getAttribute("data-kresend"), b.getAttribute("data-kk"), b.getAttribute("data-kn")); });
       $("#cmZipGo", m).onclick = function () { var z = ($("#cmZips", m).value.match(/\d{5}/g) || []); if (!z.length) { err.textContent = "Enter ZIP codes, separated by commas."; return; } call("add_casino_zips", { p_casino: c.id, p_zips: z }).then(function (r) { pay("zips", c.id, r.order, err); }, function (x) { err.textContent = x.message; }); };
       if ($("#cmRenameGo", m)) $("#cmRenameGo", m).onclick = function () { call("rename_casino", { p_casino: c.id, p_name: $("#cmRename", m).value.trim() }).then(function () { closeModal(); toast("Resubmitted for the name check."); loadMine(); }, function (x) { err.textContent = x.message; }); };
       $("#cmSeatsGo", m).onclick = function () { var n = parseInt($("#cmSeats", m).value, 10); call("set_casino_seats", { p_casino: c.id, p_seats: n }).then(function (r) { if (r && r.order) { pay("zips", c.id, r.order, err); return; } c.seats = n; toast("Seats saved: " + n + "."); loadMine(); }, function (x) { err.textContent = x.message; }); };
@@ -3974,6 +4041,8 @@
         call("join_casino", { p_casino: b.getAttribute("data-takeseat") }).then(function (st) { toast(st === "member" ? "You're seated. Welcome to the table!" : "Request sent."); loadHolds(); find(); location.href = "private-table.html?c=" + encodeURIComponent(b.getAttribute("data-takeseat")); }, function (x) { b.disabled = false; toast(x.message); }); }); }
     }
     document.addEventListener("sf:live", function () { setTimeout(loadHolds, 600); });
+    // Back to the table after signing in from an invitation link.
+    document.addEventListener("sf:live", function () { var r = null; try { r = sessionStorage.getItem("sf.return"); sessionStorage.removeItem("sf.return"); } catch (e) { } if (r && /^\/?private-table\.html\?/.test(r.replace(/^\//, ""))) location.href = r; });
     function loadMine() {
       var box = $("#casMine"); if (!live()) { box.hidden = true; return; }
       window.SF_LIVE.client.from("casinos").select("id,name,kind,about,zips,who,join_mode,status,review_note,style,scope,states,seats,seats_paid").eq("host_id", window.SF_LIVE.memberId()).neq("status", "closed").then(function (r) {
@@ -4160,12 +4229,14 @@
     var m = modal('<p class="pairtitle">' + (h.status === "won" ? "Still winning" : "It's a Pair!") + '</p>' +
       '<div class="ranks"><span>You hold ' + nm + " as <b>" + esc(h.i_hold || "?") + "</b></span><span>" + nm + " holds you as <b>" + esc(h.they_hold || "?") + "</b></span></div>" +
       (p ? '<p class="jm-line">' + nm + "'s " + jmeter(p, true) + "</p>" : "") +
+      '<div class="row duo"><button class="btn ghost sm" type="button" data-gochat>💬 Chat</button><button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video chat</button></div>' +
       '<div class="row callrow"><button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video call ' + nm + '</button><span class="hint">$2.10 first minute, then 21¢/min · you pay, ' + nm + ' doesn\'t</span></div>' +
       '<div class="row callrow">' + loungeBtn("pair", h.hand_id, h.other_id, h.other_name) + '<span class="hint">Private 21 minutes · $2.10 a seat · ID-verified players</span></div>' +
       '<details class="datedeals" open><summary>🎟️ Date Deals near you two</summary><div id="ddBox"><p class="hint">Loading…</p></div></details>' +
       '<div class="hand-box" id="handBox"></div>' +
       '<details class="sidetable" open><summary>Side Table chat</summary><div class="chat" id="chat"><p class="hint">Loading…</p></div>' +
       '<form id="chatForm" style="display:flex;gap:8px;margin-top:10px"><label class="sr" for="chatIn">Message</label><input type="text" id="chatIn" maxlength="1000" placeholder="Say hi, pick a public place…" autocomplete="off"><button class="btn felt sm" type="submit">Send</button></form>' +
+      '<div class="row" style="margin-top:8px"><button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video chat</button></div>' +
       '<p class="hint">Keep it on SuiteFace until you\'ve met. Never send money. Always meet in public.</p></details>');
     var last = 0;
     function pull() {
@@ -4182,6 +4253,7 @@
       lrpc("send_side_table", { p_hand: h.hand_id, p_body: v }).then(pull, function (x) { toast(x.message); });
     });
     renderLiveHand(m, h); renderDeals(m, h);
+    var gc = $("[data-gochat]", m); if (gc) gc.addEventListener("click", function () { var st = $("details.sidetable", m); if (st) { st.open = true; st.scrollIntoView({ behavior: "smooth", block: "start" }); } setTimeout(function () { var i = $("#chatIn", m); if (i) i.focus(); }, 350); });
   }
   /* Compliment stickers: after a date, tap what was true. Earned only, never bought. */
   function compPicker(given, done) {
@@ -4338,9 +4410,10 @@
       '<div class="bbody"><b>' + esc(h.name || "Player") + (h.age ? ", " + h.age : "") + "</b><small>" + esc(h.city || "") + (h.suit && SUIT[h.suit] ? " · " + SUIT[h.suit].sym + " " + SUIT[h.suit].name : "") + "</small>" +
       (h.bio ? '<p class="bbio">' + esc(h.bio) + "</p>" : "") + (h.last_body ? '<p class="blast">' + esc(h.last_body.slice(0, 70)) + "</p>" : "") +
       (called ? '<p class="bres ' + (h.correct ? "ok" : "no") + '">' + (h.correct ? "✓ Called it: " : "✗ Not this time: ") + (h.revealed === "house" ? "a House Card." : "a Player Card (a real player).") + "</p>" +
-          (h.revealed === "real" ? '<div class="bact">' + loungeBtn("bluff", h.hand_id, "", h.name) + "</div>" : "") :
+          (h.revealed === "house" ? '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Keep playing this hand</button></div><p class="hint">Played by SuiteFace\'s AI dealer. Just for fun: House Cards can\'t Pair, date or video chat.</p>' : "") +
+          (h.revealed === "real" ? '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn gold sm" type="button" data-bvideo="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">📹 Video chat</button>' + loungeBtn("bluff", h.hand_id, "", h.name) + "</div>" : "") :
         pending ? '<p class="hint">Call waiting for your team…</p><div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button></div>' :
-        '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + h.hand_id + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + h.hand_id + '">🂠 Player Card</button></div>') + "</div></div>";
+        '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn ghost sm" type="button" data-bvideo="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">📹 Video</button><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + h.hand_id + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + h.hand_id + '">🂠 Player Card</button></div>') + "</div></div>";
   }
   function showVerdict(r) { if (!r || !r.truth) return; var house = r.truth === "house"; modal('<div class="bverdict ' + (r.correct ? "ok" : "no") + '"><span class="big">' + (house ? "🎭" : "💞") + "</span><h3>" + (house ? "Bluff! That was a House Card." : "Player Card! That's a real player.") + '</h3><p class="lede">' + (r.correct ? "You called it. +1 to your table." : "Not this time.") + " Score: <b>" + r.score + "</b></p></div>"); if (r.correct) jackpot(2200); }
   document.addEventListener("click", function (e) {
@@ -4365,7 +4438,7 @@
         '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn sm bbluff" type="button" data-bcall="bluff" data-bh="' + h.hand_id + '">🎭 House Card</button><button class="btn sm breal" type="button" data-bcall="real" data-bh="' + h.hand_id + '">🂠 Player Card</button></div>') + "</div></div>";
   }
   function bluffChat(handId, name, asCard) {
-    var m = modal('<h3 style="font-size:1.5rem">' + esc(name || "Chat") + '</h3><p class="hint">' + (asCard ? "They're chatting with your card. Reply as yourself." : "Player Card or House Card? Chat, then call it.") + '</p><div class="bthread" id="bThread"><p class="hint">Loading…</p></div><form id="bForm" class="bform"><input id="bIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' + (asCard ? "" : '<div class="row" style="margin-top:8px"><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + handId + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + handId + '">🂠 Player Card</button></div>') +
+    var m = modal('<div class="bchead"><h3 style="font-size:1.5rem">' + esc(name || "Chat") + '</h3>' + (asCard || (((BT.state && BT.state.cards) || []).filter(function (x) { return x.hand_id === handId; })[0] || {}).revealed === "house" ? "" : '<button class="btn ghost sm" type="button" data-bvideo="' + handId + '" data-bname="' + esc(name || "") + '">📹 Video chat</button>') + '</div><p class="hint">' + (asCard ? "They're chatting with your card. Reply as yourself." : (function () { var cc = ((BT.state && BT.state.cards) || []).filter(function (x) { return x.hand_id === handId; })[0]; return cc && cc.revealed === "house" ? "🎭 You called it: a House Card, played by SuiteFace's AI dealer. Keep playing just for fun." : cc && cc.revealed === "real" ? "🂠 A real player. Say hi, video chat, or invite them to the Lounge." : "Player Card or House Card? Chat, then call it. Video unlocks once you call a Player Card."; })()) + '</p><div class="bthread" id="bThread"><p class="hint">Loading…</p></div><form id="bForm" class="bform"><input id="bIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' + (asCard ? "" : '<div class="row" style="margin-top:8px"><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + handId + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + handId + '">🂠 Player Card</button></div>') +
       '<div class="breport"><button class="linkish" type="button" id="bRepBtn">⚑ Report this chat</button><div id="bRep" hidden><label for="bRepWhy">What happened?</label><select id="bRepWhy"><option value="">Choose a reason</option><option>Sexual or explicit</option><option>Harassment or threats</option><option>Asked for money or gifts</option><option>May be under 18</option><option>Scam or moving off SuiteFace</option><option>Felt unsafe</option><option>Something else</option></select><textarea id="bRepNote" rows="2" maxlength="600" placeholder="Anything we should know? (optional)"></textarea><div class="row"><button class="btn red sm" type="button" id="bRepGo">End chat and report</button><button class="btn ghost sm" type="button" id="bRepNo">Cancel</button></div><p class="hint">Our safety team gets the reason and the last messages. The chat ends right away and the other person is flagged. In danger? Call 911.</p></div></div>');
     $("#bRepBtn", m).addEventListener("click", function () { $("#bRep", m).hidden = false; $("#bRepBtn", m).hidden = true; });
     $("#bRepNo", m).addEventListener("click", function () { $("#bRep", m).hidden = true; $("#bRepBtn", m).hidden = false; });
