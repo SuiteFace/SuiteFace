@@ -2393,6 +2393,8 @@
     var loadS = function () { if (sl) lrpc("safety_checkins").then(function (rows) { rows = rows || []; sl.innerHTML = rows.length ? rows.map(function (c) { return '<div class="cmrow"><span><b>' + esc(c.member_name) + "</b> didn't feel safe on a date with <b>" + esc(c.other_name) + "</b><br><small>" + esc(c.note || "No note.") + " · " + esc(new Date(c.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) + '</small></span><span class="row"><button class="btn ghost sm" data-ckdone="' + c.id + '">Handled</button></span></div>'; }).join("") : '<p class="hint">No safety check-ins waiting.</p>'; }); };
     if (sl) { sl.onclick = function (e) { var b = e.target.closest("[data-ckdone]"); if (!b) return; lrpc("handle_checkin", { p_id: b.getAttribute("data-ckdone") }).then(function () { toast("Marked handled."); loadS(); }); }; loadS(); }
     if (fl) lrpc("owner_fee_audit").then(function (rows) { fl.innerHTML = '<table class="feetab"><thead><tr><th>Paid item</th><th>Price</th><th>Used, 30 days</th><th>Note</th></tr></thead><tbody>' + (rows || []).map(function (r) { return "<tr><td>" + esc(r.item) + "</td><td>" + esc(r.price) + "</td><td>" + (r.used_30d == null ? "—" : r.used_30d) + "</td><td>" + esc(r.note || "") + "</td></tr>"; }).join("") + '</tbody></table><p class="hint">Rule of thumb: if members rarely use a paid add-on, drop it. Every fee should feel worth it.</p>'; }, function (x) { fl.innerHTML = '<p class="hint">' + esc(x.message) + "</p>"; });
+    var bl = $("#callBillList"), loadB = function () { if (bl) lrpc("unbilled_calls").then(function (rows) { rows = rows || []; bl.innerHTML = rows.length ? rows.map(function (c) { return '<div class="cmrow"><span><b>' + esc(c.caller_name) + "</b> · " + c.minutes + " min · $" + (c.cents / 100).toFixed(2) + " · " + esc(c.charge_status === "failed" ? "Declined: " + (c.charge_note || "") : "Waiting") + "</span></div>"; }).join("") + '<div class="row"><button class="btn gold sm" type="button" id="collectCalls">Collect now</button></div>' : '<p class="hint">All call charges are collected.</p>'; }); };
+    if (bl) { bl.onclick = function (e) { if (!e.target.closest("#collectCalls")) return; window.SF_LIVE.client.functions.invoke("call-charge", { body: { all: true } }).then(function (r) { var calls = (r.data && r.data.calls) || []; toast(calls.length ? calls.filter(function (c) { return c.status === "paid" || c.status === "on_next_bill"; }).length + " of " + calls.length + " collected." : (r.error ? r.error.message : "Nothing to collect.")); loadB(); }); }; loadB(); }
     var loadC = function () { if (cl) rpc("city_board", {}).then(function (rows) { cl.innerHTML = (rows || []).map(function (c) { return '<div class="cmrow"><span><b>' + esc(c.name) + ", " + esc(c.state) + "</b> · " + (c.status === "open" ? "Open" : "Filling") + " · " + c.players + " of " + c.open_at + '</span><span class="row">' + (c.status === "open" ? '<button class="btn ghost sm" data-city="' + c.slug + '" data-st="filling">Close to new cities list</button>' : '<button class="btn gold sm" data-city="' + c.slug + '" data-st="open">Open this table</button>') + "</span></div>"; }).join(""); }); };
     if (cl) { cl.onclick = function (e) { var b = e.target.closest("[data-city]"); if (!b) return; lrpc("owner_set_city", { p_slug: b.getAttribute("data-city"), p_status: b.getAttribute("data-st"), p_open_at: null }).then(function () { toast("Updated."); loadC(); }, function (x) { toast(x.message); }); }; loadC(); }
   }
@@ -2402,6 +2404,151 @@
     if (ROLE === "owner" && pg === "club") setTimeout(loadOwnerExtras, 900);
   });
   setTimeout(function () { var pg = document.body.getAttribute("data-page") || ""; if (pg === "winners") { var h = location.hash.replace("#", ""); if (VENUES[h]) winVenue = h; renderWinners(); } if (pg === "home") renderCityBoard(); if (pg === "club" && !liveOn()) renderWins(); }, 0);
+
+  /* =====================================================================
+     LIVE CAMERA CHAT for Pairs. The caller pays: $2.10 for the first minute, then 21¢ a minute,
+     charged to their card on file when the call ends. A call that drops in the first 15 seconds is free.
+     The person being called never pays. Nothing is recorded. Calls end at 120 minutes.
+     Video goes straight between the two phones (WebRTC); SuiteFace only passes the connection notes.
+     ===================================================================== */
+  var ICE = (CFG.iceServers && CFG.iceServers.length) ? CFG.iceServers : [{ urls: ["stun:stun.cloudflare.com:3478", "stun:stun.l.google.com:19302"] }];
+  var CALL = null;
+  function callCost(sec) { if (sec < 15) return 0; var m = Math.max(1, Math.ceil(Math.min(sec, 7200) / 60)); return 210 + 21 * (m - 1); }
+  function money(c) { return "$" + (c / 100).toFixed(2); }
+  function hourglass() {
+    return '<svg class="hg" viewBox="0 0 40 56" aria-hidden="true"><defs><clipPath id="hgTop"><path d="M8 6h24c0 10-8 14-12 22C16 20 8 16 8 6z"/></clipPath><clipPath id="hgBot"><path d="M20 28c4 8 12 12 12 22H8c0-10 8-14 12-22z"/></clipPath></defs>' +
+      '<rect x="4" y="2" width="32" height="4" rx="2" fill="#B8862F"/><rect x="4" y="50" width="32" height="4" rx="2" fill="#B8862F"/>' +
+      '<path d="M8 6h24c0 10-8 14-12 22 4 8 12 12 12 22H8c0-10 8-14 12-22C16 20 8 16 8 6z" fill="rgba(250,247,240,.12)" stroke="#E8C46A" stroke-width="1.6"/>' +
+      '<rect class="sand-top" x="6" y="6" width="28" height="22" fill="#E8C46A" clip-path="url(#hgTop)"/><rect class="sand-bot" x="6" y="50" width="28" height="0" fill="#E8C46A" clip-path="url(#hgBot)"/><rect class="stream" x="19.4" y="27" width="1.2" height="22" fill="#FFE7A3"/></svg>';
+  }
+  function callUI(name, iPay) {
+    var o = document.createElement("div"); o.className = "callov"; o.setAttribute("role", "dialog"); o.setAttribute("aria-label", "Video call with " + name);
+    o.innerHTML = '<video class="cv-remote" autoplay playsinline></video><video class="cv-local" autoplay playsinline muted></video>' +
+      '<div class="cv-top"><b>' + esc(name) + '</b><span class="cv-status">Calling…</span></div>' +
+      '<div class="cv-meter">' + hourglass() + '<div><span class="cv-time">0:00</span><span class="cv-cost">' + (iPay ? "$0.00" : "Free for you") + '</span><small>' + (iPay ? "$2.10 first minute · 21¢ a minute after" : esc(name) + " is paying for this call") + '</small></div></div>' +
+      '<div class="cv-ctrls"><button type="button" class="cvb-btn" data-cv="mic" aria-pressed="false" title="Mute">🎙</button><button type="button" class="cvb-btn" data-cv="cam" aria-pressed="false" title="Camera off">📷</button><button type="button" class="cvb-btn end" data-cv="end" title="End call">End</button><button type="button" class="cvb-btn" data-cv="report" title="Report">⚑</button></div>';
+    document.body.appendChild(o); document.documentElement.style.overflow = "hidden";
+    return o;
+  }
+  function tickMeter() {
+    if (!CALL || !CALL.ui) return;
+    var sec = CALL.answeredAt ? Math.max(0, (Date.now() - CALL.skew - CALL.answeredAt) / 1000) : 0;
+    var t = Math.floor(sec), mm = Math.floor(t / 60), ss = t % 60;
+    $(".cv-time", CALL.ui).textContent = mm + ":" + String(ss).padStart(2, "0");
+    if (CALL.iPay) $(".cv-cost", CALL.ui).textContent = money(callCost(sec)) + (sec >= 15 ? "" : " · free if under 15 s");
+    var frac = (sec % 60) / 60, hg = $(".hg", CALL.ui);
+    if (hg) {
+      var top = hg.querySelector(".sand-top"), bot = hg.querySelector(".sand-bot");
+      top.setAttribute("y", String(6 + 22 * frac)); top.setAttribute("height", String(22 * (1 - frac)));
+      bot.setAttribute("y", String(50 - 22 * frac)); bot.setAttribute("height", String(22 * frac));
+      var minute = Math.floor(sec / 60); if (CALL.answeredAt && minute !== CALL.lastMin) { CALL.lastMin = minute; if (minute > 0) { hg.classList.remove("flip"); void hg.offsetWidth; hg.classList.add("flip"); } }
+    }
+  }
+  function sig(kind, payload) { return lrpc("call_signal_send", { p_call: CALL.id, p_kind: kind, p_payload: payload || null }).catch(function () { }); }
+  function pollSignals() {
+    if (!CALL) return;
+    lrpc("call_signals_since", { p_call: CALL.id, p_after: CALL.after }).then(function (rows) {
+      (rows || []).forEach(function (r) {
+        CALL.after = Math.max(CALL.after, r.id);
+        if (r.kind === "bye") { hangUp(true); return; }
+        if (!CALL || !CALL.pc) return;
+        if (r.kind === "offer") CALL.pc.setRemoteDescription(r.payload).then(function () { return CALL.pc.createAnswer(); }).then(function (a) { return CALL.pc.setLocalDescription(a); }).then(function () { sig("answer", CALL.pc.localDescription.toJSON()); flushIce(); });
+        else if (r.kind === "answer") CALL.pc.setRemoteDescription(r.payload).then(flushIce);
+        else if (r.kind === "ice") { if (CALL.pc.remoteDescription) CALL.pc.addIceCandidate(r.payload).catch(function () { }); else CALL.pendingIce.push(r.payload); }
+      });
+    }, function () { });
+  }
+  function flushIce() { if (!CALL) return; CALL.pendingIce.splice(0).forEach(function (c) { CALL.pc.addIceCandidate(c).catch(function () { }); }); }
+  function beat() {
+    if (!CALL) return;
+    lrpc("call_beat", { p_call: CALL.id }).then(function (b) {
+      if (!CALL) return;
+      if (b.answered_at && !CALL.answeredAt) { CALL.answeredAt = new Date(b.answered_at).getTime(); CALL.skew = Date.now() - new Date(b.now).getTime(); $(".cv-status", CALL.ui).textContent = "Connected"; if (CALL.caller) makeOffer(); }
+      if (b.answered_at) CALL.skew = Date.now() - new Date(b.now).getTime();
+      if (["ended", "declined", "missed", "cancelled"].indexOf(b.status) > -1) hangUp(true, b);
+    }, function () { });
+  }
+  function startMedia() {
+    return navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } }, audio: { echoCancellation: true, noiseSuppression: true } }).then(function (s) {
+      CALL.local = s; $(".cv-local", CALL.ui).srcObject = s;
+      var pc = CALL.pc = new RTCPeerConnection({ iceServers: ICE });
+      s.getTracks().forEach(function (t) { pc.addTrack(t, s); });
+      pc.ontrack = function (e) { $(".cv-remote", CALL.ui).srcObject = e.streams[0]; };
+      pc.onicecandidate = function (e) { if (e.candidate) sig("ice", e.candidate.toJSON()); };
+      pc.onconnectionstatechange = function () { if (!CALL) return; var st = pc.connectionState; if (st === "failed") $(".cv-status", CALL.ui).textContent = "Connection trouble… trying again"; if (st === "connected") $(".cv-status", CALL.ui).textContent = "Connected"; };
+    });
+  }
+  function makeOffer() { if (!CALL || !CALL.pc || CALL.offered) return; CALL.offered = true; CALL.pc.createOffer().then(function (o) { return CALL.pc.setLocalDescription(o); }).then(function () { sig("offer", CALL.pc.localDescription.toJSON()); }); }
+  function runLoops() {
+    CALL.t1 = setInterval(pollSignals, 1200); CALL.t2 = setInterval(beat, 5000); CALL.t3 = setInterval(tickMeter, 250);
+    beat(); pollSignals();
+    CALL.ui.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-cv]"); if (!b || !CALL) return; var k = b.getAttribute("data-cv");
+      if (k === "end") { hangUp(false); return; }
+      if (k === "mic" || k === "cam") { var on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on)); (CALL.local ? CALL.local.getTracks() : []).forEach(function (t) { if ((k === "mic" && t.kind === "audio") || (k === "cam" && t.kind === "video")) t.enabled = !on; }); return; }
+      if (k === "report") { if (!confirm("End the call and report " + CALL.name + "? Our safety team reviews every report.")) return; var other = CALL.other; hangUp(false); if (other) lrpc("block_member", { target: other, is_report: true }).then(function () { toast("Reported and blocked. Thank you for telling us."); }, function () { toast("Call ended. Email help@suiteface.com to report."); }); }
+    });
+  }
+  function hangUp(remote, info) {
+    if (!CALL) return; var c = CALL; CALL = null;
+    [c.t1, c.t2, c.t3].forEach(clearInterval);
+    try { c.pc && c.pc.close(); } catch (e) { }
+    (c.local ? c.local.getTracks() : []).forEach(function (t) { t.stop(); });
+    if (c.ui) c.ui.remove(); document.documentElement.style.overflow = "";
+    var after = function (r) {
+      r = r || {};
+      if (r.status === "declined") { toast(c.name + " can't take a call right now."); return; }
+      if (r.status === "missed" || r.status === "cancelled") { toast(c.caller ? "No answer. Try again later or send a message." : "Call ended."); return; }
+      if (c.caller && r.cents > 0) {
+        toast("Call ended: " + r.minutes + " min · " + money(r.cents) + " charged to your card on file.");
+        if (window.SF_LIVE && window.SF_LIVE.client && window.SF_LIVE.client.functions) window.SF_LIVE.client.functions.invoke("call-charge", { body: {} }).catch(function () { });
+      } else toast(c.caller ? "Call ended. Under 15 seconds, so it's free." : "Call ended.");
+    };
+    if (remote && info) after(info); else lrpc("call_end", { p_call: c.id }).then(after, function () { toast("Call ended."); });
+  }
+  function placeCall(hand, name, other) {
+    if (!liveOn()) { toast("Video calls open for members with a Pair."); return; }
+    if (!window.RTCPeerConnection || !navigator.mediaDevices) { toast("This browser can't make video calls. Try Safari or Chrome."); return; }
+    var first = esc((name || "your Pair").split(" ")[0]);
+    var m = modal('<div class="form-grid callconsent"><div class="cc-hg">' + hourglass() + '</div><h3>Video call ' + first + '?</h3>' +
+      '<p class="lede"><b>$2.10</b> for the first minute, then <b>21¢</b> a minute. You pay; ' + first + ' never does. The total is charged to your card on file when the call ends.</p>' +
+      '<ul class="hint cc-list"><li>A call that drops in the first 15 seconds is free.</li><li>Calls end automatically at 2 hours.</li><li>Nothing is recorded. Report any call with ⚑ and it ends right away.</li></ul>' +
+      '<label class="chk"><input type="checkbox" id="ccOk"> Charge my card on file for this call.</label><p class="err" id="ccErr" role="alert"></p>' +
+      '<div class="row"><button class="btn gold" type="button" id="ccGo">📹 Call ' + first + '</button><button class="btn ghost" type="button" data-close>Not now</button></div></div>');
+    $("#ccGo", m).addEventListener("click", function () {
+      if (!$("#ccOk", m).checked) { $("#ccErr", m).textContent = "Please agree to the price to call."; return; }
+      $("#ccErr", m).textContent = "Starting…";
+      lrpc("call_start", { p_hand: hand, p_ok: true }).then(function (id) {
+        closeModal();
+        CALL = { id: id, name: name || "your Pair", other: other || null, caller: true, iPay: true, after: 0, pendingIce: [], skew: 0, lastMin: 0 };
+        CALL.ui = callUI(CALL.name, true);
+        startMedia().then(runLoops, function () { toast("Allow camera and microphone to call."); hangUp(false); });
+      }, function (x) { $("#ccErr", m).textContent = (x && x.message) || "Couldn't start the call."; });
+    });
+  }
+  function answerCall(row) {
+    if (CALL) return;
+    var m = modal('<div class="form-grid incoming"><div class="cc-hg ring">' + hourglass() + '</div><h3>' + esc((row.caller_name || "Your Pair").split(" ")[0]) + ' is video calling</h3><p class="lede">Free for you. ' + esc((row.caller_name || "They").split(" ")[0]) + ' pays for this call.</p>' +
+      '<div class="row"><button class="btn gold" type="button" id="icYes">Answer</button><button class="btn ghost" type="button" id="icNo">Decline</button></div></div>');
+    $("#icNo", m).addEventListener("click", function () { closeModal(); lrpc("call_answer", { p_call: row.id, p_yes: false }).catch(function () { }); });
+    $("#icYes", m).addEventListener("click", function () {
+      closeModal();
+      CALL = { id: row.id, name: row.caller_name || "Your Pair", caller: false, iPay: false, after: 0, pendingIce: [], skew: 0, lastMin: 0 };
+      CALL.ui = callUI(CALL.name, false);
+      startMedia().then(function () { return lrpc("call_answer", { p_call: row.id, p_yes: true }); }).then(function (st) { if (st !== "active") { hangUp(true, { status: st }); return; } runLoops(); }, function () { toast("Allow camera and microphone to answer."); if (CALL) lrpc("call_answer", { p_call: row.id, p_yes: false }).catch(function () { }); hangUp(true, { status: "cancelled" }); });
+    });
+  }
+  var lastRing = "";
+  function watchIncoming() {
+    if (!liveOn() || CALL || document.hidden) return;
+    lrpc("call_incoming").then(function (rows) { var r = (rows || [])[0]; if (r && r.id !== lastRing && !$("#modal")) { lastRing = r.id; answerCall(r); } }, function () { });
+  }
+  document.addEventListener("sf:live", function () {
+    clearInterval(window.__ringTick); window.__ringTick = setInterval(watchIncoming, 6000); setTimeout(watchIncoming, 1500);
+    // Collect any call charges left over from a call that dropped (closed tab, lost signal).
+    setTimeout(function () { if (window.SF_LIVE && window.SF_LIVE.client && window.SF_LIVE.client.functions) lrpc("my_calls").then(function (rows) { if ((rows || []).some(function (c) { return c.i_paid && c.charge_status === "pending"; })) window.SF_LIVE.client.functions.invoke("call-charge", { body: {} }).catch(function () { }); }, function () { }); }, 4000);
+  });
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-call]"); if (!b) return; e.preventDefault(); placeCall(b.getAttribute("data-call"), b.getAttribute("data-name"), b.getAttribute("data-other")); });
 
   /* ---------- launch popup: the first thing a new visitor sees ---------- */
   var params = new URLSearchParams(location.search), inv = params.get("ref") || params.get("invite");
@@ -2799,6 +2946,7 @@
     var m = modal('<p class="pairtitle">' + (aces ? "Pair of Aces!" : "It's a Pair!") + '</p><div class="pairhead">' + me + '<span style="font:800 2rem var(--display);color:var(--gold-hi)">+</span>' + avatar(p, "width:96px;margin:0;") + "</div>" +
       '<div class="ranks"><span>You hold ' + nm + " as <b class=\"" + (SUIT[p.suit].red ? "r" : "k") + '">' + theirRank + SUIT[p.suit].sym + "</b></span><span>" + nm + ' holds you as <b class="' + (SUIT[mySuit].red ? "r" : "k") + '">' + myRank + SUIT[mySuit].sym + "</b></span></div>" +
       '<p class="jm-line">' + nm + "'s " + jmeter(p, true) + "</p>" +
+      '<div class="row callrow"><button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video call ' + nm + '</button><span class="hint">$2.10 first minute, then 21¢/min · you pay, ' + nm + ' doesn\'t</span></div>' +
       '<div class="hand-box" id="handBox"></div>' +
       '<details class="sidetable"><summary>Side Table chat</summary><div class="chat" id="chat"><div class="msg them">' + esc(openers[p.suit]) + '</div></div><p class="hint">Sample reply from a fictional demo profile.</p>' +
       '<form id="chatForm" style="display:flex;gap:8px;margin-top:10px"><label class="sr" for="chatIn">Message</label><input type="text" id="chatIn" maxlength="300" placeholder="Say hi…" autocomplete="off"><button class="btn felt sm" type="submit">Send</button></form></details>' +
