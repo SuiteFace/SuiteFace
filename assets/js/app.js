@@ -4092,6 +4092,7 @@
       '<div class="ranks"><span>You hold ' + nm + " as <b>" + esc(h.i_hold || "?") + "</b></span><span>" + nm + " holds you as <b>" + esc(h.they_hold || "?") + "</b></span></div>" +
       (p ? '<p class="jm-line">' + nm + "'s " + jmeter(p, true) + "</p>" : "") +
       '<div class="row callrow"><button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video call ' + nm + '</button><span class="hint">$2.10 first minute, then 21¢/min · you pay, ' + nm + ' doesn\'t</span></div>' +
+      '<div class="row callrow">' + loungeBtn("pair", h.hand_id, h.other_id, h.other_name) + '<span class="hint">Private 21 minutes · $2.10 a seat · ID-verified players</span></div>' +
       '<details class="datedeals" open><summary>🎟️ Date Deals near you two</summary><div id="ddBox"><p class="hint">Loading…</p></div></details>' +
       '<div class="hand-box" id="handBox"></div>' +
       '<details class="sidetable" open><summary>Side Table chat</summary><div class="chat" id="chat"><p class="hint">Loading…</p></div>' +
@@ -4267,11 +4268,12 @@
     return '<div class="bcard' + (called ? " called" : "") + '"><div class="bph" ' + (h.photo_url ? 'style="background-image:url(' + esc(h.photo_url) + ')"' : "") + ">" + tag + "</div>" +
       '<div class="bbody"><b>' + esc(h.name || "Player") + (h.age ? ", " + h.age : "") + "</b><small>" + esc(h.city || "") + (h.suit && SUIT[h.suit] ? " · " + SUIT[h.suit].sym + " " + SUIT[h.suit].name : "") + "</small>" +
       (h.bio ? '<p class="bbio">' + esc(h.bio) + "</p>" : "") + (h.last_body ? '<p class="blast">' + esc(h.last_body.slice(0, 70)) + "</p>" : "") +
-      (called ? '<p class="bres ' + (h.correct ? "ok" : "no") + '">' + (h.correct ? "✓ Called it: " : "✗ Not this time: ") + (h.revealed === "house" ? "a House Card." : "a Player Card (a real member).") + "</p>" :
+      (called ? '<p class="bres ' + (h.correct ? "ok" : "no") + '">' + (h.correct ? "✓ Called it: " : "✗ Not this time: ") + (h.revealed === "house" ? "a House Card." : "a Player Card (a real player).") + "</p>" +
+          (h.revealed === "real" ? '<div class="bact">' + loungeBtn("bluff", h.hand_id, "", h.name) + "</div>" : "") :
         pending ? '<p class="hint">Call waiting for your team…</p><div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button></div>' :
         '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + h.hand_id + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + h.hand_id + '">🂠 Player Card</button></div>') + "</div></div>";
   }
-  function showVerdict(r) { if (!r || !r.truth) return; var house = r.truth === "house"; modal('<div class="bverdict ' + (r.correct ? "ok" : "no") + '"><span class="big">' + (house ? "🎭" : "💞") + "</span><h3>" + (house ? "Bluff! That was a House Card." : "Player Card! That's a real member.") + '</h3><p class="lede">' + (r.correct ? "You called it. +1 to your table." : "Not this time.") + " Score: <b>" + r.score + "</b></p></div>"); if (r.correct) jackpot(2200); }
+  function showVerdict(r) { if (!r || !r.truth) return; var house = r.truth === "house"; modal('<div class="bverdict ' + (r.correct ? "ok" : "no") + '"><span class="big">' + (house ? "🎭" : "💞") + "</span><h3>" + (house ? "Bluff! That was a House Card." : "Player Card! That's a real player.") + '</h3><p class="lede">' + (r.correct ? "You called it. +1 to your table." : "Not this time.") + " Score: <b>" + r.score + "</b></p></div>"); if (r.correct) jackpot(2200); }
   document.addEventListener("click", function (e) {
     if (!bluffEl()) return; var b;
     if ((b = e.target.closest("[data-btcall]"))) {
@@ -4290,7 +4292,7 @@
     return '<div class="bcard' + (called ? " called" : "") + '"><div class="bph" ' + (h.photo_url ? 'style="background-image:url(' + esc(h.photo_url) + ')"' : "") + '>' + tag + "</div>" +
       '<div class="bbody"><b>' + esc(h.name || "Player") + (h.age ? ", " + h.age : "") + "</b><small>" + esc(h.city || "") + (h.suit && SUIT[h.suit] ? " · " + SUIT[h.suit].sym + " " + SUIT[h.suit].name : "") + "</small>" +
       (h.bio ? '<p class="bbio">' + esc(h.bio) + "</p>" : "") + (h.last_body ? '<p class="blast">' + (h.last_mine ? "You: " : "") + esc(h.last_body.slice(0, 70)) + "</p>" : "") +
-      (called ? '<p class="bres ' + (h.correct ? "ok" : "no") + '">' + (h.correct ? "✓ You called it: " : "✗ Not this time: ") + (h.revealed === "house" ? "a House Card." : "a Player Card (a real member).") + "</p>" :
+      (called ? '<p class="bres ' + (h.correct ? "ok" : "no") + '">' + (h.correct ? "✓ You called it: " : "✗ Not this time: ") + (h.revealed === "house" ? "a House Card." : "a Player Card (a real player).") + "</p>" :
         '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn sm bbluff" type="button" data-bcall="bluff" data-bh="' + h.hand_id + '">🎭 House Card</button><button class="btn sm breal" type="button" data-bcall="real" data-bh="' + h.hand_id + '">🂠 Player Card</button></div>') + "</div></div>";
   }
   function bluffChat(handId, name, asCard) {
@@ -4327,12 +4329,102 @@
     if (k) { var g = k.getAttribute("data-bcall");
       lrpc("call_bluff", { p_hand: k.getAttribute("data-bh"), p_guess: g }).then(function (r) {
         closeModal(); var house = r.truth === "house";
-        modal('<div class="bverdict ' + (r.correct ? "ok" : "no") + '"><span class="big">' + (house ? "🎭" : "💞") + '</span><h3>' + (house ? "Bluff! That was a House Card." : "Player Card! That's a real member.") + "</h3><p class=\"lede\">" + (r.correct ? "You called it. Score: " + r.score + "." : "Not this time. Score: " + r.score + ".") + (house ? " House Cards are played by SuiteFace's AI dealer." : " If you're curious about them, they might be in your deck one day.") + '</p><div class="row"><button class="btn gold" type="button" data-close>Back to the table</button></div></div>');
+        modal('<div class="bverdict ' + (r.correct ? "ok" : "no") + '"><span class="big">' + (house ? "🎭" : "💞") + '</span><h3>' + (house ? "Bluff! That was a House Card." : "Player Card! That's a real player.") + "</h3><p class=\"lede\">" + (r.correct ? "You called it. Score: " + r.score + "." : "Not this time. Score: " + r.score + ".") + (house ? " House Cards are played by SuiteFace's AI dealer." : " If you're curious about them, they might be in your deck one day.") + '</p><div class="row"><button class="btn gold" type="button" data-close>Back to the table</button></div></div>');
         if (r.correct) jackpot(2200); renderBluff();
       }, function (er) { toast(er.message); }); }
   });
   if (bluffEl()) renderBluff();
   document.addEventListener("sf:live", function () { setTimeout(renderBluff, 0); });
+
+  /* ---------- The Lounge: a private 21-minute room for two ID-verified players. $2.10 a seat, all to SuiteFace.
+     The inviter can comp the other seat. Comps inside are free gifts. Invites go only to Pairs or to Bluff cards already
+     revealed as Player Cards, so a Lounge invite never gives a House Card away. ---------- */
+  var LG = { open: null, seen: {}, poll: null, verified: false };
+  var COMPS = { rose: ["🌹", "Rose"], coffee: ["☕", "Coffee"], cheers: ["🥂", "Cheers"], cherries: ["🍒", "Cherries"], bouquet: ["💐", "Bouquet"], star: ["⭐", "Star"] };
+  function loungeBtn(origin, ref, other, name) {
+    return '<button class="btn ghost sm lgbtn" type="button" data-lounge="' + origin + '" data-lref="' + esc(ref) + '" data-lother="' + esc(other || "") + '" data-lname="' + esc(name || "") + '">🛋 Invite to the Lounge</button>';
+  }
+  function loungeInvite(origin, ref, other, name) {
+    var nm = esc((name || "them").split(" ")[0]);
+    if (!LG.verified) {
+      modal('<h3>🛋 The Lounge</h3><p class="lede">A private 21-minute room for two. To keep it adults-only and safe, both players must be <b>ID-verified</b>.</p><p class="hint">Verify your ID in My Face, then come back to invite ' + nm + '.</p><div class="row"><a class="btn gold" href="my-table.html#identity">Verify my ID</a><button class="btn ghost" type="button" data-close>Not now</button></div>');
+      return;
+    }
+    var m = modal('<h3>🛋 Invite ' + nm + ' to the Lounge</h3><p class="lede">A private room for 21 minutes. Just the two of you, away from the table.</p>' +
+      '<ul class="lgfacts"><li>$2.10 per seat, charged when the Lounge opens</li><li>ID-verified players only</li><li>Send free comps: 🌹 ☕ 🥂 🍒 💐 ⭐</li><li>Leave or report any time</li></ul>' +
+      '<label class="check"><input type="checkbox" id="lgComp"> <span>Comp ' + nm + '\'s seat. You pay for both: <b>$4.20</b>.</span></label>' +
+      '<div class="row" style="margin-top:12px"><button class="btn gold" type="button" id="lgSend">Send invite · <span id="lgCost">$2.10</span></button><button class="btn ghost" type="button" data-close>Cancel</button></div><p class="hint">Never send money or gifts outside SuiteFace. Comps are free.</p>');
+    $("#lgComp", m).addEventListener("change", function () { $("#lgCost", m).textContent = this.checked ? "$4.20" : "$2.10"; });
+    $("#lgSend", m).addEventListener("click", function () {
+      var btn = this; btn.disabled = true;
+      lrpc("lounge_invite", { p_other: other || null, p_origin: origin, p_ref: ref, p_comp: $("#lgComp", m).checked }).then(function () {
+        closeModal(); toast("Invite sent. The Lounge opens when " + (name || "they").split(" ")[0] + " says yes."); loungeTick();
+      }, function (er) { btn.disabled = false; toast(er.message); });
+    });
+  }
+  function loungeBanner(inv) {
+    if (LG.seen[inv.id] || $("#lgInv")) return; LG.seen[inv.id] = 1;
+    document.body.insertAdjacentHTML("beforeend", '<div class="lginv" id="lgInv" role="dialog" aria-label="Lounge invite"><span class="lgav"' + (inv.photo ? ' style="background-image:url(' + esc(inv.photo) + ')"' : "") + '></span><div><b>' + esc(inv.from) + ' invited you to the Lounge</b><small>21 private minutes · ' + (inv.comped ? "they comped your seat 🎁" : "$2.10 for your seat") + '</small></div><span class="row"><button class="btn gold sm" type="button" id="lgYes">Join</button><button class="btn ghost sm" type="button" id="lgNo">No thanks</button></span></div>');
+    var b = $("#lgInv");
+    $("#lgYes", b).addEventListener("click", function () { lrpc("lounge_answer", { p_session: inv.id, p_yes: true }).then(function (r) { b.remove(); if (r === "active") loungeRoom(inv.id); else toast("That invite has expired."); }, function (er) { toast(er.message); }); });
+    $("#lgNo", b).addEventListener("click", function () { lrpc("lounge_answer", { p_session: inv.id, p_yes: false }).catch(function () { }); b.remove(); });
+  }
+  function loungeCharge() {
+    if (!window.SF_LIVE || !window.SF_LIVE.token) return;
+    fetch(CFG.supabaseUrl + "/functions/v1/lounge-charge", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: "{}" }).catch(function () { });
+  }
+  function loungeRoom(id) {
+    if (LG.open === id && $("#modal")) return; LG.open = id; closeModal();
+    var m = modal('<div class="lounge"><div class="lghead"><h3>🛋 The Lounge</h3><span class="lgclock" id="lgClock" aria-live="off">21:00</span></div><p class="hint" id="lgWith">Private room</p>' +
+      '<div class="bthread lgthread" id="lgThread"><p class="hint">You\'re in. Just the two of you.</p></div>' +
+      '<div class="lgcomps" role="group" aria-label="Send a comp">' + Object.keys(COMPS).map(function (k) { return '<button type="button" data-lgcomp="' + k + '" title="' + COMPS[k][1] + '">' + COMPS[k][0] + "</button>"; }).join("") + '<span class="hint">Comps are free</span></div>' +
+      '<form id="lgForm" class="bform"><label class="sr" for="lgIn">Message</label><input id="lgIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' +
+      '<div class="row lgfoot"><button class="btn ghost sm" type="button" id="lgLeave">Leave the Lounge</button><button class="linkish" type="button" id="lgRepBtn">⚑ Report</button></div>' +
+      '<div id="lgRep" hidden><label for="lgRepWhy">What happened?</label><select id="lgRepWhy"><option value="">Choose a reason</option><option>Sexual or explicit</option><option>Harassment or threats</option><option>Asked for money or gifts</option><option>May be under 18</option><option>Scam or moving off SuiteFace</option><option>Felt unsafe</option><option>Something else</option></select><textarea id="lgRepNote" rows="2" maxlength="600" placeholder="Anything we should know? (optional)"></textarea><div class="row"><button class="btn red sm" type="button" id="lgRepGo">End and report</button><button class="btn ghost sm" type="button" id="lgRepNo">Cancel</button></div><p class="hint">Our safety team gets the reason and the last messages. The Lounge closes right away and the other player is flagged. In danger? Call 911.</p></div></div>');
+    loungeCharge();
+    var last = 0, endsAt = 0, skew = 0, closed = false, lastPing = 0;
+    function line(x) { return x.comp ? '<div class="msg ' + (x.mine ? "me" : "them") + ' lgcomp"><span>' + (COMPS[x.comp] || ["🎁"])[0] + "</span>" + (x.mine ? "You sent a " : "Sent you a ") + esc((COMPS[x.comp] || ["", "comp"])[1].toLowerCase()) + "</div>" : '<div class="msg ' + (x.mine ? "me" : "them") + '">' + esc(x.body) + "</div>"; }
+    function finish(why) {
+      if (closed) return; closed = true; clearInterval(LG.poll); LG.open = null;
+      var f = $("#lgForm", m); if (f) f.remove(); var c = $(".lgcomps", m); if (c) c.remove();
+      var t = $("#lgThread", m); if (t) { t.insertAdjacentHTML("beforeend", '<p class="hint lgend">' + esc(why) + "</p>"); t.scrollTop = t.scrollHeight; }
+      var lv = $("#lgLeave", m); if (lv) { lv.textContent = "Close"; lv.setAttribute("data-close", ""); }
+    }
+    function pull() {
+      lrpc("lounge_state", { p_session: id, p_after: last }).then(function (s) {
+        if (!document.body.contains(m)) { clearInterval(LG.poll); LG.open = null; return; }
+        $("#lgWith", m).textContent = "Private room with " + (s.other || "your match");
+        if (s.ends_at) { endsAt = Date.parse(s.ends_at); skew = Date.parse(s.now) - Date.now(); }
+        var t = $("#lgThread", m), d = $("#lgTyping", m);
+        if ((s.msgs || []).length) { if (d) d.remove(); var h = t.querySelector(".hint:not(.lgend)"); if (h && !last) h.remove(); s.msgs.forEach(function (x) { last = Math.max(last, x.id); t.insertAdjacentHTML("beforeend", line(x)); if (!x.mine && x.comp) jackpot(900); }); t.scrollTop = t.scrollHeight; }
+        d = $("#lgTyping", m); if (s.typing && !d && !closed) { t.insertAdjacentHTML("beforeend", '<div class="msg them typing" id="lgTyping" aria-label="typing"><i></i><i></i><i></i></div>'); t.scrollTop = t.scrollHeight; } else if (!s.typing && d) d.remove();
+        if (s.status !== "active") finish(s.closed_reason === "reported" ? "This Lounge was closed after a report." : "The Lounge has closed. Thanks for stopping by.");
+      }, function (er) { finish(er.message || "The Lounge has closed."); });
+    }
+    function clock() { if (!endsAt || closed) return; var left = Math.max(0, Math.round((endsAt - (Date.now() + skew)) / 1000)); var el = $("#lgClock", m); if (!el) return; el.textContent = Math.floor(left / 60) + ":" + ("0" + (left % 60)).slice(-2); el.classList.toggle("low", left <= 120); if (left === 0) pull(); }
+    pull(); clearInterval(LG.poll); var n = 0; LG.poll = setInterval(function () { clock(); if (++n % 2 === 0) pull(); }, 1000);
+    $("#lgForm", m).addEventListener("submit", function (e) { e.preventDefault(); var v = $("#lgIn", m).value.trim(); if (!v) return; $("#lgIn", m).value = ""; lrpc("lounge_send", { p_session: id, p_body: v, p_comp: null }).then(pull, function (er) { toast(er.message); }); });
+    $("#lgIn", m).addEventListener("input", function () { if (Date.now() - lastPing > 3000) { lastPing = Date.now(); lrpc("lounge_typing", { p_session: id }).catch(function () { }); } });
+    m.addEventListener("click", function (e) { var b = e.target.closest("[data-lgcomp]"); if (!b || closed) return; lrpc("lounge_send", { p_session: id, p_body: null, p_comp: b.getAttribute("data-lgcomp") }).then(function () { b.classList.add("sent"); pull(); }, function (er) { toast(er.message); }); });
+    $("#lgLeave", m).addEventListener("click", function () { if (closed) return; if (!confirm("Leave the Lounge? It closes for both of you.")) return; lrpc("lounge_leave", { p_session: id }).then(function () { finish("You left the Lounge."); }); });
+    $("#lgRepBtn", m).addEventListener("click", function () { $("#lgRep", m).hidden = false; });
+    $("#lgRepNo", m).addEventListener("click", function () { $("#lgRep", m).hidden = true; });
+    $("#lgRepGo", m).addEventListener("click", function () { var why = $("#lgRepWhy", m).value; if (!why) { toast("Pick a reason."); return; } lrpc("lounge_report", { p_session: id, p_reason: why, p_note: $("#lgRepNote", m).value }).then(function () { $("#lgRep", m).hidden = true; finish("You reported this Lounge and it's closed. Thank you for telling us."); }, function (er) { toast(er.message); }); });
+  }
+  function loungeTick() {
+    if (!liveOn() || !window.SF_LIVE || !window.SF_LIVE.seated) return;
+    lrpc("my_lounge").then(function (s) {
+      if (!s) return; LG.verified = !!s.verified;
+      (s.invites || []).forEach(loungeBanner);
+      if (s.active && LG.open !== s.active.id) loungeRoom(s.active.id);
+    }, function () { });
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-lounge]"); if (!b) return; e.preventDefault();
+    loungeInvite(b.getAttribute("data-lounge"), b.getAttribute("data-lref"), b.getAttribute("data-lother"), b.getAttribute("data-lname"));
+  });
+  document.addEventListener("sf:live", function () { setTimeout(loungeTick, 400); });
+  setInterval(function () { if (!document.hidden) loungeTick(); }, 8000);
 
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();

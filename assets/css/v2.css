@@ -779,3 +779,25 @@ label.upl{cursor:pointer}
 .rmmsg .rmt{overflow-wrap:anywhere}
 .rmsend{display:flex;gap:8px;margin-top:8px}.rmsend input{flex:1;min-width:0;padding:.7rem .9rem;border-radius:12px;border:1px solid rgba(250,247,240,.2);background:rgba(23,21,27,.3);color:inherit;font:inherit}
 .breport{margin-top:10px}.breport #bRep{display:grid;gap:8px;margin-top:8px}.breport select,.breport textarea{padding:.6rem .8rem;border-radius:10px;border:1px solid rgba(250,247,240,.2);background:rgba(23,21,27,.3);color:inherit;font:inherit}
+
+/* ---------- The Lounge ---------- */
+.lgfacts{margin:10px 0 14px;padding-left:1.1em;line-height:1.7}
+.lounge .lghead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-right:84px}
+.lgclock{font:700 1.35rem/1 ui-monospace,Menlo,monospace;color:var(--gold,#d4af37);padding:6px 12px;border:1px solid currentColor;border-radius:999px;min-width:5.2em;text-align:center}
+.lgclock.low{color:#e2675b;animation:lgpulse 1s ease-in-out infinite}
+@keyframes lgpulse{50%{opacity:.55}}
+.lgthread{min-height:220px;max-height:46vh}
+.lgcomps{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
+.lgcomps button{font-size:1.35rem;line-height:1;padding:7px 9px;border-radius:12px;border:1px solid rgba(212,175,55,.35);background:rgba(255,255,255,.04);cursor:pointer;transition:transform .15s}
+.lgcomps button:hover,.lgcomps button:focus-visible{transform:translateY(-2px) scale(1.08)}
+.lgcomps button.sent{border-color:var(--gold,#d4af37);background:rgba(212,175,55,.16)}
+.msg.lgcomp{display:flex;align-items:center;gap:8px;font-style:italic}
+.msg.lgcomp span{font-size:1.6rem;font-style:normal}
+.lgend{text-align:center;margin-top:12px}
+.lgfoot{justify-content:space-between;margin-top:10px}
+#lgRep{margin-top:10px;display:grid;gap:8px}
+.lginv{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9998;display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:min(560px,calc(100vw - 32px));padding:12px 14px;border-radius:16px;background:#1d2a22;color:#f5efe1;border:1px solid rgba(212,175,55,.55);box-shadow:0 14px 40px rgba(10,14,12,.55);animation:lgin .35s ease-out}
+.lginv b{display:block}.lginv small{opacity:.8}
+.lgav{width:44px;height:44px;border-radius:50%;background:#33473a center/cover;flex:none}
+@keyframes lgin{from{transform:translate(-50%,24px);opacity:0}}
+.lgbtn{white-space:nowrap}
