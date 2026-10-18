@@ -13,15 +13,45 @@ const admin = createClient(URL_, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { a
 
 type Ctx = { is_house: boolean; card: Record<string, unknown>; player: Record<string, unknown>; thread: { from_player: boolean; body: string }[] };
 
+type Style = { turn: number; avg: number; emoji: boolean; lower: boolean; excl: boolean; lastLen: number };
+function styleOf(thread: Ctx["thread"]): Style {
+  const mine = thread.filter((m) => m.from_player).map((m) => m.body);
+  const lens = mine.map((b) => b.length);
+  const avg = lens.length ? Math.round(lens.reduce((a, b) => a + b, 0) / lens.length) : 40;
+  return {
+    turn: mine.length, avg, lastLen: lens[lens.length - 1] ?? avg,
+    emoji: mine.some((b) => /\p{Extended_Pictographic}/u.test(b)),
+    lower: mine.length > 0 && mine.filter((b) => b === b.toLowerCase()).length / mine.length >= 0.6,
+    excl: mine.some((b) => b.includes("!")),
+  };
+}
+function pacing(st: Style) {
+  // Start short and simple; open up as the conversation finds its rhythm.
+  if (st.turn <= 2) return "This is the very start. Keep it short and easy: one line, about 4 to 12 words. Friendly, a little playful, a light nod to the card table now and then (a deal, a hand, a wild card) but don't force it every time. One simple question at most.";
+  if (st.turn <= 5) return `You're warming up. Match their rhythm: aim for about ${Math.max(8, Math.min(180, Math.round(st.lastLen * 1.1)))} characters, one or two sentences. Pick up something specific they said and ask one easy follow-up.`;
+  return `You've found your flow. You can go a little deeper now: up to two or three sentences (about ${Math.max(30, Math.min(320, Math.round(st.avg * 1.4)))} characters or less), share one specific, believable detail from your life, and ask something thoughtful. Keep it close to the length they write; a little more only when they ask about you.`;
+}
+function mirror(st: Style) {
+  const bits: string[] = [];
+  bits.push(st.lower ? "They mostly type in lowercase; you can too." : "Use normal capitalization.");
+  bits.push(st.emoji ? "They use emoji, so an occasional emoji is fine (never more than one)." : "They don't use emoji, so don't either.");
+  if (st.excl) bits.push("They're upbeat with exclamation points; match the energy lightly.");
+  return bits.join(" ");
+}
+
 function system(c: Ctx) {
   const k = c.card;
+  const st = styleOf(c.thread);
   return `You are playing a House Card at SuiteFace's Bluff Table, an opt-in game on a dating site. Every player at this table chose to play and was told plainly that some cards are House Cards played by SuiteFace's AI dealer, and that calling "Bluff" on a card always gets the true answer. Your job is to be a fun, believable conversation partner so the game is a real challenge.
 
 Your card: ${k.name}, ${k.age}, ${k.suit} suit, from around ${k.city ?? "Birmingham"}. Bio: "${k.bio ?? ""}". Interests: ${(k.interests as string[] | null)?.join(", ") ?? ""}. Persona: ${k.persona ?? ""}.
 You're chatting with ${c.player.name ?? "a player"}${c.player.age ? ", " + c.player.age : ""}.
 
 How to play:
-- Text like a real person on a dating app: short (1 to 3 sentences), warm, specific, curious. Ask questions back. Match their energy. Light flirting is fine; keep it PG-13.
+- Text like a real person on a dating app: warm, specific, curious, never a wall of text. Light flirting is fine; keep it PG-13.
+- Length and depth right now: ${pacing(st)}
+- Their style: ${mirror(st)} Mirror their tone and tempo the way a good conversation partner does, without copying their words.
+- Sound like a person texting, not an assistant: no lists, no "Great question!", no sign-offs, no hashtags.
 - Stay in character, but never claim to be human. If they ask whether you're real, a bot or AI, don't deny it and don't confirm it: say something playful like "Call Bluff and find out. The house always tells the truth." If they seem sincerely confused or upset, or say they really need to know, tell them plainly: "I'm a House Card, played by SuiteFace's AI dealer."
 - Never make plans to meet, never share or ask for phone numbers, addresses, social handles, photos or money, and never move the chat off SuiteFace. If they push to meet or call, say you'd rather keep chatting here for now. House Cards don't do video calls.
 - No sexual content. If someone is crude, steer back or end the chat politely.
@@ -52,16 +82,31 @@ Deno.serve(async (req) => {
   }
   while (messages.length && messages[0].role !== "user") messages.shift();
   if (!messages.length || messages[messages.length - 1].role !== "user") return json({ ok: true });
-  const r = await fetch(API, {
+  const st = styleOf(c.thread);
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+  const started = Date.now();
+  // A person reads the message first (no dots yet), then starts typing.
+  const readMs = 1200 + Math.floor(Math.random() * 2600) + Math.min(2500, text.length * 18);
+  const ai = fetch(API, {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: 220, system: system(c), messages }),
-  });
-  const j = await r.json().catch(() => ({}));
-  const reply = (j.content ?? []).filter((x: { type: string }) => x.type === "text").map((x: { text: string }) => x.text).join("").trim();
-  if (!r.ok || !reply) return json({ ok: true, note: "house_busy" });
-  // A short, human-feeling pause before the reply lands.
-  await new Promise((res) => setTimeout(res, 1500 + Math.floor(Math.random() * 3500)));
+    body: JSON.stringify({ model: MODEL, max_tokens: st.turn <= 2 ? 70 : st.turn <= 5 ? 140 : 240, system: system(c), messages }),
+  }).then((r) => r.json().then((j) => ({ ok: r.ok, j })).catch(() => ({ ok: false, j: {} as Record<string, unknown> })));
+  await sleep(readMs);
+  await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 9000 });
+  const res = await ai;
+  const reply = ((res.j as { content?: { type: string; text: string }[] }).content ?? []).filter((x) => x.type === "text").map((x) => x.text).join("").trim();
+  if (!res.ok || !reply) { await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 }); return json({ ok: true, note: "house_busy" }); }
+  // Typing time grows with the length of the reply, like real thumbs (about 5 characters a second, 2 to 12 seconds).
+  const typeMs = Math.max(2000, Math.min(12000, Math.round(reply.length * (170 + Math.random() * 60))));
+  await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: typeMs + 3000 });
+  const left = typeMs - (Date.now() - started - readMs);
+  if (left > 0) await sleep(left);
+  // If they sent another message meanwhile, the newer request answers both (one reply, not two).
+  const { data: now2 } = await admin.rpc("bluff_house_context_svc", { p_hand: hand });
+  const newer = ((now2 as Ctx | null)?.thread ?? []).filter((m) => m.from_player).length > c.thread.filter((m) => m.from_player).length;
+  if (newer) return json({ ok: true, note: "superseded" });
   await admin.rpc("bluff_house_reply_svc", { p_hand: hand, p_body: reply });
+  await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 });
   return json({ ok: true });
 });
