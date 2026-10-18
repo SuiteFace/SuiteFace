@@ -1577,6 +1577,7 @@
     if (deckDirty || !DECK.length) buildDeck();
     var hand = G.dealt.map(function (id) { return BY[id]; }).filter(Boolean).sort(handOrder);
     $("#dealt").innerHTML = hand.length ? hand.map(cardHTML).join("") :
+      liveOn() && LIVE_ERR ? '<p class="lede deckmsg" style="align-self:center">' + esc(LIVE_ERR) + (/Friendship/i.test(LIVE_ERR) ? ' <a href="my-table.html#face">Change your Table in My Face</a>.' : "") + "</p>" :
       '<p class="lede" style="align-self:center">' + (DECK.length ? "Your deck is shuffled and waiting. Deal your Hand." : liveOn() ? "No real members fit your gates yet. SuiteFace is brand new in many areas: widen your distance or age range, invite friends, and remember your 12-Card Deck Guarantee." : "No one in the sample deck passes your gates. Widen your age range or distance in My Face.") + "</p>";
     $("#leftCount").textContent = remaining().length; $("#burnCount").textContent = G.burned.length; $("#playCount").textContent = G.played.length;
     $("#trumpHint").innerHTML = "Trumps: " + P.trumps.map(function (s) { return '<span style="color:' + suitColor(s) + '">' + SUIT[s].sym + "</span>"; }).join(" › ");
@@ -3205,9 +3206,14 @@
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
   }
+  var deckLoading = null, LIVE_ERR = "";
   function liveDeck(redeal) {
+    if (deckLoading && !redeal) return deckLoading;
+    return (deckLoading = liveDeckRun(redeal).then(function (x) { deckLoading = null; return x; }, function (e) { deckLoading = null; throw e; }));
+  }
+  function liveDeckRun(redeal) {
     var go = redeal ? lrpc("deal_deck").then(function () { return lrpc("my_deck"); }) : lrpc("my_deck").then(function (rows) { return rows && rows.length ? rows : lrpc("deal_deck").then(function () { return lrpc("my_deck"); }); });
-    return go.then(function (rows) {
+    return go.then(function (rows) { LIVE_ERR = "";
       return lrpc("deck_founders").then(function (fs) { var m = {}; (fs || []).forEach(function (x) { m[x.member_id] = x.founder_no; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.founder_no = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_compliments").then(function (cs) { var m = {}; (cs || []).forEach(function (x) { m[x.member_id] = x.kinds; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.comps = m[r.member_id]; }); return rows; }, function () { return rows; });
@@ -3223,7 +3229,7 @@
       G = { dealt: saved.dealt || [], burned: [], played: [], pairs: [], hands: {}, jokered: [], clock: 0 };
       LIVE_ROWS.forEach(function (r) { if (r.my_move) G.played.push(r.member_id); });
       deckDirty = true; buildDeck(); renderTable(!!redeal); mapT0 = performance.now(); renderMap(); liveTable();
-    }, function (e) { toast(e.message || "Your deck couldn't load."); $("#dealt").innerHTML = '<p class="lede" style="align-self:center">' + esc(e.message || "Your deck couldn't load. Try again.") + "</p>"; });
+    }, function (e) { var msg = (e && e.message) || "Your deck couldn't load. Try again."; LIVE_ERR = msg; if (redeal) toast(msg); var d = $("#dealt"); if (d) d.innerHTML = '<p class="lede deckmsg" style="align-self:center">' + esc(msg) + (/Friendship/i.test(msg) ? ' <a href="my-table.html#face">Change your Table in My Face</a>.' : "") + "</p>"; });
   }
   function liveSaveG() { if (window.SF_LIVE) S.set("live:" + window.SF_LIVE.memberId(), { dealt: G.dealt }); }
   function liveBuild() {
@@ -3409,7 +3415,9 @@
   }
   document.addEventListener("sf:live", function () {
     if (!liveOn()) { LIVE_ROWS = null; return; }
-    pullFace().then(function () { return liveDeck(false); }, function () { return liveDeck(false); });
+    /* Your hand is only dealt on My table, never in the background on other pages. */
+    var onTable = document.body.getAttribute("data-page") === "club";
+    pullFace().then(function () { if (onTable) return liveDeck(false); }, function () { if (onTable) return liveDeck(false); });
   });
 
   /* ---------- boot ---------- */
