@@ -1220,6 +1220,20 @@
       var done = function () { P.wishlist = v; saveP(); toast(v ? "Wish list saved. Only people you pair with can see it." : "Wish list removed."); };
       if (liveOn()) lrpc("set_my_wishlist", { p_url: v }).then(done, function (er) { toast(er.message); }); else done(); });
   })();
+  /* Couples (🍍): two individual members, each with their own verified account, link up. Both must agree. */
+  function renderCouple() {
+    var el = $("#couplePanel"); if (!el) return; var on = (P.bumpers || []).indexOf("pineapple") > -1;
+    el.hidden = !on; if (!on) return; var C = P.couple || [], act = C.filter(function (c) { return c.status === "active"; })[0], inc = C.filter(function (c) { return c.status === "pending" && c.incoming; }), out = C.filter(function (c) { return c.status === "pending" && !c.incoming; })[0];
+    el.innerHTML = '<span class="flabel">🍍 Play as a couple <span class="hint">(optional)</span></span><p class="hint" style="margin:2px 0 8px">Each of you keeps your own verified account. Link them and your cards show together, only to members who are open to the lifestyle.</p>' +
+      (act ? '<p><b>Linked with ' + esc(act.name || "your partner") + "</b>" + (act.tag ? " @" + esc(act.tag) : "") + ' · <button type="button" class="linkish" data-cpend>Unlink</button></p>' :
+        inc.map(function (c) { return '<p>' + esc(c.name || "Someone") + (c.tag ? " @" + esc(c.tag) : "") + ' wants to link as a couple. <button type="button" class="btn gold sm" data-cpyes="' + c.id + '">Accept</button> <button type="button" class="btn ghost sm" data-cpno="' + c.id + '">Decline</button></p>'; }).join("") +
+        (out ? '<p class="hint">Waiting for @' + esc(out.tag || "") + ' to accept. <button type="button" class="linkish" data-cpend>Cancel</button></p>' : '<div class="row"><input id="cpTag" placeholder="@their tag" maxlength="25" style="flex:1"><button type="button" class="btn ghost sm" data-cpinv>Invite</button></div>'));
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target, act = t.closest("[data-cpinv]") ? ["couple_invite", { p_tag: ($("#cpTag") || {}).value || "" }, "Invite sent."] : t.closest("[data-cpyes]") ? ["couple_respond", { p_link: t.closest("[data-cpyes]").getAttribute("data-cpyes"), p_accept: true }, "You're linked as a couple."] : t.closest("[data-cpno]") ? ["couple_respond", { p_link: t.closest("[data-cpno]").getAttribute("data-cpno"), p_accept: false }, "Declined."] : t.closest("[data-cpend]") ? ["couple_end", {}, "Unlinked."] : null;
+    if (!act) return; if (!liveOn()) { toast("Couples link in the live app once you're both members."); return; }
+    lrpc(act[0], act[1]).then(function () { toast(act[2]); return lrpc("my_couple"); }).then(function (c) { P.couple = c || []; renderCouple(); }, function (er) { toast((er && er.message) || "Try again."); });
+  });
   function renderHrDeck() {
     var el = $("#hrDeck"); if (!el) return; el.hidden = !P.highRoller; if (!P.highRoller) { el.innerHTML = ""; return; }
     var D = P.hrDeck || {}, st = D.status || "needs_address", by = D.ship_by ? new Date(D.ship_by).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "within 180 days of your confirmation";
@@ -1405,7 +1419,7 @@
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
   }
   var deckDirty = false;
-  function onChange() { if (typeof renderVerPanel === "function") renderVerPanel(); if (typeof renderHrDeck === "function") renderHrDeck(); renderCard(); updateMeter(); deckDirty = true; saveDraft(); zipHint(); if (typeof tabCounts === "function") tabCounts(); }
+  function onChange() { if (typeof renderCouple === "function") renderCouple(); if (typeof renderVerPanel === "function") renderVerPanel(); if (typeof renderHrDeck === "function") renderHrDeck(); renderCard(); updateMeter(); deckDirty = true; saveDraft(); zipHint(); if (typeof tabCounts === "function") tabCounts(); }
   function zipHint() {
     var z = ZIPS[P.zip], el = $("#zipHint"); if (!el) return;
     el.textContent = z ? z.city + ", " + z.st + ". Your cards are measured from here." : 'Your cards are measured from your ZIP. Only "about X miles" is ever shown.';
@@ -1681,7 +1695,7 @@
     var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 4, size: 14 }) : "";
     return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.cardBack && CB[p.cardBack] ? " cb-" + p.cardBack : "") + '">' +
       '<div class="cv-medal">' + (BRAND.hat || "") + "</div>" +
-      (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
+      (p.couple ? '<div class="cv-couple">🍍 Couple' + (p.couple.name ? " · with " + esc(p.couple.name) : "") + "</div>" : "") + (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
       '<div class="cv-tap">Tap to flip</div></div>' + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>";
   }
   function cardHTML(p, pos) {
@@ -1689,7 +1703,7 @@
     var lookTxt = (TABLE[p.looking] || TABLE.longterm)[1];
     if (p.joker) col += " jokercard";
     if (p.hr && !p.joker) col += " hrcard" + (p.hr === "buyin" ? " hrgold" : "");
-    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
+    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
     var face = p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + "</div></div>" + details + '<span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
       '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + jmeter(p) +
@@ -2204,6 +2218,7 @@
     ["cannabis", "Cannabis", "one", ["Never", "Sometimes", "Often"], 1, 0, "Lifestyle"],
     ["pets", "Pets (check all that apply)", "many", ["Dog", "Cat", "Other pets", "No pets", "Allergic to pets"], 1, 0, "Lifestyle"],
     ["languages", "Languages (check all that apply)", "many", ["English", "Spanish", "Chinese", "Tagalog", "Vietnamese", "Arabic", "French", "Korean", "German", "ASL", "Another"], 1, 0, "Lifestyle"],
+    ["health", "Health a partner should know", "many", ["Nothing to share", "Living with HSV (herpes)", "HIV, undetectable (U=U)", "HPV", "On treatment for an STI", "Another condition that can pass between partners"], 0, 1, "Love life"],
     ["zodiac", "Zodiac sign", "one", ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces", "I don't follow zodiac"], 0, 0, "Lifestyle"]
   ];
   var IDX = {}; IDF.forEach(function (f) { IDX[f[0]] = f; });
@@ -2982,7 +2997,7 @@
      The builder is the Host: naming rights, games, who joins. Joining is free.
      ===================================================================== */
   (function () {
-    var KINDS = [["friendship", "", "Friendship"], ["faith", "", "Faith small group"], ["prayer", "", "Prayer group"], ["service", "", "Service & volunteering"], ["games", "", "Board games"], ["greek", "", "Greek life"], ["alumni", "", "Alumni"], ["club", "", "Club"], ["sports", "", "Sports & fitness"], ["hobby", "", "Hobbies"], ["parents", "", "Parents"], ["flirty18", "", "18+ Flirty"], ["other", "", "Other"]];
+    var KINDS = [["friendship", "", "Friendship"], ["faith", "", "Faith small group"], ["prayer", "", "Prayer group"], ["service", "", "Service & volunteering"], ["games", "", "Board games"], ["greek", "", "Greek life"], ["alumni", "", "Alumni"], ["club", "", "Club"], ["sports", "", "Sports & fitness"], ["hobby", "", "Hobbies"], ["parents", "", "Parents"], ["flirty18", "", "18+ Flirty"], ["lifestyle", "", "🍍 Lifestyle (couples & singles)"], ["other", "", "Other"]];
     var KIND = {}; KINDS.forEach(function (k) { KIND[k[0]] = k; });
     var WHO = { everyone: "Everyone", men: "Men only", women: "Women only" };
     var US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","PR"];
@@ -3335,7 +3350,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -3348,6 +3363,8 @@
   function liveDeckRun(redeal) {
     var go = redeal ? lrpc("deal_deck").then(function () { return lrpc("my_deck"); }) : lrpc("my_deck").then(function (rows) { return rows && rows.length ? rows : lrpc("deal_deck").then(function () { return lrpc("my_deck"); }); });
     return go.then(function (rows) { LIVE_ERR = "";
+      return lrpc("deck_couples").then(function (cs) { var m = {}; (cs || []).forEach(function (x) { m[x.member_id] = x; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.couple = m[r.member_id]; }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
       return lrpc("deck_backs").then(function (bs) { var m = {}; (bs || []).forEach(function (x) { m[x.member_id] = x.card_back; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_back = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_founders").then(function (fs) { var m = {}; (fs || []).forEach(function (x) { m[x.member_id] = x.founder_no; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.founder_no = m[r.member_id]; }); return rows; }, function () { return rows; });
@@ -3422,6 +3439,7 @@
       if (m.rooms) P.rooms = m.rooms;
       if (m.bumpers) { P.bumpers = m.bumpers; lrpc("my_bumpers").then(function (rs) { P.bumpersOk = (rs || []).filter(function (x) { return x.status === "verified"; }).map(function (x) { return x.bumper; }); saveP(); if (typeof renderStyle === "function") renderStyle(); renderCard(); }, function () { }); }
       var st = res[1].data; if (st && st.verified_only) { P.verifiedOnly = st.verified_only; if ($("#fVerOnly")) $("#fVerOnly").value = P.verifiedOnly; }
+      lrpc("my_couple").then(function (c) { P.couple = c || []; renderCouple(); }, function () { });
       lrpc("my_wishlist").then(function (u) { P.wishlist = u || ""; if ($("#fWish")) $("#fWish").value = P.wishlist; }, function () { });
       lrpc("my_card_back").then(function (b) { P.cardBack = b || null; saveP(); renderCardBacks(); }, function () { });
       lrpc("my_heads_ups").then(function (h) { P.headsUp = h || null; renderHeadsUp(); }, function () { });

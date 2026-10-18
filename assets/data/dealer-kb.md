@@ -114,6 +114,10 @@ No profile is activated and no payment is processed until the matching agreement
 
 **2.6h Wish lists.** A member may add a link to a wish list kept by Amazon, Target, Walmart or Etsy. It's shown only to members they've paired with. Gifts are bought and shipped by the store, which keeps the shipping address private; SuiteFace never sees, handles or delivers gifts and isn't responsible for them. Never send money, gift cards or crypto to someone you haven't met, and report anyone who asks.
 
+**2.6i Individuals only; couples.** Every SuiteFace account belongs to **one real, individual adult**. Businesses, organizations, groups and shared accounts can't be players (they may take part only as Partners, Sponsors or Card Back partners). The one exception: two members who each have their own verified account may **link as a couple** if both agree. A linked couple's cards show together, and only to members whose relationship style is open to it. The **pineapple** sticker and **Lifestyle** tables are for members open to swinging or ethical non-monogamy; the pineapple is shown only to members who are open to it too, and Lifestyle tables are for ID-verified members wearing it. Each Lifestyle table's Host sets its size and terms. Explicit content is never allowed (Section 2.6g).
+
+**2.6j Health a partner should know.** Members may choose to share a health condition that can pass between partners. It's always optional, "Prefer not to say" is always an option, and it starts **Face Down** (private) until you choose to show it. SuiteFace never uses it to rank you, never shows it to anyone you haven't chosen to show it to, and never requires it. Be honest when you share, and be kind when someone shares with you.
+
 ## 3. Meeting people: risk and safety
 
 **3.1 You accept the risk.** Meeting people you don't know, online or in person, carries risk. **Harm can happen**, including emotional harm, financial loss, theft, physical injury, sexual assault, and in rare cases worse. You alone decide whether, when, where and how to meet anyone, and **you voluntarily assume all risk** of doing so. Checking in, Play Hand, ranks, verification marks and Joker meters are tools, not safety guarantees.
@@ -536,6 +540,9 @@ SuiteFace is only for adults **18 and older**. We don't knowingly collect inform
 We'll post any update here with a new date and, for material changes, notify you in advance.
 
 **SuiteFace Inc., a Florida corporation** · help@suiteface.com · suiteface.com
+
+## Health information you choose to share
+If you choose to answer "Health a partner should know," we store that answer only to show it where you decide (it starts Face Down, visible to no one). We never sell it, never use it for advertising or matching scores, and delete it as soon as you clear the answer or delete your account. You can withdraw your consent anytime by clearing the answer in My Face.
 
 
 

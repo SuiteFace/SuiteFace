@@ -14,6 +14,7 @@
     scales: '<path d="M12 3v16M6 21h12M5 6h14" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M5 6l-3 6h6zM19 6l-3 6h6z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2 12a3 2 0 0 0 6 0zM16 12a3 2 0 0 0 6 0z" fill="currentColor"/>',
     ledger: '<rect x="4.5" y="2.5" width="15" height="19" rx="2" fill="currentColor"/><rect x="7" y="5" width="10" height="3.6" rx=".6" fill="#fff" opacity=".9"/><g fill="#fff" opacity=".9"><rect x="7" y="11" width="2.4" height="2.2"/><rect x="10.8" y="11" width="2.4" height="2.2"/><rect x="14.6" y="11" width="2.4" height="2.2"/><rect x="7" y="15" width="2.4" height="2.2"/><rect x="10.8" y="15" width="2.4" height="2.2"/><rect x="14.6" y="15" width="2.4" height="5.4"/></g>',
     shop: '<path d="M3 9l2-5h14l2 5z" fill="currentColor"/><path d="M4.5 9.5V20h15V9.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="9.5" y="13.5" width="5" height="6.5" fill="currentColor"/>',
+    pineapple: '<path d="M12 9.5c-3 0-5 2.6-5 6s2 6 5 6 5-2.6 5-6-2-6-5-6z" fill="#E3B341"/><path d="M8.2 13l7.6 6M15.8 13l-7.6 6M7.4 16.4l5.8 4.6M16.6 16.4l-5.8 4.6" stroke="#B5832A" stroke-width=".9"/><path d="M12 9.6c-.6-2.4-2.2-4-4.4-4.6 1.8-.2 3.2.4 4.1 1.6-.2-2 .3-3.6 1.4-4.6-.3 1.6-.1 3 .6 4.2.8-1 2.1-1.5 3.8-1.2-1.9.6-3.4 2.1-4.1 4.6" fill="#2E7D4F"/>',
     sunset: '<path d="M7 16a5 5 0 0 1 10 0z" fill="currentColor"/><path d="M2.5 18.5h19M12 5v3M4.6 9.2l2 1.6M19.4 9.2l-2 1.6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
     wings: '<path d="M12 11.5c-3-1.6-7.2-2.2-10.5-1.8 1.4 2.3 5 4 10.5 4z M12 11.5c3-1.6 7.2-2.2 10.5-1.8-1.4 2.3-5 4-10.5 4z" fill="currentColor"/><circle cx="12" cy="11.8" r="2.6" fill="currentColor"/><path d="M5 15.5c2.2.8 4.4 1.2 7 1.2s4.8-.4 7-1.2" fill="none" stroke="currentColor" stroke-width="1.3"/>',
     wheel: '<circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><g stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></g>'
@@ -36,7 +37,8 @@
     ["owner", "Owner", "Runs the business", "shop", "#C9A55A", "#26232B", "Work"],
     ["pilot", "Pilot", "Licensed to fly", "wings", "#26232B", "#E3C77E", "Work"],
     ["captain", "Captain", "At the helm", "wheel", "#8E2230", "#F2ECDD", "Work"],
-    ["retired", "Retired", "Living it", "sunset", "#5E7A6C", "#FFF8EE", "Life"]
+    ["retired", "Retired", "Living it", "sunset", "#5E7A6C", "#FFF8EE", "Life"],
+    ["pineapple", "Pineapple", "Open to the lifestyle", "pineapple", "#FFF6DC", "#6E4E14", "Lifestyle (only members open to it see this)"]
   ];
   var BY = {}; LIST.forEach(function (b) { BY[b[0]] = b; });
   function flag() {

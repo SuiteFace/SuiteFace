@@ -593,3 +593,4 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .cbsteps{display:grid;gap:8px;padding-left:22px;margin:12px 0 22px}
 .cbform{margin-top:8px}
 .pcard .cover .cvb.pine{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#FFFDF8;box-shadow:0 0 0 1px rgba(201,165,90,.6)}
+.pcard .cover .cv-couple{font:800 .62rem/1 var(--body);padding:4px 8px;border-radius:999px;background:#FFF6DC;color:#6E4E14;white-space:nowrap}
