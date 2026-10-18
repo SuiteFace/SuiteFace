@@ -2759,6 +2759,7 @@
     // Let visitors see the game first: an invite shows right away; everyone else sees the offer
     // only after scrolling halfway down the page, or after 40 seconds of looking around.
     var offerAt = function (fn) {
+      if (document.documentElement.classList.contains("v3")) return; // v3 Beta keeps the landing to one story: no pop-up
       if (inv) { setTimeout(fn, 1800); return; }
       var fired = false, go = function () { if (fired) return; var a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) || $("#modal")) { setTimeout(go, 20000); return; } fired = true; window.removeEventListener("scroll", sc); fn(); };
       var sc = function () { var d = document.documentElement; if ((window.scrollY + innerHeight) / d.scrollHeight > .5) go(); };
