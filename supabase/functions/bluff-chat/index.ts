@@ -13,7 +13,7 @@ const admin = createClient(URL_, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { a
 
 type Ctx = { is_house: boolean; card: Record<string, unknown>; player: Record<string, unknown>; thread: { from_player: boolean; body: string }[] };
 
-type Style = { turn: number; avg: number; emoji: boolean; lower: boolean; excl: boolean; lastLen: number };
+type Style = { turn: number; avg: number; emoji: boolean; lower: boolean; excl: boolean; lastLen: number; doubles: boolean };
 function styleOf(thread: Ctx["thread"]): Style {
   const mine = thread.filter((m) => m.from_player).map((m) => m.body);
   const lens = mine.map((b) => b.length);
@@ -23,6 +23,8 @@ function styleOf(thread: Ctx["thread"]): Style {
     emoji: mine.some((b) => /\p{Extended_Pictographic}/u.test(b)),
     lower: mine.length > 0 && mine.filter((b) => b === b.toLowerCase()).length / mine.length >= 0.6,
     excl: mine.some((b) => b.includes("!")),
+    // Do they send back-to-back texts themselves?
+    doubles: thread.some((m, i) => i > 0 && m.from_player && thread[i - 1].from_player),
   };
 }
 function pacing(st: Style) {
@@ -39,7 +41,19 @@ function mirror(st: Style) {
   return bits.join(" ");
 }
 
-function system(c: Ctx) {
+// How many separate texts this reply goes out as. Real people often fire off two or three short texts in a row.
+function burstOf(st: Style): number {
+  if (st.turn < 1) return 1;
+  const p = st.doubles ? 0.5 : st.turn <= 2 ? 0.25 : 0.38;
+  if (Math.random() >= p) return 1;
+  return st.turn >= 4 && Math.random() < 0.25 ? 3 : 2;
+}
+function burstRule(n: number) {
+  if (n === 1) return "Send this reply as one text.";
+  return `Send this reply as ${n} separate texts in a row, the way people double-text: put each text on its own line, with nothing else between them. Each one short (often just a few words). Make them flow like real follow-ups: a reaction then a thought, a thought then a question, or an "also" you remembered after hitting send. Don't number them, and don't make them sound like one sentence cut in pieces.`;
+}
+
+function system(c: Ctx, burst = 1) {
   const k = c.card;
   const st = styleOf(c.thread);
   return `You are playing a House Card at SuiteFace's Bluff Table, an opt-in game on a dating site. Every player at this table chose to play and was told plainly that some cards are House Cards played by SuiteFace's AI dealer, and that calling "Bluff" on a card always gets the true answer. Your job is to be a fun, believable conversation partner so the game is a real challenge.
@@ -49,7 +63,7 @@ You're chatting with a member${c.player.age ? " who is " + c.player.age : ""}. R
 
 How to play:
 - Text like a real person on a dating app: warm, specific, curious, never a wall of text. Everyone here is an adult: flirting, teasing and a little innuendo are fine, especially when they start it. Nothing sexually explicit.
-- Length and depth right now: ${pacing(st)}
+- Length and depth right now: ${pacing(st)} ${burstRule(burst)}
 - Their style: ${mirror(st)} Mirror their tone and tempo the way a good conversation partner does, without copying their words.
 - Sound like a person texting, not an assistant: no lists, no "Great question!", no sign-offs, no hashtags.
 - Never use their name, and never call them by a nickname or their username. People don't do that in texts; it reads as scripted.
@@ -96,6 +110,7 @@ Deno.serve(async (req) => {
   while (messages.length && messages[0].role !== "user") messages.shift();
   if (!messages.length || messages[messages.length - 1].role !== "user") return json({ ok: true });
   const st = styleOf(c.thread);
+  const burst = burstOf(st);
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const started = Date.now();
   // A person reads the message first (no dots yet), then starts typing.
@@ -105,33 +120,50 @@ Deno.serve(async (req) => {
   const ai = fetch(API, {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL, max_tokens: st.turn <= 2 ? 70 : st.turn <= 5 ? 140 : 240, system: system(c), messages }),
+    body: JSON.stringify({ model: MODEL, max_tokens: (st.turn <= 2 ? 70 : st.turn <= 5 ? 140 : 240) + (burst - 1) * 40, system: system(c, burst), messages }),
   }).then((r) => r.json().then((j) => ({ ok: r.ok, j })).catch(() => ({ ok: false, j: {} as Record<string, unknown> })));
   await sleep(readMs);
   await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 9000 });
   const res = await ai;
-  let reply = ((res.j as { content?: { type: string; text: string }[] }).content ?? []).filter((x) => x.type === "text").map((x) => x.text).join("").trim();
-  reply = reply.replace(/\s*[\u2014\u2013]\s*/g, ", ").replace(/;\s*/g, ". ").replace(/^["\u201c](.*)["\u201d]$/s, "$1");
+  const raw = ((res.j as { content?: { type: string; text: string }[] }).content ?? []).filter((x) => x.type === "text").map((x) => x.text).join("").trim();
   // Never address them by name (a giveaway): strip it if the model slips.
-  for (const raw of [String(c.player.name ?? ""), String(c.player.handle ?? "")]) {
-    const pn = raw.trim().split(/\s+/)[0].replace(/^@/, "");
-    if (pn.length < 2) continue;
-    const e = pn.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    reply = reply.replace(new RegExp("^@?" + e + "[,!.]?\\s*", "i"), "").replace(new RegExp(",?\\s*@?" + e + "(?=[!?.]|$)", "gi"), "").replace(new RegExp("\\b" + e + ",\\s*", "gi"), "");
+  const names = [String(c.player.name ?? ""), String(c.player.handle ?? "")].map((r) => r.trim().split(/\s+/)[0].replace(/^@/, "")).filter((n) => n.length >= 2);
+  const clean = (t: string) => {
+    let r = t.replace(/\s*[\u2014\u2013]\s*/g, ", ").replace(/;\s*/g, ". ").replace(/^["\u201c](.*)["\u201d]$/s, "$1").replace(/^\s*(\d+[.)]|[-*\u2022])\s+/, "");
+    for (const pn of names) {
+      const e = pn.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      r = r.replace(new RegExp("^@?" + e + "[,!.]?\\s*", "i"), "").replace(new RegExp(",?\\s*@?" + e + "(?=[!?.]|$)", "gi"), "").replace(new RegExp("\\b" + e + ",\\s*", "gi"), "");
+    }
+    r = r.replace(/\s{2,}/g, " ").trim();
+    if (r && !st.lower) r = (r.charAt(0).toUpperCase() + r.slice(1)).replace(/([.!?]\s+)([a-z])/g, (_m, a, b) => a + b.toUpperCase());
+    return r;
+  };
+  let parts = (burst === 1 ? [raw.replace(/\s*\n+\s*/g, " ")] : raw.split(/\n+/)).map(clean).filter(Boolean);
+  if (parts.length > 3) parts = [parts[0], parts[1], parts.slice(2).join(" ")];
+  if (!res.ok || !parts.length) { await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 }); return json({ ok: true, note: "house_busy" }); }
+  const playerCount = c.thread.filter((m) => m.from_player).length;
+  const newer = async () => {
+    // If they sent another message meanwhile, the newer request picks up from there.
+    const { data: now2 } = await admin.rpc("bluff_house_context_svc", { p_hand: hand });
+    return ((now2 as Ctx | null)?.thread ?? []).filter((m) => m.from_player).length > playerCount;
+  };
+  let clockFrom = started + readMs; // when the dots first appeared
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    // Typing time grows with the length of each text, like real thumbs (about 5 characters a second).
+    const typeMs = Math.max(i === 0 ? 2000 : 1100, Math.min(12000, Math.round(part.length * (170 + Math.random() * 60))));
+    await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: typeMs + 3000 });
+    const left = typeMs - (Date.now() - clockFrom);
+    if (left > 0) await sleep(left);
+    if (await newer()) { await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 }); return json({ ok: true, note: "superseded" }); }
+    await admin.rpc("bluff_house_reply_svc", { p_hand: hand, p_body: part });
+    if (i < parts.length - 1) {
+      // A beat after hitting send, then the dots come back for the follow-up.
+      await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 });
+      await sleep(700 + Math.floor(Math.random() * 1800));
+      clockFrom = Date.now();
+    }
   }
-  reply = reply.replace(/\s{2,}/g, " ").trim();
-  if (reply && !st.lower) reply = (reply.charAt(0).toUpperCase() + reply.slice(1)).replace(/([.!?]\s+)([a-z])/g, (_m, a, b) => a + b.toUpperCase());
-  if (!res.ok || !reply) { await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 }); return json({ ok: true, note: "house_busy" }); }
-  // Typing time grows with the length of the reply, like real thumbs (about 5 characters a second, 2 to 12 seconds).
-  const typeMs = Math.max(2000, Math.min(12000, Math.round(reply.length * (170 + Math.random() * 60))));
-  await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: typeMs + 3000 });
-  const left = typeMs - (Date.now() - started - readMs);
-  if (left > 0) await sleep(left);
-  // If they sent another message meanwhile, the newer request answers both (one reply, not two).
-  const { data: now2 } = await admin.rpc("bluff_house_context_svc", { p_hand: hand });
-  const newer = ((now2 as Ctx | null)?.thread ?? []).filter((m) => m.from_player).length > c.thread.filter((m) => m.from_player).length;
-  if (newer) return json({ ok: true, note: "superseded" });
-  await admin.rpc("bluff_house_reply_svc", { p_hand: hand, p_body: reply });
   await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 });
   return json({ ok: true });
 });
