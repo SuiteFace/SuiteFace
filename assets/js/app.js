@@ -164,9 +164,15 @@
   function debounce(fn, ms) { var h; return function () { clearTimeout(h); h = setTimeout(fn, ms); }; }
 
   /* ---------- nav ---------- */
-  var menuBtn = $("#menuBtn"), nav = $("#nav");
-  menuBtn.addEventListener("click", function () { var o = nav.classList.toggle("open"); menuBtn.setAttribute("aria-expanded", String(o)); });
-  $$("#nav a").forEach(function (a) { a.addEventListener("click", function () { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); }); });
+  /* Header sections: Date, Play, Club (and Staff). Each opens its own list of pages. */
+  var nav = $("#nav");
+  function closeGroups(except) { $$("#nav .ng.open").forEach(function (g) { if (g !== except) { g.classList.remove("open"); g.querySelector(".ngb").setAttribute("aria-expanded", "false"); } }); }
+  $$("#nav .ngb").forEach(function (b) { b.addEventListener("click", function (e) { e.stopPropagation(); var g = b.parentNode, o = !g.classList.contains("open"); closeGroups(g); g.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); }); });
+  document.addEventListener("click", function (e) { if (!e.target.closest || !e.target.closest("#nav .ng")) closeGroups(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && $("#nav .ng.open")) { var g = $("#nav .ng.open"); closeGroups(); g.querySelector(".ngb").focus(); } });
+  $$("#nav a").forEach(function (a) { a.addEventListener("click", function () { closeGroups(); }); });
+  function navGroups() { $$("#nav .ng").forEach(function (g) { var any = $$("a", g).some(function (a) { return !a.hidden; }); g.hidden = !any; g.classList.toggle("here", !!g.querySelector('a[aria-current="page"]')); }); }
+  navGroups();
 
   /* ---------- profile state ---------- */
   var P = Object.assign({ id: {}, prefs: {}, vis: {},
@@ -3387,6 +3393,7 @@
     $("#loginBtn").textContent = (ROLE === "guest" && !SIGNED) ? "Log in" : "Log out";
     $$("[data-only]").forEach(function (el) { el.hidden = ROLE !== el.getAttribute("data-only"); });
     $$("a[data-need]").forEach(function (a) { var n = a.getAttribute("data-need"); a.hidden = a.classList.contains("clubnav") ? !(SIGNED || ROLE !== "guest") : n !== "member" ? !allowed(n) : false; });
+    if (typeof navGroups === "function") navGroups();
     $$("section[data-need]").forEach(function (sec) {
       var need = sec.getAttribute("data-need"), ok = allowed(need), wrap = sec.querySelector(":scope > .wrap");
       if (need !== "member") { sec.hidden = !ok; if (ok) renderConsole(sec.id); return; }

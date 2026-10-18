@@ -966,3 +966,32 @@ body.lb-dragmode{cursor:grabbing}
 .emptyhand .eyebrow,.emptyhand .hint{color:#F3E6BF!important;opacity:1}
 .emptyhand .eyebrow{letter-spacing:.14em;font-weight:800}
 .samplelabel{display:inline-block;margin:22px 0 4px;padding:4px 10px;border-radius:999px;background:#2B2730;color:#FFE7A3;font:800 .78rem var(--body);letter-spacing:.06em;text-transform:uppercase}
+
+/* ---------- Header sections (Oct 18): Date · Play · Club · Staff, each with its own pages ---------- */
+.menu-btn{display:none!important}
+.top .who{margin-left:auto}
+.subbar{border-top:1px solid var(--line)}
+.subbar .wrap{height:auto;display:flex;justify-content:center}
+.nav.secnav,.top .nav.secnav{position:static;inset:auto;transform:none;visibility:visible;transition:none;flex-direction:row;align-items:center;justify-content:center;gap:4px;background:none;border:0;padding:4px 0;margin:0;width:100%}
+.secnav .ng{position:relative}
+.secnav .ngb{appearance:none;border:0;background:none;cursor:pointer;color:var(--cream-dim);font:700 .98rem/1 var(--body);padding:.7rem 1.1rem;border-radius:999px;display:inline-flex;align-items:center;gap:6px}
+.secnav .ngb::after{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s;opacity:.7}
+.secnav .ng.open .ngb::after{transform:translateY(1px) rotate(225deg)}
+.secnav .ngb:hover,.secnav .ng.open .ngb{color:var(--cream);background:var(--line)}
+.secnav .ng.here .ngb{color:var(--gold-hi)}
+.secnav .ngp{display:none;position:absolute;left:50%;top:calc(100% + 6px);transform:translateX(-50%);min-width:280px;padding:8px;border-radius:16px;background:var(--night);border:1px solid var(--line);box-shadow:0 24px 48px -20px rgba(10,12,10,.6);z-index:60}
+.secnav .ng.open .ngp{display:grid;gap:2px}
+.secnav .ngp a{display:grid;gap:2px;padding:.65rem .8rem;border-radius:10px;text-decoration:none;white-space:normal;letter-spacing:0;text-transform:none}
+.secnav .ngp a[hidden]{display:none}
+.secnav .ngp a b{font:700 .98rem/1.2 var(--body);color:var(--cream)}
+.secnav .ngp a small{font:500 .82rem/1.3 var(--body);color:var(--cream-dim)}
+.secnav .ngp a:hover,.secnav .ngp a:focus-visible{background:var(--line)}
+.secnav .ngp a[aria-current="page"] b{color:var(--gold-hi)}
+.secnav .ngp a.navhand b{color:var(--gold-hi)}
+@media (max-width:700px){
+  .secnav{justify-content:space-around}
+  .secnav .ng{position:static}
+  .secnav .ngb{padding:.65rem .8rem;font-size:.95rem}
+  .secnav .ngp{position:fixed;left:8px;right:8px;top:auto;transform:none;min-width:0;margin-top:6px}
+}
+html[data-play="day"] .secnav .ngp{background:#FFFDF8;box-shadow:0 24px 48px -24px rgba(60,48,30,.35)}
