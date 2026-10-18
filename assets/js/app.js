@@ -359,6 +359,11 @@
       };
       hl.onclick = function (e) { var b = e.target.closest("[data-clear]"); if (!b || !confirm("Clear this account to be dealt a deck?")) return; window.SF_LIVE.rpc("clear_review_hold", { p_member: b.getAttribute("data-clear") }).then(function (r) { if (r.error) toast(r.error.message); else { toast("Cleared."); loadHolds(); } }); };
       loadHolds();
+      window.SF_LIVE.rpc("recent_signups", { p_limit: 100 }).then(function (r) { var su = $("#signupList"); if (!su) return; var rows = r.data || [];
+        var paid = rows.filter(function (x) { return x.paid; }).length, today = rows.filter(function (x) { return Date.now() - new Date(x.joined_at).getTime() < 864e5; }).length;
+        su.innerHTML = '<p class="hint"><b>' + rows.length + "</b> total · <b>" + today + "</b> in the last 24 hours · <b>" + paid + "</b> paid</p>" + (rows.length ? rows.map(function (x) {
+          return '<div class="cmrow"><span><b>' + esc(x.face_name || x.email) + "</b>" + (x.handle ? " @" + esc(x.handle) : "") + " · " + esc(x.email) + "<br><small>" + esc(new Date(x.joined_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) + " · " + (x.paid ? "✓ Paid" : "Not paid yet") + (x.email_confirmed ? " · email confirmed" : " · email not confirmed") + (x.home_zip ? " · " + esc(x.home_zip) : "") + (x.suit && SUIT[x.suit] ? " · " + SUIT[x.suit].sym + " " + SUIT[x.suit].name : "") + "</small></span></div>"; }).join("") : '<p class="hint">No sign-ups yet.</p>');
+      });
       var cl = $("#chalList"), loadChal = function () {
         window.SF_LIVE.rpc("joker_challenge_queue").then(function (r) {
           var rows = r.data || []; if (!cl) return;
