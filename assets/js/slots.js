@@ -35,6 +35,8 @@
     onion: '<path d="M12 4.5c.3 1.4.1 2.3-.4 3.1 3.9 1.1 6.6 4.2 6.6 7.6 0 3.3-2.7 5.6-6.2 5.6s-6.2-2.3-6.2-5.6c0-3.4 2.7-6.5 6.6-7.6" fill="#9C4A7A" stroke="#6B2E52" stroke-width=".9" stroke-linejoin="round"/>' +
       '<path d="M12 8c-1.8 2.2-2.4 7.6 0 12.6M12 8c1.8 2.2 2.4 7.6 0 12.6" fill="none" stroke="#C786AC" stroke-width=".8"/><path d="M11.6 4.5c-.6-1.2-.4-2.2.4-3 .8.8 1 1.8.4 3" fill="' + G + '"/>' +
       '<path d="M3 6.5c1 .8 1 1.8 0 2.6s-1 1.8 0 2.6M21 6.5c-1 .8-1 1.8 0 2.6s1 1.8 0 2.6" fill="none" stroke="#7D9A5A" stroke-width="1.1" stroke-linecap="round"/>',
+    pineapple: '<path d="M12 9.5c-1.2-2-3.4-3-5-2.6 1.4.6 2.6 1.7 3.2 3M12 9.5c1.2-2 3.4-3 5-2.6-1.4.6-2.6 1.7-3.2 3M12 9.2c-.5-2.4-.1-4.6 1.2-6.2.4 2 .2 4.1-.8 6.2M12 9.2c.2-2.2-.5-4.3-1.9-5.6" fill="none" stroke="' + G + '" stroke-width="1.5" stroke-linecap="round"/>' +
+      '<ellipse cx="12" cy="15.6" rx="5" ry="6.2" fill="' + B + '" stroke="' + B2 + '" stroke-width=".8"/><path d="M8 12.5l8 6.5M8.2 17.6l7.6-5.6M9 10.8l6.6 9M15 10.8l-6.6 9" stroke="' + B2 + '" stroke-width=".7" opacity=".75"/>',
     gem: '<path d="M7 4h10l4 5-9 11L3 9z" fill="#E9EEF2" stroke="' + B2 + '" stroke-width=".8" stroke-linejoin="round"/><path d="M3 9h18M7 4l2.5 5L12 20 14.5 9 17 4M9.5 9 12 4l2.5 5" fill="none" stroke="#A9B4BE" stroke-width=".7"/>'
   };
   var MEAN = {

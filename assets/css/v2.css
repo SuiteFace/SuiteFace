@@ -592,3 +592,4 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .cbkinds>div{display:grid;gap:4px;padding:14px;border-radius:14px;border:1px solid var(--line)}.cbkinds span{font-size:.9rem;color:var(--muted)}
 .cbsteps{display:grid;gap:8px;padding-left:22px;margin:12px 0 22px}
 .cbform{margin-top:8px}
+.pcard .cover .cvb.pine{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#FFFDF8;box-shadow:0 0 0 1px rgba(201,165,90,.6)}

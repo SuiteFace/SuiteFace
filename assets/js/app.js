@@ -1674,6 +1674,7 @@
     var felt = (TABLE[p.looking] || TABLE.longterm)[2] || "#1E6347", red = SUIT[p.suit] && SUIT[p.suit].red;
     var badges = [];
     if (p.founder && window.SFSlots) badges.push('<span class="cvb f1k" title="First 1,000 · Founding Player №' + String(p.founder).padStart(4, "0") + '">' + SFSlots.founder(p.founder, 34) + "</span>");
+    if (asList(p.id_ && p.id_.style).indexOf("Swinger") > -1 && window.SFSlots) badges.push('<span class="cvb pine" title="Swinger-friendly">' + SFSlots.svg("pineapple", 18) + "</span>");
     if (p.hr) badges.push('<span class="cvb hrb">' + (isMasked(p) ? "🎭 " : "💎 ") + (p.hr === "verified" ? "Platinum ✓" : "Gold") + "</span>");
     if (!p.hr && (p.photoV || p.idV)) badges.push(verBadges(p));
     var stick = window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, 3), p.bumpersOk) : "";
@@ -2185,6 +2186,7 @@
     ["status", "Relationship status", "one", ["Single, never married", "Separated", "Divorced", "Widow", "Widower", "Married", "In a relationship"], 1, 0, "Love life"],
     ["style", "Relationship style", "many", ["Monogamous", "Open relationship", "Polyamorous", "Swinger", "Ethically non-monogamous", "Still figuring it out"], 1, 1, "Love life"],
     ["kids", "Kids", "one", ["No kids", "Kids at home", "Kids, not at home", "Kids part-time"], 1, 0, "Love life"],
+    ["health", "Health a partner should know about (anything that could pass to someone through close contact)", "one", ["Nothing to share", "Yes, and I'll tell a match privately before we get close", "Prefer not to say"], 0, 1, "Love life"],
     ["wantKids", "Want kids?", "one", ["Want kids", "Open to kids", "Don't want kids", "Not sure"], 1, 0, "Love life"],
     ["education", "Education", "one", ["Some high school", "High school / GED", "Boarding school", "Trade or technical school", "Some college", "In college now", "Associate degree", "Bachelor's degree", "Master's degree", "Doctorate", "Law or medical degree"], 1, 0, "Work & money"],
     ["employment", "Work (check all that apply)", "many", ["Full-time", "Part-time", "Self-employed / business owner", "Gig work", "Student", "Military", "Retired", "Between jobs", "Homemaker / caregiver", "On disability"], 1, 0, "Work & money"],
