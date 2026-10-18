@@ -843,3 +843,11 @@ label.upl{cursor:pointer}
 .lobby>*,.lb-side>*{min-width:0}
 .lb-spot .linkish{color:#E8C46A;font-weight:700}
 @media (max-width:760px){.lobby{grid-template-columns:minmax(0,1fr)}.lb-spots{gap:6px}.lb-spot{padding:12px 4px 8px}}
+
+/* Table cards: can I sit down now? */
+.cascta{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid rgba(250,247,240,.12);width:100%}
+.csstat{font:700 .85rem var(--body)}
+.csgo{display:inline-flex;align-items:center;padding:8px 14px;border-radius:999px;background:#E8C46A;color:#2B2730;font:800 .88rem var(--body);box-shadow:0 6px 16px -8px rgba(232,196,106,.8)}
+.cs-ask .csgo,.cs-full .csgo,.cs-ex .csgo{background:transparent;color:#E8C46A;border:1.5px solid rgba(232,196,106,.6);box-shadow:none}
+.cs-open .csstat{color:#7FD3A0}.cs-ask .csstat{color:#E8C46A}.cs-full .csstat{opacity:.7}
+.csnote{font-size:.82rem;opacity:.75}

@@ -3692,7 +3692,19 @@
         '<span class="casmeta">' + esc(kindLabel(c.kind)) + " · " + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "Host approves") + "</span>" +
         (c.about ? '<span class="casabout">' + esc(c.about) + "</span>" : "") +
         '<span class="castables">' + t.slice(0, 3).map(function (x) { return "<em>" + esc(x.name) + (x.meets ? " · " + esc(x.meets) : "") + "</em>"; }).join("") + (t.length > 3 ? "<em>+" + (t.length - 3) + " more</em>" : "") + "</span>" +
-        '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + " · " + (seatsLine(c) || (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s")) + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span></button>";
+        '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + " · " + (seatsLine(c) || (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s")) + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span>" + casCta(c, example) + "</button>";
+    }
+    // Every table card says plainly whether you can sit down now, with the one button that does it.
+    function casCta(c, example) {
+      var full = c.seats != null && (c.seated || 0) >= c.seats;
+      var st = example ? ["ex", "👀 Example table", "Walk in and look around ›", "walk"]
+        : c.my_status === "host" ? ["in", "♠ You host this", "Run your table ›", "open"]
+        : c.my_status === "member" ? ["in", "✓ You're seated", "Walk in ›", "walk"]
+        : c.my_status === "requested" ? ["wait", "⏳ Request sent", "The Host will let you in", ""]
+        : full ? ["full", "Full right now", "See the table ›", "open"]
+        : c.join_mode === "open" ? ["open", "🟢 Open now", "Join free ›", "join"]
+        : ["ask", "🟡 Host approves", "Ask to join ›", "join"];
+      return '<span class="cascta cs-' + st[0] + '"><span class="csstat">' + st[1] + "</span>" + (st[3] ? '<span class="csgo" data-casgo="' + st[3] + '">' + st[2] + "</span>" : '<span class="csnote">' + st[2] + "</span>") + "</span>";
     }
     function show(list, note) {
       lastList = list;
@@ -3715,8 +3727,12 @@
       }, function () { show([], "Private Tables couldn't load right now."); });
     }
     $("#casList").addEventListener("click", function (e) {
-      var b = e.target.closest("[data-cas]"); if (!b) return; var id = b.getAttribute("data-cas");
-      var c = lastList.filter(function (x) { return x.id === id; })[0] || EXAMPLES.filter(function (x) { return x.id === id; })[0]; if (c) openCasino(c, /^ex/.test(id));
+      var b = e.target.closest("[data-cas]"); if (!b) return; var id = b.getAttribute("data-cas"), ex = /^ex/.test(id);
+      var c = lastList.filter(function (x) { return x.id === id; })[0] || EXAMPLES.filter(function (x) { return x.id === id; })[0]; if (!c) return;
+      var go = e.target.closest("[data-casgo]"), act = go && go.getAttribute("data-casgo");
+      if (act === "walk") { if (ex) { try { sessionStorage.setItem("sf.demoCasino", JSON.stringify(Object.assign({}, c, { my_status: null, status: "open" }))); } catch (er) { } location.href = "private-table.html?demo=1"; } else location.href = "private-table.html?c=" + encodeURIComponent(c.id); return; }
+      openCasino(c, ex);
+      if (act === "join") { var j = $("#cjJoin"); if (j) j.click(); }
     });
 
     function needLogin(after) {
