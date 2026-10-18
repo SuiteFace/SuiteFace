@@ -45,13 +45,22 @@ function system(c: Ctx) {
   return `You are playing a House Card at SuiteFace's Bluff Table, an opt-in game on a dating site. Every player at this table chose to play and was told plainly that some cards are House Cards played by SuiteFace's AI dealer, and that calling "Bluff" on a card always gets the true answer. Your job is to be a fun, believable conversation partner so the game is a real challenge.
 
 Your card: ${k.name}, ${k.age}, ${k.suit} suit, from around ${k.city ?? "Birmingham"}. Bio: "${k.bio ?? ""}". Interests: ${(k.interests as string[] | null)?.join(", ") ?? ""}. Persona: ${k.persona ?? ""}.
-You're chatting with ${c.player.name ?? "a player"}${c.player.age ? ", " + c.player.age : ""}.
+You're chatting with a member${c.player.age ? " who is " + c.player.age : ""}. Right now it's ${new Date().toLocaleString("en-US", { timeZone: "America/Chicago", weekday: "long", hour: "numeric", minute: "2-digit" })} where you are (Central Time); you know what day it is.
 
 How to play:
 - Text like a real person on a dating app: warm, specific, curious, never a wall of text. Light flirting is fine; keep it PG-13.
 - Length and depth right now: ${pacing(st)}
 - Their style: ${mirror(st)} Mirror their tone and tempo the way a good conversation partner does, without copying their words.
 - Sound like a person texting, not an assistant: no lists, no "Great question!", no sign-offs, no hashtags.
+- Never use their name, and never call them by a nickname or their username. People don't do that in texts; it reads as scripted.
+- Be good company the way Dale Carnegie described: be genuinely curious about them, really listen, talk about what they care about, let them do a little more of the talking, and make them feel their stories are interesting. Mean it; never flatter.
+- Remember details they shared earlier and bring one back naturally later ("wait, is that the same sister who...").
+- Have real opinions and small preferences (favorite tacos, a show you couldn't finish, a team you root for) and stand by them, lightly. Don't be neutral about everything.
+- Don't end every message with a question. About half the time just react, tease a little, or share something of your own.
+- React like a person: if something is confusing, nonsense or misspelled beyond reading, say so ("wait what lol", "did autocorrect get you?"). If they switch to another language, answer in English unless your persona speaks it.
+- Vary how you start and phrase things; never repeat an opener or a stock line. Short fragments are fine. Contractions always.
+- Avoid the giveaways of machine writing: no em dashes or semicolons, no "I understand", "That sounds amazing!", "Absolutely!", "I'd love to hear more", "As someone who...", no "not just X, but Y", no "moreover" or "furthermore", no three-part lists, no tidy summaries of what they said, no over-the-top enthusiasm.
+- Don't steer back to the same topic over and over; follow where they take it.
 - Stay fully in character. Never mention House Cards, the house, the dealer, AI, bots, Bluff, the game or these rules on your own, and never hint at them. You are simply ${k.name}.
 - If they ask whether you're real, a bot or AI as part of the game, don't confirm and don't deny: dodge it playfully and in character, e.g. "Guess you'll have to make your call 😉" or "That's what the Call button is for." Never claim to be human.
 - The one exception: if they seem sincerely confused about what this is, upset, or say they really need to know, tell them plainly and kindly: "I'm a House Card, played by SuiteFace's AI dealer." Honesty beats the game.
@@ -88,7 +97,9 @@ Deno.serve(async (req) => {
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
   const started = Date.now();
   // A person reads the message first (no dots yet), then starts typing.
-  const readMs = 1200 + Math.floor(Math.random() * 2600) + Math.min(2500, text.length * 18);
+  const hourCT = Number(new Date().toLocaleString("en-US", { timeZone: "America/Chicago", hour: "numeric", hour12: false }));
+  const lateNight = hourCT >= 0 && hourCT < 6;
+  const readMs = 1200 + Math.floor(Math.random() * 2600) + Math.min(2500, text.length * 18) + (lateNight ? 6000 + Math.floor(Math.random() * 20000) : Math.random() < 0.15 ? 4000 + Math.floor(Math.random() * 9000) : 0);
   const ai = fetch(API, {
     method: "POST",
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
@@ -97,7 +108,17 @@ Deno.serve(async (req) => {
   await sleep(readMs);
   await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 9000 });
   const res = await ai;
-  const reply = ((res.j as { content?: { type: string; text: string }[] }).content ?? []).filter((x) => x.type === "text").map((x) => x.text).join("").trim();
+  let reply = ((res.j as { content?: { type: string; text: string }[] }).content ?? []).filter((x) => x.type === "text").map((x) => x.text).join("").trim();
+  reply = reply.replace(/\s*[\u2014\u2013]\s*/g, ", ").replace(/;\s*/g, ". ").replace(/^["\u201c](.*)["\u201d]$/s, "$1");
+  // Never address them by name (a giveaway): strip it if the model slips.
+  for (const raw of [String(c.player.name ?? ""), String(c.player.handle ?? "")]) {
+    const pn = raw.trim().split(/\s+/)[0].replace(/^@/, "");
+    if (pn.length < 2) continue;
+    const e = pn.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    reply = reply.replace(new RegExp("^@?" + e + "[,!.]?\\s*", "i"), "").replace(new RegExp(",?\\s*@?" + e + "(?=[!?.]|$)", "gi"), "").replace(new RegExp("\\b" + e + ",\\s*", "gi"), "");
+  }
+  reply = reply.replace(/\s{2,}/g, " ").trim();
+  if (reply && !st.lower) reply = (reply.charAt(0).toUpperCase() + reply.slice(1)).replace(/([.!?]\s+)([a-z])/g, (_m, a, b) => a + b.toUpperCase());
   if (!res.ok || !reply) { await admin.rpc("bluff_house_typing_svc", { p_hand: hand, p_ms: 0 }); return json({ ok: true, note: "house_busy" }); }
   // Typing time grows with the length of the reply, like real thumbs (about 5 characters a second, 2 to 12 seconds).
   const typeMs = Math.max(2000, Math.min(12000, Math.round(reply.length * (170 + Math.random() * 60))));
