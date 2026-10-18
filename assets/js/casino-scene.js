@@ -272,6 +272,49 @@
     fe.querySelector(".sfe-skip").onclick = finish;
     document.addEventListener("keydown", function k(e) { if (e.key === "Escape") { document.removeEventListener("keydown", k); finish(); } });
   }
+  /* The Host's card: public to everyone who visits a Private Table, so players know who runs it.
+     First name, age, suit, city, bio, interests, badges and stickers only. Never a last name, address or contact. */
+  var HSUIT = { heart: ["♥", "Heart", 1], diamond: ["♦", "Diamond", 1], club: ["♣", "Club", 0], spade: ["♠", "Spade", 0] };
+  var HSTK = { dice: "🎲", chip: "🪙", spade: "♠️" };
+  function hesc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function hostStyle() {
+    if (document.getElementById("sf-hostcard-css")) return;
+    var s = document.createElement("style"); s.id = "sf-hostcard-css";
+    s.textContent = ".hcard{display:grid;grid-template-columns:118px 1fr;gap:16px;align-items:start;padding:16px;border-radius:18px;background:linear-gradient(160deg,#FFFDF8,#F4EEE2);color:#2B2730;box-shadow:0 14px 32px -16px rgba(10,14,12,.6),inset 0 0 0 1px rgba(184,134,47,.35);position:relative;text-align:left;margin:14px 0}" +
+      ".hcard .hc-ph{width:118px;aspect-ratio:5/7;border-radius:12px;background:#33473a center/cover;position:relative;overflow:hidden;box-shadow:inset 0 0 0 3px #fff,0 0 0 1px rgba(184,134,47,.5)}" +
+      ".hcard .hc-ill{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:2px;color:#FFF7E2;background:radial-gradient(circle at 50% 30%,var(--hc1,#2F8A62),var(--hc2,#163F2E))}" +
+      ".hcard .hc-ill b{font:900 2.4rem/1 'Big Shoulders Display',Impact,sans-serif;letter-spacing:.02em}.hcard .hc-ill i{font-style:normal;font-size:1.7rem}" +
+      ".hcard .hc-pip{position:absolute;top:6px;left:8px;font:800 1rem/1 'Big Shoulders Display',Impact,sans-serif;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}" +
+      ".hcard .hc-ey{font:800 .72rem/1 'Figtree',system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9C6B1F;margin:0 0 4px}" +
+      ".hcard h3{margin:0;font:900 1.45rem/1.05 'Big Shoulders Display',Impact,sans-serif;text-transform:uppercase;color:#2B2730}" +
+      ".hcard .hc-sub{margin:4px 0 0;font-size:.88rem;color:#5A5360}.hcard .hc-sub .r{color:#B3263A}" +
+      ".hcard .hc-bio{margin:8px 0 0;font-size:.95rem;line-height:1.4}" +
+      ".hcard .hc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.hcard .hc-chips span{font-size:.76rem;padding:3px 8px;border-radius:999px;background:rgba(30,99,71,.1);color:#1E6347}" +
+      ".hcard .hc-badges{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:.8rem}.hcard .hc-badges .v{padding:2px 8px;border-radius:999px;background:#2B2730;color:#E8C46A;font-weight:700}" +
+      ".hcard .hc-badges .st{font-size:1.15rem}.hcard .hc-badges .stamp{font-weight:800;color:#9B1B30;border:1.5px solid currentColor;border-radius:4px;padding:1px 5px;font-size:.7rem;transform:rotate(-3deg)}" +
+      ".hcard .hc-foot{margin:8px 0 0;font-size:.78rem;color:#6B6470}.hcard .hc-ex{position:absolute;top:10px;right:10px;font:700 .68rem 'Figtree',sans-serif;padding:3px 8px;border-radius:999px;background:#2B2730;color:#E8C46A}" +
+      "@media (max-width:480px){.hcard{grid-template-columns:92px 1fr;gap:12px;padding:12px}.hcard .hc-ph{width:92px}.hcard h3{font-size:1.25rem}}";
+    document.head.appendChild(s);
+  }
+  function hostCard(h, o) {
+    o = o || {}; if (!h) return ""; hostStyle();
+    var su = HSUIT[h.suit] || null, ex = !!o.example;
+    var ill = '<span class="hc-ill" style="--hc1:' + hesc(h.c1 || "#2F8A62") + ";--hc2:" + hesc(h.c2 || "#163F2E") + '"><i>' + hesc(h.emoji || (su ? su[0] : "♠")) + "</i><b>" + hesc((h.name || "?").charAt(0)) + "</b></span>";
+    var ph = '<div class="hc-ph"' + (h.photo ? ' style="background-image:url(' + hesc(h.photo) + ')"' : "") + ">" + (h.photo ? "" : ill) + (su ? '<span class="hc-pip">A' + su[0] + "</span>" : "") + "</div>";
+    var badges = [];
+    if (h.photo_verified) badges.push('<span class="v">📷 Photo ✓</span>'); if (h.id_verified) badges.push('<span class="v">🪪 ID ✓</span>');
+    if (h.founder_no) badges.push('<span class="stamp">★ First 1,000</span>');
+    (h.bumpers || []).forEach(function (k) { if (k === "pineapple") return; if (window.SFBumpers) badges.push(window.SFBumpers.html(k, {})); });
+    (h.stickers || []).forEach(function (k) { if (HSTK[k]) badges.push('<span class="st">' + HSTK[k] + "</span>"); else if (k === "first1000") badges.push('<span class="stamp">Founding Player</span>'); else if (/^ref\d+$/.test(k)) badges.push('<span class="stamp">Invite №' + k.slice(3) + "</span>"); });
+    (h.extras || []).forEach(function (x) { badges.push('<span class="st">' + hesc(x) + "</span>"); });
+    return '<div class="hcard" role="group" aria-label="Host card">' + ph + "<div>" + (ex ? '<span class="hc-ex">Example · fictional</span>' : "") +
+      '<p class="hc-ey">' + (o.label || "Your Host") + "</p><h3>" + hesc(h.name || "Host") + (h.age ? ", " + hesc(h.age) : "") + "</h3>" +
+      '<p class="hc-sub">' + (h.handle ? "@" + hesc(h.handle) : "") + (su ? (h.handle ? " · " : "") + '<span class="' + (su[2] ? "r" : "") + '">' + su[0] + " " + su[1] + "</span>" : "") + (h.city ? " · " + hesc(h.city) : "") + "</p>" +
+      (h.bio ? '<p class="hc-bio">' + hesc(h.bio) + "</p>" : "") +
+      ((h.interests || []).length ? '<div class="hc-chips">' + h.interests.slice(0, 5).map(function (x) { return "<span>" + hesc(x) + "</span>"; }).join("") + "</div>" : "") +
+      (badges.length ? '<div class="hc-badges">' + badges.join("") + "</div>" : "") +
+      '<p class="hc-foot">' + (h.since ? "Playing since " + hesc(h.since) : "") + (h.hosting > 1 ? " · Hosts " + hesc(h.hosting) + " Private Tables" : "") + (ex ? (h.since ? " · " : "") + "A sample host so you can see how it works" : "") + "</p></div></div>";
+  }
   window.SFCasino = { ICON_NAMES: ICON_NAMES, artUrl: artUrl, FELTS: FELTS, RAILS: RAILS, SHAPES: SHAPES, THEMES: THEMES, AMENITIES: AMENITIES, KIND_FELT: KIND_FELT,
-    render: function (el, c, o) { style(); render(el, c, o); }, svg: function (c, o) { style(); return tableSVG(c, o); }, entry: entry };
+    render: function (el, c, o) { style(); render(el, c, o); }, svg: function (c, o) { style(); return tableSVG(c, o); }, entry: entry, hostCard: hostCard };
 })();

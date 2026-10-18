@@ -444,6 +444,8 @@ This agreement is between **SuiteFace Inc., a Florida corporation**, and the bus
 4. I understand SuiteFace reviews every Private Table before it opens and may rename, pause or close it. If it's rejected, I can rename and resubmit free or ask for a refund within 30 days. Otherwise these fees are non-refundable except where the law requires.
 5. I'll hold my games in public places, follow the House Rules and Safety Guide, never charge members to join through SuiteFace, and remove or report anyone who makes the group unsafe.
 6. Who may join (everyone, men or women), how many seats there are, and whether I approve requests are my choices, and I'll apply them fairly. I won't use the Private Table to sell, solicit money, recruit for schemes, or harass anyone.
+7. **My Host card is public.** Anyone who visits my Private Table, including visitors who haven't joined, can see my Host card: my first name, age, @handle, suit, city, bio, interests, verification badges and the stickers on my card. It never shows my last name, address, contact details or what I'm looking for in dating. I can stop showing it by closing the table.
+8. **Seating.** I choose how seats fill: **first come, first play** (open seats go to whoever joins first, then a waitlist) or **reserved seats** (I save seats for players by @handle, and everyone else asks for a seat). A saved seat counts as taken until it's claimed, released or expires.
 
 
 

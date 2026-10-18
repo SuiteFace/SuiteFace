@@ -3604,7 +3604,25 @@
       { id: "ex13", kind: "lifestyle", name: "Pineapple Social", about: "A welcoming social for open-minded couples and singles, 21+. Meet and talk in a public lounge. No explicit content.", who: "everyone", join_mode: "request", seats: 20, seated: 11, style: { felt: "plum", rail: "gold", shape: "oval", amenities: ["late_night"], tagline: "Good company only", city: "Birmingham, AL (35244)" }, tables: [{ name: "Lounge Night", meets: "2nd Sat 8pm" }] },
       { id: "ex14", kind: "other", name: "Highway 280 Dog Pack", about: "Dog owners who like walks, patios and other dog owners.", who: "everyone", join_mode: "open", seats: 30, seated: 19, style: { felt: "olive", rail: "walnut", shape: "round", themes: ["animal", "outdoors"], amenities: ["pets", "outdoor_seating", "free"], tagline: "Who's a good table", city: "Birmingham, AL (35242)", icon: "paw" }, tables: [{ name: "Patio Pups", meets: "Sun 2pm" }] }
     ];
-    EXAMPLES.forEach(function (c, i) { c.example = true; c.zips = [EXZ[i % EXZ.length]]; c.members = (c.seated || 0) + 1; c.host_handle = null; });
+    /* Each example table's Host card, written to fit the table. Fictional and illustrated (no photos), so an example host
+       can never be mistaken for a real player or recognized as a House Card at the Bluff Table. */
+    var EX_HOST = {
+      ex1: { name: "Renée", age: 41, suit: "heart", city: "Hoover, AL", emoji: "🍽️", c1: "#2F8A62", c2: "#163F2E", bio: "Moved here for work four years ago and made it my mission that nobody eats Friday dinner alone. I'll save you a seat.", interests: ["Pickleball", "Supper clubs", "Trivia", "Patios"], extras: ["🎲"], seating: "first_come" },
+      ex2: { name: "Calvin", age: 47, suit: "spade", city: "Inverness, AL", emoji: "☕", c1: "#7A2A36", c2: "#3A1218", bio: "Husband, dad of three, deacon. Strong coffee, open Bibles and honest talk. Proverbs 27:17.", interests: ["Bible study", "Coffee", "Fatherhood", "Grilling"], bumpers: ["veteran"], seating: "reserved" },
+      ex3: { name: "Ruth", age: 58, suit: "heart", city: "Cahaba Heights, AL", emoji: "🕊️", c1: "#6E3A9E", c2: "#2E1442", bio: "Retired nurse. I pray best with a cup of tea and other people. Fifteen minutes, every weekday, all welcome.", interests: ["Prayer", "Gardening", "Hymns", "Tea"], bumpers: ["nurse", "retired"], seating: "first_come" },
+      ex4: { name: "Darnell", age: 36, suit: "club", city: "Highway 280, AL", emoji: "🧤", c1: "#5E6B2E", c2: "#2A3014", bio: "Project manager by day, Saturday volunteer by choice. I bring the gloves and the donuts. You bring a friend.", interests: ["Volunteering", "Habitat builds", "Food bank", "Donuts"], bumpers: ["owner"], seating: "first_come" },
+      ex5: { name: "Divya", age: 29, suit: "club", city: "Birmingham, AL", emoji: "🎲", c1: "#5B2A6E", c2: "#22102B", bio: "Software tester who will absolutely teach you Wingspan. Snacks are sacred. Sore losers get extra snacks.", interests: ["Board games", "Card games", "Puzzles", "Snacks"], extras: ["🎲", "🪙"], seating: "first_come" },
+      ex6: { name: "Caroline", age: 34, suit: "diamond", city: "Mountain Brook, AL", emoji: "🏛️", c1: "#7A2A36", c2: "#3A1218", bio: "Proud alum, prouder connector. Tailgates, service days and the occasional networking coffee. Every letter welcome.", interests: ["Networking", "Tailgates", "Philanthropy", "Football"], bumpers: ["college"], seating: "reserved" },
+      ex7: { name: "James", age: 31, suit: "diamond", city: "Homewood, AL", emoji: "🥂", c1: "#3A3540", c2: "#18161C", bio: "Moved here after grad school knowing no one. Now I know every good brunch spot. Seats go fast, so I save them for regulars.", interests: ["Brunch", "Alumni events", "Coffee", "Travel"], bumpers: ["masters"], seating: "reserved" },
+      ex8: { name: "Evelyn", age: 52, suit: "spade", city: "Liberty Park, AL", emoji: "📚", c1: "#2F8A62", c2: "#163F2E", bio: "High school English teacher with strong opinions about endings. Read the book, bring your take, pour what you like.", interests: ["Books", "Bourbon", "Debate", "Jazz"], bumpers: ["educator"], seating: "reserved" },
+      ex9: { name: "Tyrell", age: 38, suit: "club", city: "Pelham, AL", emoji: "🏃", c1: "#4D6B5E", c2: "#1E2E27", bio: "Physical therapist and trail regular. Easy pace, lots of talking, nobody gets left behind. Ever.", interests: ["Trail running", "Oak Mountain", "Stretching", "Tacos"], bumpers: ["coach"], seating: "first_come" },
+      ex10: { name: "Lucia", age: 44, suit: "heart", city: "Hoover, AL", emoji: "🎨", c1: "#B8673A", c2: "#5A2C14", bio: "Muralist and art teacher. If you can hold a brush, you can paint with us. If you can't, that's funnier.", interests: ["Painting", "Wine", "Murals", "Music"], bumpers: ["educator"], extras: ["🎨"], seating: "first_come" },
+      ex11: { name: "Hannah", age: 33, suit: "heart", city: "Chelsea, AL", emoji: "🧸", c1: "#B5546E", c2: "#5A1F30", bio: "Mom of two under five and a big believer that parents need friends too. Park dates, swaps and real advice.", interests: ["Playdates", "Swaps", "Coffee", "Parks"], seating: "reserved" },
+      ex12: { name: "Nico", age: 35, suit: "diamond", city: "Birmingham, AL", emoji: "🥂", c1: "#8E2230", c2: "#3A0E14", bio: "Event host and part-time DJ. Flirty, fun and respectful, in that order of fun. ID-verified adults only.", interests: ["Music", "Dancing", "Cocktails", "Speed dating"], seating: "reserved" },
+      ex13: { name: "Dana", age: 42, suit: "diamond", city: "Birmingham, AL", emoji: "🌴", c1: "#8C6A1E", c2: "#3B2C0A", bio: "Social hostess with a warm welcome for open-minded couples and singles. Public lounge, good conversation, clear boundaries.", interests: ["Socials", "Travel", "Wine", "Live music"], seating: "reserved" },
+      ex14: { name: "Mike", age: 49, suit: "spade", city: "Greystone, AL", emoji: "🐾", c1: "#5E6B2E", c2: "#2A3014", bio: "Two rescue labs, one patient wife and a standing Saturday walk. Dog-friendly patios after. Treats on me.", interests: ["Dogs", "Walks", "Patios", "Rescue"], bumpers: ["retired"], seating: "first_come" }
+    };
+    EXAMPLES.forEach(function (c, i) { c.example = true; c.zips = [EXZ[i % EXZ.length]]; c.members = (c.seated || 0) + 1; c.host_handle = null; var h = EX_HOST[c.id]; if (h) { c.host = Object.assign({ since: 2026 }, h); c.seating = h.seating; } });
     var exOn = true; rpc("example_tables_on", {}).then(function (r) { exOn = !r || r.on !== false; }, function () { });
     var kindPick = "", lastList = [];
     function live() { return !!window.SF_LIVE; }
@@ -3700,9 +3718,11 @@
       var st = example ? ["ex", "👀 Example table", "Walk in and look around ›", "walk"]
         : c.my_status === "host" ? ["in", "♠ You host this", "Run your table ›", "open"]
         : c.my_status === "member" ? ["in", "✓ You're seated", "Walk in ›", "walk"]
+        : c.my_hold ? ["open", "🎟 A seat is saved for you", "Take your seat ›", "join"]
         : c.my_status === "requested" ? ["wait", "⏳ Request sent", "The Host will let you in", ""]
-        : full ? ["full", "Full right now", "See the table ›", "open"]
-        : c.join_mode === "open" ? ["open", "🟢 Open now", "Join free ›", "join"]
+        : full ? ["full", "Full right now", "Join the waitlist ›", "join"]
+        : c.seating === "reserved" ? ["ask", "🔒 Reserved seating", "Ask for a seat ›", "join"]
+        : c.join_mode === "open" ? ["open", "🟢 Open now · first come, first play", "Join free ›", "join"]
         : ["ask", "🟡 Host approves", "Ask to join ›", "join"];
       return '<span class="cascta cs-' + st[0] + '"><span class="csstat">' + st[1] + "</span>" + (st[3] ? '<span class="csgo" data-casgo="' + st[3] + '">' + st[2] + "</span>" : '<span class="csnote">' + st[2] + "</span>") + "</span>";
     }
@@ -3722,7 +3742,7 @@
       call("casino_search", { p_zip: zip || null, p_kind: kindPick || null, p_q: q || null }).then(function (r) {
         r = r || []; show(r);
         if (r.length) call("casino_styles", { p_ids: r.map(function (x) { return x.id; }) }).then(function (st) { (st || []).forEach(function (x) { r.forEach(function (c) { if (c.id === x.id) c.style = x.style; }); }); }, function () { });
-        if (r.length) call("casino_seats", { p_ids: r.map(function (x) { return x.id; }) }).then(function (sv) { (sv || []).forEach(function (x) { r.forEach(function (c) { if (c.id === x.id) { c.seats = x.seats; c.seated = x.seated; } }); }); if (lastList === r) show(r); }, function () { });
+        if (r.length) call("casino_seats_v2", { p_ids: r.map(function (x) { return x.id; }) }).then(function (sv) { (sv || []).forEach(function (x) { r.forEach(function (c) { if (c.id === x.id) { c.seats = x.seats; c.seated = x.seated; c.seating = x.seating; c.my_hold = x.my_hold; } }); }); if (lastList === r) show(r); }, function () { });
         if (r.length) call("casino_coverage", { p_ids: r.map(function (x) { return x.id; }) }).then(function (cv) { (cv || []).forEach(function (x) { r.forEach(function (c) { if (c.id === x.id) { c.scope = x.scope; c.states = x.states; } }); }); }, function () { });
       }, function () { show([], "Private Tables couldn't load right now."); });
     }
@@ -3746,18 +3766,20 @@
       var m = modal((SC ? '<div id="cjScene"></div>' : '<div class="casign big" aria-hidden="true"><span>' + esc(kindLabel(c.kind)) + "</span><b>" + esc(c.name) + "</b><span>Host @" + esc(c.host_handle || "host") + "</span></div>") +
         '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · " + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + (example ? ' · <a href="private-table.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="private-table.html?c=' + encodeURIComponent(c.id) + '">Walk in to the table ›</a>') + "</p>" +
         (c.about ? '<p class="lede" style="margin:12px 0 6px">' + esc(c.about) + "</p>" : "") +
-        '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "The Host approves each request") + " · " + (seatsLine(c) || (c.members || 1) + " members") + " · " + esc(reach(c)) + "</p>" +
+        '<div id="cjHost">' + (example && c.host && SC && SC.hostCard ? SC.hostCard(c.host, { example: true }) : "") + "</div>" +
+        '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.seating === "reserved" ? "Reserved seating: the Host saves seats for players" : c.join_mode === "open" ? "First come, first play" : "The Host approves each request") + " · " + (seatsLine(c) || (c.members || 1) + " members") + " · " + esc(reach(c)) + "</p>" +
         '<h4 style="margin:14px 0 6px">Games</h4><ul class="castbl">' + (c.tables || []).map(function (t) { return "<li><b>" + esc(t.name) + "</b>" + (t.meets ? "<span>" + esc(t.meets) + "</span>" : "") + "</li>"; }).join("") + "</ul>" +
         '<p class="hint">Meet in public places, and never send money to anyone. <a href="safety.html" target="_blank" rel="noopener">Safety Guide</a></p>' +
         '<span class="err" id="cjErr"></span><div class="row" style="margin-top:10px">' +
         (example ? '<p class="hint" style="flex-basis:100%;margin:0 0 6px">This is a fictional example, so it can\'t be joined. Real tables near 35242 replace the examples as members build them.</p><button class="btn gold" type="button" data-build-casino>Build one like it · $21</button>' :
           host ? '<button class="btn gold" type="button" id="cjManage">Run this Private Table</button>' :
           c.my_status === "member" || c.my_status === "requested" ? '<button class="btn ghost" type="button" id="cjLeave">' + (c.my_status === "member" ? "Leave this table" : "Cancel request") + "</button>" :
-          '<button class="btn gold" type="button" id="cjJoin">' + (c.join_mode === "open" ? "Join free" : "Ask to join") + "</button>") +
+          '<button class="btn gold" type="button" id="cjJoin">' + (c.my_hold ? "Take your saved seat" : c.seats != null && (c.seated || 0) >= c.seats ? "Join the waitlist" : c.seating === "reserved" ? "Ask for a seat" : c.join_mode === "open" ? "Join free" : "Ask to join") + "</button>") +
         '<button class="btn ghost" type="button" data-close>Close</button></div>');
       if (SC) SC.render($("#cjScene", m), c);
       var dl = $("[data-democas]", m); if (dl) dl.addEventListener("click", function () { try { sessionStorage.setItem("sf.demoCasino", JSON.stringify(Object.assign({}, c, { my_status: null, status: "open" }))); } catch (e) { } });
       if (example) return;
+      if (SC && SC.hostCard) call("casino_host_card", { p_casino: c.id }).then(function (h) { var hb = $("#cjHost", m); if (hb && h) hb.innerHTML = SC.hostCard(h); }, function () { });
       if ($("#cjJoin", m)) $("#cjJoin", m).onclick = function () {
         if (!live()) { needLogin("tables"); return; }
         if (c.kind === "flirty18" && !$("#cjJoin", m).__ok) {
@@ -3765,7 +3787,7 @@
           if (!confirm("18+ Flirty table rules:\n\n• Adults only. ID-verified members only.\n• Flirty and suggestive is fine when everyone is into it. Stop the moment anyone isn't.\n• No nudity, no sexual images and no explicit sexual content, ever.\n• No asking for or offering money, gifts or meetups for anything sexual.\n\nBreak a rule and you're banned for life, with no refund, and your card becomes a Joker. Join?")) return;
           jb.__ok = true;
         }
-        call("join_casino", { p_casino: c.id }).then(function (st) { closeModal(); toast(st === "member" ? "You're in! Welcome to " + c.name + "." : "Request sent. The Host will let you in."); find(); }, function (e) {
+        call("join_casino", { p_casino: c.id }).then(function (st) { closeModal(); toast(st === "member" ? "You're in! Welcome to " + c.name + "." : st === "waitlist" ? "It's full right now, so you're on the waitlist. The Host can add seats or let you in." : c.seating === "reserved" ? "Asked for a seat. The Host saves seats for players." : "Request sent. The Host will let you in."); find(); }, function (e) {
           if (/Sign-up Agreement/i.test(e.message)) { window.SFSign.require("signup", function () { $("#cjJoin", m).click(); }); return; }
           $("#cjErr", m).textContent = e.message; });
       };
@@ -3904,6 +3926,11 @@
       var m = modal('<h3 style="font-size:1.8rem">Run ' + esc(c.name) + '</h3><p class="hint">' + ({ unpaid: "🚧 Under construction. Edit anything below, then tap Finish & pay when it's ready.", review: "Paid. Waiting for the name check; you can set up games now.", open: "Open on the floor.", rejected: "Not approved: " + (c.review_note || "rename and resubmit for free.") }[c.status] || "") + "</p>" +
         '<h4>Members &amp; requests</h4><div id="cmPeople" class="cmpeople"><p class="hint">Loading…</p></div>' +
         '<h4>Seats</h4><div class="casbar"><input type="number" id="cmSeats" min="2" max="52" value="' + (c.seats || 12) + '" aria-label="Seats at your table, not counting you"><button class="btn ghost sm" type="button" id="cmSeatsGo">Save seats</button></div><p class="hint">' + (c.status === "unpaid" ? "12 included; extra seats are $2.10 each at checkout." : "You've paid for " + (c.seats_paid || 12) + " seats. More are $2.10 each, up to 52.") + "</p>" +
+        '<h4>Seating</h4><div class="casbar"><label class="sr" for="cmSeating">How seats fill</label><select id="cmSeating"><option value="first_come">First come, first play</option><option value="reserved">Reserved seats</option></select><button class="btn ghost sm" type="button" id="cmSeatingGo">Save seating</button></div>' +
+        '<p class="hint" id="cmSeatingHint">First come, first play: open seats go to whoever joins first. Reserved: you save seats for players by @handle; everyone else asks for a seat. Saved seats count as taken, so you can\'t be overbooked.</p>' +
+        '<div class="cmholds"><h5 style="margin:10px 0 6px">Saved seats</h5><div id="cmHolds"><p class="hint">Loading…</p></div>' +
+        '<div class="casbar cmholdform"><label class="sr" for="cmHoldH">Player @handle</label><input type="text" id="cmHoldH" maxlength="40" placeholder="@handle" autocapitalize="none"><label class="sr" for="cmHoldD">Hold for</label><select id="cmHoldD"><option value="1">Hold 1 day</option><option value="3">Hold 3 days</option><option value="7" selected>Hold 7 days</option><option value="30">Hold 30 days</option><option value="0">Until they arrive</option></select>' +
+        '<input type="text" id="cmHoldN" maxlength="120" placeholder="Note (optional): For Friday dinner"><button class="btn gold sm" type="button" id="cmHoldGo">Save a seat</button></div></div>' +
         '<h4>Add a game</h4><div class="casbar"><input type="text" id="cmTName" maxlength="40" placeholder="Saturday Service"><input type="text" id="cmTMeets" maxlength="120" placeholder="Sat 9am · food bank"><button class="btn ghost sm" type="button" id="cmTAdd">Add game</button></div>' +
         '<h4>Add ZIP codes · $2.10 each</h4><div class="casbar"><input type="text" id="cmZips" maxlength="60" placeholder="35212, 35213"><button class="btn ghost sm" type="button" id="cmZipGo">Pay &amp; add</button></div>' +
         (c.status === "rejected" ? '<h4>Rename &amp; resubmit (free)</h4><div class="casbar"><input type="text" id="cmRename" maxlength="40" value="' + esc(c.name) + '"><button class="btn ghost sm" type="button" id="cmRenameGo">Resubmit</button></div>' : "") +
@@ -3920,6 +3947,17 @@
         }, function (e) { err.textContent = e.message; });
       }
       people();
+      function holds() {
+        call("casino_seat_holds_list", { p_casino: c.id }).then(function (rows) {
+          $("#cmHolds", m).innerHTML = (rows || []).length ? (rows || []).map(function (h) { return '<div class="cmrow"><span>🎟 @' + esc(h.handle) + (h.name ? " · " + esc(h.name) : "") + (h.note ? ' · <i>' + esc(h.note) + "</i>" : "") + ' · <small>' + (h.expires_at ? "held until " + new Date(h.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "held until they arrive") + '</small></span><button class="chip sm" type="button" data-unhold="' + h.member_id + '">Release</button></div>'; }).join("") : '<p class="hint">No saved seats yet.</p>';
+        }, function (e) { $("#cmHolds", m).innerHTML = '<p class="hint">' + esc(e.message) + "</p>"; });
+      }
+      holds();
+      call("casino_floor", { p_id: c.id }).then(function (f) { if (f && f.seating) { c.seating = f.seating; $("#cmSeating", m).value = f.seating; } }, function () { });
+      $("#cmSeatingGo", m).onclick = function () { var v = $("#cmSeating", m).value; call("set_casino_seating", { p_casino: c.id, p_mode: v }).then(function () { c.seating = v; toast(v === "reserved" ? "Reserved seats on. Save seats for your players below." : "First come, first play."); find(); }, function (x) { err.textContent = x.message; }); };
+      $("#cmHoldGo", m).onclick = function () { var hd = $("#cmHoldH", m).value.trim(); if (!hd) { err.textContent = "Enter the player's @handle."; return; }
+        call("hold_casino_seat", { p_casino: c.id, p_handle: hd, p_days: parseInt($("#cmHoldD", m).value, 10), p_note: $("#cmHoldN", m).value }).then(function (r) { err.textContent = ""; $("#cmHoldH", m).value = $("#cmHoldN", m).value = ""; toast(r === "seated" ? "They'd already asked, so they're seated now." : "Seat saved. It's waiting for them when they open your table."); holds(); people(); find(); }, function (x) { err.textContent = x.message; }); };
+      $("#cmHolds", m).addEventListener("click", function (e) { var b = e.target.closest("[data-unhold]"); if (!b) return; call("release_casino_seat", { p_casino: c.id, p_member: b.getAttribute("data-unhold") }).then(function () { toast("Seat released."); holds(); find(); }, function (x) { err.textContent = x.message; }); });
       $("#cmPeople", m).addEventListener("click", function (e) { var b = e.target.closest("[data-act]"); if (!b) return; call("decide_casino_member", { p_casino: c.id, p_member: b.getAttribute("data-mid"), p_action: b.getAttribute("data-act") }).then(people, function (x) { err.textContent = x.message; }); });
       $("#cmTAdd", m).onclick = function () { var n = $("#cmTName", m).value.trim(); if (n.length < 2) { err.textContent = "Name the game."; return; } call("save_casino_table", { p_casino: c.id, p_name: n, p_meets: $("#cmTMeets", m).value.trim() }).then(function () { toast("Game added."); $("#cmTName", m).value = $("#cmTMeets", m).value = ""; loadMine(); }, function (x) { err.textContent = x.message; }); };
       $("#cmZipGo", m).onclick = function () { var z = ($("#cmZips", m).value.match(/\d{5}/g) || []); if (!z.length) { err.textContent = "Enter ZIP codes, separated by commas."; return; } call("add_casino_zips", { p_casino: c.id, p_zips: z }).then(function (r) { pay("zips", c.id, r.order, err); }, function (x) { err.textContent = x.message; }); };
@@ -3940,6 +3978,17 @@
       wireDesigner(m, function () { return { id: c.id, name: c.name, kind: c.kind, seats: c.seats || 12, seated: c.seated || 0, tables: c.tables || [] }; }, $("#rdScene", m));
       $("#rdSave", m).onclick = function () { call("set_casino_style", { p_casino: c.id, p_style: readDesign(m) }).then(function (st) { c.style = st; return saveTableArt(m, c.id).then(function () { closeModal(); toast("New look saved. Walk in to see it."); loadMine(); find(); }); }, function (x) { $("#rdErr", m).textContent = x.message; }); };
     }
+    // Players see any seat a Host has saved for them, with a one-tap way in.
+    function loadHolds() {
+      var list = $("#casList"); if (!list || !live()) return;
+      var box = $("#casHolds"); if (!box) { box = document.createElement("div"); box.id = "casHolds"; list.parentNode.insertBefore(box, list); }
+      call("my_seat_holds", {}).then(function (rows) {
+        box.innerHTML = (rows || []).map(function (h) { return '<div class="casheld"><span>🎟 <b>' + esc(h.host_handle ? "@" + h.host_handle : "A Host") + "</b> saved you a seat at <b>" + esc(h.name) + "</b>" + (h.note ? " · " + esc(h.note) : "") + (h.expires_at ? ' <small>· until ' + new Date(h.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "</small>" : "") + '</span><button class="btn gold sm" type="button" data-takeseat="' + esc(h.casino_id) + '">Take your seat</button></div>'; }).join("");
+      }, function () { });
+      if (!box.__wired) { box.__wired = true; box.addEventListener("click", function (e) { var b = e.target.closest("[data-takeseat]"); if (!b) return; b.disabled = true;
+        call("join_casino", { p_casino: b.getAttribute("data-takeseat") }).then(function (st) { toast(st === "member" ? "You're seated. Welcome to the table!" : "Request sent."); loadHolds(); find(); location.href = "private-table.html?c=" + encodeURIComponent(b.getAttribute("data-takeseat")); }, function (x) { b.disabled = false; toast(x.message); }); }); }
+    }
+    document.addEventListener("sf:live", function () { setTimeout(loadHolds, 600); });
     function loadMine() {
       var box = $("#casMine"); if (!live()) { box.hidden = true; return; }
       window.SF_LIVE.client.from("casinos").select("id,name,kind,about,zips,who,join_mode,status,review_note,style,scope,states,seats,seats_paid").eq("host_id", window.SF_LIVE.memberId()).neq("status", "closed").then(function (r) {

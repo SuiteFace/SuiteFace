@@ -110,9 +110,11 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
 .repbox{width:min(460px,100%);background:#FFFDF8;color:#2B2730;border-radius:18px;padding:20px;display:grid;gap:10px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
 .repbox label{display:grid;gap:4px;font-weight:600}.repbox select,.repbox textarea,.repbox input{font:inherit;padding:.5rem;border-radius:10px;border:1px solid rgba(43,39,48,.25)}
 .repbox .hint{font-size:.85rem;color:#5B5560;margin:0}
+.seatnote{margin:12px 0 0;padding:10px 14px;border-radius:12px;background:rgba(232,196,106,.14);border:1px solid rgba(232,196,106,.55)}
+.seatmode{margin-top:10px}
 </style>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792297642">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792297642">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792328773">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792328773">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://suiteface.com/private-table.html">
 <meta property="og:type" content="website">
@@ -132,9 +134,10 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   <p class="note" id="status">Setting the table…</p>
 </main>
 <footer>© 2026 SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™ and SuiteFace Private Tables™ are trademarks of SuiteFace Inc. Private Tables are built and hosted by SuiteFace players. Always meet in public. In an emergency, call 911.</footer>
-<script src="assets/js/config.js?v=1792297642"></script>
-<script src="assets/js/live.js?v=1792297642"></script>
-<script src="assets/js/casino-scene.js?v=1792297642"></script>
+<script src="assets/js/config.js?v=1792328773"></script>
+<script src="assets/js/live.js?v=1792328773"></script>
+<script src="assets/js/bumpers.js?v=1792328773"></script>
+<script src="assets/js/casino-scene.js?v=1792328773"></script>
 <script>
 (function () {
   var CFG = window.SUITEFACE_CONFIG || {}, main = document.getElementById("main");
@@ -159,11 +162,15 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
     var host = c.my_status === "host";
     main.innerHTML = '<div class="door" id="door"><div id="scene"></div><div class="doors" id="doors" aria-hidden="true"><i></i><i></i></div></div>' +
       '<div class="head"><div><p class="meta">' + esc(KIND[c.kind] || "Private Table") + " · " + (c.host_handle ? "Hosted by @" + esc(c.host_handle) : "Hosted by a member") + " · " + (c.seats ? Math.max(0, c.seats - (c.seated || 0)) + " of " + c.seats + " seats open" : c.members + " member" + (c.members === 1 ? "" : "s")) + " · " + esc(WHO[c.who] || "") + "</p><h1>" + esc(c.name) + "</h1></div>" +
-      '<div class="row">' + (host ? '<a class="btn gold" href="./#private-tables">Run this table</a>' : c.my_status === "member" ? '<span class="btn ghost" aria-disabled="true">You\'re in ✓</span>' : c.my_status === "requested" ? '<span class="btn ghost" aria-disabled="true">Request sent</span>' : '<button class="btn gold" id="join" type="button">' + (c.join_mode === "open" ? "Join free" : "Ask to join") + "</button>") + "</div></div>" +
-      (c.about ? '<p class="about">' + esc(c.about) + "</p>" : "") + '<p class="err" id="err" role="alert"></p>' +
+      '<div class="row">' + (host ? '<a class="btn gold" href="./#private-tables">Run this table</a>' : c.my_status === "member" ? '<span class="btn ghost" aria-disabled="true">You\'re in ✓</span>' : c.my_status === "requested" ? '<span class="btn ghost" aria-disabled="true">Request sent</span>' : '<button class="btn gold" id="join" type="button">' + (c.my_hold ? "Take your saved seat" : c.seats && (c.seated || 0) >= c.seats ? "Join the waitlist" : c.seating === "reserved" ? "Ask for a seat" : c.join_mode === "open" ? "Join free" : "Ask to join") + "</button>") + "</div></div>" +
+      (c.about ? '<p class="about">' + esc(c.about) + "</p>" : "") +
+      (c.my_hold && !host && c.my_status !== "member" ? '<p class="seatnote">🎟 The Host saved a seat for you. Tap <b>Take your saved seat</b>.</p>' : "") +
+      '<p class="note seatmode">' + (c.seating === "reserved" ? "🔒 Reserved seating: the Host saves seats for players. Everyone else can ask for a seat." : c.join_mode === "open" ? "🟢 First come, first play: open seats go to whoever joins first." : "🟡 The Host approves each player.") + "</p>" +
+      '<div id="hostCard">' + (c.example && c.host && window.SFCasino.hostCard ? window.SFCasino.hostCard(c.host, { example: true }) : "") + "</div>" + '<p class="err" id="err" role="alert"></p>' +
       '<h2 class="sub">Games</h2><div id="floor"></div>' +
       (c.status !== "open" ? '<p class="note">Only you can see this table until it passes its name check.</p>' : "") +
       '<p class="note">Games meet in public places. Never send money to anyone you meet. Covers ' + esc(c.scope === "national" ? "the whole United States" : c.scope === "states" && (c.states || []).length ? (c.states || []).join(", ") : "ZIP " + (c.zips || []).slice(0, 7).join(", ") + ((c.zips || []).length > 7 ? " and " + ((c.zips || []).length - 7) + " more" : "")) + ".</p>";
+    if (!c.example && c.id && window.SFCasino.hostCard) call("casino_host_card", { p_casino: c.id }).then(function (h) { var hb = document.getElementById("hostCard"); if (hb && h) hb.innerHTML = window.SFCasino.hostCard(h); }, function () { });
     window.SFCasino.render(document.getElementById("scene"), c);
     window.SFCasino.render(document.getElementById("floor"), c, { floor: true });
     // Live chat for each game: members of this table only.
@@ -179,7 +186,7 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
     var j = document.getElementById("join");
     if (j) j.onclick = function () {
       if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "tables"); } catch (e) { } location.href = "./?login=1#private-tables"; return; }
-      call("join_casino", { p_casino: c.id }).then(function (st) { toast(st === "member" ? "You're in! Welcome to " + c.name + "." : "Request sent. The Host will let you in."); load(); }, function (e) { document.getElementById("err").textContent = e.message; });
+      call("join_casino", { p_casino: c.id }).then(function (st) { toast(st === "member" ? "You're in! Welcome to " + c.name + "." : st === "waitlist" ? "It's full right now, so you're on the waitlist." : c.seating === "reserved" ? "Asked for a seat. The Host saves seats for players." : "Request sent. The Host will let you in."); load(); }, function (e) { document.getElementById("err").textContent = e.message; });
     };
   }
   function openChat(t, c) {
@@ -254,9 +261,9 @@ footer{border-top:1px solid rgba(250,247,240,.1);padding:24px 16px;text-align:ce
   setTimeout(go, window.__demo ? 0 : 700); // anonymous visitors don't wait long for a session
 })();
 </script>
-<script src="assets/js/gate.js?v=1792297642"></script>
-<script src="assets/js/fx.js?v=1792297642"></script>
+<script src="assets/js/gate.js?v=1792328773"></script>
+<script src="assets/js/fx.js?v=1792328773"></script>
 <p class="sf-credit" style="margin:0;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));text-align:center;font:600 .85rem/1.5 Figtree,system-ui,sans-serif;color:var(--muted,#A69DB0)">U.S. patent pending (USPTO). Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--gold-hi,#E8C46A);text-decoration:none;font-weight:800">GoFirehorseGo</a>.</p>
-<script src="/assets/js/slots.js?v=1792297642" defer></script>
+<script src="/assets/js/slots.js?v=1792328773" defer></script>
 </body>
 </html>

@@ -851,3 +851,5 @@ label.upl{cursor:pointer}
 .cs-ask .csgo,.cs-full .csgo,.cs-ex .csgo{background:transparent;color:#E8C46A;border:1.5px solid rgba(232,196,106,.6);box-shadow:none}
 .cs-open .csstat{color:#7FD3A0}.cs-ask .csstat{color:#E8C46A}.cs-full .csstat{opacity:.7}
 .csnote{font-size:.82rem;opacity:.75}
+.casheld{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:12px 16px;border-radius:14px;background:rgba(232,196,106,.12);border:1px solid rgba(232,196,106,.55)}
+.cmholdform{flex-wrap:wrap}.cmholdform input,.cmholdform select{flex:1 1 140px;min-width:0}
