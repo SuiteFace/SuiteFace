@@ -3565,12 +3565,29 @@
     var WHO = { everyone: "Everyone", men: "Men only", women: "Women only" };
     var US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","PR"];
     function reach(c) { return c.scope === "national" ? "Nationwide" : c.scope === "states" && (c.states || []).length ? (c.states || []).join(", ") : "ZIP " + (c.zips || []).slice(0, 7).join(", ") + ((c.zips || []).length > 7 ? " +" + ((c.zips || []).length - 7) : ""); }
+    /* EXAMPLE TABLES (fictional): one of every kind around ZIP 35242, so the room never looks empty.
+       Always labeled "Example", no real people, can't be joined. They switch off by themselves once 12 paying
+       members live within 25 miles of 35242 (example_tables_on in the database). */
+    var EXZ = ["35242", "35243", "35244", "35216", "35226", "35213", "35043"];
+    var EX_ART = "assets/brand/table-art-skyline.jpg", EX_SIGN = "assets/brand/suiteface-vegas-sign-heart-1600w.png";
     var EXAMPLES = [
-      { id: "ex1", seats: 12, seated: 8, style: { felt: "wine", rail: "walnut", shape: "oval", themes: ["christian"], amenities: ["coffee", "prayer_space", "free"], tagline: "Iron sharpens iron", welcome: "Pull up a chair, brother.", city: "Birmingham, AL" }, name: "Tuesday Prayer Brothers", kind: "faith", about: "A small group of Christian men. Coffee, Scripture and honest talk.", zips: ["35203", "35205", "35209"], who: "men", join_mode: "request", host_handle: "marcus.t", members: 9, tables: [{ name: "Tuesday Night Table", meets: "Tue 7pm · coffee shop" }, { name: "Saturday Service", meets: "Sat 9am · food bank" }] },
-      { id: "ex2", seats: 24, seated: 22, style: { felt: "plum", rail: "ebony", shape: "long", themes: ["games"], amenities: ["food", "late_night"], tagline: "Roll for initiative" }, name: "Magic City Game Night", kind: "games", about: "Board games, card games, snacks. Beginners welcome.", zips: ["35233", "35222"], who: "everyone", join_mode: "open", host_handle: "dana.rolls", members: 23, tables: [{ name: "Friday Strategy Table", meets: "Fri 7pm · game café" }] },
-      { id: "ex3", seats: 52, seated: 40, style: { felt: "olive", rail: "gold", shape: "oval", themes: ["service", "outdoors"], amenities: ["family", "free", "accessible"], tagline: "Many hands" }, name: "Southside Volunteers", kind: "service", about: "Monthly service projects around town. Bring a friend.", zips: ["35205", "35211"], who: "everyone", join_mode: "open", host_handle: "kels.helps", members: 41, tables: [{ name: "Park Cleanup Crew", meets: "1st Sat · 8am" }, { name: "Meal Packers", meets: "3rd Thu · 6pm" }] },
-      { id: "ex4", seats: 14, seated: 13, style: { felt: "charcoal", rail: "rose_gold", shape: "round", themes: ["alumni", "food"], amenities: ["food", "coffee"], tagline: "Once a grad, always a grad" }, name: "Alumni Brunch Club", kind: "alumni", about: "Grads who moved here and want a monthly brunch crew.", zips: ["35209", "35216"], who: "everyone", join_mode: "request", host_handle: "j.ortiz", members: 14, tables: [{ name: "Sunday Brunch", meets: "Last Sun · 11am" }] }
+      { id: "ex1", kind: "friendship", name: "Greystone Friday Friends", about: "New to the area? Friday dinners, pickleball and a standing invite to whatever's going on.", who: "everyone", join_mode: "open", seats: 24, seated: 17, style: { felt: "emerald", rail: "gold", shape: "oval", tagline: "Everybody needs a crew", city: "Birmingham, AL (35242)", amenities: ["food", "free"], welcome: "Pull up a chair. First dinner's on the house." }, tables: [{ name: "Friday Dinner", meets: "Fri 7pm · Lee Branch" }, { name: "Sunday Pickleball", meets: "Sun 9am · Veterans Park" }] },
+      { id: "ex2", kind: "faith", name: "Inverness Iron Sharpens Iron", about: "A small group of Christian men. Coffee, Scripture and honest talk.", who: "men", join_mode: "request", seats: 12, seated: 9, style: { felt: "wine", rail: "walnut", shape: "round", themes: ["christian"], amenities: ["coffee", "prayer_space", "free"], tagline: "Iron sharpens iron", city: "Birmingham, AL (35242)" }, tables: [{ name: "Tuesday Table", meets: "Tue 6:30am · coffee shop" }, { name: "Serve Saturday", meets: "First Sat · food pantry" }] },
+      { id: "ex3", kind: "prayer", name: "Cahaba Morning Prayer", about: "Fifteen quiet minutes of prayer before work, with anyone who wants to join.", who: "everyone", join_mode: "open", seats: 30, seated: 21, style: { felt: "plum", rail: "silver", shape: "oval", themes: ["faith"], amenities: ["prayer_space", "free", "accessible"], tagline: "Start the day still", city: "Birmingham, AL (35243)" }, tables: [{ name: "Weekday Prayer", meets: "Mon–Fri 6:45am · online" }] },
+      { id: "ex4", kind: "service", name: "280 Helping Hands", about: "Monthly service projects around Highway 280. Bring a friend and some gloves.", who: "everyone", join_mode: "open", seats: 52, seated: 38, style: { felt: "olive", rail: "gold", shape: "long", themes: ["service", "outdoors"], amenities: ["family", "free"], tagline: "Many hands, light work", city: "Birmingham, AL (35242)" }, tables: [{ name: "Park Cleanup", meets: "2nd Sat 8am" }, { name: "Meal Packing", meets: "Last Thu 6pm" }] },
+      { id: "ex5", kind: "games", name: "Magic City Game Night", about: "Board games, card games, snacks. Beginners always welcome.", who: "everyone", join_mode: "open", seats: 24, seated: 22, style: { felt: "plum", rail: "ebony", shape: "long", themes: ["games"], amenities: ["food", "late_night"], tagline: "Roll for initiative", city: "Birmingham, AL (35216)", img: EX_SIGN, img_area: "center", img_fit: "fit" }, tables: [{ name: "Thursday Strategy", meets: "Thu 7pm" }, { name: "Party Games", meets: "Sat 8pm" }] },
+      { id: "ex6", kind: "greek", name: "Over the Mountain Greek Alumni", about: "Fraternity and sorority alumni of every chapter. Networking, tailgates and service.", who: "everyone", join_mode: "request", seats: 52, seated: 31, style: { felt: "wine", rail: "gold", shape: "oval", themes: ["greek", "alumni"], amenities: ["food"], tagline: "Bonds for life", city: "Birmingham, AL (35213)" }, tables: [{ name: "Monthly Mixer", meets: "3rd Thu 6pm" }] },
+      { id: "ex7", kind: "alumni", name: "Alumni Brunch Club", about: "Grads who moved here and want a monthly brunch crew. Any school, any year.", who: "everyone", join_mode: "request", seats: 14, seated: 13, style: { felt: "charcoal", rail: "rose_gold", shape: "round", themes: ["alumni", "food"], amenities: ["food", "coffee"], tagline: "Once a grad, always a grad", city: "Birmingham, AL (35242)" }, tables: [{ name: "First Sunday Brunch", meets: "1st Sun 11am" }] },
+      { id: "ex8", kind: "club", name: "Liberty Park Book & Bourbon", about: "One book a month and a good conversation. Bourbon optional, opinions required.", who: "everyone", join_mode: "request", seats: 16, seated: 12, style: { felt: "emerald", rail: "walnut", shape: "round", amenities: ["late_night"], tagline: "Chapter and verse", city: "Birmingham, AL (35242)", icon: "star" }, tables: [{ name: "Book Night", meets: "Last Wed 7pm" }] },
+      { id: "ex9", kind: "sports", name: "Oak Mountain Trail Runners", about: "Easy, social trail runs. No one gets left behind, ever.", who: "everyone", join_mode: "open", seats: 40, seated: 27, style: { felt: "emerald", rail: "silver", shape: "long", themes: ["sports", "outdoors"], amenities: ["free", "pets"], tagline: "Run happy", city: "Pelham, AL (35124)", img: EX_ART, img_area: "full", img_fit: "fill" }, tables: [{ name: "Saturday Long Run", meets: "Sat 7am" }, { name: "Tuesday Hills", meets: "Tue 6pm" }] },
+      { id: "ex10", kind: "hobby", name: "Hoover Paint & Sip", about: "Paint along with a local artist. No talent required, laughs guaranteed.", who: "everyone", join_mode: "open", seats: 20, seated: 14, style: { felt: "desert", rail: "rose_gold", shape: "oval", themes: ["art"], amenities: ["coffee"], tagline: "Happy little accidents", city: "Hoover, AL (35226)" }, tables: [{ name: "Canvas Night", meets: "2nd Fri 7pm" }] },
+      { id: "ex11", kind: "parents", name: "Chelsea Parents Play Club", about: "Parents of little ones. Park meetups, swaps and a group chat that actually helps.", who: "everyone", join_mode: "request", seats: 30, seated: 26, style: { felt: "rose", rail: "gold", shape: "round", themes: ["parents"], amenities: ["family", "free", "accessible"], tagline: "It takes a village", city: "Chelsea, AL (35043)" }, tables: [{ name: "Park Morning", meets: "Wed 9:30am" }] },
+      { id: "ex12", kind: "flirty18", name: "Friday Flirt Night", about: "Adults only, ID-verified. A light speed-flirting game, then everyone mingles. Respect first, always.", who: "everyone", join_mode: "request", seats: 24, seated: 18, style: { felt: "wine", rail: "rose_gold", shape: "oval", amenities: ["late_night"], tagline: "Shuffle up and flirt", city: "Birmingham, AL (35242)" }, tables: [{ name: "Speed-Flirt Rounds", meets: "Fri 8pm" }] },
+      { id: "ex13", kind: "lifestyle", name: "Pineapple Social", about: "A welcoming social for open-minded couples and singles, 21+. Meet and talk in a public lounge. No explicit content.", who: "everyone", join_mode: "request", seats: 20, seated: 11, style: { felt: "plum", rail: "gold", shape: "oval", amenities: ["late_night"], tagline: "Good company only", city: "Birmingham, AL (35244)" }, tables: [{ name: "Lounge Night", meets: "2nd Sat 8pm" }] },
+      { id: "ex14", kind: "other", name: "Highway 280 Dog Pack", about: "Dog owners who like walks, patios and other dog owners.", who: "everyone", join_mode: "open", seats: 30, seated: 19, style: { felt: "olive", rail: "walnut", shape: "round", themes: ["animal", "outdoors"], amenities: ["pets", "outdoor_seating", "free"], tagline: "Who's a good table", city: "Birmingham, AL (35242)", icon: "paw" }, tables: [{ name: "Patio Pups", meets: "Sun 2pm" }] }
     ];
+    EXAMPLES.forEach(function (c, i) { c.example = true; c.zips = [EXZ[i % EXZ.length]]; c.members = (c.seated || 0) + 1; c.host_handle = null; });
+    var exOn = true; rpc("example_tables_on", {}).then(function (r) { exOn = !r || r.on !== false; }, function () { });
     var kindPick = "", lastList = [];
     function live() { return !!window.SF_LIVE; }
     function call(name, args) {
@@ -3594,13 +3611,34 @@
         '<div class="field"><span class="lbl">Good to know <span class="hint">(check all that apply)</span></span><div class="cdes-checks">' + SC.AMENITIES.map(function (t) { return '<label class="ck"><input type="checkbox" name="cdAm" value="' + t[0] + '"' + ((st.amenities || []).indexOf(t[0]) > -1 ? " checked" : "") + "> <span>" + esc(t[1]) + "</span></label>"; }).join("") + "</div></div>" +
         '<div class="cdes-grid"><div class="field"><label for="cdTag">Words on the felt</label><input type="text" id="cdTag" maxlength="80" value="' + esc(st.tagline || "") + '" placeholder="Iron sharpens iron"></div>' +
         '<div class="field"><label for="cdCity">City or area</label><input type="text" id="cdCity" maxlength="40" value="' + esc(st.city || "") + '" placeholder="Birmingham, AL"></div></div>' +
-        '<div class="field"><label for="cdWelcome">Welcome note from you</label><textarea id="cdWelcome" maxlength="280" rows="2" placeholder="Pull up a chair. All are welcome here.">' + esc(st.welcome || "") + "</textarea></div></fieldset>";
+        '<div class="field"><label for="cdWelcome">Welcome note from you</label><textarea id="cdWelcome" maxlength="280" rows="2" placeholder="Pull up a chair. All are welcome here.">' + esc(st.welcome || "") + "</textarea></div>" +
+        '<div class="cdes-grid"><div class="field"><label for="cdIcon">Center icon</label><select id="cdIcon">' + opt(SC.ICON_NAMES, st.icon || "auto") + "</select></div></div>" +
+        '<div class="field cdimg"><span class="lbl">Your image on the felt <span class="hint">(optional)</span></span>' +
+        '<input type="file" id="cdImg" accept="image/jpeg,image/png,image/webp" aria-label="Choose an image for your table">' +
+        (st.img ? '<label class="ck"><input type="checkbox" id="cdImgRm"> <span>Remove the current image</span></label>' : "") +
+        '<div class="cdes-grid"><div class="field"><label for="cdArea">Where</label><select id="cdArea">' + opt([["full", "The whole table"], ["center", "Just the center"]], st.img_area || "full") + '</select></div>' +
+        '<div class="field"><label for="cdFit">How it fits</label><select id="cdFit">' + opt([["fill", "Fill (crop to the table)"], ["fit", "Fit (show it all)"], ["focus", "Focus and zoom (pick a portion)"]], st.img_fit || "fill") + "</select></div></div>" +
+        '<div class="cdes-grid cdfocus"' + ((st.img_fit || "fill") === "focus" ? "" : " hidden") + '><div class="field"><label for="cdX">Left ↔ right</label><input type="range" id="cdX" min="0" max="100" value="' + (st.img_x == null ? 50 : st.img_x) + '"></div><div class="field"><label for="cdY">Top ↕ bottom</label><input type="range" id="cdY" min="0" max="100" value="' + (st.img_y == null ? 50 : st.img_y) + '"></div><div class="field"><label for="cdZ">Zoom</label><input type="range" id="cdZ" min="1" max="3" step="0.05" value="' + (st.img_zoom || 1) + '"></div></div>' +
+        '<p class="hint">JPEG, PNG or WebP up to 3 MB. It\'s cropped to your table\'s shape, and the card spots always stay on solid felt. Images show to others after a quick SuiteFace check. Use only photos you own or have permission to use; no people without their OK, no children, nothing explicit.</p></div></fieldset>';
     }
     function readDesign(m) {
       if (!$("#cdFelt", m)) return {};
       return { felt: $("#cdFelt", m).value, rail: $("#cdRail", m).value, shape: $("#cdShape", m).value, c1: $("#cdC1", m).value,
         themes: $$('input[name="cdTheme"]:checked', m).map(function (x) { return x.value; }), amenities: $$('input[name="cdAm"]:checked', m).map(function (x) { return x.value; }),
-        tagline: $("#cdTag", m).value.trim(), city: $("#cdCity", m).value.trim(), welcome: $("#cdWelcome", m).value.trim() };
+        tagline: $("#cdTag", m).value.trim(), city: $("#cdCity", m).value.trim(), welcome: $("#cdWelcome", m).value.trim(),
+        icon: $("#cdIcon", m) ? $("#cdIcon", m).value : "auto", img_area: $("#cdArea", m) ? $("#cdArea", m).value : "full", img_fit: $("#cdFit", m) ? $("#cdFit", m).value : "fill",
+        img_x: $("#cdX", m) ? +$("#cdX", m).value : 50, img_y: $("#cdY", m) ? +$("#cdY", m).value : 50, img_zoom: $("#cdZ", m) ? +$("#cdZ", m).value : 1,
+        img_remove: !!($("#cdImgRm", m) && $("#cdImgRm", m).checked),
+        img_preview: ($("#cdImgRm", m) && $("#cdImgRm", m).checked) ? null : (m.__imgUrl || m.__curImg || null) };
+    }
+    /* After a table's design is saved: upload a new felt image (if one was chosen) and send it for review. */
+    function saveTableArt(m, casinoId) {
+      var f = m.__imgFile; if (!f || !window.SF_LIVE || !window.SF_LIVE.client) return Promise.resolve(false);
+      if (f.size > 3145728) { toast("That image is over 3 MB. Pick a smaller one."); return Promise.resolve(false); }
+      var ext = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" })[f.type]; if (!ext) { toast("Use a JPEG, PNG or WebP image."); return Promise.resolve(false); }
+      var path = window.SF_LIVE.memberId() + "/" + (crypto.randomUUID ? crypto.randomUUID() : Date.now()) + "." + ext;
+      return window.SF_LIVE.client.storage.from("table-art").upload(path, f, { contentType: f.type }).then(function (r) { if (r.error) throw r.error; return call("submit_casino_art", { p_casino: casinoId, p_path: path }); })
+        .then(function () { toast("Image sent for a quick check. It shows to others once approved."); return true; }, function (x) { toast((x && x.message) || "The image didn't upload. Try again."); return false; });
     }
     function fillDesign(m, dz) {
       if (!$("#cdFelt", m) || !dz) return;
@@ -3608,11 +3646,13 @@
       $$('input[name="cdTheme"]', m).forEach(function (x) { x.checked = (dz.themes || []).indexOf(x.value) > -1; });
       $$('input[name="cdAm"]', m).forEach(function (x) { x.checked = (dz.amenities || []).indexOf(x.value) > -1; });
       $("#cdTag", m).value = dz.tagline || ""; $("#cdCity", m).value = dz.city || ""; $("#cdWelcome", m).value = dz.welcome || "";
+      if ($("#cdIcon", m) && dz.icon) $("#cdIcon", m).value = dz.icon; if ($("#cdArea", m) && dz.img_area) $("#cdArea", m).value = dz.img_area; if ($("#cdFit", m) && dz.img_fit) $("#cdFit", m).value = dz.img_fit;
     }
     function wireDesigner(m, getTable, previewEl) {
       if (!SC || !previewEl) return;
-      function draw() { var c = getTable(); c.style = readDesign(m); $("#cdCustom", m).hidden = c.style.felt !== "custom"; SC.render(previewEl, c); }
+      function draw() { var c = getTable(); if (m.__curImg === undefined) m.__curImg = (c.style && c.style.img) || null; c.style = readDesign(m); $("#cdCustom", m).hidden = c.style.felt !== "custom"; var fo = $(".cdfocus", m); if (fo) fo.hidden = c.style.img_fit !== "focus"; SC.render(previewEl, c); }
       m.__draw = draw;
+      var fi = $("#cdImg", m); if (fi) fi.addEventListener("change", function () { var f = fi.files[0]; if (m.__imgUrl) URL.revokeObjectURL(m.__imgUrl); m.__imgFile = f || null; m.__imgUrl = f ? URL.createObjectURL(f) : null; draw(); });
       m.addEventListener("input", function (e) { if (e.target.closest(".cdes") || /^cb(Name|Kind|Seats)$/.test(e.target.id)) draw(); });
       m.addEventListener("change", function (e) { if (e.target.closest(".cdes") || /^cb(Kind|Seats)$/.test(e.target.id)) draw(); });
       draw();
@@ -3628,18 +3668,22 @@
     function card(c, example) {
       var t = (c.tables || []);
       return '<button type="button" class="cascard' + (example ? " ex" : "") + '" data-cas="' + esc(c.id) + '">' +
+        (SC && c.style ? '<span class="casthumb" aria-hidden="true">' + SC.svg(c, { dark: true }) + "</span>" : "") +
+        (example ? '<span class="exbadge">Example · fictional</span>' : "") +
         '<span class="casmarq"><i>' + esc(KIND[c.kind] ? KIND[c.kind][1] : "🃏") + "</i>" + esc(c.name) + "</span>" +
         '<span class="casmeta">' + esc(kindLabel(c.kind)) + " · " + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "Host approves") + "</span>" +
         (c.about ? '<span class="casabout">' + esc(c.about) + "</span>" : "") +
         '<span class="castables">' + t.slice(0, 3).map(function (x) { return "<em>" + esc(x.name) + (x.meets ? " · " + esc(x.meets) : "") + "</em>"; }).join("") + (t.length > 3 ? "<em>+" + (t.length - 3) + " more</em>" : "") + "</span>" +
-        '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : "Hosted by a member") + " · " + (seatsLine(c) || (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s")) + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span></button>";
+        '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + " · " + (seatsLine(c) || (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s")) + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span></button>";
     }
     function show(list, note) {
       lastList = list;
-      var box = $("#casList");
-      if (list.length) { box.innerHTML = list.map(function (c) { return card(c, false); }).join(""); return; }
-      var ex = EXAMPLES.filter(function (c) { return !kindPick || c.kind === kindPick; });
-      box.innerHTML = '<p class="hint casempty">' + esc(note || "No Private Tables open here yet. Be the first to build one.") + " Here's what they look like:</p>" + ex.map(function (c) { return card(c, true); }).join("");
+      var box = $("#casList"), z = ($("#casZip") && $("#casZip").value) || "", q = (($("#casQ") && $("#casQ").value) || "").trim().toLowerCase();
+      var ex = EXAMPLES.filter(function (c) { return (!kindPick || c.kind === kindPick) && (!q || c.name.toLowerCase().indexOf(q) > -1); });
+      var near = !z || /^35(0|1|2)\d\d$/.test(z);
+      var exHTML = exOn && ex.length ? '<p class="hint casempty exnote"><b>Example tables near 35242.</b> These are fictional samples so you can see how Private Tables work. Walk in, look around, then build your own. They disappear once real tables fill the area.</p>' + ex.map(function (c) { return card(c, true); }).join("") : "";
+      if (list.length) { box.innerHTML = list.map(function (c) { return card(c, false); }).join("") + (near ? exHTML : ""); return; }
+      box.innerHTML = '<p class="hint casempty">' + esc(note || "No Private Tables open here yet. Be the first to build one.") + "</p>" + (exHTML || '<p class="hint">Here\'s what one looks like:</p>' + EXAMPLES.slice(0, 2).map(function (c) { return card(c, true); }).join(""));
     }
     function find() {
       var zip = $("#casZip").value, q = $("#casQ").value.trim();
@@ -3666,13 +3710,13 @@
     function openCasino(c, example) {
       var host = c.my_status === "host";
       var m = modal((SC ? '<div id="cjScene"></div>' : '<div class="casign big" aria-hidden="true"><span>' + esc(kindLabel(c.kind)) + "</span><b>" + esc(c.name) + "</b><span>Host @" + esc(c.host_handle || "host") + "</span></div>") +
-        '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · " + (c.host_handle ? "Host @" + esc(c.host_handle) : "Hosted by a member") + (example ? ' · <a href="private-table.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="private-table.html?c=' + encodeURIComponent(c.id) + '">Walk in to the table ›</a>') + "</p>" +
+        '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · " + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + (example ? ' · <a href="private-table.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="private-table.html?c=' + encodeURIComponent(c.id) + '">Walk in to the table ›</a>') + "</p>" +
         (c.about ? '<p class="lede" style="margin:12px 0 6px">' + esc(c.about) + "</p>" : "") +
         '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "The Host approves each request") + " · " + (seatsLine(c) || (c.members || 1) + " members") + " · " + esc(reach(c)) + "</p>" +
         '<h4 style="margin:14px 0 6px">Games</h4><ul class="castbl">' + (c.tables || []).map(function (t) { return "<li><b>" + esc(t.name) + "</b>" + (t.meets ? "<span>" + esc(t.meets) + "</span>" : "") + "</li>"; }).join("") + "</ul>" +
         '<p class="hint">Meet in public places, and never send money to anyone. <a href="safety.html" target="_blank" rel="noopener">Safety Guide</a></p>' +
         '<span class="err" id="cjErr"></span><div class="row" style="margin-top:10px">' +
-        (example ? '<button class="btn gold" type="button" data-build-casino>Build one like it · $21</button>' :
+        (example ? '<p class="hint" style="flex-basis:100%;margin:0 0 6px">This is a fictional example, so it can\'t be joined. Real tables near 35242 replace the examples as members build them.</p><button class="btn gold" type="button" data-build-casino>Build one like it · $21</button>' :
           host ? '<button class="btn gold" type="button" id="cjManage">Run this Private Table</button>' :
           c.my_status === "member" || c.my_status === "requested" ? '<button class="btn ghost" type="button" id="cjLeave">' + (c.my_status === "member" ? "Leave this table" : "Cancel request") + "</button>" :
           '<button class="btn gold" type="button" id="cjJoin">' + (c.join_mode === "open" ? "Join free" : "Ask to join") + "</button>") +
@@ -3800,7 +3844,7 @@
               if (sr.error) { err.textContent = sr.error.message; return; }
               return window.SF_LIVE.rpc("set_casino_seats", { p_casino: newId, p_seats: seatsN() }).then(function (xr) { if (xr.error) { err.textContent = xr.error.message; throw xr.error; } });
             }).then(function () {
-              window.SF_LIVE.rpc("set_casino_style", { p_casino: newId, p_style: d.style || {} }).then(function () {
+              window.SF_LIVE.rpc("set_casino_style", { p_casino: newId, p_style: d.style || {} }).then(function () { return saveTableArt(m, newId); }).then(function () {
                 if (draftOnly) { closeModal(); toast("🚧 Saved as Under construction. Finish it anytime under Private Tables you host."); loadMine(); var cm = $("#casMine"); if (cm) setTimeout(function () { cm.scrollIntoView({ behavior: "smooth", block: "center" }); }, 400); return; }
                 pay("build", newId, null, err);
               });
@@ -3860,7 +3904,7 @@
     function redesign(c) {
       var m = modal('<h3 style="font-size:1.8rem">Redesign ' + esc(c.name) + '</h3><div id="rdScene" class="cbscene"></div>' + designerHTML(c.style || {}, c.kind) + '<span class="err" id="rdErr"></span><div class="row"><button class="btn gold" type="button" id="rdSave">Save the look</button><button class="btn ghost" type="button" data-close>Cancel</button></div>');
       wireDesigner(m, function () { return { id: c.id, name: c.name, kind: c.kind, seats: c.seats || 12, seated: c.seated || 0, tables: c.tables || [] }; }, $("#rdScene", m));
-      $("#rdSave", m).onclick = function () { call("set_casino_style", { p_casino: c.id, p_style: readDesign(m) }).then(function (st) { c.style = st; closeModal(); toast("New look saved. Walk in to see it."); loadMine(); find(); }, function (x) { $("#rdErr", m).textContent = x.message; }); };
+      $("#rdSave", m).onclick = function () { call("set_casino_style", { p_casino: c.id, p_style: readDesign(m) }).then(function (st) { c.style = st; return saveTableArt(m, c.id).then(function () { closeModal(); toast("New look saved. Walk in to see it."); loadMine(); find(); }); }, function (x) { $("#rdErr", m).textContent = x.message; }); };
     }
     function loadMine() {
       var box = $("#casMine"); if (!live()) { box.hidden = true; return; }

@@ -62,6 +62,55 @@
       return { x: p[0], y: p[1], deg: deg };
     };
   }
+  /* Center icons for the felt (original line art, 24-unit glyphs). "auto" picks one from the table's kind and themes. */
+  var ICONS = {
+    spade: ['f', 'M12 3C9 7 4 9.5 4 13.5a4 4 0 0 0 7 2.6L10 21h4l-1-4.9a4 4 0 0 0 7-2.6C20 9.5 15 7 12 3z'],
+    heart: ['f', 'M12 20.5C6 16.4 3 13.2 3 9.6 3 7 5 5 7.5 5c1.8 0 3.4 1 4.5 2.6C13.1 6 14.7 5 16.5 5 19 5 21 7 21 9.6c0 3.6-3 6.8-9 10.9z'],
+    star: ['f', 'M12 2.8l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.6l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z'],
+    cross: ['f', 'M10.6 2.5h2.8v5.6H19v2.8h-5.6V21.5h-2.8V10.9H5V8.1h5.6z'],
+    dove: ['f', 'M2.5 12.5c3.2.2 5.6-1 7.4-3.6C11.3 7 13 5.6 15.3 5.6c1.6 0 2.7.9 3.2 2l3 .6-2.6 1.4c-.1 4.3-3.3 7.6-8.3 7.6H7.3l-3.2 3 .9-3.8c-1.3-.8-2.3-2-2.5-3.9z'],
+    rings: ['s', 'M9 15.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM15 18.5a5 5 0 1 0 0-10 5 5 0 0 0 0 10z'],
+    dice: ['d', 'M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z'],
+    cap: ['f', 'M12 3.5 1 8.8l11 5.3 8.6-4.2v5.6h1.9V8.8zM5.6 12.4v3.8c0 1.6 2.9 3.3 6.4 3.3s6.4-1.7 6.4-3.3v-3.8L12 15.5z'],
+    laurel: ['f', 'M4 20h16v1.6H4zM5.5 17.6h13v1.6h-13zM6.5 7.5h2.2v9.3H6.5zM10.9 7.5h2.2v9.3h-2.2zM15.3 7.5h2.2v9.3h-2.2zM3.5 6 12 2.5 20.5 6z'],
+    ball: ['s', 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3.5 9.5c5 1.5 12 1.5 17 0M3.5 14.5c5-1.5 12-1.5 17 0M12 3c-3 4-3 14 0 18'],
+    palette: ['f', 'M12 3a9 9 0 0 0 0 18c1.6 0 2-1.2 1.2-2.2-.9-1 .1-2.3 1.4-2.3H17a4 4 0 0 0 4-4c0-5-4-9.5-9-9.5zM8 11.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-3a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm4.3.8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'],
+    home: ['f', 'M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z'],
+    glasses: ['s', 'M6 3h5l-.7 6.5A2.3 2.3 0 0 1 8.5 11.6 2.3 2.3 0 0 1 6.7 9.5zM13 3h5l-.7 6.5a2.3 2.3 0 0 1-1.8 2.1 2.3 2.3 0 0 1-1.8-2.1zM8.5 11.6V20M15.5 11.6V20M6 20.5h5M13 20.5h5'],
+    pineapple: ['f', 'M12 9.5c3.3 0 5.5 2.6 5.5 6S15.3 22 12 22s-5.5-3-5.5-6.5 2.2-6 5.5-6zM12 9c-1-2-3-3-5-3 1.5 1 2.5 2 3 3.2C9.3 7 8.4 5 9 2.5c1 1.4 2 3 2.6 5 .4-2.1 1.4-3.8 2.9-5 .4 2.5-.4 4.5-1.2 6.4.8-1.1 2.3-2.2 3.7-2.9-.7 1.7-2.1 2.6-3.5 3zM9 13l6 6M15 13l-6 6M7.5 16l3.5 3.5M16.5 16 13 19.5'],
+    music: ['f', 'M9 17.2V6.2l11-2.3v11.3a2.9 2.9 0 1 1-1.8-2.7V7.6L10.8 9.1v8.1a2.9 2.9 0 1 1-1.8-2.7z'],
+    paw: ['f', 'M12 12.5c2.7 0 5.5 3.3 5.5 5.6 0 1.6-1.3 2.4-2.8 2.4-1.2 0-1.8-.6-2.7-.6s-1.5.6-2.7.6c-1.5 0-2.8-.8-2.8-2.4 0-2.3 2.8-5.6 5.5-5.6zM6 12.2a2 2.5 0 1 0 0-5 2 2.5 0 0 0 0 5zM18 12.2a2 2.5 0 1 0 0-5 2 2.5 0 0 0 0 5zM9.5 8.5a2 2.5 0 1 0 0-5 2 2.5 0 0 0 0 5zM14.5 8.5a2 2.5 0 1 0 0-5 2 2.5 0 0 0 0 5z'],
+    hands: ['f', 'M12 13.8C9 11.6 7.5 10 7.5 8.2 7.5 6.9 8.5 6 9.7 6c.9 0 1.7.5 2.3 1.3.6-.8 1.4-1.3 2.3-1.3 1.2 0 2.2.9 2.2 2.2 0 1.8-1.5 3.4-4.5 5.6zM2.5 14.5l4.2-.5 4.3 2.2h3.6a1.4 1.4 0 0 1 0 2.8H11l3.6.4 5-2.9a1.5 1.5 0 0 1 1.8 2.3L16 22H8.5l-6-2.2z']
+  };
+  var ICON_NAMES = [["auto", "Match my table"], ["none", "No icon"], ["spade", "Spade"], ["heart", "Heart"], ["star", "Star"], ["cross", "Cross"], ["dove", "Dove"], ["rings", "Linked rings"], ["dice", "Dice"], ["cap", "Graduation cap"], ["laurel", "Columns"], ["ball", "Ball"], ["palette", "Paint palette"], ["home", "Home"], ["glasses", "Champagne"], ["pineapple", "Pineapple"], ["music", "Music"], ["paw", "Paw"], ["hands", "Helping hands"]];
+  var KIND_ICON = { friendship: "rings", faith: "dove", prayer: "dove", service: "hands", games: "dice", greek: "laurel", alumni: "cap", club: "star", sports: "ball", hobby: "palette", parents: "home", flirty18: "glasses", lifestyle: "pineapple", other: "spade" };
+  function iconFor(c, st) {
+    var k = st.icon || "auto"; if (k === "none") return null; if (ICONS[k]) return k;
+    var th = st.themes || [];
+    if (th.indexOf("christian") > -1 || th.indexOf("catholic") > -1) return "cross";
+    if (th.indexOf("music") > -1 && !KIND_ICON[c.kind]) return "music";
+    if (th.indexOf("animal") > -1 && !KIND_ICON[c.kind]) return "paw";
+    return KIND_ICON[c.kind] || "spade";
+  }
+  function iconGlyph(k, x, y, s, col) {
+    var ic = ICONS[k]; if (!ic) return "";
+    var t = 'transform="translate(' + (x - 12 * s).toFixed(1) + " " + (y - 12 * s).toFixed(1) + ") scale(" + s + ')"';
+    if (ic[0] === "s") return '<path ' + t + ' d="' + ic[1] + '" fill="none" stroke="' + col + '" stroke-width="' + (1.8).toFixed(1) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+    if (ic[0] === "d") return '<g ' + t + '><path d="' + ic[1] + '" fill="none" stroke="' + col + '" stroke-width="1.8"/>' + [[8, 8], [16, 8], [12, 12], [8, 16], [16, 16]].map(function (q) { return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="1.4" fill="' + col + '"/>'; }).join("") + "</g>";
+    return '<path ' + t + ' d="' + ic[1] + '" fill="' + col + '"/>';
+  }
+  function artUrl(p) {
+    if (!p) return "";
+    if (/^(blob:|data:|https?:|assets\/|\.\/|\/)/.test(p)) return p;
+    var cfg = window.SUITEFACE_CONFIG || {}; if (!cfg.supabaseUrl) return "";
+    return cfg.supabaseUrl + "/storage/v1/object/public/table-art/" + String(p).split("/").map(encodeURIComponent).join("/");
+  }
+  /* The felt's own shape, scaled around its center (k = 1 is the whole felt). */
+  function shapePath(shape, g, kx, ky, dy) {
+    var rx = g.rx * kx, ry = g.ry * ky, cy = g.cy + (dy || 0);
+    return shape === "long" ? '<rect x="' + (g.cx - rx).toFixed(1) + '" y="' + (cy - ry).toFixed(1) + '" width="' + (rx * 2).toFixed(1) + '" height="' + (ry * 2).toFixed(1) + '" rx="' + ry.toFixed(1) + '"'
+      : '<ellipse cx="' + g.cx + '" cy="' + cy.toFixed(1) + '" rx="' + rx.toFixed(1) + '" ry="' + ry.toFixed(1) + '"';
+  }
   var uid = 0;
   function tableSVG(c, opts) {
     opts = opts || {};
@@ -97,6 +146,26 @@
     var fan = [["♠", "#2B2730", -27], ["♥", "#C0283A", -9], ["♦", "#C0283A", 9], ["♣", "#2B2730", 27]].map(function (k, j) {
       return '<g transform="translate(' + g.cx + " " + (g.cy + (L.shape === "long" ? 66 : 78)) + ") rotate(" + k[2] + ') translate(0 -30)"><rect x="-15" y="-21" width="30" height="42" rx="4" fill="#FAF7F0" stroke="#E8C46A" stroke-width="1"/>' + pip(-8, -7, 12, k[0], k[1]) + pip(0, 10, 17, k[0], k[1]) + "</g>";
     }).join("");
+    /* Host image: the whole felt or just the center, cropped to the table's shape. Fill, Fit, or Focus and zoom. */
+    var st = L.st, imgUrl = artUrl(st.img_preview || st.img), img = "", area = st.img_area === "center" ? "center" : "full", fit = st.img_fit || "fill";
+    var icon = imgUrl && area === "center" ? null : iconFor(c, st), hasTag = !!tag;
+    var iconY = g.cy - (hasTag ? 42 : 26), tagY = icon ? g.cy - 2 : g.cy - 6, ir = hasTag ? 27 : 33;
+    if (imgUrl) {
+      var kx = area === "center" ? (L.shape === "round" ? .58 : L.shape === "long" ? .4 : .44) : 1, ky = area === "center" ? (L.shape === "long" ? .56 : .5) : 1, dy = area === "center" ? -10 : 0;
+      var bx = g.cx - g.rx * kx, by = g.cy + dy - g.ry * ky, bw = g.rx * kx * 2, bh = g.ry * ky * 2, z = fit === "focus" ? Math.max(1, Math.min(3, +st.img_zoom || 1)) : 1;
+      var fx = (st.img_x == null ? 50 : +st.img_x) / 100, fy = (st.img_y == null ? 50 : +st.img_y) / 100;
+      var iw = bw * z, ih = bh * z, ix = bx - (iw - bw) * fx, iy = by - (ih - bh) * fy;
+      var par = fit === "fit" ? "xMidYMid meet" : fit === "focus" ? (fx < .34 ? "xMin" : fx > .66 ? "xMax" : "xMid") + (fy < .34 ? "YMin" : fy > .66 ? "YMax" : "YMid") + " slice" : "xMidYMid slice";
+      img = '<clipPath id="' + id + 'ic">' + shapePath(L.shape, g, kx, ky, dy) + "/></clipPath>" +
+        '<g clip-path="url(#' + id + (area === "full" ? "clip" : "ic") + ')"><image href="' + esc(imgUrl) + '" x="' + ix.toFixed(1) + '" y="' + iy.toFixed(1) + '" width="' + iw.toFixed(1) + '" height="' + ih.toFixed(1) + '" preserveAspectRatio="' + par + '"/>' +
+        (area === "full" ? '<rect width="800" height="470" fill="url(#' + id + 'vig)"/>' : "") + "</g>" +
+        (area === "center" ? shapePath(L.shape, g, kx, ky, dy) + ' fill="none" stroke="#E8C46A" stroke-width="2" stroke-opacity=".8"/>' : "");
+    }
+    var medal = icon ? '<g class="sft-icon"><circle cx="' + g.cx + '" cy="' + iconY + '" r="' + ir + '" fill="' + shade(L.felt, -.38) + '" stroke="url(#' + id + 'rail)" stroke-width="3.5"/><circle cx="' + g.cx + '" cy="' + iconY + '" r="' + (ir - 5) + '" fill="none" stroke="#E8C46A" stroke-opacity=".55" stroke-width="1.2"/>' + iconGlyph(icon, g.cx, iconY, ir / 17, "#E8C46A") + "</g>" : "";
+    /* Card spots keep a solid felt pad, so cards always read clearly over any image. */
+    var fanY = g.cy + (L.shape === "long" ? 66 : 78) - 30;
+    var pad = imgUrl ? '<ellipse cx="' + g.cx + '" cy="' + (fanY + 2) + '" rx="' + (L.shape === "long" ? 74 : 80) + '" ry="' + (L.shape === "long" ? 40 : 46) + '" fill="url(#' + id + 'felt)" stroke="#E8C46A" stroke-opacity=".6" stroke-width="1.4"/>' : "";
+    var halo = imgUrl ? ' stroke="#141217" stroke-opacity=".7" stroke-width="5" paint-order="stroke" stroke-linejoin="round"' : "";
     var lights = opts.dark ? "" : '<ellipse class="sft-sweep" cx="' + (g.cx - g.rx) + '" cy="' + g.cy + '" rx="70" ry="' + (g.ry + 30) + '" fill="url(#' + id + 'sw)"/>';
     return '<svg class="sft" viewBox="0 0 800 470" role="img" aria-label="' + esc(c.name || "Private Table") + ": " + seats + " seats, " + seated + ' taken" preserveAspectRatio="xMidYMid meet">' +
       "<defs>" +
@@ -110,6 +179,7 @@
       '<filter id="' + id + 'nz" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .22 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>' +
       '<filter id="' + id + 'sh" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="14"/></filter>' +
       '<clipPath id="' + id + 'clip">' + feltPath + "/></clipPath>" +
+      '<radialGradient id="' + id + 'vig" cx="50%" cy="50%" r="60%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>' +
       '<path id="' + id + 'arc" d="' + arc + '"/>' +
       "</defs>" +
       '<rect width="800" height="470" fill="url(#' + id + 'room)"/>' +
@@ -118,12 +188,14 @@
       railPath + ' fill="url(#' + id + 'rail)"/>' +
       railPath + ' fill="none" stroke="rgba(255,240,200,.3)" stroke-width="1" stroke-dasharray="2 5"/>' +
       feltPath + ' fill="url(#' + id + 'felt)"/>' +
-      '<g clip-path="url(#' + id + 'clip)"><rect width="800" height="470" filter="url(#' + id + 'nz)" opacity=".9"/>' + lights + "</g>" +
+      '<g clip-path="url(#' + id + 'clip)"><rect width="800" height="470" filter="url(#' + id + 'nz)" opacity=".9"/>' + "</g>" + img +
+      '<g clip-path="url(#' + id + 'clip)">' + lights + "</g>" +
       inlay + ' fill="none" stroke="#E8C46A" stroke-opacity=".55" stroke-width="1.4"/>' +
-      '<text class="sft-name" font-family="\'Big Shoulders Display\',Impact,\'Arial Narrow\',sans-serif" font-weight="900" font-size="' + fs + '" letter-spacing="3" fill="#E8C46A" fill-opacity=".92" text-anchor="middle"><textPath href="#' + id + 'arc" startOffset="50%">' + esc(name) + "</textPath></text>" +
-      (tag ? '<text x="' + g.cx + '" y="' + (g.cy - 6) + '" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-style="italic" font-size="17" fill="#FAF7F0" fill-opacity=".8">' + esc(tag) + "</text>" : "") +
-      fan +
-      (themes ? '<text x="' + g.cx + '" y="' + (g.cy + g.ry - 26) + '" text-anchor="middle" font-family="Figtree,Arial,sans-serif" font-weight="800" font-size="12" letter-spacing="3" fill="#FFE7A3" fill-opacity=".75">' + esc(themes.toUpperCase()) + "</text>" : "") +
+      '<text class="sft-name" font-family="\'Big Shoulders Display\',Impact,\'Arial Narrow\',sans-serif" font-weight="900" font-size="' + fs + '" letter-spacing="3" fill="#E8C46A" fill-opacity=".95" text-anchor="middle"' + halo + '><textPath href="#' + id + 'arc" startOffset="50%">' + esc(name) + "</textPath></text>" +
+      medal +
+      (tag ? '<text x="' + g.cx + '" y="' + tagY + '" text-anchor="middle" font-family="Georgia,\'Times New Roman\',serif" font-style="italic" font-size="17" fill="#FAF7F0" fill-opacity=".9"' + halo + '>' + esc(tag) + "</text>" : "") +
+      pad + fan +
+      (themes ? '<text x="' + g.cx + '" y="' + (g.cy + g.ry - 26) + '" text-anchor="middle" font-family="Figtree,Arial,sans-serif" font-weight="800" font-size="12" letter-spacing="3" fill="#FFE7A3" fill-opacity=".85"' + halo + '>' + esc(themes.toUpperCase()) + "</text>" : "") +
       "</svg>";
   }
   var KIND = { friendship: "Friendship", faith: "Faith small group", prayer: "Prayer group", service: "Service & volunteering", games: "Board games", greek: "Greek life", alumni: "Alumni", club: "Club", sports: "Sports & fitness", hobby: "Hobbies", parents: "Parents", other: "Private Table" };
@@ -200,6 +272,6 @@
     fe.querySelector(".sfe-skip").onclick = finish;
     document.addEventListener("keydown", function k(e) { if (e.key === "Escape") { document.removeEventListener("keydown", k); finish(); } });
   }
-  window.SFCasino = { FELTS: FELTS, RAILS: RAILS, SHAPES: SHAPES, THEMES: THEMES, AMENITIES: AMENITIES, KIND_FELT: KIND_FELT,
+  window.SFCasino = { ICON_NAMES: ICON_NAMES, artUrl: artUrl, FELTS: FELTS, RAILS: RAILS, SHAPES: SHAPES, THEMES: THEMES, AMENITIES: AMENITIES, KIND_FELT: KIND_FELT,
     render: function (el, c, o) { style(); render(el, c, o); }, svg: function (c, o) { style(); return tableSVG(c, o); }, entry: entry };
 })();

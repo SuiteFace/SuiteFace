@@ -744,3 +744,12 @@ label.upl{cursor:pointer}
 .casbluff:hover{border-color:#E8C46A}.casbluff:focus-visible{outline:3px solid #FFE7A3;outline-offset:3px}
 .bluffart.sm{height:150px}.bluffart.sm .bc{width:78px;height:110px;font-size:2.2rem}
 @media (max-width:640px){.casbluff{grid-template-columns:1fr;padding:16px}.bluffart.sm{height:130px;max-width:260px;margin:0 auto;width:100%}}
+
+/* Private Table cards: a small table picture with its center icon, and the Example badge */
+.cascard{position:relative}
+.casthumb{display:block;margin:-4px -4px 8px;border-radius:12px;overflow:hidden;aspect-ratio:800/470;background:#141217}
+.casthumb svg{display:block;width:100%;height:100%}
+.exbadge{position:absolute;top:10px;right:10px;padding:3px 9px;border-radius:999px;background:rgba(23,21,27,.82);color:#FFE7A3;font:800 .66rem Figtree,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;border:1px solid rgba(232,196,106,.5)}
+.exnote{margin-top:14px}
+.cdimg input[type=file]{margin:6px 0}
+.cdfocus input[type=range]{width:100%;accent-color:#B8862F}
