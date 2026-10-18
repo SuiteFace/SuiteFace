@@ -118,3 +118,16 @@ html.v3 body[data-page="club"] main,html.v3 body[data-page="club"] .v3-clubwrap{
   html.v3 header.top .nav{position:static;transform:none;visibility:visible;flex-direction:row;align-items:center;background:none;padding:0;border:0;box-shadow:none;inset:auto;margin-left:28px;margin-right:auto;max-height:none;overflow:visible}
   html.v3 header.top .menu-btn{display:none}
 }
+/* Kelly's hand: who's holding it, and the Pair ladder */
+html.v3 .v3-who{position:absolute;left:16px;top:14px;z-index:8;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border-radius:999px;background:rgba(18,58,42,.82);box-shadow:0 0 0 1px color-mix(in srgb,var(--v3-brass) 55%,transparent);color:var(--v3-ivory);font:500 .72rem/1.15 var(--body)}
+html.v3 .v3-who img{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:50% 30%}
+html.v3 .v3-who b{display:block;font:800 .82rem var(--body)}
+html.v3 .v3-pairnote{position:absolute;left:50%;top:calc(8% + 54px);transform:translateX(-50%);margin:0;z-index:9;white-space:nowrap;font:600 .8rem var(--body);color:#FFE7A3;opacity:0}
+html.v3 .v3-pair span{font-size:.85em;margin-right:4px}
+html.v3 .v3-ladder{flex-direction:column;align-items:stretch;gap:4px;font:500 .78rem var(--body)}
+html.v3 .v3-ladder span{display:flex;justify-content:space-between;gap:10px;padding:3px 8px;border-radius:6px;background:rgba(251,246,236,.08)}
+html.v3 .v3-ladder b{font:900 .85rem var(--display)}
+html.v3 .v3-ladder .top{background:color-mix(in srgb,var(--v3-brass) 35%,transparent);color:#FFE7A3}
+@media (prefers-reduced-motion:no-preference){html.v3 .v3-felt .v3-pairnote{animation:v3pair 6s 1.2s ease-in-out infinite}}
+@media (prefers-reduced-motion:reduce){html.v3 .v3-felt .v3-pairnote,html.v3 .v3-felt .v3-pair{opacity:1}}
+@media (max-width:600px){html.v3 .v3-who{left:10px;top:10px}html.v3 .v3-pairnote{font-size:.7rem;top:calc(8% + 44px)}}

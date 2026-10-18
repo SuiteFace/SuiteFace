@@ -1503,6 +1503,9 @@
   function rng(seed) { var x = seed >>> 0; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
   function demoBumpers(i) { var q = rng(i * 7919 + 13), keys = ["veteran", "flag", "college", "masters", "nurse", "educator", "coach", "owner", "pilot", "retired", "captain", "cpa", "lawyer", "md", "phd", "active_duty", "do"], out = [];
     if (q() < .5) { out.push(keys[(q() * keys.length) | 0]); if (q() < .35) { var k2 = keys[(q() * keys.length) | 0]; if (out.indexOf(k2) < 0) out.push(k2); } } return out; }
+  var CAST = [["Kelly", "women", 32, "heart"], ["Maya", "women", 29, "club"], ["Priya", "women", 31, "diamond"], ["Grace", "women", 46, "club"], ["Jane", "women", 39, "spade"], ["Ana", "women", 28, "heart"], ["Nia", "women", 27, "diamond"], ["Taylor", "women", 31, "heart"],
+    ["Jordan", "men", 34, "heart"], ["Ellis", "men", 38, "spade"], ["Ryan", "men", 33, "club"], ["Matteo", "men", 36, "diamond"], ["Ben", "men", 31, "heart"], ["Chris", "men", 41, "spade"], ["Daniel", "men", 45, "club"], ["Luke", "men", 36, "diamond"],
+    ["Nikolai", "men", 40, "heart"], ["Joe", "men", 50, "club"], ["Malik", "men", 33, "diamond"], ["Sam", "men", 29, "spade"], ["Theo", "men", 44, "spade"]];
   var POOL = (function () {
     var r = rng(52), out = [], id = 0, looks = ["longterm", "longterm", "seeing", "marriage", "friends", "seeing", "casual", "open"];
     function add(name, gender) {
@@ -1512,16 +1515,11 @@
         looking: looks[(r() * looks.length) | 0], interests: ints, bio: BIOS[s][(r() * 4) | 0], noise: r(), hue: (r() * 360) | 0, bumpers: demoBumpers(id) });
       id++;
     }
-    var LAST = "ABCDEFGHJKLMNPRSTVW", used = {};
-    for (var i = 0; i < 260; i++) {
-      var g = i % 20 === 19 ? "nb" : i % 2 ? "men" : "women", list = g === "nb" ? NB : g === "men" ? M : W;
-      var base = list[(r() * list.length) | 0], nm = base;
-      if (used[base]) nm = base + " " + LAST[(used[base] * 7 + i) % LAST.length] + ".";
-      used[base] = (used[base] || 0) + 1; add(nm, g);
-    }
+    // The sample deck is the photographed example cast: one face, one name, one suit each. No initials, no reused faces.
+    CAST.forEach(function (c) { add(c[0], c[1]); var q = out[out.length - 1]; q.age = c[2]; q.suit = c[3]; q.photo = "assets/people/" + c[0].toLowerCase() + ".webp"; q.bio = BIOS[c[3]][(r() * 4) | 0]; });
     // a few sample cards carry public Joker status (10 disaster reports in 180 days, confirmed by Judges)
     out.forEach(function (p, i) { var r2 = rng(hash(p.id + "jk"))(); p.jk = r2 < .62 ? 0 : r2 < .8 ? 1 : r2 < .9 ? 2 : r2 < .95 ? 3 : r2 < .98 ? 5 : 8; });
-    [17, 90, 151].forEach(function (k, j) { if (out[k]) { out[k].jk = 10; out[k].joker = { count: 10 + j, until: ["Feb 3, 2027", "Mar 19, 2027", "Apr 11, 2027"][j] }; } });
+    [6, 15].forEach(function (k, j) { if (out[k]) { out[k].jk = 10; out[k].joker = { count: 10 + j, until: ["Feb 3, 2027", "Mar 19, 2027"][j] }; } });
     return out;
   })();
 
@@ -1580,6 +1578,7 @@
   function saveG() { if (liveOn() && LIVE_ROWS) { liveSaveG(); return; } S.set("game", G); }
   function buildDeck() {
     if (liveOn() && LIVE_ROWS) { liveBuild(); return; }
+    if (liveOn()) { DECK = []; BY = {}; deckDirty = false; return; } // signed-in players only ever see real players; never the sample cast
     var el = POOL.filter(eligible).filter(inRoom).map(function (p) { var f = fitOf(p), c = Object.assign({}, p, { fit: f.score, shared: f.shared }); if (p.masked) { c.realName = p.realName; c.realAge = p.realAge; defineMask(c); } return c; });
     el.sort(function (a, b) { return b.fit - a.fit || a.dist - b.dist; });
     DECK = []; BY = {};
@@ -4148,8 +4147,8 @@
     }, function (e) { var msg = (e && e.message) || "Your deck couldn't load. Try again."; LIVE_ERR = msg; if (redeal) toast(msg); var d = $("#dealt"); if (d) d.innerHTML = '<p class="lede deckmsg" style="align-self:center">' + esc(msg) + (/Friendship/i.test(msg) ? ' <a href="my-table.html#face">Change your Table in My Face</a>.' : "") + "</p>"; });
   }
   /* An empty live hand says exactly why, and shows a clearly labeled sample hand so the picture cards make sense. */
-  var SAMPLE_HAND = [["Maya", 31, "heart", "A", "maya.jpg", "Nurse, sunset chaser, collects vinyl.", ["Music", "Hiking"]], ["Theo", 44, "spade", "K", "theo.jpg", "Jazz on Sundays, grill master, big laugh.", ["Jazz", "Cooking"]],
-    ["Priya", 29, "diamond", "Q", "priya.jpg", "Planner with a travel spreadsheet.", ["Travel", "Food"]], ["Luke", 36, "club", "J", "luke.jpg", "Ranch boy who cleans up nice.", ["Horses", "Fishing"]], ["Grace", 52, "heart", "10", "grace.jpg", "Garden, book club and a good red.", ["Books", "Gardening"]]];
+  var SAMPLE_HAND = [["Jordan", 34, "heart", "A", "jordan.webp", "Teacher and Army veteran. Sunday pancakes, long walks.", ["Hiking", "Cooking"]], ["Ellis", 38, "spade", "K", "ellis.webp", "Architect who still sketches by hand.", ["Design", "Jazz"]],
+    ["Ryan", 33, "club", "Q", "ryan.webp", "Weekend fly fisherman, weekday nurse.", ["Fishing", "Live music"]], ["Matteo", 36, "diamond", "J", "matteo.webp", "Runs a small bakery. Up at 4, happy about it.", ["Food", "Travel"]], ["Ben", 31, "heart", "10", "ben.webp", "Coaches Little League. Terrible singer, sings anyway.", ["Baseball", "Music"]]];
   function emptyHand() {
     var d = $("#dealt"); if (!d) return; var friend = P.looking === "friendship" || /Friendship/i.test(LIVE_ERR || "");
     var cards = SAMPLE_HAND.map(function (s, i) { var p = { id: "sample" + i, name: s[0], age: s[1], suit: s[2], rank: s[3], photo: "assets/people/" + s[4], bio: s[5], interests: s[6], looking: "longterm", dist: 3 + i * 2, hue: 30 + i * 40, shared: [], city: "Birmingham", jk: 0, self: true, id_: {} };
@@ -4157,7 +4156,7 @@
     d.innerHTML = '<div class="emptyhand"><h3>' + (friend ? "Your hand is empty because you're at the Friendship Table." : "No real players fit your hand yet.") + "</h3>" +
       '<p class="lede">' + (friend ? "Friendship players aren't dealt into dating decks. Switch your Table in My Face to <b>Dating</b>, <b>Long-term</b> or <b>Marriage</b> and you'll be dealt real players nearby." : "SuiteFace only deals real, paying players near you. As people in your area take a seat, their cards land here.") + "</p>" +
       '<div class="row">' + (friend ? '<a class="btn gold" href="my-table.html#face">Switch to dating</a>' : '<button class="btn gold" type="button" data-redeal>Deal again</button>') + '<a class="btn ghost" href="my-table.html#invite">Invite friends</a><a class="btn ghost" href="bluff-table.html">Play the Bluff Table</a></div>' +
-      '<p class="samplelabel">Sample hand · fictional people, not real players</p><p class="hint">This is what your hand looks like with picture cards. Tap a card to see its back.</p><div class="samplehand">' + cards + "</div></div>";
+      '<p class="samplelabel">Kelly\'s hand, an example · fictional people, not real players</p><p class="hint">This is what a hand looks like with picture cards: one face per person, ranked Ace down, each in their own suit. Tap a card to see its back.</p><div class="samplehand">' + cards + "</div></div>";
   }
   document.addEventListener("click", function (e) {
     var c = e.target.closest && e.target.closest(".samplehand .pcard"); if (c) { c.classList.toggle("flipped"); return; }
