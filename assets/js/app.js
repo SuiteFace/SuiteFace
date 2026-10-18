@@ -282,7 +282,7 @@
   (function () {
     var hb = $("#helpBtn"); if (!hb) return;
     var FAQ = [
-      ["How much does SuiteFace cost?", "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Launch offer: through October 31, 2026 the $21 Buy-In is waived and you join for $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."],
+      ["How much does SuiteFace cost?", "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Launch offer: through December 31, 2026 the $21 Buy-In is waived and you join for $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."],
       ["What does a comp code do?", "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."],
       ["How do I cancel or pause?", "Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."],
       ["Why isn't my deck full yet?", "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."],
@@ -1892,8 +1892,8 @@
   }
 
 
-  /* ---------- Launch offer (15 days): Buy-In waived, or choose First 1,000 ---------- */
-  var LAUNCH = { open: false, ends: "2026-11-01T05:00:00Z", left: 1000 }, PLAN = "launch";
+  /* ---------- Launch offer (Oct 17 to Dec 31, 2026): Buy-In waived, or choose First 1,000 ---------- */
+  var LAUNCH = { open: false, ends: "2027-01-01T06:00:00Z", left: 1000 }, PLAN = "launch";
   function launchEndText() { return new Date(new Date(LAUNCH.ends).getTime() - 1).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/Chicago" }); }
   function SIGNED_PAID() { return !!(window.SF_LIVE && window.SF_LIVE.seated); }
   function launchUI() {
