@@ -396,7 +396,7 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .pcard .face .bumpers{gap:4px;margin:4px 0 0}
 .pcard .face .bump{height:18px;width:22px;padding:0;justify-content:center}.pcard .face .bump b{display:none}
 .pcard .face .bump .bchk{width:11px;height:11px;font-size:8px;line-height:11px;top:-5px;right:-5px}
-.pcard .back .bumpers{justify-content:flex-start;margin:2px 0 4px}
+.pcard .details .bumpers{justify-content:flex-start;margin:2px 0 4px}
 .pcard .face .bump svg{width:11px;height:11px}
 .pcard .face .bump svg.bflag{width:30px;height:18px}
 .mycard .bumpers{margin:8px 0 2px}
@@ -421,7 +421,7 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .vsteps{display:grid;gap:8px;padding-left:20px;margin:10px 0}
 .pcard .face .vbad{display:flex;gap:4px;justify-content:center;margin-top:3px}
 .pcard .face .vbad i{font-style:normal;font-size:9px;font-weight:800;padding:1px 5px;border-radius:999px;background:rgba(46,125,79,.12);color:#1E6347;letter-spacing:.02em}
-.pcard .back .vline{color:#1E6347;font-weight:700}
+.pcard .details .vline{color:#1E6347;font-weight:700}
 @media (max-width:640px){.verpanel .verrow{grid-template-columns:1fr}}
 .pcard .face .ficons{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:4px;margin-top:3px;max-width:100%}
 .pcard .face .ficons .vbad,.pcard .face .ficons .bumpers{margin:0;flex-wrap:nowrap}
@@ -432,28 +432,28 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 
 /* ===== High Roller cards: platinum (verified $1M) or gold (High Roller Buy-In), with a rhinestone frame and a slow light sweep.
    Shown at every table, so everyone sees the status. ===== */
-.pcard.hrcard .face,.mycard.hr .in{overflow:hidden;
+.pcard.hrcard .cover,.mycard.hr .in{overflow:hidden;
   background:linear-gradient(135deg,#F7F7F5 0%,#DADBE0 18%,#FFFFFF 34%,#C8CAD0 52%,#F1F2F4 68%,#B9BBC2 86%,#ECEDEF 100%)!important;
   box-shadow:inset 0 0 0 2px #E8C46A,inset 0 0 0 4px #FFF3C4,inset 0 0 0 5px #B8862F,0 0 0 1px rgba(184,134,47,.6),0 0 22px rgba(232,196,106,.55)}
 .pcard.hrcard.hrgold .face,.mycard.hr.hrgold .in{
   background:linear-gradient(135deg,#FFF6D8 0%,#E9C46B 20%,#FFF1BF 36%,#C9963A 54%,#FBE3A0 70%,#B98432 88%,#F5D98E 100%)!important}
-.pcard.hrcard .face::before,.mycard.hr .in::before{content:"";position:absolute;inset:5px;border-radius:inherit;pointer-events:none;padding:4px;
+.pcard.hrcard .cover::before,.mycard.hr .in::before{content:"";position:absolute;inset:5px;border-radius:inherit;pointer-events:none;padding:4px;
   background:radial-gradient(circle,#FFFFFF 0 1.1px,#FFF6D0 1.3px 1.7px,#C9A55A 1.9px 2.3px,transparent 2.6px) 0 0/8px 8px;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:.95}
-.pcard.hrcard .face::after,.mycard.hr .in::after{content:"";position:absolute;inset:-40%;pointer-events:none;
+.pcard.hrcard .cover::after,.mycard.hr .in::after{content:"";position:absolute;inset:-40%;pointer-events:none;
   background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.75) 50%,transparent 58%);transform:translateX(-60%);animation:hrsweep 5.5s ease-in-out infinite}
 @keyframes hrsweep{0%,55%{transform:translateX(-60%)}100%{transform:translateX(60%)}}
-.pcard.hrcard .face>*:not(.idx):not(.stamp),.mycard.hr .in>*:not(.corner){position:relative;z-index:1}
-.pcard.hrcard .face>.idx,.pcard.hrcard .face>.stamp,.mycard.hr .in>.corner{z-index:2}
-.pcard.hrcard .face .idx,.pcard.hrcard .face .title{text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.pcard.hrcard .cover>*:not(.idx):not(.stamp),.mycard.hr .in>*:not(.corner){position:relative;z-index:1}
+.pcard.hrcard .cover>.idx,.pcard.hrcard .cover>.stamp,.mycard.hr .in>.corner{z-index:2}
+.pcard.hrcard .cover .idx,.pcard.hrcard .cover .title{text-shadow:0 1px 0 rgba(255,255,255,.7)}
 .pcard.hrcard .hrb,.mycard.hr .hrb{background:linear-gradient(180deg,#2B2730,#4A3F55);color:#FFE7A3;box-shadow:0 0 0 1px #E8C46A,0 2px 6px rgba(43,39,48,.35)}
 .slot:has(.hrcard) .card-actions{filter:drop-shadow(0 0 8px rgba(232,196,106,.35))}
-@media (prefers-reduced-motion:reduce){.pcard.hrcard .face::after,.mycard.hr .in::after{animation:none;opacity:0}}
+@media (prefers-reduced-motion:reduce){.pcard.hrcard .cover::after,.mycard.hr .in::after{animation:none;opacity:0}}
 .hrdeck{padding:14px 16px;border-radius:16px;border:1px solid #C9A55A;background:linear-gradient(135deg,rgba(232,196,106,.16),rgba(201,165,90,.06))}
 .hrdeck .addr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.hrdeck .addr .full{grid-column:1/-1}
 @media (max-width:560px){.hrdeck .addr{grid-template-columns:1fr}}
 
-.pcard.hrcard .face{position:relative}
+.pcard.hrcard .cover{position:relative}
 .pcard .face .hrb{white-space:nowrap;font-size:.6rem;padding:2px 7px;margin-top:2px}
 .pcard .face .ficons .hrb{margin:0;font-size:.56rem;padding:2px 6px}
 .pcard .face .ficons:has(.hrb){max-width:84%}
@@ -471,7 +471,7 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .cp.sent{opacity:.6;cursor:default}.cp.sent span::after{content:" · sent"}
 .cp.mine[aria-pressed=false]{opacity:.55}
 .pcard .face .ficons .comps{margin:0;gap:2px}.pcard .face .ficons .comp{padding:1px 4px 1px 2px}.pcard .face .ficons .comp b{font-size:8px}
-.pcard .back .comps{justify-content:flex-start;margin:2px 0 4px}
+.pcard .details .comps{justify-content:flex-start;margin:2px 0 4px}
 .mycard .comps{margin-top:4px}
 .h-steps .reel-div{justify-content:flex-start;margin:6px 0 0;max-width:360px}
 .flabel [data-slot],.eyebrow [data-slot]{display:inline-block;vertical-align:-2px;margin-right:4px}
@@ -490,7 +490,7 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .f1kline{display:inline-flex;align-items:center;gap:6px}
 
 .pcard .face .ficons .f1kmini{display:inline-flex}.pcard .face .ficons .f1kmini .emb{filter:none}
-.pcard .back .f1kback{display:inline-flex;align-items:center;gap:6px;color:#8F6410}
+.pcard .details .f1kback{display:inline-flex;align-items:center;gap:6px;color:#8F6410}
 .lopt.f1kopt .f1kd strong{color:#FFE7A3;font-weight:700}
 
 /* ===== The Bluff Table ===== */
@@ -524,3 +524,52 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .binrow .bph{width:44px;height:44px;border-radius:50%;background:#E9E2D6 center/cover}.binrow small{display:block;color:#6B6372}
 .bverdict{text-align:center}.bverdict .big{font-size:3.4rem;display:block}
 .bcard .btn.ghost{color:#2B2730;border-color:rgba(43,39,48,.3);background:#fff}
+
+
+/* ===== Face-down cards: the decorated back everyone sees first ===== */
+.pcard .cover{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;
+  background:#FFFDF8;box-shadow:0 10px 24px -10px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.08);padding:7px}
+.pcard .cover .cv-in{position:relative;height:100%;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 6px;
+  background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.12) 0 1.6px,transparent 2.4px) 0 0/12px 12px,
+    repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 1.5px,transparent 1.5px 9px),repeating-linear-gradient(-45deg,rgba(255,255,255,.07) 0 1.5px,transparent 1.5px 9px),
+    radial-gradient(120% 90% at 50% 40%,color-mix(in srgb,var(--felt) 88%,#fff),var(--felt) 60%,color-mix(in srgb,var(--felt) 70%,#000));
+  box-shadow:inset 0 0 0 2px var(--rim),inset 0 0 0 4px #E8C46A,inset 0 0 0 5px rgba(255,255,255,.35)}
+.pcard .cover .cv-medal{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#2B2730,#1C1921);box-shadow:0 0 0 2px #E8C46A,0 0 0 5px rgba(232,196,106,.25),0 6px 14px -6px rgba(0,0,0,.6)}
+.pcard .cover .cv-medal svg{width:40px;height:auto}
+.pcard .cover .cv-badges,.pcard .cover .cv-stick,.pcard .cover .cv-comps{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:100%}
+.pcard .cover .cv-badges .vbad{display:flex;gap:3px;margin:0}.pcard .cover .vbad i{font-style:normal;font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;background:#FFFDF8;color:#1E6347;white-space:nowrap}
+.pcard .cover .cvb.hrb{white-space:nowrap;font-size:.6rem;padding:2px 7px;margin:0}
+.pcard .cover .cv-stick .bumpers{margin:0;gap:4px}.pcard .cover .cv-stick .bump{height:16px;width:20px;padding:0;justify-content:center;transform:none}.pcard .cover .cv-stick .bump b,.pcard .cover .cv-stick .bump small{display:none}.pcard .cover .cv-stick .bump svg{width:10px;height:10px}.pcard .cover .cv-stick .bump svg.bflag{width:24px;height:16px}
+.pcard .cover .cv-comps .comps{margin:0;gap:3px}.pcard .cover .cv-comps .comp b{font-size:8px}
+.pcard .cover .cv-tap{position:absolute;bottom:8px;left:0;right:0;text-align:center;font:700 .62rem/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.pcard .flip>.face{transform:rotateY(180deg)}
+.pcard.flipped .flip{transform:rotateY(180deg)}
+.pcard:not(.flipped):hover .cover{box-shadow:0 14px 30px -10px rgba(0,0,0,.75),0 0 0 2px #E8C46A}
+.slot .card-actions{opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .3s,transform .3s}
+.slot:has(.pcard.flipped) .card-actions{opacity:1;pointer-events:auto;transform:none}
+.pcard .face .fbtns{display:flex;gap:4px;justify-content:center;margin-top:4px}
+.pcard .face .fb{all:unset;cursor:pointer;font:700 .62rem/1 var(--body);padding:4px 7px;border-radius:999px;background:rgba(43,39,48,.08);color:#2B2730}
+.pcard .face .fb.gold{background:linear-gradient(180deg,#FFF3C4,#E8C46A);color:#5E4210}
+.pcard .face .fb:focus-visible{outline:2px solid #C9A55A}
+.pcard .details{position:absolute;inset:0;z-index:5;background:var(--cream,#FAF7F0);color:#2B2730;padding:10px;font-size:.74rem;line-height:1.32;overflow-y:auto;display:flex;flex-direction:column;gap:6px;transform:translateY(102%);transition:transform .35s ease}
+.pcard.more .details{transform:none}
+.pcard .details .dclose{align-self:flex-start;font-weight:700}
+/* High Rollers: the metal shows on the back, for everyone */
+.pcard.hrcard .cover .cv-in{background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.5) 0 1.2px,transparent 2px) 0 0/10px 10px,linear-gradient(135deg,#F7F7F5 0%,#DADBE0 18%,#FFFFFF 34%,#C8CAD0 52%,#F1F2F4 68%,#B9BBC2 86%,#ECEDEF 100%)}
+.pcard.hrcard.hrgold .cover .cv-in{background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.5) 0 1.2px,transparent 2px) 0 0/10px 10px,linear-gradient(135deg,#FFF6D8 0%,#E9C46B 20%,#FFF1BF 36%,#C9963A 54%,#FBE3A0 70%,#B98432 88%,#F5D98E 100%)}
+.pcard.hrcard .cover .cv-tap{color:rgba(43,39,48,.6)}
+@media (prefers-reduced-motion:reduce){.pcard .details{transition:none}}
+
+/* Read us */
+.readus .ru-cards{display:flex;align-items:center;justify-content:center;gap:12px;margin:4px 0 12px}
+.readus .ru-card{width:74px;height:104px;border-radius:10px;background:#FFFDF8;color:var(--c);display:grid;place-items:center;align-content:center;gap:4px;box-shadow:0 0 0 1px rgba(43,39,48,.12),0 10px 20px -12px rgba(23,21,27,.6);animation:ruin .7s cubic-bezier(.3,.7,.3,1.2) both}
+.readus .ru-card .pip{width:30px;height:30px}.readus .ru-card b{font:800 .72rem/1 var(--body);color:#2B2730;max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.readus .ru-card.mine{transform:rotate(-6deg);animation-name:ruinL}.readus .ru-card:not(.mine){transform:rotate(6deg)}
+.readus .ru-plus{font:900 1.6rem/1 var(--display);color:#C9A55A}
+@keyframes ruin{from{opacity:0;transform:translateX(40px) rotate(20deg)}}@keyframes ruinL{from{opacity:0;transform:translateX(-40px) rotate(-20deg)}}
+.readus .ru-wait{text-align:center;animation:rupulse 1.2s ease-in-out infinite}@keyframes rupulse{50%{opacity:.4}}
+.readus .ru-t{font-size:1.6rem;margin:0 0 4px;text-align:center}.readus .lede{text-align:center}
+.readus .ru-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0}.readus h4{margin:0 0 4px}.readus ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.readus .ru-z,.readus .ru-d{margin:6px 0;padding:8px 12px;border-radius:12px;background:rgba(201,165,90,.12)}
+@media (max-width:560px){.readus .ru-cols{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.readus .ru-card,.readus .ru-wait{animation:none}}

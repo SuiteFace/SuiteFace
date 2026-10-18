@@ -1565,18 +1565,87 @@
     var n = p.jk || 0, pips = ""; for (var i = 0; i < 10; i++) pips += '<i class="' + (i < n ? "on" : "") + '"></i>';
     return '<span class="jm' + (n >= 7 ? " hot" : n >= 4 ? " warm" : "") + '" title="Jokers from confirmed dates in the last 180 days">' + (big ? "Joker meter " : "Jokers ") + n + "/10" + (big ? '<span class="pips">' + pips + "</span>" : "") + "</span>";
   }
+  /* "Read us": your card and theirs, read together. Live members get the AI dealer's reading; the sample deck gets a
+     house reading built from the cards. Zodiac shows only when both of you follow it. */
+  var PAIRNOTE = {
+    "heart|heart": ["Two steady hearts: loyalty comes easy, and nobody has to wonder where they stand.", "Someone has to make the plan. Take turns being the one who books it."],
+    "diamond|heart": ["One of you makes it happen, the other makes it feel like home.", "Diamond moves fast; Heart likes time to settle in. Match the pace early."],
+    "club|heart": ["Club brings the fun, Heart brings the follow-through.", "A packed Saturday versus a quiet night in. Trade off."],
+    "heart|spade": ["Both of you are quietly all-in. Trust builds deep and fast.", "Neither likes to say the hard thing first. Say it anyway, kindly."],
+    "diamond|diamond": ["Two planners: no wasted time and no wondering what's next.", "Two captains, one ship. Decide who steers which part."],
+    "club|diamond": ["Big plans meet big energy. This could be a lot of fun.", "Club improvises, Diamond schedules. Leave room for both."],
+    "diamond|spade": ["Decisive meets thoughtful: good choices, made well.", "Diamond wants an answer; Spade wants to be sure. Give it a day."],
+    "club|club": ["Never a dull night. You'll make friends everywhere you go together.", "Somebody has to handle the logistics. Pick a night to be the grown-up."],
+    "club|spade": ["Club draws Spade out; Spade gives Club something solid to land on.", "Different batteries: one recharges with people, one alone. Respect both."],
+    "spade|spade": ["Deep trust and quiet devotion. You'll notice the little things.", "Both slow to open up. Ask the second question."]
+  };
+  var ZEL = { Aries: "fire", Leo: "fire", Sagittarius: "fire", Taurus: "earth", Virgo: "earth", Capricorn: "earth", Gemini: "air", Libra: "air", Aquarius: "air", Cancer: "water", Scorpio: "water", Pisces: "water" };
+  function zodiacNote(a, b) {
+    var x = ZEL[a], y = ZEL[b]; if (!x || !y) return null;
+    var good = { "fire|air": 1, "air|fire": 1, "earth|water": 1, "water|earth": 1 };
+    if (x === y) return a + " and " + b + ": two " + x + " signs. You get each other without translating.";
+    if (good[x + "|" + y]) return a + " and " + b + ": " + x + " and " + y + " feed each other. The stars say lean in.";
+    return a + " and " + b + ": " + x + " and " + y + " take a little learning. The stars say be curious, not certain.";
+  }
+  function houseReading(p) {
+    var me = P.mySuit || P.trumps[0], them = p.suit, key = [me, them].sort().join("|"), note = PAIRNOTE[key] || PAIRNOTE["heart|heart"];
+    var shared = (p.interests || []).filter(function (x) { return (P.interests || []).indexOf(x) > -1; });
+    var nm = p.name.split(" ")[0], mz = asList(P.id && P.id.zodiac)[0], tz = asList(p.id_ && p.id_.zodiac)[0];
+    var zod = mz && tz && !/don't follow/i.test(mz + tz) ? zodiacNote(mz, tz) : null;
+    var sameTable = p.looking === P.looking;
+    return {
+      title: SUIT[me].name + " meets " + SUIT[them].name,
+      story: "You " + (shared.length ? "both light up over " + shared.slice(0, 2).join(" and ").toLowerCase() : "come at life from different corners") + ", and " + nm + " " + SUIT[them].love.charAt(0).toLowerCase() + SUIT[them].love.slice(1) + " " + note[0],
+      strengths: [note[0], shared.length ? "Shared ground: " + shared.slice(0, 3).join(", ") + "." : "New ground to explore together: you'd each bring the other somewhere new.", sameTable ? "You're at the same table: you want the same kind of thing right now." : "Different tables: talk early about what you're each looking for."],
+      challenges: [note[1], (p.dist > 20 ? "About " + Math.round(p.dist) + " miles apart. Plan the drive into the date." : "Close by, so it's easy to move fast. Let it build.")],
+      zodiac: zod,
+      first_date: shared.length ? "Start with " + shared[0].toLowerCase() + ", then find somewhere quiet to talk." : "Pick something neither of you has done before."
+    };
+  }
+  function readUs(p) {
+    var me = P.mySuit || P.trumps[0];
+    var m = modal('<div class="readus"><div class="ru-cards"><div class="ru-card mine" style="--c:' + suitColor(me) + '">' + pip(me) + "<b>" + esc(P.name || "You") + '</b></div><div class="ru-plus">+</div><div class="ru-card" style="--c:' + suitColor(p.suit) + '">' + pip(p.suit) + "<b>" + esc(p.name.split(" ")[0]) + '</b></div></div><div id="ruBody"><p class="hint ru-wait">The dealer is reading your cards…</p></div></div>');
+    function show(R) {
+      var b = $("#ruBody", m); if (!b) return;
+      b.innerHTML = '<h3 class="ru-t">' + esc(R.title || "Your reading") + '</h3><p class="lede">' + esc(R.story || "") + "</p>" +
+        '<div class="ru-cols"><div><h4>✦ Why it could work</h4><ul>' + (R.strengths || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + '</ul></div><div><h4>◆ Worth watching</h4><ul>' + (R.challenges || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div></div>" +
+        (R.zodiac ? '<p class="ru-z">✧ <b>In the stars:</b> ' + esc(R.zodiac) + "</p>" : "") + (R.first_date ? '<p class="ru-d">🍸 <b>First move:</b> ' + esc(R.first_date) + "</p>" : "") +
+        '<p class="hint">A reading is for fun and reflection, not a promise. Zodiac appears only when you both follow it.</p><div class="row"><button class="btn gold" type="button" data-close>Back to my hand</button></div>';
+      jackpot(1500);
+    }
+    if (liveOn() && /^[0-9a-f-]{36}$/.test(String(p.id))) {
+      fetch(CFG.supabaseUrl + "/functions/v1/pair-reading", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ other: p.id }) })
+        .then(function (r) { return r.json(); }).then(function (j) { if (j && j.reading) show(j.reading); else { var b = $("#ruBody", m); if (b) b.innerHTML = '<p class="hint">' + esc((j && j.error) || "The dealer couldn't read these cards right now.") + "</p>"; } }, function () { var b = $("#ruBody", m); if (b) b.innerHTML = '<p class="hint">The dealer couldn\'t read these cards right now.</p>'; });
+    } else setTimeout(function () { show(houseReading(p)); }, REDUCED ? 50 : 900);
+  }
+  /* Every card is dealt face down. The back (what everyone sees first) carries only the player's badges, stickers,
+     felt and pattern. Tap to flip and meet the person; Burn and Play appear once it's turned over. */
+  function coverHTML(p) {
+    var felt = (TABLE[p.looking] || TABLE.longterm)[2] || "#1E6347", red = SUIT[p.suit] && SUIT[p.suit].red;
+    var badges = [];
+    if (p.founder && window.SFSlots) badges.push('<span class="cvb f1k" title="First 1,000 · Founding Player №' + String(p.founder).padStart(4, "0") + '">' + SFSlots.founder(p.founder, 34) + "</span>");
+    if (p.hr) badges.push('<span class="cvb hrb">' + (isMasked(p) ? "🎭 " : "💎 ") + (p.hr === "verified" ? "Platinum ✓" : "Gold") + "</span>");
+    if (!p.hr && (p.photoV || p.idV)) badges.push(verBadges(p));
+    var stick = window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, 3), p.bumpersOk) : "";
+    var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 4, size: 14 }) : "";
+    return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in">' +
+      '<div class="cv-medal">' + (BRAND.hat || "") + "</div>" +
+      (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
+      '<div class="cv-tap">Tap to flip</div></div>' + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>";
+  }
   function cardHTML(p, pos) {
     var col = SUIT[p.suit].red ? "red" : "";
     var lookTxt = (TABLE[p.looking] || TABLE.longterm)[1];
     if (p.joker) col += " jokercard";
     if (p.hr && !p.joker) col += " hrcard" + (p.hr === "buyin" ? " hrgold" : "");
-    return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="' + esc(p.name) + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + '. Press to flip."><div class="flip">' +
-      (p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + '</div></div><span class="idx br">J<b class="jk">★</b></span></div>' :
+    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
+    var face = p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + "</div></div>" + details + '<span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
-      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + ((p.photoV || p.idV || p.hr || (p.bumpers || []).length || p.comps || p.founder) ? '<div class="ficons">' + (p.founder && window.SFSlots ? '<span class="f1kmini" title="First 1,000 · Founding Player №' + String(p.founder).padStart(4, "0") + '">' + SFSlots.founder(p.founder, 22) + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 2, size: 12 }) : "") + (p.hr ? "" : verBadges(p)) + (p.hr ? '<span class="hrb" title="High Roller">' + (isMasked(p) ? "🎭 " : "💎 ") + (p.hr === "verified" ? "Platinum ✓" : "Gold") + "</span>" : (window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, p.photoV && p.idV ? 1 : 2), p.bumpersOk) : "")) + "</div>" : "") + jmeter(p) + "</div>" +
-      '<span class="idx br">' + p.rank + pip(p.suit) + "</span>" + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>") +
-      '<div class="back"><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">Fictional sample profile · <button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>' +
-      '</div></div><div class="card-actions"><button class="btn ghost" type="button" data-burn>Burn</button><button class="btn red" type="button" data-play>Play</button></div></div>';
+      '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + jmeter(p) +
+      '<div class="fbtns"><button type="button" class="fb" data-more>ⓘ More</button><button type="button" class="fb gold" data-read>✨ Read us</button></div></div>' +
+      '<span class="idx br">' + p.rank + pip(p.suit) + "</span>" + details + "</div>";
+    return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="Face-down card. Press to flip it over."><div class="flip">' + coverHTML(p) + face +
+      '</div></div><div class="card-actions"><button class="btn ghost" type="button" data-burn>Burn</button><button class="btn red" type="button" data-playcard>Play</button></div></div>';
   }
   function renderTable(redeal) {
     if (deckDirty || !DECK.length) buildDeck();
@@ -1621,7 +1690,7 @@
       if (e.target.closest("[data-report]")) { e.stopPropagation(); if (!confirm("Report and block " + nm0 + "? Our safety team reviews every report.")) return; lrpc("block_member", { target: id, is_report: true }).then(function () { remove(id, "burned", slot); toast("Reported and blocked. Thank you for telling us."); }, function (x) { toast(x.message); }); return; }
       if (e.target.closest("[data-block]")) { e.stopPropagation(); lrpc("block_member", { target: id, is_report: false }).then(function () { remove(id, "burned", slot); toast(nm0 + " is blocked and won't be dealt again."); }, function (x) { toast(x.message); }); return; }
       if (e.target.closest("[data-burn]")) { lrpc("burn_card", { target: id }).then(function () { remove(id, "burned", slot); toast("Burned. " + nm0 + " won't be dealt to you again."); }, function (x) { toast(x.message); }); return; }
-      if (e.target.closest("[data-play]")) {
+      if (e.target.closest("[data-playcard]")) {
         slot.querySelector(".pcard").classList.add("played");
         lrpc("play_card", { target: id }).then(function (r) {
           remove(id, "played", slot);
@@ -1634,8 +1703,10 @@
     if (e.target.closest("[data-report]")) { e.stopPropagation(); toast("Report sent to the Judges (demo only)."); return; }
     if (e.target.closest("[data-block]")) { e.stopPropagation(); remove(id, "burned", slot); toast(p.name.split(" ")[0] + " is blocked and won't be dealt again."); return; }
     if (e.target.closest("[data-burn]")) { remove(id, "burned", slot); toast("Burned. " + p.name.split(" ")[0] + " won't be dealt to you again."); return; }
-    if (e.target.closest("[data-play]")) { playCard(p, slot); return; }
-    var c = e.target.closest(".pcard"); if (c) c.classList.toggle("flipped");
+    if (e.target.closest("[data-playcard]")) { playCard(p, slot); return; }
+    if (e.target.closest("[data-more]")) { e.stopPropagation(); slot.querySelector(".pcard").classList.toggle("more"); return; }
+    if (e.target.closest("[data-read]")) { e.stopPropagation(); readUs(p); return; }
+    var c = e.target.closest(".pcard"); if (c && !c.classList.contains("more")) { c.classList.toggle("flipped"); c.setAttribute("aria-label", c.classList.contains("flipped") ? p.name + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + ". Press to turn face down." : "Face-down card. Press to flip it over."); if (c.classList.contains("flipped")) jackpot(600); }
   });
   $("#dealt").addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("pcard")) { e.preventDefault(); e.target.classList.toggle("flipped"); } });
   function remove(id, to, slot) {
@@ -2081,7 +2152,7 @@
     ["cannabis", "Cannabis", "one", ["Never", "Sometimes", "Often"], 1, 0, "Lifestyle"],
     ["pets", "Pets (check all that apply)", "many", ["Dog", "Cat", "Other pets", "No pets", "Allergic to pets"], 1, 0, "Lifestyle"],
     ["languages", "Languages (check all that apply)", "many", ["English", "Spanish", "Chinese", "Tagalog", "Vietnamese", "Arabic", "French", "Korean", "German", "ASL", "Another"], 1, 0, "Lifestyle"],
-    ["zodiac", "Zodiac sign", "one", ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"], 0, 0, "Lifestyle"]
+    ["zodiac", "Zodiac sign", "one", ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces", "I don't follow zodiac"], 0, 0, "Lifestyle"]
   ];
   var IDX = {}; IDF.forEach(function (f) { IDX[f[0]] = f; });
   POOL.forEach(function (p) { var q = rng(hash(p.id + "cmp")), K = ["cherries", "kiss", "hug", "goldbars", "talk", "clover", "seven", "horseshoe"], c = null; if (q() < .45) { c = {}; var n = 1 + ((q() * 3) | 0); while (n--) { var k = K[(q() * K.length) | 0]; c[k] = (c[k] || 0) + 1 + ((q() * 4) | 0); } } p.comps = c; });
