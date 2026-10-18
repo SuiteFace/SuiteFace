@@ -8,7 +8,7 @@
   var KEY = "sf.gate";
   var path = location.pathname.replace(/^\/+/, "");
   var OPEN = /^(terms|privacy|safety|state-notices|joker-rules|fit|legal|under-18)\.html$|^agreements\//;
-  var MEMBERS = /^(my-table|joker-lobby|private-table|bluff-table|card-backs|preview-club|casino)\.html$/;
+  var MEMBERS = /^(my-table|joker-lobby|private-table|bluff-table|card-backs|casino)\.html$/;
   function passed() { try { return localStorage.getItem(KEY) === VERSION; } catch (e) { return false; } }
   var waiting = [];
   window.SFGate = { ok: passed, require: function (cb) { if (passed()) { cb && cb(); return; } if (cb) waiting.push(cb); if (!document.querySelector(".sfg")) show(); } };

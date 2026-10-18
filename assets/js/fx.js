@@ -9,12 +9,12 @@
   var CSS = '\
 .sfx-veil{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 30%,rgba(47,138,98,.35),rgba(23,21,27,.94) 60%);backdrop-filter:blur(3px);opacity:0;transition:opacity .25s}\
 .sfx-veil.on{opacity:1}\
-.sfx-machine{position:relative;width:min(380px,88vw);padding:26px 22px 20px;border-radius:28px 28px 18px 18px;background:linear-gradient(180deg,#9B1B30,#6A1020);box-shadow:0 0 0 4px #B8862F,0 0 0 8px #6A1020,0 30px 80px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.25);font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif}\
+.sfx-machine{position:relative;width:min(380px,88vw);padding:26px 22px 20px;border-radius:28px 28px 18px 18px;background:linear-gradient(180deg,#9B1B30,#6A1020);box-shadow:0 0 0 4px #B8862F,0 0 0 8px #6A1020,0 30px 80px rgba(12,18,15,.7),inset 0 2px 0 rgba(255,255,255,.25);font-family:"Big Shoulders Display","Arial Narrow",Impact,sans-serif}\
 .sfx-top{position:absolute;left:50%;top:-34px;transform:translateX(-50%);background:linear-gradient(180deg,#E8C46A,#B8862F);color:#231C10;font-weight:900;letter-spacing:.14em;font-size:1.15rem;padding:6px 18px;border-radius:14px 14px 4px 4px;box-shadow:0 0 18px rgba(232,196,106,.7);white-space:nowrap}\
 .sfx-bulbs{position:absolute;inset:6px;border-radius:24px 24px 14px 14px;pointer-events:none}\
 .sfx-bulbs i{position:absolute;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:#FFE7A3;box-shadow:0 0 8px 2px #FFE7A3;opacity:.25;animation:sfxBulb .9s infinite}\
 @keyframes sfxBulb{0%,100%{opacity:.25}50%{opacity:1}}\
-.sfx-window{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#17151B;border-radius:14px;padding:8px;box-shadow:inset 0 6px 14px rgba(0,0,0,.8)}\
+.sfx-window{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#17151B;border-radius:14px;padding:8px;box-shadow:inset 0 6px 14px rgba(12,18,15,.8)}\
 .sfx-reel{height:112px;overflow:hidden;border-radius:9px;background:linear-gradient(180deg,#CFC6B6,#FFFDF8 30%,#FFFDF8 70%,#CFC6B6);position:relative}\
 .sfx-strip{position:absolute;left:0;right:0;top:0;will-change:transform}\
 .sfx-sym{height:112px;display:grid;place-items:center;align-content:center;font-weight:900;font-size:2.6rem;line-height:.9;color:#2B2730}\
@@ -22,11 +22,11 @@
 .sfx-sym.jk{gap:2px}.sfx-sym.jk small{font:900 .95rem "Big Shoulders Display",Impact,sans-serif;letter-spacing:.14em;color:var(--jc)}\
 .sfx-reel.spin .sfx-strip{filter:blur(2px)}\
 .sfx-line{position:absolute;left:14px;right:14px;top:50%;height:2px;background:rgba(200,48,63,.5);pointer-events:none}\
-.sfx-slot{margin:14px auto 0;width:70%;height:12px;border-radius:6px;background:#17151B;box-shadow:inset 0 3px 6px #000,0 1px 0 rgba(255,255,255,.2)}\
+.sfx-slot{margin:14px auto 0;width:70%;height:12px;border-radius:6px;background:#17151B;box-shadow:inset 0 3px 6px #0C120F,0 1px 0 rgba(255,255,255,.2)}\
 .sfx-msg{color:#FAF7F0;text-align:center;margin-top:10px;font-family:Figtree,system-ui,sans-serif;font-weight:700;font-size:.95rem;min-height:1.3em}\
-.sfx-note{position:fixed;z-index:10000;background:#FFFDF8;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.5);transform-origin:50% 0;transition:transform .75s cubic-bezier(.5,0,.3,1),opacity .75s,left .75s cubic-bezier(.5,0,.3,1),top .75s cubic-bezier(.5,0,.3,1),width .75s,height .75s;overflow:hidden}\
+.sfx-note{position:fixed;z-index:10000;background:#FFFDF8;border-radius:6px;box-shadow:0 10px 30px rgba(12,18,15,.5);transform-origin:50% 0;transition:transform .75s cubic-bezier(.5,0,.3,1),opacity .75s,left .75s cubic-bezier(.5,0,.3,1),top .75s cubic-bezier(.5,0,.3,1),width .75s,height .75s;overflow:hidden}\
 .sfx-note::before{content:"";position:absolute;inset:8px 10px;background:repeating-linear-gradient(180deg,transparent 0 10px,rgba(43,39,48,.12) 10px 11px)}\
-.sfx-ticket{position:relative;margin:-6px auto 0;width:78%;background:#FFFDF8;color:#2B2730;border-radius:4px;padding:12px 14px 14px;font-family:Figtree,system-ui,sans-serif;text-align:center;box-shadow:0 12px 24px rgba(0,0,0,.45);transform-origin:50% 0;clip-path:inset(0 0 100% 0);transition:clip-path 1.1s steps(14,end)}\
+.sfx-ticket{position:relative;margin:-6px auto 0;width:78%;background:#FFFDF8;color:#2B2730;border-radius:4px;padding:12px 14px 14px;font-family:Figtree,system-ui,sans-serif;text-align:center;box-shadow:0 12px 24px rgba(12,18,15,.45);transform-origin:50% 0;clip-path:inset(0 0 100% 0);transition:clip-path 1.1s steps(14,end)}\
 .sfx-ticket.out{clip-path:inset(0 0 0 0)}\
 .sfx-ticket::before,.sfx-ticket::after{content:"";position:absolute;left:0;right:0;height:6px;background:radial-gradient(circle at 5px 0,transparent 4px,#FFFDF8 4.5px) 0 0/10px 6px}\
 .sfx-ticket::before{top:-5px;transform:rotate(180deg)}.sfx-ticket::after{bottom:-5px}\
@@ -155,17 +155,17 @@
   // ---------- Celebrations: coin drop, roulette or dice, then WINNER WINNER ----------
   var CCSS = '\
 .sfx-stage{position:relative;width:min(380px,88vw);display:grid;justify-items:center;gap:14px;font-family:Figtree,system-ui,sans-serif;color:#FAF7F0;text-align:center}\
-.sfx-chip{position:fixed;z-index:10002;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#FFE7A3 0 38%,#B8862F 39% 44%,#FFE7A3 45% 52%,#9B1B30 53%);box-shadow:0 0 0 3px #FAF7F0,0 8px 18px rgba(0,0,0,.5);display:grid;place-items:center;font:900 1rem "Big Shoulders Display",Impact,sans-serif;color:#6A1020;transition:left .8s cubic-bezier(.5,0,.3,1),top .8s cubic-bezier(.5,0,.3,1),transform .8s,opacity .3s}\
-.sfx-wheel{width:240px;height:240px;border-radius:50%;position:relative;background:conic-gradient(' + (function () { var s = []; for (var i = 0; i < 18; i++) s.push((i % 2 ? "#2B2730" : "#9B1B30") + " " + (i * 20) + "deg " + (i * 20 + 20) + "deg"); return s.join(","); })() + ');box-shadow:0 0 0 8px #6A3B12,0 0 0 11px #B8862F,0 20px 50px rgba(0,0,0,.6)}\
+.sfx-chip{position:fixed;z-index:10002;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#FFE7A3 0 38%,#B8862F 39% 44%,#FFE7A3 45% 52%,#9B1B30 53%);box-shadow:0 0 0 3px #FAF7F0,0 8px 18px rgba(12,18,15,.5);display:grid;place-items:center;font:900 1rem "Big Shoulders Display",Impact,sans-serif;color:#6A1020;transition:left .8s cubic-bezier(.5,0,.3,1),top .8s cubic-bezier(.5,0,.3,1),transform .8s,opacity .3s}\
+.sfx-wheel{width:240px;height:240px;border-radius:50%;position:relative;background:conic-gradient(' + (function () { var s = []; for (var i = 0; i < 18; i++) s.push((i % 2 ? "#2B2730" : "#9B1B30") + " " + (i * 20) + "deg " + (i * 20 + 20) + "deg"); return s.join(","); })() + ');box-shadow:0 0 0 8px #6A3B12,0 0 0 11px #B8862F,0 20px 50px rgba(12,18,15,.6)}\
 .sfx-wheel::after{content:"";position:absolute;inset:34%;border-radius:50%;background:radial-gradient(circle,#E8C46A,#7a5410);box-shadow:0 0 0 3px #FAF7F0}\
 .sfx-wheel.spin{animation:sfxWheel 3.2s cubic-bezier(.15,.7,.2,1) forwards}\
 @keyframes sfxWheel{to{transform:rotate(1440deg)}}\
 .sfx-ballring{position:absolute;inset:0;animation:sfxBall 3.2s cubic-bezier(.2,.6,.25,1) forwards}\
-.sfx-ballring i{position:absolute;left:50%;top:10px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#CFC6B6);box-shadow:0 2px 4px rgba(0,0,0,.5)}\
+.sfx-ballring i{position:absolute;left:50%;top:10px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#CFC6B6);box-shadow:0 2px 4px rgba(12,18,15,.5)}\
 @keyframes sfxBall{to{transform:rotate(-1800deg)}}\
 .sfx-num{font:900 3rem "Big Shoulders Display",Impact,sans-serif;color:#FFE7A3;text-shadow:0 0 18px rgba(232,196,106,.8);min-height:1em}\
 .sfx-felt{width:100%;height:150px;border-radius:18px;background:radial-gradient(ellipse at 50% 30%,#2a7a58,#1E6347 65%,#154a35);border:8px solid #3a2a1a;position:relative;overflow:hidden}\
-.sfx-die{position:absolute;width:56px;height:56px;border-radius:12px;background:#FFFDF8;box-shadow:inset 0 -4px 0 #CFC6B6,0 8px 14px rgba(0,0,0,.45);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:7px;top:45px}\
+.sfx-die{position:absolute;width:56px;height:56px;border-radius:12px;background:#FFFDF8;box-shadow:inset 0 -4px 0 #CFC6B6,0 8px 14px rgba(12,18,15,.45);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:7px;top:45px}\
 .sfx-die b{width:10px;height:10px;border-radius:50%;background:#9B1B30;place-self:center}\
 .sfx-die.roll1{left:-70px;animation:sfxRoll1 1.6s cubic-bezier(.2,.7,.3,1) forwards}.sfx-die.roll2{left:-140px;animation:sfxRoll2 1.8s cubic-bezier(.2,.7,.3,1) forwards}\
 @keyframes sfxRoll1{60%{transform:translate(200px,-30px) rotate(620deg)}to{transform:translate(170px,0) rotate(720deg)}}\
@@ -221,7 +221,7 @@
 
   // ---------- Bingo / Keno: daubed letters spell the message ----------
   var BCSS = '\
-.sfx-bingo{display:grid;gap:5px;padding:12px;border-radius:16px;background:#FFFDF8;box-shadow:0 0 0 4px #B8862F,0 20px 50px rgba(0,0,0,.6)}\
+.sfx-bingo{display:grid;gap:5px;padding:12px;border-radius:16px;background:#FFFDF8;box-shadow:0 0 0 4px #B8862F,0 20px 50px rgba(12,18,15,.6)}\
 .sfx-bingo .bh{font:900 1.5rem "Big Shoulders Display",Impact,sans-serif;color:#FFFDF8;background:#9B1B30;border-radius:8px;display:grid;place-items:center;height:38px}\
 .sfx-bingo .bc{position:relative;display:grid;place-items:center;height:42px;border-radius:8px;background:#F1E9D8;font:800 1.15rem "Big Shoulders Display",Impact,sans-serif;color:#2B2730}\
 .sfx-bingo .bc.free{font-size:.7rem;color:#9B1B30}\
@@ -229,7 +229,7 @@
 .sfx-bingo .bc.win{color:#FFFDF8;z-index:1}\
 .sfx-bingo .bc.win span{position:relative;z-index:2}\
 @keyframes sfxDab{to{transform:scale(1)}}\
-.sfx-ball{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff,#E8C46A 55%,#B8862F);box-shadow:0 10px 20px rgba(0,0,0,.45);font:900 2rem "Big Shoulders Display",Impact,sans-serif;color:#9B1B30;transition:transform .25s}\
+.sfx-ball{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff,#E8C46A 55%,#B8862F);box-shadow:0 10px 20px rgba(12,18,15,.45);font:900 2rem "Big Shoulders Display",Impact,sans-serif;color:#9B1B30;transition:transform .25s}\
 .sfx-ball.pop{transform:scale(1.18)}';
   function bingo(src, opts, keno) {
     ccss(); if (!document.getElementById("sfx-bcss")) { var s = document.createElement("style"); s.id = "sfx-bcss"; s.textContent = BCSS; document.head.appendChild(s); }
