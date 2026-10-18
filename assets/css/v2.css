@@ -233,7 +233,8 @@ body[data-page="membership"] section[data-pg]:not([data-pg="membership"]),
 body[data-page="club"] section[data-pg]:not([data-pg="club"]),
 body[data-page="contact"] section[data-pg]:not([data-pg="contact"]),
 body[data-page="bluff"] section[data-pg]:not([data-pg="bluff"]),
-body[data-page="backs"] section[data-pg]:not([data-pg="backs"]){display:none!important}
+body[data-page="backs"] section[data-pg]:not([data-pg="backs"]),
+body[data-page="winners"] section[data-pg]:not([data-pg="winners"]){display:none!important}
 body:not([data-page="home"]) main > section:first-of-type{padding-top:clamp(40px,6vw,72px)}
 .nav a[aria-current="page"]{color:var(--cream);background:var(--line)}
 
@@ -594,3 +595,69 @@ input[type=tel]:focus,input[type=number]:focus,input[type=password]:focus{outlin
 .cbform{margin-top:8px}
 .pcard .cover .cvb.pine{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#FFFDF8;box-shadow:0 0 0 1px rgba(201,165,90,.6)}
 .pcard .cover .cv-couple{font:800 .62rem/1 var(--body);padding:4px 8px;border-radius:999px;background:#FFF6DC;color:#6E4E14;white-space:nowrap}
+
+.learnnote{margin:10px 0 0;font-size:.82rem;line-height:1.45;color:var(--muted,#A69DB0);max-width:220px}
+.learnnote b{color:var(--gold-hi,#E8C46A)}
+
+/* ===== Winners' Row badges on cards ===== */
+.cvb.winb{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 4px;border-radius:999px;background:linear-gradient(180deg,#FFF6DC,#F2DDA4);color:#5A3E10;font:800 .62rem/1.2 Figtree,system-ui,sans-serif;letter-spacing:.02em;box-shadow:0 0 0 1px #B8862F,0 2px 6px rgba(0,0,0,.25)}
+.cvb.winb b{font-weight:800;white-space:nowrap}
+.cvb.win-married,.cvb.win-engaged{background:linear-gradient(180deg,#FFFFFF,#F4ECD8)}
+.cv-more{display:inline-block;margin-left:4px;font:700 .6rem Figtree,system-ui,sans-serif;color:rgba(250,247,240,.8);background:rgba(23,21,27,.45);padding:2px 7px;border-radius:999px}
+.mywin{display:flex;justify-content:center;margin:2px 0 4px}
+.mywin .cvb.winb{font-size:.7rem}
+.vline.winline{display:flex;align-items:center;gap:6px}
+.vline.winline a{color:var(--gold-hi,#E8C46A)}
+/* ===== Share card ===== */
+.sharepanel{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.sharebox h3{margin:2px 0 6px}
+.sharegrid{display:grid;grid-template-columns:minmax(0,200px) 1fr;gap:18px;align-items:start;margin-top:10px}
+.shareprev img{width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.4);display:block;background:#2B2730;min-height:120px}
+.sharetips{margin:4px 0 0;padding-left:18px;font-size:.86rem;line-height:1.5;color:var(--muted,#A69DB0)}
+.sharetips b{color:var(--cream,#FAF7F0)}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:560px){.sharegrid{grid-template-columns:1fr}.shareprev{max-width:180px;margin:0 auto}}
+/* ===== Winners' Row page ===== */
+.venuetabs{margin:8px 0 18px}
+.venue{display:flex;gap:20px;align-items:center;padding:22px;border-radius:22px;border:1px solid rgba(232,196,106,.45);background:radial-gradient(120% 140% at 0% 0%,rgba(232,196,106,.16),rgba(43,39,48,.9) 60%);margin-bottom:18px}
+.venue h3{font:900 clamp(1.6rem,4vw,2.3rem)/1 var(--display,"Big Shoulders Display",Impact,sans-serif);text-transform:uppercase;color:#FAF7F0;margin:2px 0 6px;letter-spacing:.02em}
+.venue.v-chapel{background:radial-gradient(120% 140% at 0% 0%,rgba(255,246,220,.22),rgba(43,39,48,.92) 62%)}
+.vart{width:96px;height:96px;flex:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+.wingrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.wincard{border-radius:18px;overflow:hidden;background:#FAF7F0;color:#2B2730;box-shadow:0 0 0 1px #B8862F,0 12px 30px rgba(0,0,0,.3);display:flex;flex-direction:column}
+.wincard img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.wincard .wsuits{aspect-ratio:4/3;display:grid;place-items:center;grid-auto-flow:column;gap:10px;font-size:3.4rem;background:radial-gradient(circle,#FFF6DC,#EBDDBA);color:#23202A}
+.wincard .wsuits .r{color:#B3263A}
+.wbody{padding:14px 16px 16px;display:grid;gap:6px}
+.wbody h4{margin:0;font:900 1.35rem/1.1 var(--display,"Big Shoulders Display",Impact,sans-serif);text-transform:uppercase}
+.wbody p{margin:0;font-size:.95rem;line-height:1.5}
+.wbody small{color:#6B6470}
+.wbadge{display:inline-flex;align-items:center;gap:6px;font:800 .72rem Figtree,system-ui,sans-serif;color:#7A5418;text-transform:uppercase;letter-spacing:.06em}
+.winempty{grid-column:1/-1;display:flex;gap:18px;align-items:center;padding:24px;border-radius:18px;border:1px dashed rgba(232,196,106,.5)}
+.winempty .vart{width:72px;height:72px}
+.wincta{margin-top:22px}
+.winask{border-left:3px solid var(--gold-hi,#E8C46A);padding-left:10px}
+.ckrow .row{gap:6px;flex-wrap:wrap}
+/* ===== Home: Winners' Row band and city check ===== */
+.h-wins-in{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;align-items:center}
+.h-venues{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.h-venues li{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 10px;border-radius:16px;background:rgba(250,247,240,.05);border:1px solid rgba(232,196,106,.35);font:800 .85rem Figtree,system-ui,sans-serif;text-align:center;color:#FAF7F0}
+.h-venues li span{font-size:1.8rem}
+@media (max-width:760px){.h-wins-in{grid-template-columns:1fr}}
+.citycheck{max-width:560px;margin:8px auto 22px;text-align:left;padding:18px 20px;border-radius:18px;background:rgba(250,247,240,.05);border:1px solid rgba(232,196,106,.3)}
+.citycheck h3{margin:0 0 4px;font-size:1.15rem}
+.citycheck form{gap:8px;margin-top:10px}
+.citycheck input{flex:1;min-width:120px}
+.cityprog,.cityboard .mini{display:block;height:10px;border-radius:999px;background:rgba(250,247,240,.12);overflow:hidden}
+.cityprog i,.cityboard .mini i{display:block;height:100%;background:linear-gradient(90deg,#B8862F,#FFE7A3);border-radius:inherit}
+.cityok{color:#E8C46A}
+.cityboard{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
+.cityboard li{display:grid;grid-template-columns:1fr 90px;align-items:center;gap:10px;font-size:.88rem}
+.cityboard li small{color:var(--muted,#A69DB0)}
+.cityboard li.open span{color:#E8C46A;font-weight:800}
+.cityboard .mini{height:6px}
+.feetab{width:100%;border-collapse:collapse;font-size:.88rem}
+.feetab th,.feetab td{text-align:left;padding:6px 8px;border-bottom:1px solid rgba(250,247,240,.1)}
+.feetab th{color:var(--muted,#A69DB0);font-weight:700}
+.venuechip .count:empty{display:none}
+#winForm input[type=date]{padding:.7rem .9rem;border-radius:12px;border:1px solid rgba(250,247,240,.2);background:rgba(23,21,27,.25);color:inherit;font:inherit;color-scheme:dark}

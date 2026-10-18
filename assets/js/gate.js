@@ -1,4 +1,6 @@
-/* SuiteFace age gate: 18+ confirmation and agreement to the Terms on a visitor's first visit.
+/* SuiteFace age gate: 18+ confirmation and agreement to the Terms.
+   Visitors see the public pages (the game, the suits, a sample hand) first. The gate opens when they
+   take a step to join: "Get dealt in", Log in, any agreement to sign, or a members-area page.
    Legal pages stay open so the links inside the gate work. The choice is remembered on this device;
    members still sign the full Sign-up Agreement (with date of birth) when they create an account. */
 (function () {
@@ -6,8 +8,11 @@
   var KEY = "sf.gate";
   var path = location.pathname.replace(/^\/+/, "");
   var OPEN = /^(terms|privacy|safety|state-notices|joker-rules|fit|legal|under-18)\.html$|^agreements\//;
-  if (OPEN.test(path)) return;
-  try { if (localStorage.getItem(KEY) === VERSION) return; } catch (e) { }
+  var MEMBERS = /^(my-table|joker-lobby|private-table|bluff-table|card-backs|preview-club|casino)\.html$/;
+  function passed() { try { return localStorage.getItem(KEY) === VERSION; } catch (e) { return false; } }
+  var waiting = [];
+  window.SFGate = { ok: passed, require: function (cb) { if (passed()) { cb && cb(); return; } if (cb) waiting.push(cb); if (!document.querySelector(".sfg")) show(); } };
+  if (OPEN.test(path) || passed()) return;
   var up = /^agreements\//.test(path) ? "../" : "";
 
   var css = '\
@@ -47,6 +52,7 @@
       if (!age.checked || !terms.checked) { err.textContent = !age.checked ? "Please confirm you are 18 or older." : "Please agree to the Terms of Service to continue."; return; }
       try { localStorage.setItem(KEY, VERSION); localStorage.setItem(KEY + ".at", new Date().toISOString()); } catch (e) { }
       document.documentElement.style.overflow = ""; g.remove();
+      var q = waiting.splice(0); q.forEach(function (f) { try { f(); } catch (e) { } });
     });
     g.querySelector("#sfgNo").addEventListener("click", function () { location.href = up + "under-18.html"; });
     // keep keyboard focus inside the gate
@@ -56,5 +62,19 @@
     });
     setTimeout(function () { age.focus(); }, 50);
   }
-  if (document.body) show(); else document.addEventListener("DOMContentLoaded", show);
+  function start() {
+    if (MEMBERS.test(path)) { show(); return; }
+    // Steps that mean "I want to join" go through the gate first, then carry on.
+    document.addEventListener("click", function (e) {
+      if (passed()) return;
+      var el = e.target.closest && e.target.closest("[data-gate], #loginBtn, #payBtn, .promo-cta");
+      if (!el) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      window.SFGate.require(function () { if (el.tagName === "A" && el.href && !/#/.test(el.getAttribute("href") || "")) location.href = el.href; else el.click(); });
+    }, true);
+    // Signing any SuiteFace agreement also needs the 18+ confirmation first.
+    var hook = function () { var S = window.SFSign; if (!S || S.__gated) return; var r = S.require; S.require = function () { var a = arguments, me = this; window.SFGate.require(function () { r.apply(me, a); }); }; S.__gated = true; };
+    hook(); setTimeout(hook, 0);
+  }
+  if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
 })();

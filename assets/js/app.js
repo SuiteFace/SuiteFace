@@ -17,9 +17,9 @@
 
   /* ---------- pages: one site, several pages. Each section lives on one page; links to a section on another page go there. ---------- */
   var PAGE = (document.body && document.body.getAttribute("data-page")) || "home";
-  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html", bluff: "bluff-table.html", backs: "card-backs.html" };
+  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html", bluff: "bluff-table.html", backs: "card-backs.html", winners: "winners.html" };
   var SEC_PAGE = { how: "how", demo: "how", safety: "how", quiz: "suit", "private-tables": "tables", casinos: "tables", membership: "membership",
-    face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home", bluff: "bluff", backs: "backs" };
+    face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home", bluff: "bluff", backs: "backs", winners: "winners" };
   function pageFor(id) { return SEC_PAGE[id] || null; }
   function goSection(id, keepSearch) {
     var pg = pageFor(id); if (!pg || pg === PAGE) return false;
@@ -785,7 +785,7 @@
       '<div class="bars">' + ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); return '<div class="bar"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") + "</div>" +
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-wild="' + lean + '">That\'s me. Play as a Wild Card</button>' +
       ORDER.map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
-      '<button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
+      '<button class="btn ghost sm" type="button" data-sharecard="' + top + '">📤 Share my suit</button><button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
       (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your Wild Card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your deck.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") + "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
@@ -1413,7 +1413,7 @@
     var thm = THEME[P.theme] || THEME.private; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +
-      '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") + (P.founderNo ? '<div class="f1kline">' + (window.SFSlots ? SFSlots.founder(P.founderNo, 44) : "") + '<span>★ First 1,000 · №' + String(P.founderNo).padStart(4, "0") + "</span></div>" : "") + ((P.hostCasinos || []).length ? '<div class="hostline">♠ Host · ' + esc(P.hostCasinos.join(" · ")) + "</div>" : "") + (P.highRoller ? '<div class="hrb mine">💎 High Roller · ' + (P.highRoller === "verified" ? "Platinum ✓" : "Gold") + "</div>" + (P.masked ? '<div class="maskline">🎭 Others see: ' + esc(P.maskName || "Masked High Roller") + (parseInt(P.age, 10) ? ", " + (parseInt(P.age, 10) - 1) + "–" + (parseInt(P.age, 10) + 1) : "") + "</div>" : "") : "") +
+      (P.wins && topWin(P.wins) ? '<div class="mywin">' + winBadge(P.wins, true) + "</div>" : "") + '<div class="nm">' + esc(P.name || "Your Name") + (parseInt(P.age, 10) ? ", " + esc(parseInt(P.age, 10)) : "") + '</div><div class="hd">' + esc(h) + "</div>" + (seekLine() ? '<div class="seek">' + esc(seekLine()) + "</div>" : "") + (P.founderNo ? '<div class="f1kline">' + (window.SFSlots ? SFSlots.founder(P.founderNo, 44) : "") + '<span>★ First 1,000 · №' + String(P.founderNo).padStart(4, "0") + "</span></div>" : "") + ((P.hostCasinos || []).length ? '<div class="hostline">♠ Host · ' + esc(P.hostCasinos.join(" · ")) + "</div>" : "") + (P.highRoller ? '<div class="hrb mine">💎 High Roller · ' + (P.highRoller === "verified" ? "Platinum ✓" : "Gold") + "</div>" + (P.masked ? '<div class="maskline">🎭 Others see: ' + esc(P.maskName || "Masked High Roller") + (parseInt(P.age, 10) ? ", " + (parseInt(P.age, 10) - 1) + "–" + (parseInt(P.age, 10) + 1) : "") + "</div>" : "") : "") +
       '<div class="bio">' + esc(P.bio || "Your Face Value goes here: a few lines about what makes you, you.") + "</div>" + ((P.selfWords && P.selfWords.length) ? '<div class="words2"><span><b>Me:</b> ' + esc(P.selfWords.slice(0, 3).join(" · ")) + '</span>' + ((P.othersWords && P.othersWords.length) ? '<span><b>My people:</b> ' + esc(P.othersWords.slice(0, 3).join(" · ")) + "</span>" : "") + "</div>" : "") + '<div class="facts">' + esc(myFacts()) + "</div>" + (window.SFBumpers ? SFBumpers.strip(P.bumpers, P.bumpersOk) : "") + (window.SFSlots && P.myComps ? SFSlots.strip(P.myComps, { size: 16 }) : "") +
       '<div class="tr" style="color:' + col + '">' + (P.wild ? "★ Wild Card" : P.mySuit ? SUIT[s].sym + " " + SUIT[s].name : "Take the quiz to get your suit") + "</div></div>" + '<div class="tablebadge">' + esc(TABLE[P.looking][1]) + " table</div>" + '<div class="stks">' + P.stickers.map(function (id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="stk-' + k[2] + '">' + k[1] + "</span>" : ""; }).join("") + "</div>";
     $("#ph").style.backgroundImage = P.photo ? "url(" + P.photo + ")" : ""; $("#ph").textContent = P.photo ? "" : initials(P.name);
@@ -1532,8 +1532,9 @@
     var h = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(a * r) * Math.cos(c * r) * Math.sin(dl / 2) * Math.sin(dl / 2);
     return 3958.8 * 2 * Math.asin(Math.sqrt(h));
   }
+  var zipAsked = false;
   function loadZips() {
-    if (!window.fetch) return;
+    if (!window.fetch || zipAsked) return; zipAsked = true;
     fetch(CFG.zipDataUrl).then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); }).then(function (txt) {
       var lines = txt.split("\n");
       for (var i = 1; i < lines.length; i++) {
@@ -1684,15 +1685,46 @@
   }
   /* Every card is dealt face down. The back (what everyone sees first) carries only the player's badges, stickers,
      felt and pattern. Tap to flip and meet the person; Burn and Play appear once it's turned over. */
+  /* ---------- Winners' Row badges: earned only when both people shared a win and staff approved it ---------- */
+  var WINS = {
+    married: { ic: "ring", short: "Married here", venue: "chapel", long: "Met on SuiteFace and married" },
+    engaged: { ic: "ring", short: "Engaged here", venue: "chapel", long: "Met on SuiteFace and got engaged" },
+    together: { ic: "flush", short: "Royal Flush", venue: "royal-flush", long: "Found their person on SuiteFace" },
+    friends: { ic: "cheers", short: "Friends made", venue: "lounge", long: "Made a real friend on SuiteFace" },
+    great_date: { ic: "jackpot", short: "Jackpot date", venue: "jackpot", long: "Had a jackpot date on SuiteFace" }
+  };
+  var WIN_ORDER = ["married", "engaged", "together", "friends", "great_date"];
+  function topWin(list) { list = list || []; for (var i = 0; i < WIN_ORDER.length; i++) if (list.indexOf(WIN_ORDER[i]) > -1) return WIN_ORDER[i]; return null; }
+  function winIcon(kind, size) {
+    size = size || 18; var w = WINS[kind]; if (!w) return "";
+    var g = '<defs><linearGradient id="wg' + size + kind + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE7A3"/><stop offset=".55" stop-color="#E8C46A"/><stop offset="1" stop-color="#9C6B1F"/></linearGradient></defs>', f = "url(#wg" + size + kind + ")";
+    var art = {
+      ring: '<circle cx="12" cy="15" r="6.5" fill="none" stroke="' + f + '" stroke-width="2.4"/><path d="M8.6 6.2 10.4 3.4h3.2l1.8 2.8L12 9.6z" fill="#F4F1FA" stroke="#B8862F" stroke-width=".8"/>',
+      flush: '<rect x="4" y="3" width="11" height="15" rx="2" fill="#FAF7F0" stroke="#B8862F"/><rect x="9" y="6" width="11" height="15" rx="2" fill="#FAF7F0" stroke="' + f + '" stroke-width="1.4"/><path d="M14.5 16.8c-2.6-1.7-3.6-3-3.6-4.3 0-1 .8-1.7 1.7-1.7.8 0 1.4.4 1.9 1 .5-.6 1.1-1 1.9-1 .9 0 1.7.7 1.7 1.7 0 1.3-1 2.6-3.6 4.3z" fill="#B3263A"/>',
+      cheers: '<path d="M6 4h6l-1 7a2 2 0 0 1-4 0zM12 4h6l-1 7a2 2 0 0 1-4 0z" fill="' + f + '"/><path d="M9 13v6M15 13v6M7 20h4M13 20h4" stroke="#B8862F" stroke-width="1.6" stroke-linecap="round"/>',
+      jackpot: '<rect x="3" y="5" width="18" height="14" rx="3" fill="#2B2730" stroke="' + f + '" stroke-width="1.6"/><text x="12" y="15.5" text-anchor="middle" font-family="Big Shoulders Display,Impact,sans-serif" font-weight="900" font-size="8" fill="#E8C46A">777</text>'
+    }[w.ic];
+    return '<svg class="winic" viewBox="0 0 24 24" width="' + size + '" height="' + size + '" aria-hidden="true">' + g + art + "</svg>";
+  }
+  function winBadge(list, long) { var k = topWin(list); if (!k) return ""; return '<span class="cvb winb win-' + k + '" title="' + esc(WINS[k].long) + '">' + winIcon(k, long ? 20 : 16) + "<b>" + esc(WINS[k].short) + "</b></span>"; }
+
   function coverHTML(p) {
     var felt = (TABLE[p.looking] || TABLE.longterm)[2] || "#1E6347", red = SUIT[p.suit] && SUIT[p.suit].red;
     var badges = [];
+    if (p.wins && topWin(p.wins)) badges.push(winBadge(p.wins));
     if (p.founder && window.SFSlots) badges.push('<span class="cvb f1k" title="First 1,000 · Founding Player №' + String(p.founder).padStart(4, "0") + '">' + SFSlots.founder(p.founder, 34) + "</span>");
     if (asList(p.id_ && p.id_.style).indexOf("Swinger") > -1 && window.SFSlots) badges.push('<span class="cvb pine" title="Swinger-friendly">' + SFSlots.svg("pineapple", 18) + "</span>");
     if (p.hr) badges.push('<span class="cvb hrb">' + (isMasked(p) ? "🎭 " : "💎 ") + (p.hr === "verified" ? "Platinum ✓" : "Gold") + "</span>");
     if (!p.hr && (p.photoV || p.idV)) badges.push(verBadges(p));
-    var stick = window.SFBumpers ? SFBumpers.strip((p.bumpers || []).slice(0, 3), p.bumpersOk) : "";
-    var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 4, size: 14 }) : "";
+    // Card clean-up: the top of a card shows at most three badges or stickers, in this order:
+    // a win, verification or High Roller, First 1,000, pineapple, then bumper stickers. The rest live under "More".
+    var extra = 0;
+    if (badges.length > 3) { extra += badges.length - 3; badges = badges.slice(0, 3); }
+    var room = 3 - badges.length, bl = p.bumpers || [];
+    var stick = window.SFBumpers && room > 0 ? SFBumpers.strip(bl.slice(0, room), p.bumpersOk) : "";
+    extra += Math.max(0, bl.length - Math.max(room, 0));
+    var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 3, size: 14 }) : "";
+    if (extra) stick += '<span class="cv-more" title="' + extra + ' more under More">+' + extra + "</span>";
     return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.cardBack && CB[p.cardBack] ? " cb-" + p.cardBack : "") + '">' +
       '<div class="cv-medal">' + (BRAND.hat || "") + "</div>" +
       (p.couple ? '<div class="cv-couple">🍍 Couple' + (p.couple.name ? " · with " + esc(p.couple.name) : "") + "</div>" : "") + (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
@@ -1703,7 +1735,7 @@
     var lookTxt = (TABLE[p.looking] || TABLE.longterm)[1];
     if (p.joker) col += " jokercard";
     if (p.hr && !p.joker) col += " hrcard" + (p.hr === "buyin" ? " hrgold" : "");
-    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
+    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.wins && topWin(p.wins) ? '<span class="vline winline">' + winIcon(topWin(p.wins), 20) + " " + esc(WINS[topWin(p.wins)].long) + ' · <a href="winners.html">Winners\' Row</a></span>' : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
     var face = p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + "</div></div>" + details + '<span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
       '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + jmeter(p) +
@@ -1769,9 +1801,11 @@
     if (e.target.closest("[data-block]")) { e.stopPropagation(); remove(id, "burned", slot); toast(p.name.split(" ")[0] + " is blocked and won't be dealt again."); return; }
     if (e.target.closest("[data-burn]")) { remove(id, "burned", slot); toast("Burned. " + p.name.split(" ")[0] + " won't be dealt to you again."); return; }
     if (e.target.closest("[data-playcard]")) { playCard(p, slot); return; }
-    if (e.target.closest("[data-more]")) { e.stopPropagation(); slot.querySelector(".pcard").classList.toggle("more"); return; }
-    if (e.target.closest("[data-read]")) { e.stopPropagation(); readUs(p); return; }
-    var c = e.target.closest(".pcard"); if (c && !c.classList.contains("more")) { c.classList.toggle("flipped"); c.setAttribute("aria-label", c.classList.contains("flipped") ? p.name + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + ". Press to turn face down." : "Face-down card. Press to flip it over."); if (c.classList.contains("flipped")) jackpot(600); }
+    // Quiet signals that teach the dealer (live only): flipping a card, opening More, asking for a Read us.
+    var sig = function (k) { if (liveOn() && LIVE_ROWS && /^[0-9a-f-]{36}$/.test(id)) lrpc("card_signal", { target: id, kind: k }).catch(function () { }); };
+    if (e.target.closest("[data-more]")) { e.stopPropagation(); slot.querySelector(".pcard").classList.toggle("more"); sig("more"); return; }
+    if (e.target.closest("[data-read]")) { e.stopPropagation(); readUs(p); sig("read"); return; }
+    var c = e.target.closest(".pcard"); if (c && !c.classList.contains("more")) { c.classList.toggle("flipped"); if (c.classList.contains("flipped")) sig("flipped"); c.setAttribute("aria-label", c.classList.contains("flipped") ? p.name + ", " + p.age + ", " + p.rank + " of " + SUIT[p.suit].name + ". Press to turn face down." : "Face-down card. Press to flip it over."); if (c.classList.contains("flipped")) jackpot(600); }
   });
   $("#dealt").addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("pcard")) { e.preventDefault(); e.target.classList.toggle("flipped"); } });
   function remove(id, to, slot) {
@@ -2142,19 +2176,254 @@
     });
   });
 
+  /* ---------- The Deal learns: show members what the dealer has picked up ---------- */
+  function renderLearn() {
+    var el = $("#learnNote"); if (!el || !liveOn()) return;
+    lrpc("my_deal_learning").then(function (d) {
+      if (!d || !(d.played + d.burned + d.looked)) { el.hidden = false; el.innerHTML = "🎰 <b>The dealer learns as you play.</b> Flip, Play and Burn cards and each new deal fits you better."; return; }
+      var top = Object.keys(d.suits || {}).filter(function (k) { return d.suits[k] > 0 && SUIT[k]; }).sort(function (a, b) { return d.suits[b] - d.suits[a]; }).slice(0, 2).map(function (k) { return SUIT[k].sym + " " + SUIT[k].name + "s"; });
+      el.hidden = false;
+      el.innerHTML = "🎰 <b>The dealer is learning.</b> " + d.played + " played · " + d.burned + " burned · " + d.looked + " looked" + (top.length ? ". Leaning " + esc(top.join(" and ")) + "." : ".") + " New members in their first week get a fair first deal too.";
+    }).catch(function () { });
+  }
+  document.addEventListener("sf:live", function () { if ((document.body.getAttribute("data-page") || "") === "club") setTimeout(renderLearn, 600); });
+
+  /* =====================================================================
+     SHARE YOUR CARD: a tasteful image for Instagram, TikTok, Facebook, Snapchat or LinkedIn.
+     First name and suit only. No age, no last name, no town. Your photo only if you switch it on.
+     ===================================================================== */
+  var SHARE = { fmt: "story", photo: false, win: true };
+  function myRef() { var h = (P.handle || "").trim().replace(/^@/, ""); return CFG.siteUrl + (h ? "?ref=" + encodeURIComponent(h) : ""); }
+  function loadImg(src) { return new Promise(function (ok) { if (!src) return ok(null); var im = new Image(); im.crossOrigin = "anonymous"; im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = src; }); }
+  function rr(x, c, X, Y, W, H, R) { x.beginPath(); x.moveTo(X + R, Y); x.arcTo(X + W, Y, X + W, Y + H, R); x.arcTo(X + W, Y + H, X, Y + H, R); x.arcTo(X, Y + H, X, Y, R); x.arcTo(X, Y, X + W, Y, R); x.closePath(); }
+  function wrapText(x, t, cx, y, maxW, lh) { var words = String(t).split(" "), line = "", lines = []; words.forEach(function (w) { var test = line ? line + " " + w : w; if (x.measureText(test).width > maxW && line) { lines.push(line); line = w; } else line = test; }); if (line) lines.push(line); lines.forEach(function (l, i) { x.fillText(l, cx, y + i * lh); }); return lines.length; }
+  function drawShareCard(o) {
+    var W = 1080, H = o.fmt === "post" ? 1080 : 1920, cv = document.createElement("canvas"); cv.width = W; cv.height = H; var x = cv.getContext("2d");
+    var D = '"Big Shoulders Display", Impact, "Arial Narrow", sans-serif', B = 'Figtree, "Segoe UI", system-ui, sans-serif';
+    var g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, "#3A2F3E"); g.addColorStop(.55, "#231E29"); g.addColorStop(1, "#17151B"); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    var glow = x.createRadialGradient(W / 2, H * .42, 40, W / 2, H * .42, W * .8); glow.addColorStop(0, "rgba(232,196,106,.22)"); glow.addColorStop(1, "rgba(232,196,106,0)"); x.fillStyle = glow; x.fillRect(0, 0, W, H);
+    // marquee frame with bulbs
+    x.strokeStyle = "#B8862F"; x.lineWidth = 6; rr(x, 0, 44, 44, W - 88, H - 88, 46); x.stroke();
+    var per = 2 * (W - 88) + 2 * (H - 88), n = Math.round(per / 54);
+    for (var i = 0; i < n; i++) { var d = i / n * per, px, py; if (d < W - 88) { px = 44 + d; py = 44; } else if (d < W - 88 + H - 88) { px = W - 44; py = 44 + d - (W - 88); } else if (d < 2 * (W - 88) + H - 88) { px = W - 44 - (d - (W - 88) - (H - 88)); py = H - 44; } else { px = 44; py = H - 44 - (d - 2 * (W - 88) - (H - 88)); }
+      if ((px < 90 || px > W - 90) && (py < 90 || py > H - 90)) continue; x.fillStyle = i % 2 ? "#FFE7A3" : "#E8C46A"; x.beginPath(); x.arc(px, py, 7, 0, 7); x.fill(); }
+    var post = o.fmt === "post", top = post ? 120 : 190;
+    x.textAlign = "center"; x.fillStyle = "#E8C46A"; x.font = "900 " + (post ? 62 : 84) + "px " + D; x.fillText("SUITEFACE", W / 2, top);
+    x.fillStyle = "#CFC6B6"; x.font = "600 " + (post ? 26 : 34) + "px " + B; x.fillText("No Jokers Needed.", W / 2, top + (post ? 40 : 56));
+    // the card
+    var cw = post ? 420 : 600, ch = cw * 1.4, cx0 = (W - cw) / 2, cy0 = post ? 220 : 340, red = !o.wild && SUIT[o.suit] && SUIT[o.suit].red, ink = red ? "#B3263A" : "#23202A";
+    x.save(); x.shadowColor = "rgba(0,0,0,.45)"; x.shadowBlur = 50; x.shadowOffsetY = 20; x.fillStyle = "#FAF7F0"; rr(x, 0, cx0, cy0, cw, ch, 36); x.fill(); x.restore();
+    x.strokeStyle = "#E8C46A"; x.lineWidth = 4; rr(x, 0, cx0 + 14, cy0 + 14, cw - 28, ch - 28, 26); x.stroke();
+    var sym = o.wild ? "★" : SUIT[o.suit].sym, rank = o.wild ? "W" : "A";
+    x.fillStyle = ink; x.textAlign = "left"; x.font = "900 " + cw * .13 + "px " + D; x.fillText(rank, cx0 + 34, cy0 + cw * .16); x.font = "700 " + cw * .1 + "px " + B; x.fillText(sym, cx0 + 36, cy0 + cw * .27);
+    x.save(); x.translate(cx0 + cw - 34, cy0 + ch - cw * .16); x.rotate(Math.PI); x.font = "900 " + cw * .13 + "px " + D; x.fillText(rank, 0, 0); x.font = "700 " + cw * .1 + "px " + B; x.fillText(sym, 2, cw * .11); x.restore();
+    x.textAlign = "center";
+    if (o.img) { var r = cw * .27, pcx = W / 2, pcy = cy0 + ch * .38; x.save(); x.beginPath(); x.arc(pcx, pcy, r, 0, 7); x.clip(); var s = Math.max(2 * r / o.img.width, 2 * r / o.img.height); x.drawImage(o.img, pcx - o.img.width * s / 2, pcy - o.img.height * s / 2 * .9, o.img.width * s, o.img.height * s); x.restore(); x.strokeStyle = "#E8C46A"; x.lineWidth = 6; x.beginPath(); x.arc(pcx, pcy, r, 0, 7); x.stroke();
+      x.fillStyle = ink; x.font = "700 " + cw * .2 + "px " + B; x.fillText(sym, W / 2, cy0 + ch * .76); }
+    else { x.fillStyle = ink; x.font = "700 " + cw * .5 + "px " + B; x.fillText(sym, W / 2, cy0 + ch * .62); }
+    // line under the card
+    var y = cy0 + ch + (post ? 70 : 110), nm = (o.name || "").split(" ")[0];
+    x.fillStyle = "#FAF7F0"; x.font = "900 " + (post ? 56 : 80) + "px " + D;
+    x.fillText(((nm ? nm + " is " : "I'm ") + (o.wild ? "a Wild Card" : (/^[AEIOU]/.test(SUIT[o.suit].name) ? "an " : "a ") + SUIT[o.suit].name)).toUpperCase(), W / 2, y);
+    if (!post) { x.fillStyle = "#CFC6B6"; x.font = "500 38px " + B; y += 30 + 26 * wrapText(x, o.wild ? "Plays well in any suit. Steady, playful, direct and thoughtful, depending on the table." : SUIT[o.suit].line + " " + SUIT[o.suit].love, W / 2, y + 66, 820, 52); y += 40; }
+    if (o.winKind) { var wl = WINS[o.winKind].long; x.font = "700 " + (post ? 28 : 36) + "px " + B; var tw = x.measureText(wl).width + 90, bh = post ? 56 : 70, by = y + (post ? 22 : 30); x.fillStyle = "rgba(232,196,106,.14)"; rr(x, 0, (W - tw) / 2, by, tw, bh, bh / 2); x.fill(); x.strokeStyle = "#E8C46A"; x.lineWidth = 3; x.stroke(); x.fillStyle = "#FFE7A3"; x.fillText((o.winKind === "married" || o.winKind === "engaged" ? "💍 " : "🏆 ") + wl, W / 2, by + bh * .66); y = by + bh; }
+    // call to action
+    var fy = H - (post ? 110 : 190);
+    x.fillStyle = "#E8C46A"; x.font = "900 " + (post ? 44 : 60) + "px " + D; x.fillText("WHAT SUIT ARE YOU?", W / 2, fy);
+    x.fillStyle = "#FAF7F0"; x.font = "700 " + (post ? 30 : 40) + "px " + B; x.fillText("suiteface.com", W / 2, fy + (post ? 46 : 64));
+    return cv;
+  }
+  function openShare(o) {
+    o = o || {}; var suit = o.suit || P.mySuit || "heart", wild = o.wild != null ? o.wild : !!P.wild;
+    var myWin = topWin(P.wins), name = o.name != null ? o.name : (P.name || "");
+    var m = modal('<div class="sharebox"><p class="eyebrow">Share your card</p><h3>Put your suit on your socials</h3>' +
+      '<p class="lede">First name and suit only. No age, last name or town. Your photo stays off unless you turn it on.</p>' +
+      '<div class="sharegrid"><div class="shareprev"><img id="shImg" alt="Preview of your share card"></div><div class="form-grid">' +
+      '<div class="seg" role="group" aria-label="Size"><button type="button" class="chip" data-fmt="story" aria-pressed="true">Story (9:16)</button><button type="button" class="chip" data-fmt="post" aria-pressed="false">Post (square)</button></div>' +
+      (P.photo && /^https?:|^data:/.test(P.photo) && o.member !== false ? '<label class="chk"><input type="checkbox" id="shPhoto"> Include my photo</label>' : "") +
+      (myWin ? '<label class="chk"><input type="checkbox" id="shWin" checked> Show my Winners\' Row badge</label>' : "") +
+      '<div class="row"><button class="btn gold" type="button" id="shGo">Share…</button><a class="btn ghost" id="shDl" download="suiteface-card.png" href="#">Download</a><button class="btn ghost" type="button" id="shLink">Copy my link</button></div>' +
+      '<ul class="sharetips"><li><b>Instagram or TikTok:</b> post the Story size and add a link sticker with your link.</li><li><b>Facebook or LinkedIn:</b> post the square and paste your link in the text.</li><li><b>Snapchat:</b> send the Story size to My Story.</li><li><b>Your bio:</b> copy your link and add it to your profile.</li></ul>' +
+      '<p class="hint">Your link takes friends to the suit quiz' + ((P.handle || "").trim() ? " and credits you for the invite" : "") + '.</p></div></div></div>');
+    var url = "";
+    function paint() {
+      var useImg = SHARE.photo && $("#shPhoto", m) && $("#shPhoto", m).checked;
+      return (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () { return loadImg(useImg ? P.photo : null); }).then(function (img) {
+        var cv = drawShareCard({ fmt: SHARE.fmt, suit: suit, wild: wild, name: name, img: img, winKind: myWin && (!$("#shWin", m) || $("#shWin", m).checked) ? myWin : null });
+        try { url = cv.toDataURL("image/png"); } catch (e) { url = drawShareCard({ fmt: SHARE.fmt, suit: suit, wild: wild, name: name }).toDataURL("image/png"); toast("Your photo couldn't be added here, so the card shows your suit."); }
+        $("#shImg", m).src = url; $("#shDl", m).href = url;
+      });
+    }
+    $$("[data-fmt]", m).forEach(function (b) { b.addEventListener("click", function () { SHARE.fmt = b.getAttribute("data-fmt"); $$("[data-fmt]", m).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); paint(); }); });
+    if ($("#shPhoto", m)) $("#shPhoto", m).addEventListener("change", function () { SHARE.photo = this.checked; paint(); });
+    if ($("#shWin", m)) $("#shWin", m).addEventListener("change", paint);
+    $("#shLink", m).addEventListener("click", function () { copy(myRef(), $("#shLink", m)); });
+    $("#shGo", m).addEventListener("click", function () {
+      fetch(url).then(function (r) { return r.blob(); }).then(function (b) {
+        var f = new File([b], "suiteface-card.png", { type: "image/png" }), data = { files: [f], title: "My SuiteFace card", text: "What suit are you? " + myRef() };
+        if (navigator.canShare && navigator.canShare({ files: [f] })) return navigator.share(data).catch(function () { });
+        $("#shDl", m).click(); toast("Saved. Post it from your photos and paste your link.");
+      });
+    });
+    paint();
+  }
+  window.SF_share = openShare;
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-sharecard]"); if (!b) return; e.preventDefault();
+    var v = b.getAttribute("data-sharecard"); var lead = S.get("suitLead", null);
+    if (v && v !== "me") openShare({ suit: v === "wild" ? (P.mySuit || "heart") : v, wild: v === "wild", name: (lead && lead.name) || P.name || "", member: !!(window.SF_LIVE && window.SF_LIVE.seated) });
+    else openShare();
+  });
+
+  /* =====================================================================
+     WINNERS' ROW: real winning hands, shown only when both people say yes and staff approve.
+     The Chapel of Aces (married and engaged), the Royal Flush Room (together), the Friendship
+     Lounge (friends made) and the Jackpot Wall (great dates).
+     ===================================================================== */
+  var VENUES = {
+    chapel: { name: "The Chapel of Aces", eyebrow: "Married or engaged", line: "They met at a SuiteFace table and said I do. Every couple here gets a ring on the top of their cards.", empty: "The first couple to marry after meeting on SuiteFace gets the first pew in the Chapel. Save it a seat." },
+    "royal-flush": { name: "The Royal Flush Room", eyebrow: "Found their person", line: "Long-term players who made their pair and kept it. Their cards wear the Royal Flush.", empty: "The Royal Flush Room is waiting for its first pair. Will it be yours?" },
+    lounge: { name: "The Friendship Lounge", eyebrow: "Friends made", line: "Not every winning hand is a romance. These players found a real friend at the table.", empty: "The Lounge's first round is on the house. Made a friend here? Share it." },
+    jackpot: { name: "The Jackpot Wall", eyebrow: "Great dates", line: "One great night, honestly told. First names or initials only.", empty: "No jackpots on the wall yet. The first great date goes up top." }
+  };
+  var winVenue = "chapel";
+  function photoUrl(p) { return p && CFG.supabaseUrl ? CFG.supabaseUrl + "/storage/v1/object/public/win-photos/" + p.split("/").map(encodeURIComponent).join("/") : ""; }
+  function renderWinners() {
+    var root = $("#winRow"); if (!root) return;
+    var tabs = $("#winTabs");
+    tabs.innerHTML = Object.keys(VENUES).map(function (k) { return '<button type="button" class="chip venuechip v-' + k + '" data-venue="' + k + '" aria-pressed="' + (k === winVenue) + '">' + esc(VENUES[k].name) + ' <span class="count" data-vc="' + k + '"></span></button>'; }).join("");
+    var v = VENUES[winVenue];
+    $("#winHead").innerHTML = '<div class="venue v-' + winVenue + '">' + venueArt(winVenue) + '<div><p class="eyebrow">' + esc(v.eyebrow) + '</p><h3>' + esc(v.name) + '</h3><p class="lede">' + esc(v.line) + "</p></div></div>";
+    root.innerHTML = '<p class="hint">Loading…</p>';
+    rpc("winners_counts", {}).then(function (c) { Object.keys(VENUES).forEach(function (k) { var el = tabs.querySelector('[data-vc="' + k + '"]'); if (el) el.textContent = c && c[k] ? c[k] : ""; }); }, function () { });
+    rpc("winners_row", { p_venue: winVenue }).then(function (rows) {
+      rows = rows || [];
+      root.innerHTML = rows.length ? rows.map(function (w) {
+        return '<article class="wincard v-' + winVenue + '">' + (w.photo_path ? '<img src="' + esc(photoUrl(w.photo_path)) + '" alt="' + esc(w.names) + '" loading="lazy">' : '<div class="wsuits">' + (w.suits || []).map(function (s) { return SUIT[s] ? '<span class="' + (SUIT[s].red ? "r" : "") + '">' + SUIT[s].sym + "</span>" : ""; }).join("") + "</div>") +
+          '<div class="wbody"><span class="wbadge">' + winIcon(w.kind, 18) + " " + esc(WINS[w.kind] ? WINS[w.kind].short : "") + '</span><h4>' + esc(w.names) + '</h4><p>“' + esc(w.story) + '”</p><small>' + esc([w.city, w.event_date ? new Date(w.event_date + "T12:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" }) : ""].filter(Boolean).join(" · ")) + "</small></div></article>";
+      }).join("") : '<div class="winempty">' + venueArt(winVenue) + '<p class="lede">' + esc(v.empty) + '</p><p class="hint">Every story here is real, shared by both people and checked by our team. We never write them for anyone.</p></div>';
+    }, function () { root.innerHTML = '<div class="winempty"><p class="lede">' + esc(v.empty) + '</p><p class="hint">Every story here is real, shared by both people and checked by our team.</p></div>'; });
+  }
+  function venueArt(k) {
+    if (k === "chapel") return '<svg class="vart" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 8 98 40v70H22V40z" fill="#FAF7F0" stroke="#B8862F" stroke-width="3"/><path d="M60 18c-6-4-9-7-9-10.5 0-2.4 1.9-4.2 4.2-4.2 2 0 3.6 1.1 4.8 2.6 1.2-1.5 2.8-2.6 4.8-2.6 2.3 0 4.2 1.8 4.2 4.2 0 3.5-3 6.5-9 10.5z" fill="#B3263A"/><path d="M46 110V78a14 14 0 0 1 28 0v32z" fill="#3A2F3E"/><circle cx="60" cy="52" r="10" fill="none" stroke="#E8C46A" stroke-width="3"/><path d="M56 41 58 37h4l2 4-4 4z" fill="#F4F1FA" stroke="#B8862F"/>' + [0, 1, 2, 3, 4, 5, 6].map(function (i) { return '<circle cx="' + (26 + i * 11.3) + '" cy="40" r="2.6" fill="#FFE7A3"/>'; }).join("") + "</svg>";
+    if (k === "royal-flush") return '<svg class="vart" viewBox="0 0 120 120" aria-hidden="true">' + [0, 1, 2, 3, 4].map(function (i) { return '<g transform="rotate(' + (i * 12 - 24) + ' 60 104)"><rect x="44" y="22" width="32" height="46" rx="4" fill="#FAF7F0" stroke="#B8862F" stroke-width="2"/><text x="49" y="36" font-size="11" font-weight="900" fill="#B3263A" font-family="Impact,sans-serif">' + ["10", "J", "Q", "K", "A"][i] + '</text></g>'; }).join("") + '<text x="60" y="112" text-anchor="middle" font-size="18" fill="#B3263A">♥</text></svg>';
+    if (k === "lounge") return '<svg class="vart" viewBox="0 0 120 120" aria-hidden="true"><path d="M30 30h26l-4 30a9 9 0 0 1-18 0zM64 30h26l-4 30a9 9 0 0 1-18 0z" fill="#E8C46A" stroke="#B8862F" stroke-width="2"/><path d="M43 70v26M77 70v26M33 98h20M67 98h20" stroke="#B8862F" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="22" r="3" fill="#FFE7A3"/><circle cx="52" cy="14" r="2" fill="#FFE7A3"/><circle cx="68" cy="14" r="2" fill="#FFE7A3"/></svg>';
+    return '<svg class="vart" viewBox="0 0 120 120" aria-hidden="true"><rect x="14" y="22" width="92" height="76" rx="12" fill="#2B2730" stroke="#E8C46A" stroke-width="4"/>' + [0, 1, 2].map(function (i) { return '<rect x="' + (24 + i * 25) + '" y="40" width="22" height="34" rx="4" fill="#FAF7F0"/><text x="' + (35 + i * 25) + '" y="65" text-anchor="middle" font-size="20" font-weight="900" fill="#B3263A" font-family="Impact,sans-serif">7</text>'; }).join("") + [0, 1, 2, 3, 4, 5].map(function (i) { return '<circle cx="' + (24 + i * 14.4) + '" cy="30" r="2.6" fill="#FFE7A3"/>'; }).join("") + "</svg>";
+  }
+  document.addEventListener("click", function (e) { var b = e.target.closest("[data-venue]"); if (!b) return; winVenue = b.getAttribute("data-venue"); try { history.replaceState(null, "", "#" + winVenue); } catch (er) { } renderWinners(); });
+
+  /* ---------- My table: winning hands, approvals and date check-ins ---------- */
+  var KIND_OPTS = [["married", "💍 We got married"], ["engaged", "💍 We got engaged"], ["together", "♥ We're together (Royal Flush)"], ["friends", "🥂 We became friends"], ["great_date", "🎰 We had a great date"]];
+  function renderWins() {
+    var el = $("#winsPanel"); if (!el) return;
+    if (!liveOn()) { el.innerHTML = '<h3 style="font-size:1.2rem">Winning hands</h3><p class="hint">When a Pair turns into something real, share it together on <a href="winners.html">Winners\' Row</a>: the Chapel of Aces for weddings, the Royal Flush Room for couples, the Friendship Lounge and the Jackpot Wall. Both of you approve before anyone sees it.</p>'; return; }
+    Promise.all([lrpc("my_hands").catch(function () { return []; }), lrpc("my_wins").catch(function () { return []; }), lrpc("my_checkins").catch(function () { return []; })]).then(function (r) {
+      var hands = (r[0] || []).filter(function (h) { return h.status === "paired" || h.status === "won"; }), wins = r[1] || [], done = (r[2] || []).map(function (x) { return x.hand_id; });
+      var check = hands.filter(function (h) { return h.play_at && new Date(h.play_at).getTime() < Date.now() && Date.now() - new Date(h.play_at).getTime() < 14 * 864e5 && done.indexOf(h.hand_id) < 0; });
+      var asks = wins.filter(function (w) { return w.status === "pending_partner" && !w.mine_ok; });
+      var h = '<h3 style="font-size:1.2rem">Winning hands</h3>';
+      if (check.length) h += '<div class="checkins">' + check.map(function (x) { return '<div class="cmrow ckrow"><span><b>How did it go with ' + esc(x.other_name) + '?</b><br><small>Two taps. Only our safety team sees this.</small></span><span class="row"><button class="btn gold sm" data-ck="' + x.hand_id + '" data-met="1" data-safe="1">We met · all good</button><button class="btn ghost sm" data-ck="' + x.hand_id + '" data-met="1" data-safe="0">I didn\'t feel safe</button><button class="btn ghost sm" data-ck="' + x.hand_id + '" data-met="0">We didn\'t meet</button></span></div>'; }).join("") + "</div>";
+      if (asks.length) h += asks.map(function (w) { return '<div class="cmrow winask"><span>' + winIcon(w.kind, 18) + " <b>" + esc(w.other_name) + " wants to share your win</b> (" + esc(WINS[w.kind].short) + ')<br><small>“' + esc(w.story) + '”</small></span><span class="row"><button class="btn gold sm" data-winok="' + w.id + '">Approve</button><button class="btn ghost sm" data-winno="' + w.id + '">Not now</button></span></div>'; }).join("");
+      if (wins.length) h += wins.filter(function (w) { return asks.indexOf(w) < 0; }).map(function (w) { var st = { pending_partner: "Waiting for " + w.other_name + " to approve", pending_review: "With our team for a quick check", approved: "On Winners' Row", declined: "Not approved" }[w.status] || w.status; return '<div class="cmrow"><span>' + winIcon(w.kind, 18) + " <b>" + esc(WINS[w.kind].short) + "</b> with " + esc(w.other_name) + "<br><small>" + esc(st) + '</small></span><span class="row">' + (w.status === "approved" ? '<a class="btn ghost sm" href="winners.html#' + WINS[w.kind].venue + '">See it</a>' : "") + '<button class="btn ghost sm" data-winwd="' + w.id + '">Take it down</button></span></div>'; }).join("");
+      h += hands.length ? '<p class="hint">Did a Pair turn into something real? Share it together. Both of you approve, our team checks it, then it goes up on <a href="winners.html">Winners\' Row</a> and a badge goes on both your cards.</p><div class="row">' + hands.slice(0, 8).map(function (x) { return '<button class="btn ghost sm" data-winshare="' + x.hand_id + '" data-name="' + esc(x.other_name) + '">🏆 Share our win with ' + esc((x.other_name || "").split(" ")[0]) + "</button>"; }).join("") + "</div>" : '<p class="hint">Make a Pair and, when it turns into something real, share it on <a href="winners.html">Winners\' Row</a>.</p>';
+      el.innerHTML = h;
+    });
+  }
+  function shareWinModal(hand, other) {
+    var m = modal('<form class="form-grid" id="winForm" novalidate><p class="eyebrow">Winners\' Row</p><h3>Share your win with ' + esc(other) + '</h3>' +
+      '<div class="field"><label for="wKind">What happened?</label><select id="wKind">' + KIND_OPTS.map(function (k) { return '<option value="' + k[0] + '">' + k[1] + "</option>"; }).join("") + '</select></div>' +
+      '<div class="field" id="wDateF"><label for="wDate">Date</label><input type="date" id="wDate"></div>' +
+      '<div class="field"><label for="wStory">Your story, in a few lines</label><textarea id="wStory" rows="4" maxlength="700" placeholder="He played my card on a Tuesday. By Friday we were sharing pie at Saw\'s."></textarea><span class="hint"><span id="wCount">0</span>/700 · no last names, addresses or explicit details</span></div>' +
+      '<div class="field"><label for="wNames">Show us as</label><select id="wNames"><option value="first">First names (Jordan & Kelly)</option><option value="initials">Initials only (J. & K.)</option></select></div>' +
+      '<div class="field"><label for="wPhoto">A photo of you two (optional)</label><input type="file" id="wPhoto" accept="image/jpeg,image/png,image/webp"><span class="hint">Both of you should be happy with it. No children, please.</span></div>' +
+      '<label class="chk"><input type="checkbox" id="wOk"> We both agree to show this publicly on SuiteFace. Either of us can take it down at any time.</label>' +
+      '<p class="err" id="wErr" role="alert"></p><div class="row"><button class="btn gold" type="submit">Send to ' + esc((other || "").split(" ")[0]) + ' to approve</button></div></form>');
+    var kind = $("#wKind", m), df = $("#wDateF", m);
+    function sync() { df.hidden = ["married", "engaged"].indexOf(kind.value) < 0; $("label[for=wDate]", m).textContent = kind.value === "married" ? "Wedding date" : "Engagement date"; }
+    kind.addEventListener("change", sync); sync();
+    $("#wStory", m).addEventListener("input", function () { $("#wCount", m).textContent = this.value.length; });
+    $("#winForm", m).addEventListener("submit", function (e) {
+      e.preventDefault(); var err = $("#wErr", m), st = $("#wStory", m).value.trim(), dt = $("#wDate", m).value || null;
+      if (st.length < 20) { err.textContent = "Tell it in at least a sentence or two."; return; }
+      if (kind.value === "married" && !dt) { err.textContent = "Add your wedding date."; return; }
+      if (!$("#wOk", m).checked) { err.textContent = "Please confirm you both agree to share it."; return; }
+      var file = $("#wPhoto", m).files[0], mid = window.SF_LIVE.memberId(), up = Promise.resolve(null);
+      if (file) { if (file.size > 8e6) { err.textContent = "That photo is over 8 MB. Pick a smaller one."; return; } var path = mid + "/" + (crypto.randomUUID ? crypto.randomUUID() : Date.now()) + "." + (file.type.split("/")[1] || "jpg"); up = window.SF_LIVE.client.storage.from("win-photos").upload(path, file, { contentType: file.type }).then(function (r) { if (r.error) throw r.error; return path; }); }
+      err.textContent = "Sending…";
+      up.then(function (path) { return lrpc("share_win", { p_hand: hand, p_kind: kind.value, p_story: st, p_names: $("#wNames", m).value, p_photo: path, p_date: ["married", "engaged"].indexOf(kind.value) > -1 ? dt : null }); })
+        .then(function () { closeModal(); jackpot(2500); toast("Sent to " + (other || "").split(" ")[0] + ". Once they approve, our team takes a quick look."); renderWins(); }, function (x) { err.textContent = (x && x.message) || "Try again."; });
+    });
+  }
+  document.addEventListener("click", function (e) {
+    var b;
+    if ((b = e.target.closest("[data-winshare]"))) { shareWinModal(b.getAttribute("data-winshare"), b.getAttribute("data-name")); return; }
+    if ((b = e.target.closest("[data-winok]")) || (b = e.target.closest("[data-winno]"))) { var yes = b.hasAttribute("data-winok"); lrpc("answer_win", { p_win: b.getAttribute(yes ? "data-winok" : "data-winno"), p_yes: yes }).then(function (s) { toast(yes ? (s === "pending_review" ? "Approved. Our team will take a quick look, then it's on Winners' Row." : "Approved.") : "Okay, it won't be shared."); if (yes) jackpot(1500); renderWins(); }, function (x) { toast(x.message); }); return; }
+    if ((b = e.target.closest("[data-winwd]"))) { if (!confirm("Take this win down? It comes off Winners' Row and your cards right away.")) return; lrpc("withdraw_win", { p_win: b.getAttribute("data-winwd") }).then(function () { toast("Taken down."); renderWins(); }, function (x) { toast(x.message); }); return; }
+    if ((b = e.target.closest("[data-ck]"))) {
+      var hand = b.getAttribute("data-ck"), met = b.getAttribute("data-met") === "1", safe = b.getAttribute("data-safe");
+      var send = function (note) { lrpc("date_checkin", { p_hand: hand, p_met: met, p_safe: met ? safe === "1" : null, p_note: note || null }).then(function () { closeModal(); toast(!met ? "Thanks for telling us." : safe === "1" ? "Glad it went well. If it turns into something real, share your win." : "Thank you. Our safety team will reach out by email."); renderWins(); }, function (x) { toast(x.message); }); };
+      if (met && safe === "0") { var m = modal('<div class="form-grid"><h3>We\'re sorry. Tell us what happened.</h3><p class="lede">Our safety team reads every one of these and will reach out at the email on your account. <b>If you are in danger right now, call 911.</b></p><textarea id="ckNote" rows="4" maxlength="600" placeholder="What happened? (optional)"></textarea><div class="row"><button class="btn gold" type="button" id="ckSend">Send to the safety team</button></div></div>'); $("#ckSend", m).addEventListener("click", function () { send($("#ckNote", m).value); }); return; }
+      send(); return;
+    }
+  });
+
+  /* ---------- City tables: one city at a time, like a campus ---------- */
+  function cityMsg(d, zip) {
+    if (!d || d.error) return '<p class="err">' + esc((d && d.error) || "Use a 5-digit ZIP code.") + "</p>";
+    var pct = Math.min(100, Math.round((d.players || 0) / (d.open_at || 500) * 100));
+    if (d.status === "open") return '<p class="cityok">♥ <b>' + esc(d.city) + "'s table is open.</b> Real players near you are ready to be dealt.</p>" + '<div class="row"><a class="btn gold" data-gate href="membership.html">Get dealt in</a></div>';
+    return '<p><b>' + esc(d.city) + ", " + esc(d.state) + (d.status === "new" ? "</b> doesn't have a table yet." : "'s table is filling.") + " It opens at " + (d.open_at || 500) + ' players.</p><div class="cityprog" role="progressbar" aria-valuemin="0" aria-valuemax="' + (d.open_at || 500) + '" aria-valuenow="' + (d.players || 0) + '"><i style="width:' + Math.max(2, pct) + '%"></i></div><p class="hint">' + (d.players || 0) + " of " + (d.open_at || 500) + ' players so far</p>' +
+      '<form class="row citywait" data-zip="' + esc(zip) + '"><label class="sr" for="cwEmail">Email</label><input type="email" id="cwEmail" placeholder="you@email.com" autocomplete="email" required><button class="btn gold sm" type="submit">Save my seat</button></form><p class="hint">We\'ll email you once, when your table opens. Invite friends to open it sooner.</p>';
+  }
+  document.addEventListener("submit", function (e) {
+    var f = e.target;
+    if (f.id === "cityForm") { e.preventDefault(); var z = $("#cityZip").value.trim(), out = $("#cityOut"); if (!/^\d{5}$/.test(z)) { out.innerHTML = '<p class="err">Use a 5-digit ZIP code.</p>'; return; } out.innerHTML = '<p class="hint">Checking…</p>'; rpc("city_status", { p_zip: z }).then(function (d) { out.innerHTML = cityMsg(d, z); }, function () { out.innerHTML = '<p class="hint">Birmingham\'s table is open now. More cities open one at a time as players sign up.</p>'; }); return; }
+    if (f.classList.contains("citywait")) { e.preventDefault(); var em = f.querySelector("input").value.trim(), zz = f.getAttribute("data-zip"); rpc("join_city_waitlist", { p_zip: zz, p_email: em }).then(function (d) { $("#cityOut").innerHTML = cityMsg(d, zz).replace(/<form[\s\S]*?<\/form>/, "") + '<p class="cityok">✓ Seat saved. We\'ll email you when it opens.</p>'; jackpot(1200); }, function (x) { toast(x.message); }); }
+  });
+  function renderCityBoard() {
+    var el = $("#cityBoard"); if (!el) return;
+    rpc("city_board", {}).then(function (rows) { rows = (rows || []).slice(0, 7); el.innerHTML = rows.map(function (c) { var pct = Math.min(100, Math.round(c.players / c.open_at * 100)); return '<li class="' + (c.status === "open" ? "open" : "") + '"><b>' + esc(c.name) + "</b> <small>" + esc(c.state) + "</small><span>" + (c.status === "open" ? "Open" : '<i class="mini"><i style="width:' + Math.max(3, pct) + '%"></i></i>') + "</span></li>"; }).join(""); }, function () { el.innerHTML = '<li class="open"><b>Birmingham</b> <small>AL</small><span>Open</span></li>'; });
+  }
+
+  /* ---------- Owner: winning hands, safety check-ins, fees audit, city tables ---------- */
+  function loadOwnerExtras() {
+    var wl = $("#winReviewList"), sl = $("#safetyCkList"), fl = $("#feeAuditList"), cl = $("#cityAdminList");
+    var loadW = function () { if (wl) lrpc("review_wins").then(function (rows) { rows = rows || []; wl.innerHTML = rows.length ? rows.map(function (w) { return '<div class="cmrow"><span>' + winIcon(w.kind, 18) + " <b>" + esc(w.a_name) + " & " + esc(w.b_name) + "</b> · " + esc(WINS[w.kind].short) + (w.event_date ? " · " + esc(w.event_date) : "") + " · shown as " + esc(w.names) + "<br><small>“" + esc(w.story) + '”</small>' + (w.photo_path ? '<br><a href="' + esc(photoUrl(w.photo_path)) + '" target="_blank" rel="noopener">View photo</a>' : "") + '</span><span class="row"><button class="btn gold sm" data-wrule="' + w.id + '" data-v="1">Approve</button><button class="btn ghost sm" data-wrule="' + w.id + '" data-v="0">Decline</button></span></div>'; }).join("") : '<p class="hint">Nothing to review.</p>'; }, function (x) { wl.innerHTML = '<p class="hint">' + esc(x.message) + "</p>"; }); };
+    if (wl) { wl.onclick = function (e) { var b = e.target.closest("[data-wrule]"); if (!b) return; var ok = b.getAttribute("data-v") === "1", note = ok ? null : prompt("Why not? (sent to neither member; for your records)", "") || null; lrpc("rule_win", { p_win: b.getAttribute("data-wrule"), p_ok: ok, p_note: note }).then(function () { toast(ok ? "Approved. It's on Winners' Row." : "Declined."); loadW(); }, function (x) { toast(x.message); }); }; loadW(); }
+    var loadS = function () { if (sl) lrpc("safety_checkins").then(function (rows) { rows = rows || []; sl.innerHTML = rows.length ? rows.map(function (c) { return '<div class="cmrow"><span><b>' + esc(c.member_name) + "</b> didn't feel safe on a date with <b>" + esc(c.other_name) + "</b><br><small>" + esc(c.note || "No note.") + " · " + esc(new Date(c.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })) + '</small></span><span class="row"><button class="btn ghost sm" data-ckdone="' + c.id + '">Handled</button></span></div>'; }).join("") : '<p class="hint">No safety check-ins waiting.</p>'; }); };
+    if (sl) { sl.onclick = function (e) { var b = e.target.closest("[data-ckdone]"); if (!b) return; lrpc("handle_checkin", { p_id: b.getAttribute("data-ckdone") }).then(function () { toast("Marked handled."); loadS(); }); }; loadS(); }
+    if (fl) lrpc("owner_fee_audit").then(function (rows) { fl.innerHTML = '<table class="feetab"><thead><tr><th>Paid item</th><th>Price</th><th>Used, 30 days</th><th>Note</th></tr></thead><tbody>' + (rows || []).map(function (r) { return "<tr><td>" + esc(r.item) + "</td><td>" + esc(r.price) + "</td><td>" + (r.used_30d == null ? "—" : r.used_30d) + "</td><td>" + esc(r.note || "") + "</td></tr>"; }).join("") + '</tbody></table><p class="hint">Rule of thumb: if members rarely use a paid add-on, drop it. Every fee should feel worth it.</p>'; }, function (x) { fl.innerHTML = '<p class="hint">' + esc(x.message) + "</p>"; });
+    var loadC = function () { if (cl) rpc("city_board", {}).then(function (rows) { cl.innerHTML = (rows || []).map(function (c) { return '<div class="cmrow"><span><b>' + esc(c.name) + ", " + esc(c.state) + "</b> · " + (c.status === "open" ? "Open" : "Filling") + " · " + c.players + " of " + c.open_at + '</span><span class="row">' + (c.status === "open" ? '<button class="btn ghost sm" data-city="' + c.slug + '" data-st="filling">Close to new cities list</button>' : '<button class="btn gold sm" data-city="' + c.slug + '" data-st="open">Open this table</button>') + "</span></div>"; }).join(""); }); };
+    if (cl) { cl.onclick = function (e) { var b = e.target.closest("[data-city]"); if (!b) return; lrpc("owner_set_city", { p_slug: b.getAttribute("data-city"), p_status: b.getAttribute("data-st"), p_open_at: null }).then(function () { toast("Updated."); loadC(); }, function (x) { toast(x.message); }); }; loadC(); }
+  }
+  document.addEventListener("sf:live", function () {
+    var pg = document.body.getAttribute("data-page") || "";
+    if (pg === "club") { setTimeout(renderWins, 700); lrpc("my_win_badges").then(function (w) { P.wins = w || []; renderCard(); }, function () { }); }
+    if (ROLE === "owner" && pg === "club") setTimeout(loadOwnerExtras, 900);
+  });
+  setTimeout(function () { var pg = document.body.getAttribute("data-page") || ""; if (pg === "winners") { var h = location.hash.replace("#", ""); if (VENUES[h]) winVenue = h; renderWinners(); } if (pg === "home") renderCityBoard(); if (pg === "club" && !liveOn()) renderWins(); }, 0);
+
   /* ---------- launch popup: the first thing a new visitor sees ---------- */
   var params = new URLSearchParams(location.search), inv = params.get("ref") || params.get("invite");
   var seenOffer = S.get("offerSeen", 0);
   if (PAGE === "home" && !SIGNED && (inv || !seenOffer || Date.now() - seenOffer > 3 * 864e5)) {
-    setTimeout(function () {
+    // Let visitors see the game first: an invite shows right away; everyone else sees the offer
+    // only after scrolling halfway down the page, or after 40 seconds of looking around.
+    var offerAt = function (fn) {
+      if (inv) { setTimeout(fn, 1800); return; }
+      var fired = false, go = function () { if (fired) return; var a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) || $("#modal")) { setTimeout(go, 20000); return; } fired = true; window.removeEventListener("scroll", sc); fn(); };
+      var sc = function () { var d = document.documentElement; if ((window.scrollY + innerHeight) / d.scrollHeight > .5) go(); };
+      window.addEventListener("scroll", sc, { passive: true }); setTimeout(go, 40000);
+    };
+    offerAt(function () {
       if (window.SF_LIVE || SIGNED || !LAUNCH.open || $("#modal")) return;
       S.set("offerSeen", Date.now());
       var m = modal('<div class="offerpop"><div class="offerchips" aria-hidden="true"><span class="sfchip waived" data-chip="21" data-size="104" data-label="$21 buy-in"></span><span class="sfchip" data-chip="2.10" data-size="132" data-spin data-label="a month"></span></div>' +
         '<h3>' + (inv ? "A friend saved you a seat." : "Your seat is on the house.") + '</h3>' +
         '<p class="lede">Launch offer: the $21 buy-in is waived through ' + esc(launchEndText()) + '. Join for $2.10 a month and cancel any time.</p>' +
-        '<div class="row"><a class="btn gold" href="membership.html" data-close>Claim my seat</a><a class="textlink" href="find-your-suit.html" data-close>Find my suit first</a></div></div>');
+        '<div class="row"><a class="btn gold" href="membership.html" data-gate data-close>Claim my seat</a><a class="textlink" href="find-your-suit.html" data-close>Find my suit first</a></div></div>');
       if (window.SFChips) window.SFChips.paint(m);
-    }, 1800);
+    });
   }
 
   /* =====================================================================
@@ -2758,7 +3027,7 @@
     document.documentElement.setAttribute("data-role", ROLE);
     $("#loginBtn").textContent = (ROLE === "guest" && !SIGNED) ? "Log in" : "Log out";
     $$("[data-only]").forEach(function (el) { el.hidden = ROLE !== el.getAttribute("data-only"); });
-    $$("a[data-need]").forEach(function (a) { var n = a.getAttribute("data-need"); a.hidden = n !== "member" ? !allowed(n) : false; });
+    $$("a[data-need]").forEach(function (a) { var n = a.getAttribute("data-need"); a.hidden = a.classList.contains("clubnav") ? !(SIGNED || ROLE !== "guest") : n !== "member" ? !allowed(n) : false; });
     $$("section[data-need]").forEach(function (sec) {
       var need = sec.getAttribute("data-need"), ok = allowed(need), wrap = sec.querySelector(":scope > .wrap");
       if (need !== "member") { sec.hidden = !ok; if (ok) renderConsole(sec.id); return; }
@@ -2894,7 +3163,7 @@
   var dS = 0, dI = 0, dTimer = null;
   function demoCard(c, flags, side) {
     var red = SUIT[c[1]].red, cls = "dcard" + (red ? " red" : "") + (flags.joker && side === 1 ? " jk" : "") + (flags.burn && side === 1 ? " burnt" : "") + ((flags.loss || flags.burn) && side === 1 && !flags.joker ? " dim" : "");
-    var face = flags.joker && side === 1 ? '<span class="jhat">' + BRAND.hat + '</span><b>JOKER</b>' : '<span class="ix">' + c[2] + pip(c[1]) + '</span><img class="dph" src="assets/people/' + c[0].toLowerCase() + '.jpg" alt="" loading="lazy"><span class="nm">' + c[0] + '</span><span class="st">' + SUIT[c[1]].sym + " " + SUIT[c[1]].name + "</span>";
+    var face = flags.joker && side === 1 ? '<span class="jhat">' + BRAND.hat + '</span><b>JOKER</b>' : '<span class="ix">' + c[2] + pip(c[1]) + '</span><img class="dph" src="assets/people/' + c[0].toLowerCase() + '.webp" alt="" loading="lazy"><span class="nm">' + c[0] + '</span><span class="st">' + SUIT[c[1]].sym + " " + SUIT[c[1]].name + "</span>";
     var meter = flags.meter && side === 1 ? '<span class="dmeter">Jokers ' + flags.meter + "/10</span>" : "";
     return '<div class="' + cls + '">' + face + meter + (flags.a && side === 0 ? '<span class="tag">Played</span>' : "") + (flags.b && side === 1 ? '<span class="tag">Played</span>' : "") + "</div>";
   }
@@ -3350,7 +3619,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -3376,6 +3645,8 @@
       return lrpc("deck_badges").then(function (vs) { var m = {}; (vs || []).forEach(function (v) { m[v.member_id] = v; }); (rows || []).forEach(function (r) { var v = m[r.member_id]; if (v) { r.photo_ok = v.photo_verified; r.id_ok = v.id_verified; r.confirmed = v.confirmed; } }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_bumpers").then(function (bs) { var m = {}; (bs || []).forEach(function (b) { m[b.member_id] = b; }); (rows || []).forEach(function (r) { var b = m[r.member_id]; if (b) { r.bumpers = b.bumpers; r.bumpers_ok = b.verified; } }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
+      return lrpc("deck_wins").then(function (ws) { var m = {}; (ws || []).forEach(function (w) { m[w.member_id] = w.kinds; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.wins = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       LIVE_ROWS = rows || [];
       var mid = window.SF_LIVE.memberId(), saved = S.get("live:" + mid, { dealt: [] });
@@ -3646,6 +3917,8 @@
 
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();
-  wireIam(); renderIam(); renderRooms(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); loadZips(); renderMap();
+  wireIam(); renderIam(); renderRooms(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); renderMap();
+  // The 1.5 MB ZIP table loads only where it's used: My table, or once someone types a ZIP code.
+  (function () { var pg = document.body.getAttribute("data-page") || ""; if (pg === "club" || /#(map|face|table)/.test(location.hash)) loadZips(); var fz = $("#fZip"); if (fz) ["focus", "input"].forEach(function (ev) { fz.addEventListener(ev, loadZips); }); document.addEventListener("sf:live", function () { if ((document.body.getAttribute("data-page") || "") === "club") loadZips(); }); })();
   $("#pile").style.setProperty("--hat", "url(\"data:image/svg+xml," + encodeURIComponent(BRAND.hat) + "\")");
 })();

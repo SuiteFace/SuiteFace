@@ -118,6 +118,14 @@ No profile is activated and no payment is processed until the matching agreement
 
 **2.6j Health a partner should know.** Members may choose to share a health condition that can pass between partners. It's always optional, "Prefer not to say" is always an option, and it starts **Face Down** (private) until you choose to show it. SuiteFace never uses it to rank you, never shows it to anyone you haven't chosen to show it to, and never requires it. Be honest when you share, and be kind when someone shares with you.
 
+**2.6k Winners' Row.** Members who met on SuiteFace may share a winning hand (a marriage, engagement, relationship, friendship or great date) on Winners' Row, including the Chapel of Aces. A win is shown **only after both members approve it and SuiteFace staff review it**. Members write their own stories; SuiteFace never writes, invents or edits a story to change its meaning, though staff may decline any story or photo, including for last names, addresses, children, or explicit content. Either member may take a win down at any time, and it then comes off Winners' Row and off both cards. By sharing, both members give SuiteFace a non-exclusive, royalty-free license to show the story, first names or initials, general city and photo on SuiteFace and in SuiteFace's own promotion until either of them takes it down. Win badges appear on both members' cards while the win is shown.
+
+**2.6l Date check-ins.** After a date, SuiteFace may ask whether you met and whether you felt safe. Answers go only to SuiteFace's safety team, never to the other member. A check-in is not an emergency service: **if you are in danger, call 911.**
+
+**2.6m City tables and sharing.** SuiteFace opens cities one at a time. A city "opens" for marketing and waitlist purposes when it reaches its player goal; members anywhere may still be dealt the real members within their chosen distance. Waitlist emails are used only to tell you when your city opens and are never sold. Members may share an image of their suit and a personal invite link on other social platforms; it shows only a first name and suit, plus a photo only if the member chooses. Members are responsible for following the rules of the platform where they post.
+
+**2.6n How the Deal learns.** Your deck is ranked by fit and by what you do at the table: cards you play, burn, flip, open or ask to have read. New members get extra visibility during their first week so everyone has a fair first deal. SuiteFace never sells this activity and never uses protected traits to rank cards beyond the dealbreakers you choose.
+
 ## 3. Meeting people: risk and safety
 
 **3.1 You accept the risk.** Meeting people you don't know, online or in person, carries risk. **Harm can happen**, including emotional harm, financial loss, theft, physical injury, sexual assault, and in rare cases worse. You alone decide whether, when, where and how to meet anyone, and **you voluntarily assume all risk** of doing so. Checking in, Play Hand, ranks, verification marks and Joker meters are tools, not safety guarantees.
@@ -543,6 +551,16 @@ We'll post any update here with a new date and, for material changes, notify you
 
 ## Health information you choose to share
 If you choose to answer "Health a partner should know," we store that answer only to show it where you decide (it starts Face Down, visible to no one). We never sell it, never use it for advertising or matching scores, and delete it as soon as you clear the answer or delete your account. You can withdraw your consent anytime by clearing the answer in My Face.
+
+
+## Winners' Row, date check-ins and city waitlists
+**Winners' Row.** If you and your match share a win, we store your story, your choice of first names or initials, your general city, an optional photo, and both approvals. It's public only after both of you approve and staff review it, and either of you can take it down at any time; we then remove it from public view. Approved photos are stored in a public folder so the page can show them.
+
+**Date check-ins.** If you answer a check-in, we keep whether you met, whether you felt safe, and any note. Only our safety team sees it; the other member never does.
+
+**City waitlists.** If you save a seat for a city, we keep your email and ZIP code only to tell you when that city opens. We never sell them.
+
+**What you do at the table.** We record the cards you play, burn, flip, open and ask to have read, to rank your future decks. This stays inside SuiteFace and is never sold.
 
 
 
