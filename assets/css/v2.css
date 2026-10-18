@@ -958,3 +958,4 @@ body.lb-dragmode{cursor:grabbing}
 @keyframes lbdeal{40%{transform:translateY(-18px) rotate(-4deg) scale(1.05)}100%{transform:translateY(60px) scale(.6);opacity:0}}
 @media (prefers-reduced-motion:reduce){.lb-card .pcard.lb-dealt{animation:none}}
 .lb-spot .cvstk{font-size:2rem;max-width:none}.lb-spot .cvstk .pstamp{transform:scale(.8)}
+.backlobby{margin:0 0 14px}

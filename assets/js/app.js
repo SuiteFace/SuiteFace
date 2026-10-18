@@ -1638,7 +1638,7 @@
       out.textContent = "Sending…";
       fetch(CFG.supabaseUrl + "/rest/v1/rpc/submit_card_back_application", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(a) })
         .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.message || "Couldn't send."); return j; }); })
-        .then(function () { out.textContent = ""; f.innerHTML = '<h3>Thank you.</h3><p class="lede">We\'ll review your application and email you within a few business days about rights, design and launch.</p>'; }, function (er) { out.textContent = er.message; });
+        .then(function () { out.textContent = ""; f.innerHTML = '<h3>Thank you.</h3><p class="lede">We\'ll review your application and email you within a few business days about rights, design and launch.</p>' + (liveOn() ? '<div class="row"><a class="btn gold" href="my-table.html#lobby">‹ Back to Your Lobby</a></div>' : ""); }, function (er) { out.textContent = er.message; });
     });
   })();
   setTimeout(renderCardBacks, 0);
@@ -4627,7 +4627,7 @@
     setTimeout(function () { if (pc) pc.classList.remove("lb-dealt"); var t = $("#table"); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); else location.href = "my-table.html#table"; }, 900);
   });
   document.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.closest && e.target.closest("#lbCard .pcard")) { e.preventDefault(); LOBBY.flipped = !LOBBY.flipped; e.target.closest(".pcard").classList.toggle("flipped", LOBBY.flipped); } });
-  document.addEventListener("sf:live", function () { LOBBY.venues = null; setTimeout(renderLobby, 1200); });
+  document.addEventListener("sf:live", function () { LOBBY.venues = null; setTimeout(renderLobby, 1200); $$(".backlobby").forEach(function (x) { x.hidden = !liveOn(); }); });
   if ($("#lbCard")) setTimeout(renderLobby, 0);
 
   /* ---------- Double & group dates: your crew is one hand. Each pairing between your crew and theirs is a card,
