@@ -4229,7 +4229,7 @@
     var m = modal('<p class="pairtitle">' + (h.status === "won" ? "Still winning" : "It's a Pair!") + '</p>' +
       '<div class="ranks"><span>You hold ' + nm + " as <b>" + esc(h.i_hold || "?") + "</b></span><span>" + nm + " holds you as <b>" + esc(h.they_hold || "?") + "</b></span></div>" +
       (p ? '<p class="jm-line">' + nm + "'s " + jmeter(p, true) + "</p>" : "") +
-      '<div class="row duo"><button class="btn ghost sm" type="button" data-gochat>💬 Chat</button><button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video chat</button></div>' +
+      '<div class="row duo"><button class="btn ghost sm" type="button" data-gochat>💬 Chat</button>' + (h.other_id ? friendBtn(h.other_id) : "") + '<button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video chat</button></div>' +
       '<div class="row callrow"><button class="btn gold sm" type="button" data-call="' + esc(h.hand_id) + '" data-name="' + esc(h.other_name || "") + '" data-other="' + esc(h.other_id || "") + '">📹 Video call ' + nm + '</button><span class="hint">$2.10 first minute, then 21¢/min · you pay, ' + nm + ' doesn\'t</span></div>' +
       '<div class="row callrow">' + loungeBtn("pair", h.hand_id, h.other_id, h.other_name) + '<span class="hint">Private 21 minutes · $2.10 a seat · ID-verified players</span></div>' +
       '<details class="datedeals" open><summary>🎟️ Date Deals near you two</summary><div id="ddBox"><p class="hint">Loading…</p></div></details>' +
@@ -4411,7 +4411,7 @@
       (h.bio ? '<p class="bbio">' + esc(h.bio) + "</p>" : "") + (h.last_body ? '<p class="blast">' + esc(h.last_body.slice(0, 70)) + "</p>" : "") +
       (called ? '<p class="bres ' + (h.correct ? "ok" : "no") + '">' + (h.correct ? "✓ Called it: " : "✗ Not this time: ") + (h.revealed === "house" ? "a House Card." : "a Player Card (a real player).") + "</p>" +
           (h.revealed === "house" ? '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Keep playing this hand</button></div><p class="hint">Played by SuiteFace\'s AI dealer. Just for fun: House Cards can\'t Pair, date or video chat.</p>' : "") +
-          (h.revealed === "real" ? '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn gold sm" type="button" data-bvideo="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">📹 Video chat</button>' + loungeBtn("bluff", h.hand_id, "", h.name) + "</div>" : "") :
+          (h.revealed === "real" ? '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn gold sm" type="button" data-bvideo="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">📹 Video chat</button>' + loungeBtn("bluff", h.hand_id, "", h.name) + friendBtn(h.hand_id, "bluff") + "</div>" : "") :
         pending ? '<p class="hint">Call waiting for your team…</p><div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button></div>' :
         '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn ghost sm" type="button" data-bvideo="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">📹 Video</button><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + h.hand_id + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + h.hand_id + '">🂠 Player Card</button></div>') + "</div></div>";
   }
@@ -4567,6 +4567,45 @@
   document.addEventListener("sf:live", function () { LOBBY.venues = null; setTimeout(renderLobby, 1200); });
   if ($("#lbCard")) setTimeout(renderLobby, 0);
 
+  /* ---------- Friends: people you've played with (a Pair, the Lounge, a Private Table, a Player Card).
+     See who's online, message each other. Dating stays front and center; friends live on My table. ---------- */
+  var FR = { data: null, dm: null };
+  var HOW = { pair: "Your Pair", lounge: "Met in the Lounge", table: "From a Private Table", bluff: "Met at the Bluff Table", team: "Bluff Table teammate" };
+  function friendBtn(id, kind) { return '<button class="btn ghost sm" type="button" data-addfriend="' + esc(id) + '"' + (kind ? ' data-fkind="' + kind + '"' : "") + '>👥 Add friend</button>'; }
+  function ago(t) { if (!t) return ""; var s = (Date.now() - Date.parse(t)) / 1000; return s < 3600 ? Math.max(1, Math.round(s / 60)) + " min ago" : s < 86400 ? Math.round(s / 3600) + " hr ago" : Math.round(s / 86400) + " days ago"; }
+  function renderFriends() {
+    var el = $("#friends"); if (!el || !liveOn()) return;
+    lrpc("my_friends").then(function (d) {
+      FR.data = d = d || {}; var fs = d.friends || [], inc = d.incoming || [];
+      el.hidden = false;
+      var on = fs.filter(function (f) { return f.online; }).length;
+      el.innerHTML = '<div class="fr-head"><h3 style="font-size:1.2rem;margin:0">👥 Friends <span class="hint">' + (fs.length ? on + " online · " + fs.length + " friend" + (fs.length === 1 ? "" : "s") : "") + '</span></h3><label class="chk fr-vis"><input type="checkbox" id="frShow"' + (d.show_online !== false ? " checked" : "") + "> Show friends when I'm online</label></div>" +
+        (inc.length ? '<div class="fr-inc">' + inc.map(function (r) { return '<div class="fr-row ask"><span class="fr-av"' + (r.photo ? ' style="background-image:url(' + esc(r.photo) + ')"' : "") + ">" + (r.photo ? "" : esc((r.name || "?").charAt(0))) + '</span><span class="fr-who"><b>' + esc(r.name) + '</b> wants to be friends<small>@' + esc(r.handle || "") + " · " + esc(HOW[r.how] || "") + '</small></span><span class="fr-act"><button class="btn gold sm" type="button" data-fyes="' + r.id + '">Accept</button><button class="btn ghost sm" type="button" data-fno="' + r.id + '">Not now</button></span></div>'; }).join("") + "</div>" : "") +
+        (fs.length ? '<div class="fr-list">' + fs.map(function (f) { return '<div class="fr-row"><span class="fr-av"' + (f.photo ? ' style="background-image:url(' + esc(f.photo) + ')"' : "") + ">" + (f.photo ? "" : esc((f.name || "?").charAt(0))) + '<i class="fr-dot' + (f.online ? " on" : "") + '" title="' + (f.online ? "Online" : "Offline") + '"></i></span><span class="fr-who"><b>' + esc(f.name) + "</b><small>" + (f.online ? '<span class="fr-on">Online now</span>' : f.last_seen ? "Seen " + ago(f.last_seen) : "Offline") + " · " + esc(HOW[f.how] || "Friend") + '</small></span><span class="fr-act"><button class="btn ' + (f.unread ? "gold" : "ghost") + ' sm" type="button" data-fdm="' + f.id + '" data-fname="' + esc(f.name) + '">💬 Message' + (f.unread ? ' <b class="fr-badge">' + f.unread + "</b>" : "") + '</button><button class="linkish fr-x" type="button" data-funf="' + f.id + '" data-fname="' + esc(f.name) + '" aria-label="Remove ' + esc(f.name) + '">⋯</button></span></div>'; }).join("") + "</div>"
+          : '<p class="hint">No friends yet. After you play with someone, at a Private Table, in the Lounge, or as a Pair, tap <b>👥 Add friend</b>.</p>');
+    }, function () { });
+  }
+  function friendDm(id, name) {
+    var last = 0, m = modal('<div class="bchead"><h3 style="font-size:1.4rem">' + esc(name) + '</h3><span class="hint" id="fdmSt"></span></div><div class="bthread" id="fdmLog"><p class="hint">Loading…</p></div><form id="fdmForm" class="bform"><label class="sr" for="fdmIn">Message</label><input id="fdmIn" maxlength="1000" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form><p class="hint">Friends only. Never send money. Report anything that feels off: help@suiteface.com.</p>');
+    function pull() { lrpc("friend_thread", { p_member: id, p_after: last }).then(function (rows) { var log = $("#fdmLog", m); if (!log) return; rows = (rows || []).slice().reverse(); if (!last) log.innerHTML = ""; rows.forEach(function (r) { last = Math.max(last, r.id); log.insertAdjacentHTML("beforeend", '<div class="msg ' + (r.mine ? "me" : "them") + '">' + esc(r.body) + "</div>"); }); if (!log.children.length) log.innerHTML = '<p class="hint">Say hi to your friend.</p>'; if (rows.length) log.scrollTop = log.scrollHeight; }, function (x) { var log = $("#fdmLog", m); if (log) log.innerHTML = '<p class="hint">' + esc(x.message) + "</p>"; }); }
+    var f = ((FR.data && FR.data.friends) || []).filter(function (x) { return x.id === id; })[0]; if (f) $("#fdmSt", m).textContent = f.online ? "● Online" : f.last_seen ? "Seen " + ago(f.last_seen) : "Offline";
+    pull(); clearInterval(FR.dm); FR.dm = setInterval(function () { if (!document.body.contains(m)) { clearInterval(FR.dm); renderFriends(); return; } pull(); }, 4000);
+    $("#fdmForm", m).addEventListener("submit", function (e) { e.preventDefault(); var i = $("#fdmIn", m), v = i.value.trim(); if (!v) return; i.value = ""; lrpc("friend_send", { p_member: id, p_body: v }).then(function () { var log = $("#fdmLog", m); if (log && log.querySelector(".hint")) log.innerHTML = ""; pull(); }, function (x) { toast(x.message); }); });
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-addfriend]");
+    if (b) { e.preventDefault(); b.disabled = true; var bl = b.getAttribute("data-fkind") === "bluff";
+      lrpc(bl ? "friend_request_bluff" : "friend_request", bl ? { p_bhand: b.getAttribute("data-addfriend") } : { p_member: b.getAttribute("data-addfriend") }).then(function (r) { b.textContent = r === "friends" ? "👥 Friends ✓" : "👥 Request sent"; toast(r === "friends" ? "You're friends now!" : "Friend request sent."); renderFriends(); }, function (x) { b.disabled = false; toast(x.message); }); return; }
+    if ((b = e.target.closest("[data-fyes]")) || (b = e.target.closest("[data-fno]"))) { var y = b.hasAttribute("data-fyes"); lrpc("friend_answer", { p_member: b.getAttribute(y ? "data-fyes" : "data-fno"), p_yes: y }).then(function () { toast(y ? "You're friends now!" : "Okay."); renderFriends(); }, function (x) { toast(x.message); }); return; }
+    if ((b = e.target.closest("[data-fdm]"))) { friendDm(b.getAttribute("data-fdm"), b.getAttribute("data-fname")); return; }
+    if ((b = e.target.closest("[data-funf]"))) { if (!confirm("Remove " + b.getAttribute("data-fname") + " from your friends?")) return; lrpc("unfriend", { p_member: b.getAttribute("data-funf") }).then(renderFriends); return; }
+  });
+  document.addEventListener("change", function (e) { if (e.target && e.target.id === "frShow") lrpc("set_show_online", { p_on: e.target.checked }).then(function (v) { toast(v ? "Friends can see when you're online." : "You'll appear offline to friends."); }, function (x) { toast(x.message); }); });
+  // Presence: a quiet heartbeat while the tab is open.
+  function beatPresence() { if (liveOn() && !document.hidden) lrpc("touch_presence").catch(function () { }); }
+  document.addEventListener("sf:live", function () { beatPresence(); clearInterval(FR.beat); FR.beat = setInterval(beatPresence, 60000); setTimeout(renderFriends, 900); clearInterval(FR.poll); FR.poll = setInterval(function () { if ($("#friends") && !document.hidden && !$("#modal")) renderFriends(); }, 45000); });
+  document.addEventListener("visibilitychange", beatPresence);
+
   /* ---------- The Lounge: a private 21-minute room for two ID-verified players. $2.10 a seat, all to SuiteFace.
      The inviter can comp the other seat. Comps inside are free gifts. Invites go only to Pairs or to Bluff cards already
      revealed as Player Cards, so a Lounge invite never gives a House Card away. ---------- */
@@ -4625,6 +4664,7 @@
       lrpc("lounge_state", { p_session: id, p_after: last }).then(function (s) {
         if (!document.body.contains(m)) { clearInterval(LG.poll); LG.open = null; return; }
         $("#lgWith", m).textContent = "Private room with " + (s.other || "your match");
+        if (s.other_id && !$("#lgFriend", m)) { var lf = document.createElement("span"); lf.id = "lgFriend"; lf.innerHTML = friendBtn(s.other_id); $(".lgfoot", m).insertBefore(lf, $("#lgRepBtn", m)); }
         if (s.ends_at) { endsAt = Date.parse(s.ends_at); skew = Date.parse(s.now) - Date.now(); }
         var t = $("#lgThread", m), d = $("#lgTyping", m);
         if ((s.msgs || []).length) { if (d) d.remove(); var h = t.querySelector(".hint:not(.lgend)"); if (h && !last) h.remove(); s.msgs.forEach(function (x) { last = Math.max(last, x.id); t.insertAdjacentHTML("beforeend", line(x)); if (!x.mine && x.comp) jackpot(900); }); t.scrollTop = t.scrollHeight; }
