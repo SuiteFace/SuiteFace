@@ -79,9 +79,9 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792297265">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792297265">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792297265">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792297555">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792297555">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792297555">
 </head>
 <body data-page="tables">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -156,6 +156,7 @@
       <a href="joker-lobby.html" data-need="member" class="clubnav">Joker Lobby</a>
       <a href="bluff-table.html" data-pgnav="bluff" data-need="member" class="clubnav">Bluff Table</a>
       <a href="card-backs.html" data-pgnav="backs" data-need="member" class="clubnav">Card Backs</a>
+      <a href="my-table.html#lobby" data-need="member" class="clubnav">Your Lobby</a>
       <a href="my-table.html" data-pgnav="club" data-need="member">My table</a>
       <a href="my-table.html#dealer" data-need="dealer">Dealer</a>
       <a href="my-table.html#pitboss" data-need="pitboss">Pit Boss</a>
@@ -352,6 +353,38 @@
         <div class="quiz-nav"><button class="btn ghost sm" id="qBack" disabled>Back</button><button class="btn ghost sm" id="qRestart">Start over</button></div>
       </div>
       <div class="panel result" id="quizResult" hidden></div>
+    </div>
+  </section>
+
+  <!-- ============ YOUR LOBBY: your card as the table sees it, plus the sticker tray ============ -->
+  <section data-pg="club" id="lobby" data-need="member" aria-labelledby="lobbyTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Your Lobby</p>
+        <h2 id="lobbyTitle">Your card, the way the table sees it</h2>
+        <p class="lede">This is the card other players get dealt. Tap it to flip. Place and peel stickers from the tray, and every change saves to your card.</p>
+      </div>
+      <div class="lobby">
+        <div class="lb-stage">
+          <div class="lb-card" id="lbCard" aria-live="polite"></div>
+          <div class="row lb-flip"><button class="btn ghost sm" type="button" id="lbFlip">↻ Flip my card</button><a class="btn ghost sm" href="#face">✎ Edit my Face</a></div>
+        </div>
+        <div class="lb-side">
+          <div class="panel lb-top"><h3>Top of your card</h3><p class="hint">Three spots show before anyone flips your card. Earned badges go first, then your stickers in the order you placed them. Extras wait under <b>More</b>.</p><div class="lb-spots" id="lbSpots"></div></div>
+          <div class="panel lb-tray">
+            <h3>Sticker tray</h3>
+            <div class="lb-tabs" role="tablist" aria-label="Sticker types" id="lbTabs">
+              <button type="button" role="tab" data-lbtab="stickers" aria-selected="true">Stickers</button>
+              <button type="button" role="tab" data-lbtab="bumpers" aria-selected="false">Bumper stickers</button>
+              <button type="button" role="tab" data-lbtab="spots" aria-selected="false">Date spots</button>
+              <button type="button" role="tab" data-lbtab="comps" aria-selected="false">Compliments</button>
+              <button type="button" role="tab" data-lbtab="earned" aria-selected="false">Earned</button>
+            </div>
+            <div class="lb-pane" id="lbPane" role="tabpanel"></div>
+          </div>
+          <div class="panel lb-back"><div id="lbBack"></div></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -880,15 +913,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792297265"></script>
-<script src="/assets/js/sign.js?v=1792297265"></script>
-<script src="/assets/js/live.js?v=1792297265"></script>
-<script src="/assets/js/gate.js?v=1792297265"></script>
-<script src="/assets/js/fx.js?v=1792297265"></script>
-<script src="/assets/js/casino-scene.js?v=1792297265"></script>
-<script src="/assets/js/chips.js?v=1792297265"></script>
-<script src="/assets/js/bumpers.js?v=1792297265"></script>
-<script src="/assets/js/slots.js?v=1792297265"></script>
-<script src="/assets/js/app.js?v=1792297265"></script>
+<script src="/assets/js/config.js?v=1792297555"></script>
+<script src="/assets/js/sign.js?v=1792297555"></script>
+<script src="/assets/js/live.js?v=1792297555"></script>
+<script src="/assets/js/gate.js?v=1792297555"></script>
+<script src="/assets/js/fx.js?v=1792297555"></script>
+<script src="/assets/js/casino-scene.js?v=1792297555"></script>
+<script src="/assets/js/chips.js?v=1792297555"></script>
+<script src="/assets/js/bumpers.js?v=1792297555"></script>
+<script src="/assets/js/slots.js?v=1792297555"></script>
+<script src="/assets/js/app.js?v=1792297555"></script>
 </body>
 </html>

@@ -997,6 +997,20 @@
       return '<div class="stkpack"><span class="stkhead">' + pv[0] + (open ? "" : ' <button type="button" class="unlockbtn" data-pack="' + pk + '">Unlock · $' + pv[1].toFixed(2) + "</button>") + '</span><div class="stickers">' +
         STICKERS.filter(function (k) { return k[2] === pk; }).map(function (k) { return '<button type="button" class="stkpick' + (pk === "passport" ? " wide" : "") + '" data-stk="' + k[0] + '" aria-pressed="' + (P.stickers.indexOf(k[0]) > -1) + '"' + (open ? "" : ' data-locked="' + pk + '"') + ">" + k[1] + (open ? "" : "<em>🔒</em>") + "</button>"; }).join("") + "</div></div>"; }).join("");
   }
+  /* Placing and peeling stickers. Shared by My Face and the Lobby. Live players' stickers save to their card right away,
+     so other players see them in their decks. */
+  function toggleSticker(id) {
+    var before = P.stickers.slice(), at = P.stickers.indexOf(id);
+    if (at > -1) P.stickers.splice(at, 1); else { if (P.stickers.length >= 3) { toast("Up to 3 stickers. Tap one to peel it off."); return; } P.stickers.push(id); }
+    renderStyle(); onChange(); if (typeof renderLobby === "function") renderLobby();
+    if (liveOn()) lrpc("set_my_card_stickers", { p_stickers: P.stickers }).then(function (v) { P.stickers = v || []; saveP(); }, function (er) { P.stickers = before; saveP(); renderStyle(); onChange(); if (typeof renderLobby === "function") renderLobby(); toast(er.message); });
+  }
+  function toggleBumper(bk, live) {
+    var bi = P.bumpers.indexOf(bk);
+    if (bi > -1) P.bumpers.splice(bi, 1); else { if (P.bumpers.length >= 3) { toast("Up to 3 bumper stickers. Tap one to peel it off."); return; } P.bumpers.push(bk); }
+    renderStyle(); onChange(); if (typeof renderLobby === "function") renderLobby();
+    if (live && liveOn()) lrpc("set_my_bumpers", { p_bumpers: P.bumpers }).catch(function (er) { toast(er.message); });
+  }
   function buy(id, label, price, then) {
     if (houseCode() && window.SF_LIVE) { window.SF_LIVE.rpc("house_comp_check", { p_code: houseCode() }).then(function (r) { if (r.error || !r.data) { toast(r.error ? r.error.message : "Comp not valid."); return; } if (!owns(id)) P.owned.push(id); saveP(); toast("🎩 " + label + " comped by the house."); then && then(); }); return; }
     if (PUBLIC_SITE) { toast("Paid themes and sticker packs open soon. Free and earned ones are ready now."); return; }
@@ -1013,12 +1027,10 @@
     if (k && k.hasAttribute("data-earn")) { var ek = k.getAttribute("data-earn"); toast(ek === "first1000" ? "The First 1,000 badge goes to members who chose the $21 Buy-In during the launch offer." : "Unlocks when " + ek.replace("ref", "") + " friend" + (ek === "ref1" ? "" : "s") + " you invited join SuiteFace. Share your invite link from Invite."); return; }
     if (k) { var id = k.getAttribute("data-stk");
       if (k.hasAttribute("data-locked")) { var pk = k.getAttribute("data-locked"); return buy("pack_" + pk, PACKS[pk][0] + " sticker pack", PACKS[pk][1], function () { renderStyle(); }); }
-      var at = P.stickers.indexOf(id); if (at > -1) P.stickers.splice(at, 1); else { if (P.stickers.length >= 3) { toast("Up to 3 stickers. Tap one to remove it."); return; } P.stickers.push(id); }
-      renderStyle(); onChange(); }
+      toggleSticker(id); }
     var bp = e.target.closest("[data-bump]");
-    if (bp) { var bk = bp.getAttribute("data-bump"), bi = P.bumpers.indexOf(bk);
-      if (bi > -1) P.bumpers.splice(bi, 1); else { if (P.bumpers.length >= 3) { toast("Up to 3 bumper stickers. Tap one to peel it off."); return; } P.bumpers.push(bk); }
-      renderStyle(); onChange(); return; }
+    if (bp) { var bk = bp.getAttribute("data-bump");
+      toggleBumper(bk, false); return; }
     if (e.target.closest("[data-bumpask]")) {
       var want = P.bumpers.filter(function (k) { return P.bumpersOk.indexOf(k) < 0 && k !== "flag"; });
       Promise.all(want.map(function (k) { return lrpc("request_bumper_check", { p_bumper: k }); })).then(function () { toast("Requested. Save my Face first if you just added them. A dealer will be in touch."); }, function (er) { toast((er && er.message) || "Save my Face first, then ask again."); });
@@ -1708,6 +1720,7 @@
   }
   function winBadge(list, long) { var k = topWin(list); if (!k) return ""; return '<span class="cvb winb win-' + k + '" title="' + esc(WINS[k].long) + '">' + winIcon(k, long ? 20 : 16) + "<b>" + esc(WINS[k].short) + "</b></span>"; }
 
+  function stickerChip(id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="cvstk stk-' + k[2] + '" title="Sticker">' + k[1] + "</span>" : ""; }
   function coverHTML(p) {
     var felt = (TABLE[p.looking] || TABLE.longterm)[2] || "#1E6347", red = SUIT[p.suit] && SUIT[p.suit].red;
     var badges = [];
@@ -1723,7 +1736,10 @@
     var room = 3 - badges.length, bl = p.bumpers || [];
     var stick = window.SFBumpers && room > 0 ? SFBumpers.strip(bl.slice(0, room), p.bumpersOk) : "";
     extra += Math.max(0, bl.length - Math.max(room, 0));
-    var used = badges.length + Math.min(bl.length, Math.max(room, 0)), vroom = Math.max(0, 3 - used), vs = p.venueStickers || [];
+    var used = badges.length + Math.min(bl.length, Math.max(room, 0)), cs = p.cardStickers || [], sroom = Math.max(0, 3 - used);
+    if (cs.length && sroom) stick += cs.slice(0, sroom).map(stickerChip).join("");
+    extra += Math.max(0, cs.length - sroom); used += Math.min(cs.length, sroom);
+    var vroom = Math.max(0, 3 - used), vs = p.venueStickers || [];
     if (vs.length && vroom) stick += vs.slice(0, vroom).map(function (v) { return venueSticker(v, 14); }).join("");
     extra += Math.max(0, vs.length - vroom);
     var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 3, size: 14 }) : "";
@@ -1738,7 +1754,7 @@
     var lookTxt = (TABLE[p.looking] || TABLE.longterm)[1];
     if (p.joker) col += " jokercard";
     if (p.hr && !p.joker) col += " hrcard" + (p.hr === "buyin" ? " hrgold" : "");
-    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.venueStickers && p.venueStickers.length ? '<span class="vline vstickline"><b>Date spots:</b> ' + p.venueStickers.map(function (v) { return venueSticker(v, 16); }).join("") + "</span>" : "") + (p.wins && topWin(p.wins) ? '<span class="vline winline">' + winIcon(topWin(p.wins), 20) + " " + esc(WINS[topWin(p.wins)].long) + ' · <a href="winners.html">Winners\' Row</a></span>' : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
+    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.cardStickers && p.cardStickers.length ? '<span class="vline cstkline"><b>Stickers:</b> ' + p.cardStickers.map(stickerChip).join("") + "</span>" : "") + (p.venueStickers && p.venueStickers.length ? '<span class="vline vstickline"><b>Date spots:</b> ' + p.venueStickers.map(function (v) { return venueSticker(v, 16); }).join("") + "</span>" : "") + (p.wins && topWin(p.wins) ? '<span class="vline winline">' + winIcon(topWin(p.wins), 20) + " " + esc(WINS[topWin(p.wins)].long) + ' · <a href="winners.html">Winners\' Row</a></span>' : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
     var face = p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + "</div></div>" + details + '<span class="idx br">J<b class="jk">★</b></span></div>' :
       '<div class="face"><span class="idx">' + p.rank + pip(p.suit) + "</span>" +
       '<div class="center">' + avatar(p) + '<div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="dist">about ' + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">' + SUIT[p.suit].sym + " " + SUIT[p.suit].name + "</div>" + jmeter(p) +
@@ -3959,7 +3975,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, cardStickers: r.card_stickers || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -3987,6 +4003,8 @@
       return lrpc("deck_bumpers").then(function (bs) { var m = {}; (bs || []).forEach(function (b) { m[b.member_id] = b; }); (rows || []).forEach(function (r) { var b = m[r.member_id]; if (b) { r.bumpers = b.bumpers; r.bumpers_ok = b.verified; } }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_venue_stickers").then(function (vs) { var m = {}; (vs || []).forEach(function (v) { m[v.member_id] = v.stickers; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.venue_stickers = m[r.member_id]; }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
+      return lrpc("deck_card_stickers").then(function (vs) { var m = {}; (vs || []).forEach(function (v) { m[v.member_id] = v.stickers; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_stickers = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_wins").then(function (ws) { var m = {}; (ws || []).forEach(function (w) { m[w.member_id] = w.kinds; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.wins = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
@@ -4055,6 +4073,7 @@
       lrpc("my_couple").then(function (c) { P.couple = c || []; renderCouple(); }, function () { });
       lrpc("my_wishlist").then(function (u) { P.wishlist = u || ""; if ($("#fWish")) $("#fWish").value = P.wishlist; }, function () { });
       lrpc("my_card_back").then(function (b) { P.cardBack = b || null; saveP(); renderCardBacks(); }, function () { });
+      lrpc("my_card_stickers").then(function (v) { P.stickers = v || []; saveP(); try { renderStyle(); } catch (e) { } renderCard(); if (typeof renderLobby === "function") renderLobby(); }, function () { });
       lrpc("my_heads_ups").then(function (h) { P.headsUp = h || null; renderHeadsUp(); }, function () { });
       lrpc("my_compliments").then(function (rs) { P.compRows = rs || []; P.myComps = null; (rs || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function () { });
       lrpc("my_suit_lock").then(function (L) { if (L) { P.suitLock = L; if (L.locked) { P.mySuit = L.suit; P.wild = !!L.wild; } saveP(); renderCard(); } }, function () { });
@@ -4335,6 +4354,95 @@
   });
   if (bluffEl()) renderBluff();
   document.addEventListener("sf:live", function () { setTimeout(renderBluff, 0); });
+
+  /* ---------- Your Lobby: your own card exactly as other players get it dealt, with a tray to place and peel stickers.
+     Uses the same card template as the deck, so what you see here is what they see. ---------- */
+  var LOBBY = { tab: "stickers", venues: null, flipped: false };
+  function selfCard() {
+    var V = P.ver || {}, s = P.mySuit || (P.trumps || ["heart"])[0];
+    return { id: "me-lobby", name: P.name || "Your Name", age: parseInt(P.age, 10) || "", dist: 1, suit: s, rank: "A", looking: P.looking || "longterm",
+      interests: P.interests || [], bio: P.bio || "Your Face Value goes here.", hue: 28, shared: [], city: "", wins: P.wins || null, founder: P.founderNo || null,
+      hr: P.highRoller || null, photoV: !!(V.photo || (P.photoLive && P.photo)), idV: !!V.id, confirmed: [], bumpers: P.bumpers || [], bumpersOk: P.bumpersOk || [],
+      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, jk: 0, id_: {} };
+  }
+  function lobbySpots(p) {
+    var spots = [];
+    if (p.wins && topWin(p.wins)) spots.push(["Earned", winBadge(p.wins)]);
+    if (p.founder && window.SFSlots) spots.push(["Earned", SFSlots.founder(p.founder, 30)]);
+    if (p.hr) spots.push(["High Roller", "💎"]);
+    if (!p.hr && (p.photoV || p.idV)) spots.push(["Verified", (p.photoV ? "📷✓" : "") + (p.idV ? " 🪪✓" : "")]);
+    (p.bumpers || []).forEach(function (k) { spots.push(["Bumper", window.SFBumpers ? SFBumpers.html(k, { verified: (p.bumpersOk || []).indexOf(k) > -1 }) : k, "bump", k]); });
+    (p.cardStickers || []).forEach(function (k) { spots.push(["Sticker", stickerChip(k), "stk", k]); });
+    (p.venueStickers || []).forEach(function (v) { spots.push(["Date spot", venueSticker(v, 16), "venue", v.partner_id]); });
+    return spots;
+  }
+  function renderLobby() {
+    var el = $("#lbCard"); if (!el) return;
+    var p = selfCard(), html = "";
+    try { html = cardHTML(p, 0); } catch (e) { html = '<div class="slot"><div class="pcard"><div class="flip">' + coverHTML(p) + "</div></div></div>"; }
+    el.innerHTML = html; var ca = el.querySelector(".card-actions"); if (ca) ca.remove();
+    var pc = el.querySelector(".pcard"); if (pc) { pc.classList.toggle("flipped", LOBBY.flipped); pc.setAttribute("aria-label", "Your card. Press to flip it."); }
+    var spots = lobbySpots(p), top = spots.slice(0, 3), more = spots.slice(3);
+    $("#lbSpots").innerHTML = [0, 1, 2].map(function (i) { var s = top[i];
+      return s ? '<div class="lb-spot on"><span class="lb-n">' + (i + 1) + '</span><div class="lb-art">' + s[1] + "</div><small>" + esc(s[0]) + "</small>" + (s[2] ? '<button type="button" class="linkish" data-lbpeel="' + s[2] + '" data-k="' + esc(s[3]) + '">Peel off</button>' : "") + "</div>"
+        : '<div class="lb-spot"><span class="lb-n">' + (i + 1) + '</span><div class="lb-art lb-empty">+</div><small>Open spot</small></div>'; }).join("") +
+      (more.length ? '<p class="hint lb-more">Under <b>More</b>: ' + more.map(function (s) { return '<span class="lb-mini">' + s[1] + "</span>"; }).join(" ") + "</p>" : "");
+    lobbyPane();
+    var cb = P.cardBack && CB[P.cardBack];
+    $("#lbBack").innerHTML = '<div class="lb-backrow">' + (typeof cbPreview === "function" ? cbPreview(P.cardBack || null, 74) : "") + '<div><h3>Card back</h3><p class="hint">' + (cb ? "<b>" + esc(cb[0]) + "</b> is on the back of your card." : "You're using the house design.") + '</p><a class="btn ghost sm" href="card-backs.html">Choose a card back</a></div></div>';
+  }
+  function lobbyPane() {
+    var pane = $("#lbPane"); if (!pane) return; var t = LOBBY.tab, h = "";
+    $$("#lbTabs [data-lbtab]").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-lbtab") === t ? "true" : "false"); });
+    if (t === "stickers") {
+      h = '<p class="hint">Up to 3. Tap to place, tap again to peel. Free and earned stickers are ready now; the paid packs open soon.</p>' + Object.keys(PACKS).map(function (pk) {
+        var list = STICKERS.filter(function (k) { return k[2] === pk; }), paid = !!PACKS[pk][1];
+        return '<div class="lb-pack"><span class="stkhead">' + esc(PACKS[pk][0]) + (paid ? ' <span class="hint">· opens soon</span>' : pk === "earned" ? ' <span class="hint">· First 1,000 and friends who join</span>' : ' <span class="free">Free</span>') + '</span><div class="lb-grid">' +
+          list.map(function (k) { var on = P.stickers.indexOf(k[0]) > -1, lock = paid || (pk === "earned" && !earnedHas(k[0]));
+            return '<button type="button" class="lb-item' + (on ? " on" : "") + (lock ? " lock" : "") + (pk === "passport" || pk === "earned" ? " wide" : "") + '" data-lbstk="' + k[0] + '"' + (lock ? ' data-lblock="' + pk + '"' : "") + ' aria-pressed="' + on + '">' + k[1] + (lock ? "<em>🔒</em>" : "") + "</button>"; }).join("") + "</div></div>";
+      }).join("");
+    } else if (t === "bumpers") {
+      h = '<p class="hint">Up to 3: what you\'d proudly put on your car. Self-declared until the house checks it; checked ones wear a brass ✓.</p><div class="lb-grid">' + (window.SFBumpers ? SFBumpers.list.map(function (b) { var on = P.bumpers.indexOf(b[0]) > -1;
+        return '<button type="button" class="lb-item wide' + (on ? " on" : "") + '" data-lbbump="' + b[0] + '" aria-pressed="' + on + '">' + SFBumpers.html(b[0], { verified: P.bumpersOk.indexOf(b[0]) > -1 }) + "</button>"; }).join("") : "") + "</div>";
+    } else if (t === "spots") {
+      if (!liveOn()) h = '<p class="hint">Date spot stickers are thank-yous from venues that honored your Date Deal. Log in to see yours.</p>';
+      else if (LOBBY.venues === null) { h = '<p class="hint">Loading…</p>'; lrpc("my_venue_stickers_v2").then(function (r) { LOBBY.venues = r || []; renderLobby(); }, function () { LOBBY.venues = []; lobbyPane(); }); }
+      else if (!LOBBY.venues.length) h = '<p class="hint">None yet. Use a Date Deal with a Pair and the venue\'s thank-you sticker lands here.</p>';
+      else h = '<p class="hint">Choose which date spots show on your card.</p><div class="lb-grid">' + LOBBY.venues.map(function (v) { return '<button type="button" class="lb-item wide' + (v.shown ? " on" : "") + '" data-lbvenue="' + esc(v.partner_id) + '" aria-pressed="' + !!v.shown + '">' + venueSticker(v, 18) + "</button>"; }).join("") + "</div>";
+    } else if (t === "comps") {
+      var rows = P.compRows || [];
+      h = rows.length ? '<p class="hint">Compliments from your dates. Earned, never bought. Hide any you\'d rather not show.</p><div class="lb-grid">' + rows.map(function (x) { var M = window.SFSlots ? SFSlots.meaning[x.kind] : null;
+        return '<button type="button" class="lb-item wide' + (x.hidden ? "" : " on") + '" data-lbcomp="' + esc(x.kind) + '" aria-pressed="' + !x.hidden + '">' + (window.SFSlots ? SFSlots.svg(x.kind, 22) : "") + "<b>" + esc(M ? M[0] : x.kind) + "</b><i>×" + x.n + "</i></button>"; }).join("") + "</div>"
+        : '<p class="hint">After a date, your match can leave compliment stickers like Great Listener or Made Me Laugh. They show up here.</p>';
+    } else {
+      var items = [];
+      if (P.wins && P.wins.length) P.wins.forEach(function (w) { if (WINS[w]) items.push(winIcon(w, 22) + "<b>" + esc(WINS[w].long) + "</b>"); });
+      if (P.founderNo && window.SFSlots) items.push(SFSlots.founder(P.founderNo, 26) + "<b>First 1,000 · №" + String(P.founderNo).padStart(4, "0") + "</b>");
+      var V = P.ver || {}; if (V.photo || (P.photoLive && P.photo)) items.push("📷 <b>Photo verified</b>"); if (V.id) items.push("🪪 <b>ID verified</b>");
+      h = '<p class="hint">Earned badges always lead the top of your card. You can\'t buy them, only win them.</p>' + (items.length ? '<div class="lb-earned">' + items.map(function (x) { return '<span class="lb-e">' + x + "</span>"; }).join("") + "</div>" : '<p class="hint">Nothing yet. Verify your photo or ID, win a hand for <a href="winners.html">Winners\' Row</a>, or invite friends to earn stamps.</p>');
+    }
+    pane.innerHTML = h;
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target, b;
+    if (!t.closest || !t.closest("#lobby")) return;
+    if ((b = t.closest("#lbCard .pcard")) || t.closest("#lbFlip")) { e.preventDefault(); LOBBY.flipped = !LOBBY.flipped; var pc = $("#lbCard .pcard"); if (pc) pc.classList.toggle("flipped", LOBBY.flipped); return; }
+    if ((b = t.closest("[data-lbtab]"))) { LOBBY.tab = b.getAttribute("data-lbtab"); lobbyPane(); return; }
+    if ((b = t.closest("[data-lblock]"))) { var pk = b.getAttribute("data-lblock"); toast(pk === "earned" ? (b.getAttribute("data-lbstk") === "first1000" ? "The First 1,000 stamp is for founding players." : "Unlocks when friends you invited join. Share your invite link from My table.") : PACKS[pk][0] + " stickers open soon."); return; }
+    if ((b = t.closest("[data-lbstk]"))) { toggleSticker(b.getAttribute("data-lbstk")); return; }
+    if ((b = t.closest("[data-lbbump]"))) { toggleBumper(b.getAttribute("data-lbbump"), true); return; }
+    if ((b = t.closest("[data-lbpeel]"))) { var kind = b.getAttribute("data-lbpeel"), k = b.getAttribute("data-k");
+      if (kind === "stk") toggleSticker(k); else if (kind === "bump") toggleBumper(k, true);
+      else if (kind === "venue") lrpc("set_venue_sticker_shown", { p_partner: k, p_shown: false }).then(function () { (LOBBY.venues || []).forEach(function (v) { if (v.partner_id === k) v.shown = false; }); renderLobby(); renderVenueStickPanel(); }, function (er) { toast(er.message); });
+      return; }
+    if ((b = t.closest("[data-lbvenue]"))) { var id = b.getAttribute("data-lbvenue"), v = (LOBBY.venues || []).filter(function (x) { return x.partner_id === id; })[0]; if (!v) return;
+      lrpc("set_venue_sticker_shown", { p_partner: id, p_shown: !v.shown }).then(function () { v.shown = !v.shown; renderLobby(); renderVenueStickPanel(); toast(v.shown ? "It's on your card." : "Peeled off your card."); }, function (er) { toast(er.message); }); return; }
+    if ((b = t.closest("[data-lbcomp]"))) { var ck = b.getAttribute("data-lbcomp"), row = (P.compRows || []).filter(function (x) { return x.kind === ck; })[0]; if (!row) return; var hide = !row.hidden;
+      lrpc("set_compliment_hidden", { p_kind: ck, p_hidden: hide }).then(function () { row.hidden = hide; P.myComps = null; (P.compRows || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); renderLobby(); }, function (er) { toast(er.message); }); return; }
+  });
+  document.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.closest && e.target.closest("#lbCard .pcard")) { e.preventDefault(); LOBBY.flipped = !LOBBY.flipped; e.target.closest(".pcard").classList.toggle("flipped", LOBBY.flipped); } });
+  document.addEventListener("sf:live", function () { LOBBY.venues = null; setTimeout(renderLobby, 1200); });
+  if ($("#lbCard")) setTimeout(renderLobby, 0);
 
   /* ---------- The Lounge: a private 21-minute room for two ID-verified players. $2.10 a seat, all to SuiteFace.
      The inviter can comp the other seat. Comps inside are free gifts. Invites go only to Pairs or to Bluff cards already
