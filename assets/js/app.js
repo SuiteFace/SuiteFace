@@ -557,6 +557,9 @@
   }
   window.SF_openHighRoller = openHighRoller;
   document.addEventListener("click", function (e) { if (e.target.closest("[data-highroller]")) { e.preventDefault(); openHighRoller(); } });
+  // Direct link: any page + #highroller opens the High Roller Room.
+  function hrHash() { if (location.hash === "#highroller") setTimeout(openHighRoller, 600); }
+  hrHash(); window.addEventListener("hashchange", hrHash);
   document.addEventListener("click", function (e) { if (!e.target.closest("[data-hr-sponsor]")) return; e.preventDefault();
     window.SFSign.require("sponsor", function () { location.href = CFG.stripeHrSponsorLink; }, { about: "High Roller Sponsor" }); });
   (function () { var q = new URLSearchParams(location.search).get("highroller");
