@@ -79,9 +79,9 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792292545">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792292545">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792292545">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792293534">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792293534">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792293534">
 </head>
 <body data-page="home">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -400,7 +400,8 @@
           <div class="field hrdeck" id="hrDeck" hidden></div>
           <div class="field couplepanel" id="couplePanel" hidden></div>
           <div class="field wishfield"><label for="fWish">🎁 Wish list <span class="hint">(optional)</span></label><div class="row"><input type="url" id="fWish" maxlength="300" placeholder="https://www.amazon.com/hz/wishlist/ls/…" style="flex:1"><button type="button" class="btn ghost sm" id="wishSave">Save</button></div><span class="hint">Paste an Amazon, Target, Walmart or Etsy wish list. Only people you've paired with see it, and the store ships gifts without showing them your address. On Amazon, set the list to Shared and keep "third-party seller shipping" privacy on.</span></div>
-          <div class="field comppanel" id="compPanel" hidden></div>
+          <div class="field" id="venueStickPanel" hidden></div>
+<div class="field comppanel" id="compPanel" hidden></div>
           <div class="field headsup" id="headsUp" hidden></div>
           <div class="two">
             <div class="field"><label for="fName">Face Name</label><input type="text" id="fName" maxlength="40" placeholder="Jordan" autocomplete="given-name"><span class="err" id="fNameErr"></span></div>
@@ -747,6 +748,15 @@
     </div>
   </section>
 
+  <section data-pg="redeem" id="redeem" aria-labelledby="redTitle">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">For House Partner venues</p><h2 id="redTitle">Date Deals: check a code</h2>
+        <p class="lede">When a SuiteFace Pair shows you a code like <b>SF-7K3QXP</b>, check it here and tap Redeem when you honor the deal. Each code works once. You never see members' names.</p></div>
+      <div id="venueApp" class="venueapp"></div>
+      <p class="hint" style="margin-top:14px">Want your venue on SuiteFace? <a href="contact.html">Become a House Partner</a>.</p>
+    </div>
+  </section>
+
   <section data-pg="contact" id="join" aria-labelledby="joinTitle">
     <div class="wrap">
       <div class="forms">
@@ -814,6 +824,18 @@
           <h4 style="margin:18px 0 4px">Winning hands to review</h4><p class="hint">Both people already approved. Check the story and photo (no last names, addresses, children or explicit content), then approve for Winners' Row.</p><div id="winReviewList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">City tables</h4><p class="hint">Cities open automatically at their player goal. You can open one early here.</p><div id="cityAdminList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Video call charges</h4><p class="hint">Calls that ended but haven't been collected yet, or whose card was declined.</p><div id="callBillList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">House Partners and Date Deals</h4><p class="hint">Add a venue, give it a venue code and a 6 to 8 digit PIN, and send both to the venue privately. Venues add their own deals at suiteface.com/redeem.html; you approve each one below.</p>
+          <form class="form-grid ptform" id="partnerForm" novalidate><input type="hidden" id="ptId">
+            <div class="ptgrid"><input id="ptName" placeholder="Venue name" aria-label="Venue name"><input id="ptSlug" placeholder="Venue code (e.g. sawsbbq)" aria-label="Venue code"><input id="ptZip" inputmode="numeric" maxlength="5" placeholder="ZIP" aria-label="ZIP"><input id="ptAddr" placeholder="Street address" aria-label="Address"><input id="ptEmail" type="email" placeholder="Contact email" aria-label="Contact email">
+            <select id="ptKind" aria-label="Kind"><option value="restaurant">Restaurant</option><option value="bar">Bar or lounge</option><option value="coffee">Coffee shop</option><option value="dessert">Dessert</option><option value="activity">Activity (bowling, golf, games)</option><option value="arts">Arts and music</option><option value="outdoors">Outdoors</option><option value="other">Other</option></select>
+            <select id="ptStatus" aria-label="Status"><option value="active">Active</option><option value="paused">Paused</option><option value="pending">Pending</option><option value="ended">Ended</option></select>
+            <select id="ptTier" aria-label="Tier"><option value="standard">Standard</option><option value="high_roller">High Roller only</option></select>
+            <select id="ptArt" aria-label="Thank-you sticker art"><option value="star">Sticker: Star</option><option value="coffee">Sticker: Coffee</option><option value="donut">Sticker: Donut</option><option value="pizza">Sticker: Pizza</option><option value="burger">Sticker: Burger</option><option value="taco">Sticker: Taco</option><option value="icecream">Sticker: Ice cream</option><option value="cocktail">Sticker: Cocktail</option><option value="wine">Sticker: Wine</option><option value="beer">Sticker: Beer</option><option value="bowling">Sticker: Bowling</option><option value="golf">Sticker: Golf</option><option value="film">Sticker: Movies</option><option value="music">Sticker: Music</option><option value="art">Sticker: Art</option><option value="flower">Sticker: Flowers</option></select>
+            <input id="ptLabel" maxlength="20" placeholder="Sticker words (e.g. Dunkin' Date)" aria-label="Sticker words">
+            <input id="ptPin" type="password" inputmode="numeric" placeholder="New PIN (6–8 digits)" aria-label="PIN" autocomplete="new-password"></div>
+            <p class="err" id="ptErr" role="alert"></p><div class="row"><button class="btn gold sm" type="submit">Save venue</button></div></form>
+          <div id="partnerList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">Deals to review</h4><p class="hint">Check that each deal is real, legal, and right for a first date (no adult content; alcohol deals note 21+).</p><div id="offerReviewList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Fees audit</h4><p class="hint">Every paid add-on, its price, and how much members use it.</p><div id="feeAuditList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Table reports</h4><p class="hint">Reported table messages, with screenshots. A violation bans the sender for life, with no refund, and makes their card a permanent Joker. Your ruling is final.</p><div id="tableReportList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Card back applications</h4><p class="hint">Brands, artists, causes and churches asking to put a design on SuiteFace card backs. Confirm rights in writing before any design work.</p><div id="cbAppList"><p class="hint">Loading…</p></div>
@@ -853,15 +875,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792292545"></script>
-<script src="/assets/js/sign.js?v=1792292545"></script>
-<script src="/assets/js/live.js?v=1792292545"></script>
-<script src="/assets/js/gate.js?v=1792292545"></script>
-<script src="/assets/js/fx.js?v=1792292545"></script>
-<script src="/assets/js/casino-scene.js?v=1792292545"></script>
-<script src="/assets/js/chips.js?v=1792292545"></script>
-<script src="/assets/js/bumpers.js?v=1792292545"></script>
-<script src="/assets/js/slots.js?v=1792292545"></script>
-<script src="/assets/js/app.js?v=1792292545"></script>
+<script src="/assets/js/config.js?v=1792293534"></script>
+<script src="/assets/js/sign.js?v=1792293534"></script>
+<script src="/assets/js/live.js?v=1792293534"></script>
+<script src="/assets/js/gate.js?v=1792293534"></script>
+<script src="/assets/js/fx.js?v=1792293534"></script>
+<script src="/assets/js/casino-scene.js?v=1792293534"></script>
+<script src="/assets/js/chips.js?v=1792293534"></script>
+<script src="/assets/js/bumpers.js?v=1792293534"></script>
+<script src="/assets/js/slots.js?v=1792293534"></script>
+<script src="/assets/js/app.js?v=1792293534"></script>
 </body>
 </html>
