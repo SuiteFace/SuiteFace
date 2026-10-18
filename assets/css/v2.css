@@ -995,3 +995,5 @@ body.lb-dragmode{cursor:grabbing}
   .secnav .ngp{position:fixed;left:8px;right:8px;top:auto;transform:none;min-width:0;margin-top:6px}
 }
 html[data-play="day"] .secnav .ngp{background:#FFFDF8;box-shadow:0 24px 48px -24px rgba(60,48,30,.35)}
+/* audit fix: launch box notes stay readable on the green box in Day Play */
+.launchbox .hint,html[data-play="day"] .launchbox .hint{color:#F2ECDD}

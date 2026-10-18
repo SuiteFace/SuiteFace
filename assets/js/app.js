@@ -282,7 +282,7 @@
   (function () {
     var hb = $("#helpBtn"); if (!hb) return;
     var FAQ = [
-      ["How much does SuiteFace cost?", "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."],
+      ["How much does SuiteFace cost?", "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Launch offer: through October 31, 2026 the $21 Buy-In is waived and you join for $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."],
       ["What does a comp code do?", "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."],
       ["How do I cancel or pause?", "Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."],
       ["Why isn't my deck full yet?", "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."],
@@ -1915,6 +1915,8 @@
     $("#launchLeft").textContent = ms > 0 ? (d ? d + " day" + (d === 1 ? "" : "s") + " " : "") + h + " hr left." : "";
     $("#f1kLeft").textContent = LAUNCH.left.toLocaleString() + " of 1,000 left";
     var launch = LAUNCH.open && PLAN === "launch";
+    var pr = $("#priceBuy"); if (pr) pr.innerHTML = launch ? '<span class="big"><s>$21.00</s> $0</span><span class="hint">Buy-In waived during the launch offer</span>' : '<span class="big">$21.00</span><span class="hint">one-time Buy-In, today' + (LAUNCH.open ? " · First 1,000 badge" : "") + "</span>";
+    var pm = $("#priceMonth"); if (pm) pm.innerHTML = launch ? '<span class="big">$2.10</span><span class="hint">today, then every month</span>' : '<span class="big">$2.10</span><span class="hint">a month, starting 30 days after you join</span>';
     $("#payBtn").textContent = launch ? "Join for $2.10 with Stripe" : (LAUNCH.open ? "Pay $21.00 · First 1,000" : "Pay $21.00 with Stripe");
     var ag = $("#agree").parentElement.querySelector("span");
     ag.innerHTML = launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and SuiteFace charges <b>$2.10 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership (rejoining then requires the Buy-In). I agree to the <a href="terms.html">Terms of Service</a>.'
@@ -1957,7 +1959,7 @@
     }
   })();
   /* ---------- membership (Stripe) ---------- */
-  function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."; $("#agree").focus(); return false; }
+  function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = (LAUNCH.open && PLAN === "launch" ? "Please tick the box to confirm the $2.10 monthly charge." : "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."); $("#agree").focus(); return false; }
   $("#payBtn").addEventListener("click", function (e) {
     e.preventDefault(); if (!needAgree()) return;
     if (CFG.stripePaymentLink && window.SF_AUTH && (PUBLIC_SITE || window.SF_LIVE)) { liveBuyIn(); return; }
@@ -3403,7 +3405,7 @@
       if (!ok && !lock) {
         lock = document.createElement("div"); lock.className = "lockpanel wrap"; lock.setAttribute("data-s", String(SIGNED));
         var t = { face: "Build your Face", table: "Your Hand", map: "The Table Map", invite: "Invite friends to the table" }[sec.id] || "Members only";
-        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Members only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month." : "Buy in to play: $21.00 once, then $2.10 a month. Already a member? Log in.") + '</p><div class="row"><a class="btn gold sm" href="#membership">Buy in · $21</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
+        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Members only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? (LAUNCH.open ? "You're signed in. Take your seat for $2.10 a month: the $21 Buy-In is waived through " + launchEndText() + "." : "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month.") : (LAUNCH.open ? "Take a seat to play: $2.10 a month, with the $21 Buy-In waived through " + launchEndText() + ". Already a player? Log in." : "Buy in to play: $21.00 once, then $2.10 a month. Already a member? Log in.")) + '</p><div class="row"><a class="btn gold sm" href="#membership">Buy in · $21</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
         sec.appendChild(lock);
       }
       if (lock) lock.hidden = ok; sec.classList.toggle("is-locked", !ok);
@@ -3749,7 +3751,7 @@
         '<span class="casmeta">' + esc(kindLabel(c.kind)) + " · " + esc(WHO[c.who] || "Everyone") + " · " + (c.join_mode === "open" ? "Open to join" : "Host approves") + "</span>" +
         (c.about ? '<span class="casabout">' + esc(c.about) + "</span>" : "") +
         '<span class="castables">' + t.slice(0, 3).map(function (x) { return "<em>" + esc(x.name) + (x.meets ? " · " + esc(x.meets) : "") + "</em>"; }).join("") + (t.length > 3 ? "<em>+" + (t.length - 3) + " more</em>" : "") + "</span>" +
-        '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + " · " + (seatsLine(c) || (c.members || 1) + " member" + ((c.members || 1) === 1 ? "" : "s")) + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + (example ? ' · <b class="exb">Example</b>' : "") + "</span>" + casCta(c, example) + "</button>";
+        '<span class="casfoot">' + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? '<b class="exb">Example host · fictional</b>' : "Hosted by a player") + " · " + (seatsLine(c) || (c.members || 1) + " player" + ((c.members || 1) === 1 ? "" : "s")) + (c.my_status ? ' · <b>' + esc({ host: "You host this", member: "You're in", requested: "Request sent" }[c.my_status] || "") + "</b>" : "") + "</span>" + casCta(c, example) + "</button>";
     }
     // Every table card says plainly whether you can sit down now, with the one button that does it.
     function casGroup(c) { return { about: c.about, guide: c.guide || (c.host && c.host.guide) || null, seating: c.seating || "first_come", bits: [WHO[c.who] || "Everyone welcome", seatsLine(c), (c.tables || []).length ? (c.tables.length + " game" + (c.tables.length === 1 ? "" : "s")) : ""] }; }
@@ -3804,7 +3806,7 @@
     function openCasino(c, example) {
       var host = c.my_status === "host";
       var m = modal((SC ? '<div id="cjScene"></div>' : '<div class="casign big" aria-hidden="true"><span>' + esc(kindLabel(c.kind)) + "</span><b>" + esc(c.name) + "</b><span>Host @" + esc(c.host_handle || "host") + "</span></div>") +
-        '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · " + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a member") + (example ? ' · <a href="private-table.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="private-table.html?c=' + encodeURIComponent(c.id) + '">Walk in to the table ›</a>') + "</p>" +
+        '<p class="hint" style="margin:8px 0 0">' + esc(kindLabel(c.kind)) + " · " + (c.host_handle ? "Host @" + esc(c.host_handle) : example ? "Example host" : "Hosted by a player") + (example ? ' · <a href="private-table.html?demo=1" data-democas>Walk in to this example ›</a>' : ' · <a href="private-table.html?c=' + encodeURIComponent(c.id) + '">Walk in to the table ›</a>') + "</p>" +
         '<div id="cjHost">' + (example ? "" : (c.about ? '<p class="lede" style="margin:12px 0 6px">' + esc(c.about) + "</p>" : "")) + (example && c.host && SC && SC.hostCard ? SC.hostCard(c.host, { example: true, group: casGroup(c) }) : "") + "</div>" +
         '<p class="hint">' + esc(WHO[c.who] || "Everyone") + " · " + (c.seating === "reserved" ? "Reservations only: the Host saves seats for players" : c.join_mode === "open" ? "Free play: first come, first seated" : "Free play, with the Host approving each player") + " · " + (seatsLine(c) || (c.members || 1) + " members") + " · " + esc(reach(c)) + "</p>" +
         '<h4 style="margin:14px 0 6px">Games</h4><ul class="castbl">' + (c.tables || []).map(function (t) { return "<li><b>" + esc(t.name) + "</b>" + (t.meets ? "<span>" + esc(t.meets) + "</span>" : "") + "</li>"; }).join("") + "</ul>" +
@@ -4778,7 +4780,7 @@
   function loungeInvite(origin, ref, other, name) {
     var nm = esc((name || "them").split(" ")[0]);
     if (!LG.verified) {
-      modal('<h3>🛋 The Lounge</h3><p class="lede">A private 21-minute room for two. To keep it adults-only and safe, both players must be <b>ID-verified</b>.</p><p class="hint">Verify your ID in My Face, then come back to invite ' + nm + '.</p><div class="row"><a class="btn gold" href="my-table.html#identity">Verify my ID</a><button class="btn ghost" type="button" data-close>Not now</button></div>');
+      modal('<h3>🛋 The Lounge</h3><p class="lede">A private 21-minute room for two. To keep it adults-only and safe, both players must be <b>ID-verified</b>.</p><p class="hint">Verify your ID in My Face, then come back to invite ' + nm + '.</p><div class="row"><a class="btn gold" href="my-table.html#face">Verify my ID</a><button class="btn ghost" type="button" data-close>Not now</button></div>');
       return;
     }
     var m = modal('<h3>🛋 Invite ' + nm + ' to the Lounge</h3><p class="lede">A private room for 21 minutes. Just the two of you, away from the table.</p>' +

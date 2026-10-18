@@ -2,7 +2,7 @@
 SuiteFace Inc., a Florida corporation. Contact: help@suiteface.com only (no phone line). Emergency: 911.
 ## Quick answers
 Q: How much does SuiteFace cost?
-A: Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings.
+A: Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Launch offer: through October 31, 2026 the $21 Buy-In is waived and you join for $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings.
 Q: What does a comp code do?
 A: Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days.
 Q: How do I cancel or pause?
@@ -350,7 +350,7 @@ A Backfire is in addition to any other action under Section 5 and to the maker's
 
 ## Agreements you sign
 
-Each agreement below appears in a pop-up. Agreements A and E are signed at sign-up, B before the Buy-In, C before each lobby entry, and D for every Joker. Each and ends with your typed **/Name/** signature, the date, and **I Sign and Agree**.
+Each agreement below appears in a pop-up. Agreements A and E are signed at sign-up, B before the Buy-In, C before each lobby entry, and D for every Joker. Each ends with your typed **/Name/** signature, the date, and **I Sign and Agree**.
 
 ### A. Sign-up Agreement
 
