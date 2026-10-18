@@ -759,3 +759,23 @@ label.upl{cursor:pointer}
 @keyframes sfdot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:.9;transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){.msg.typing i{animation:none;opacity:.6}}
 .msg.them.typing{background:#FAF7F0;color:#2B2730}
+.btlobby{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.btlobby .panel{display:grid;gap:10px;align-content:start}
+.btlobby .row{display:grid;gap:10px}
+.btlobby select,.btlobby input,.btmult{padding:.7rem .9rem;border-radius:12px;border:1px solid rgba(250,247,240,.2);background:rgba(23,21,27,.3);color:inherit;font:inherit;width:100%;box-sizing:border-box}
+.btmult{width:auto}
+.btteam{display:grid;gap:10px;margin:12px 0}
+.btplayers{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btp{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:rgba(250,247,240,.07);font-weight:700}
+.btp.me{outline:1px solid rgba(232,196,106,.6)}
+.btav{width:30px;height:30px;border-radius:50%;background:#3A3440 center/cover}
+.btinvite{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btinvite b{letter-spacing:.12em;color:#FFE7A3}
+.btvote{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:14px;border-left:3px solid #E8C46A;background:rgba(232,196,106,.1)}
+.btchat{margin-top:18px}
+.rmfeed{max-height:260px;overflow:auto;display:grid;gap:8px;padding:6px 2px}
+.rmmsg{display:grid;grid-template-columns:minmax(64px,auto) 1fr;gap:10px;align-items:start;line-height:1.45}
+.rmmsg .rmn{color:#E8C46A;white-space:nowrap}.rmmsg.mine .rmn{color:#CFC6B6}
+.rmmsg .rmt{overflow-wrap:anywhere}
+.rmsend{display:flex;gap:8px;margin-top:8px}.rmsend input{flex:1;min-width:0;padding:.7rem .9rem;border-radius:12px;border:1px solid rgba(250,247,240,.2);background:rgba(23,21,27,.3);color:inherit;font:inherit}
+.breport{margin-top:10px}.breport #bRep{display:grid;gap:8px;margin-top:8px}.breport select,.breport textarea{padding:.6rem .8rem;border-radius:10px;border:1px solid rgba(250,247,240,.2);background:rgba(23,21,27,.3);color:inherit;font:inherit}
