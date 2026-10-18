@@ -959,3 +959,10 @@ body.lb-dragmode{cursor:grabbing}
 @media (prefers-reduced-motion:reduce){.lb-card .pcard.lb-dealt{animation:none}}
 .lb-spot .cvstk{font-size:2rem;max-width:none}.lb-spot .cvstk .pstamp{transform:scale(.8)}
 .backlobby{margin:0 0 14px}
+.emptyhand{width:100%;padding:8px 0}.emptyhand h3{margin:0 0 6px;font-size:1.3rem}
+.samplehand{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 14px;scroll-snap-type:x mandatory}.samplehand .slot{scroll-snap-align:start;flex:none}
+.samplehand .pcard{opacity:.96}
+.nav a.navhand{font-weight:800;color:var(--gold-hi)}
+.emptyhand .eyebrow,.emptyhand .hint{color:#F3E6BF!important;opacity:1}
+.emptyhand .eyebrow{letter-spacing:.14em;font-weight:800}
+.samplelabel{display:inline-block;margin:22px 0 4px;padding:4px 10px;border-radius:999px;background:#2B2730;color:#FFE7A3;font:800 .78rem var(--body);letter-spacing:.06em;text-transform:uppercase}

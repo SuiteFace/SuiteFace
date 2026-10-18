@@ -1774,6 +1774,7 @@
     $("#dealt").innerHTML = hand.length ? hand.map(cardHTML).join("") :
       liveOn() && LIVE_ERR ? '<p class="lede deckmsg" style="align-self:center">' + esc(LIVE_ERR) + (/Friendship/i.test(LIVE_ERR) ? ' <a href="my-table.html#face">Change your Table in My Face</a>.' : "") + "</p>" :
       '<p class="lede" style="align-self:center">' + (DECK.length ? "Your deck is shuffled and waiting. Deal your Hand." : liveOn() ? "No real members fit your gates yet. SuiteFace is brand new in many areas: widen your distance or age range, invite friends, and remember your 12-Card Deck Guarantee." : "No one in the sample deck passes your gates. Widen your age range or distance in My Face.") + "</p>";
+    if (!hand.length && liveOn() && !DECK.length && (LIVE_ROWS || /Friendship/i.test(LIVE_ERR || ""))) emptyHand();
     $("#leftCount").textContent = remaining().length; $("#burnCount").textContent = G.burned.length; $("#playCount").textContent = G.played.length;
     $("#trumpHint").innerHTML = "Trumps: " + P.trumps.map(function (s) { return '<span style="color:' + suitColor(s) + '">' + SUIT[s].sym + "</span>"; }).join(" › ");
     $("#suitKey").innerHTML = ORDER.map(function (s) { return '<span><span style="color:' + suitColor(s) + '">' + pip(s) + "</span>" + SUIT[s].name + ": " + SUIT[s].line + "</span>"; }).join("");
@@ -1805,7 +1806,7 @@
     toast("Fresh Shuffle. Burned and played cards are back in your deck."); setTimeout(deal, 150);
   });
   $("#dealt").addEventListener("click", function (e) {
-    var slot = e.target.closest(".slot"); if (!slot) return; var id = slot.getAttribute("data-id"), p = BY[id];
+    var slot = e.target.closest(".slot"); if (!slot) return; var id = slot.getAttribute("data-id"), p = BY[id]; if (!p) return;
     if (liveOn() && LIVE_ROWS && p) {
       var nm0 = p.name.split(" ")[0];
       if (e.target.closest("[data-report]")) { e.stopPropagation(); if (!confirm("Report and block " + nm0 + "? Our safety team reviews every report.")) return; lrpc("block_member", { target: id, is_report: true }).then(function () { remove(id, "burned", slot); toast("Reported and blocked. Thank you for telling us."); }, function (x) { toast(x.message); }); return; }
@@ -4139,8 +4140,25 @@
       G = { dealt: saved.dealt || [], burned: [], played: [], pairs: [], hands: {}, jokered: [], clock: 0 };
       LIVE_ROWS.forEach(function (r) { if (r.my_move) G.played.push(r.member_id); });
       deckDirty = true; buildDeck(); renderTable(!!redeal); mapT0 = performance.now(); renderMap(); liveTable();
+      if (!LIVE_ROWS.length) emptyHand();
     }, function (e) { var msg = (e && e.message) || "Your deck couldn't load. Try again."; LIVE_ERR = msg; if (redeal) toast(msg); var d = $("#dealt"); if (d) d.innerHTML = '<p class="lede deckmsg" style="align-self:center">' + esc(msg) + (/Friendship/i.test(msg) ? ' <a href="my-table.html#face">Change your Table in My Face</a>.' : "") + "</p>"; });
   }
+  /* An empty live hand says exactly why, and shows a clearly labeled sample hand so the picture cards make sense. */
+  var SAMPLE_HAND = [["Maya", 31, "heart", "A", "maya.jpg", "Nurse, sunset chaser, collects vinyl.", ["Music", "Hiking"]], ["Theo", 44, "spade", "K", "theo.jpg", "Jazz on Sundays, grill master, big laugh.", ["Jazz", "Cooking"]],
+    ["Priya", 29, "diamond", "Q", "priya.jpg", "Planner with a travel spreadsheet.", ["Travel", "Food"]], ["Luke", 36, "club", "J", "luke.jpg", "Ranch boy who cleans up nice.", ["Horses", "Fishing"]], ["Grace", 52, "heart", "10", "grace.jpg", "Garden, book club and a good red.", ["Books", "Gardening"]]];
+  function emptyHand() {
+    var d = $("#dealt"); if (!d) return; var friend = P.looking === "friendship" || /Friendship/i.test(LIVE_ERR || "");
+    var cards = SAMPLE_HAND.map(function (s, i) { var p = { id: "sample" + i, name: s[0], age: s[1], suit: s[2], rank: s[3], photo: "assets/people/" + s[4], bio: s[5], interests: s[6], looking: "longterm", dist: 3 + i * 2, hue: 30 + i * 40, shared: [], city: "Birmingham", jk: 0, self: true, id_: {} };
+      try { return cardHTML(p, i).replace(/<div class="card-actions">[\s\S]*?<\/div><\/div>$/, "</div>").replace('class="pcard ', 'class="pcard flipped '); } catch (e) { return ""; } }).join("");
+    d.innerHTML = '<div class="emptyhand"><h3>' + (friend ? "Your hand is empty because you're at the Friendship Table." : "No real players fit your hand yet.") + "</h3>" +
+      '<p class="lede">' + (friend ? "Friendship players aren't dealt into dating decks. Switch your Table in My Face to <b>Dating</b>, <b>Long-term</b> or <b>Marriage</b> and you'll be dealt real players nearby." : "SuiteFace only deals real, paying players near you. As people in your area take a seat, their cards land here.") + "</p>" +
+      '<div class="row">' + (friend ? '<a class="btn gold" href="my-table.html#face">Switch to dating</a>' : '<button class="btn gold" type="button" data-redeal>Deal again</button>') + '<a class="btn ghost" href="my-table.html#invite">Invite friends</a><a class="btn ghost" href="bluff-table.html">Play the Bluff Table</a></div>' +
+      '<p class="samplelabel">Sample hand · fictional people, not real players</p><p class="hint">This is what your hand looks like with picture cards. Tap a card to see its back.</p><div class="samplehand">' + cards + "</div></div>";
+  }
+  document.addEventListener("click", function (e) {
+    var c = e.target.closest && e.target.closest(".samplehand .pcard"); if (c) { c.classList.toggle("flipped"); return; }
+    if (e.target.closest && e.target.closest("[data-redeal]")) { liveDeck(true).catch(function () { }); }
+  });
   function liveSaveG() { if (window.SF_LIVE) S.set("live:" + window.SF_LIVE.memberId(), { dealt: G.dealt }); }
   function liveBuild() {
     DECK = []; BY = {};
