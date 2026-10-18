@@ -4231,12 +4231,20 @@
   function bluffChat(handId, name, asCard) {
     var m = modal('<h3 style="font-size:1.5rem">' + esc(name || "Chat") + '</h3><p class="hint">' + (asCard ? "They're chatting with your card. Reply as yourself." : "Real member or House Card? Chat, then call it.") + '</p><div class="bthread" id="bThread"><p class="hint">Loading…</p></div><form id="bForm" class="bform"><input id="bIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' + (asCard ? "" : '<div class="row" style="margin-top:8px"><button class="btn sm bbluff" type="button" data-bcall="bluff" data-bh="' + handId + '">🎭 Call Bluff</button><button class="btn sm breal" type="button" data-bcall="real" data-bh="' + handId + '">✓ Call Real</button></div>'));
     function load() { lrpc("bluff_thread", { p_hand: handId }).then(function (rows) { var t = $("#bThread", m); if (!t) return; t.innerHTML = (rows || []).length ? rows.map(function (r) { return '<div class="msg ' + (r.mine ? "me" : "them") + '">' + esc(r.body) + "</div>"; }).join("") : '<p class="hint">Say hello. First impressions count.</p>'; t.scrollTop = t.scrollHeight; }); }
-    load(); clearInterval(bluffPoll); var ticks = 0; bluffPoll = setInterval(function () { if (!document.body.contains(m) || ++ticks > 200) { clearInterval(bluffPoll); return; } load(); }, 3000);
+    /* Typing dots come only from the server, for real members and House Cards alike, so they never give a card away. */
+    var lastSig = "", dots = false;
+    function setDots(on) { var t = $("#bThread", m); if (!t) return; var d = $("#bTyping", m); if (on && !d) { t.insertAdjacentHTML("beforeend", '<div class="msg them typing" id="bTyping" aria-label="typing"><i></i><i></i><i></i></div>'); t.scrollTop = t.scrollHeight; } if (!on && d) d.remove(); dots = on; }
+    var load0 = load; load = function () { lrpc("bluff_thread", { p_hand: handId }).then(function (rows) { var sig = (rows || []).length + ":" + ((rows || []).slice(-1)[0] || {}).at; if (sig !== lastSig) { lastSig = sig; load0(); setTimeout(function () { if (dots) { dots = false; setDots(true); } }, 350); } }, function () { }); };
+    function typingTick() { lrpc("bluff_other_typing", { p_hand: handId }).then(function (on) { setDots(!!on); }, function () { }); }
+    load0(); clearInterval(bluffPoll); var ticks = 0; bluffPoll = setInterval(function () { if (!document.body.contains(m) || ++ticks > 900) { clearInterval(bluffPoll); return; } typingTick(); if (ticks % 2 === 0) load(); }, 1500);
+    var lastPing = 0; $("#bIn", m).addEventListener("input", function () { if (Date.now() - lastPing > 3000) { lastPing = Date.now(); lrpc("bluff_typing", { p_hand: handId }).catch(function () { }); } });
     $("#bForm", m).addEventListener("submit", function (e) {
       e.preventDefault(); var inp = $("#bIn", m), v = inp.value.trim(); if (!v) return; inp.value = "";
-      var t = $("#bThread", m); if (t) { t.insertAdjacentHTML("beforeend", '<div class="msg me">' + esc(v) + '</div><div class="msg them typing" id="bTyping">…</div>'); t.scrollTop = t.scrollHeight; }
-      var send = asCard ? lrpc("bluff_send", { p_hand: handId, p_body: v }) : fetch(CFG.supabaseUrl + "/functions/v1/bluff-chat", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ hand: handId, text: v }) }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.error) throw new Error(j.error); return j; });
-      send.then(function () { var ty = $("#bTyping", m); if (ty) ty.remove(); load(); }, function (er) { var ty = $("#bTyping", m); if (ty) ty.remove(); toast((er && er.message) || "Couldn't send."); });
+      var t = $("#bThread", m); if (t) { var d = $("#bTyping", m); if (d) d.remove(); t.insertAdjacentHTML("beforeend", '<div class="msg me">' + esc(v) + "</div>"); t.scrollTop = t.scrollHeight; }
+      var send = asCard ? lrpc("bluff_send", { p_hand: handId, p_body: v }) : fetch(CFG.supabaseUrl + "/functions/v1/bluff-chat", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ hand: handId, text: v }) }).then(function (r) { return r.json().then(function (j) { if (j && j.error) throw new Error(j.error); }); });
+      // Don't wait for the reply here: it arrives through the thread, after the dots, like any message.
+      send.then(function () { load(); }, function (er) { toast((er && er.message) || "Couldn't send."); });
+      setTimeout(load, 800);
     });
   }
   document.addEventListener("click", function (e) {
