@@ -3620,8 +3620,8 @@
     function seatsLine(c) { if (c.seats == null) return ""; var open = Math.max(0, c.seats - (c.seated || 0)); return open ? open + " of " + c.seats + " seats open" : "Full · " + c.seats + " seats"; }
 
     if (SC && $("#casArt")) $("#casArt").innerHTML = SC.svg({ name: "Your name here", kind: "friendship", seats: 12, seated: 7, style: { felt: "wine", rail: "gold", tagline: "Pull up a chair" } });
-    $("#casKinds").innerHTML = '<button class="chip sm" type="button" data-kind="" aria-pressed="true">All</button>' + KINDS.map(function (k) { return '<button class="chip sm" type="button" data-kind="' + k[0] + '" aria-pressed="false">' + k[1] + " " + esc(k[2]) + "</button>"; }).join("");
-    $("#casKinds").addEventListener("click", function (e) { var b = e.target.closest("[data-kind]"); if (!b) return; kindPick = b.getAttribute("data-kind"); $$("[data-kind]", this).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); find(); });
+    $("#casKind").innerHTML = '<option value="">All tables</option>' + KINDS.map(function (k) { return '<option value="' + k[0] + '">' + (k[1] ? k[1] + " " : "") + esc(k[2]) + "</option>"; }).join("");
+    $("#casKind").addEventListener("change", function () { kindPick = this.value; find(); });
     $("#casFind").addEventListener("submit", function (e) { e.preventDefault(); find(); });
     $("#casZip").addEventListener("input", function () { this.value = this.value.replace(/\D/g, "").slice(0, 5); });
 

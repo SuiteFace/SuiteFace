@@ -79,9 +79,9 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792293534">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792293534">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792293534">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792293704">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792293704">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792293704">
 </head>
 <body data-page="contact">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -514,13 +514,17 @@
         <h2 id="casTitle">Not here to date? Pull up a chair.</h2>
         <p class="lede">A Private Table is your own circle on SuiteFace: a friendship crew, a small group of Christian men, a prayer group, service volunteers, a board-game night, your Greek chapter, alumni or club. You name it, you host it, and you decide how many seats it has. Pick the <b>Friendship only</b> Table on your Face and you'll never be dealt into anyone's dating deck.</p>
       </div>
+      <a class="casbluff" href="bluff-table.html" aria-labelledby="cbT">
+        <div class="bluffart sm" aria-hidden="true"><span class="bc a">?</span><span class="bc b">?</span><span class="bc c">?</span></div>
+        <div><p class="eyebrow">Always open · house table</p><h3 id="cbT">🎭 The Bluff Table</h3><p>Five cards: some real members, some House Cards played by SuiteFace's AI dealer. Chat, then call <b>Bluff</b> or <b>Real</b>. The house always tells the truth.</p><span class="btn gold sm">Take a seat</span></div>
+      </a>
       <div class="casgrid">
         <div class="feltbox casfind">
-          <div class="chips casKinds" id="casKinds" role="group" aria-label="Kind of table"></div>
           <form class="casbar" id="casFind" novalidate>
-            <input type="text" id="casZip" inputmode="numeric" maxlength="5" placeholder="ZIP code" aria-label="ZIP code">
-            <input type="search" id="casQ" maxlength="40" placeholder="Search names" aria-label="Search Private Table names">
-            <button class="btn gold sm" type="submit">Find a table</button>
+            <div class="field cb-kind"><label for="casKind">Kind of table</label><select id="casKind"></select></div>
+            <div class="field"><label for="casZip">ZIP code</label><input type="text" id="casZip" inputmode="numeric" maxlength="5" placeholder="35203"></div>
+            <div class="field"><label for="casQ">Name</label><input type="search" id="casQ" maxlength="40" placeholder="Search names"></div>
+            <button class="btn gold cb-go" type="submit">Find a table</button>
           </form>
           <div class="caslist" id="casList" aria-live="polite"></div>
         </div>
@@ -875,15 +879,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792293534"></script>
-<script src="/assets/js/sign.js?v=1792293534"></script>
-<script src="/assets/js/live.js?v=1792293534"></script>
-<script src="/assets/js/gate.js?v=1792293534"></script>
-<script src="/assets/js/fx.js?v=1792293534"></script>
-<script src="/assets/js/casino-scene.js?v=1792293534"></script>
-<script src="/assets/js/chips.js?v=1792293534"></script>
-<script src="/assets/js/bumpers.js?v=1792293534"></script>
-<script src="/assets/js/slots.js?v=1792293534"></script>
-<script src="/assets/js/app.js?v=1792293534"></script>
+<script src="/assets/js/config.js?v=1792293704"></script>
+<script src="/assets/js/sign.js?v=1792293704"></script>
+<script src="/assets/js/live.js?v=1792293704"></script>
+<script src="/assets/js/gate.js?v=1792293704"></script>
+<script src="/assets/js/fx.js?v=1792293704"></script>
+<script src="/assets/js/casino-scene.js?v=1792293704"></script>
+<script src="/assets/js/chips.js?v=1792293704"></script>
+<script src="/assets/js/bumpers.js?v=1792293704"></script>
+<script src="/assets/js/slots.js?v=1792293704"></script>
+<script src="/assets/js/app.js?v=1792293704"></script>
 </body>
 </html>
