@@ -835,7 +835,6 @@
       }, function (er) { go.disabled = false; toast((er && er.message) || "Couldn't lock your suit. Try again."); });
     });
   }
-  var V4 = (function () { try { return localStorage.getItem("sf.v4") === "1"; } catch (e) { return false; } })();
   function showResult() {
     var c = { diamond: 0, club: 0, heart: 0, spade: 0 };
     /* Points: each scenario 2, each word card 1, the fault card 1. */
@@ -886,7 +885,7 @@
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-use="' + top + '">That\'s me. Use ' + SUIT[top].name + "</button>" +
       ORDER.filter(function (s) { return s !== top; }).map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
       '<button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
-      (window.SF_LIVE && window.SF_LIVE.seated ? "" : V4 ? '<div class="suitcta v4next"><h4>Your ' + SUIT[top].name + ' card is ready.</h4><p class="hint">Next: build your card and see who is in your hand. Free until you take your seat.</p><div class="row"><a class="btn gold" data-v4suit href="deal.html?suit=' + top + '#card">Next: build my card</a></div></div>' : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your hand.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
+      (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your hand.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
       "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
@@ -2770,7 +2769,6 @@
     // Let visitors see the game first: an invite shows right away; everyone else sees the offer
     // only after scrolling halfway down the page, or after 40 seconds of looking around.
     var offerAt = function (fn) {
-      if (document.documentElement.classList.contains("v3")) return; // v3 Beta keeps the landing to one story: no pop-up
       if (inv) { setTimeout(fn, 1800); return; }
       var fired = false, go = function () { if (fired) return; var a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) || $("#modal")) { setTimeout(go, 20000); return; } fired = true; window.removeEventListener("scroll", sc); fn(); };
       var sc = function () { var d = document.documentElement; if ((window.scrollY + innerHeight) / d.scrollHeight > .5) go(); };
