@@ -79,9 +79,9 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792285145">
-<link rel="stylesheet" href="/assets/css/day.css?v=1792285145">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792285145">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792285894">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792285894">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792285894">
 </head>
 <body data-page="home">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -154,6 +154,7 @@
       <a href="tables.html" data-pgnav="tables">Private Tables</a>
       <a href="membership.html" data-pgnav="membership">Membership</a>
       <a href="joker-lobby.html">🃏 Joker Lobby</a>
+      <a href="bluff-table.html" data-pgnav="bluff">🎭 Bluff Table</a>
       <a href="my-table.html" data-pgnav="club" data-need="member">My table</a>
       <a href="my-table.html#dealer" data-need="dealer">Dealer</a>
       <a href="my-table.html#pitboss" data-need="pitboss">Pit Boss</a>
@@ -251,6 +252,15 @@
         <span class="hsc red"><svg><use href="#s-heart"/></svg></span>
         <span class="hsc"><svg><use href="#s-spade"/></svg></span>
       </div>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-bluff" aria-labelledby="hBluffT">
+    <div class="wrap h-bluff-in">
+      <div><p class="eyebrow">New game</p><h2 id="hBluffT">Can you read a room?</h2>
+        <p class="lede">Sit at the <b>Bluff Table</b> and you're dealt five cards. Some are real members. Some are House Cards, played by SuiteFace's AI dealer. Chat, trust your gut, and call <b>Bluff</b> or <b>Real</b>. The house always tells the truth.</p>
+        <div class="row"><a class="btn gold" href="bluff-table.html">Take a seat at the Bluff Table</a></div></div>
+      <div class="bluffart" aria-hidden="true"><span class="bc a">?</span><span class="bc b">?</span><span class="bc c">?</span></div>
     </div>
   </section>
 
@@ -636,6 +646,25 @@
   </section>
 
   <!-- ============ JOIN / CONTACT ============ -->
+  <section data-pg="bluff" id="bluff" aria-labelledby="bluffTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">The Bluff Table</p>
+        <h1 id="bluffTitle">Real person, or House Card?</h1>
+        <p class="lede">Every hand here is five cards. Some are real SuiteFace members who also took a seat. Some are <b>House Cards</b>, played by SuiteFace's AI dealer. Chat with any of them, then call it. <b>The house always tells the truth.</b></p>
+      </div>
+      <div class="bluffrules">
+        <div><b>🎴 Five cards, always</b><span>The table always deals a full hand, so you're never sitting alone.</span></div>
+        <div><b>💬 Chat with anyone</b><span>Real members answer themselves. The house plays its own cards.</span></div>
+        <div><b>🎭 Call Bluff or Real</b><span>Tap a card and call it. You find out on the spot, and every right call raises your score.</span></div>
+        <div><b>👁 Sharp Eye</b><span>Five right calls earns the Sharp Eye badge on your card.</span></div>
+        <div><b>🔒 Honest by design</b><span>House Cards never ask to meet, never ask for money or your number, and don't do video. After 7 days every card is revealed. Ask one sincerely if it's real, and it'll tell you.</span></div>
+        <div><b>💞 Your real deck stays real</b><span>House Cards only sit at this table. They're never dealt into Your Hand.</span></div>
+      </div>
+      <div id="bluffApp" class="bluffapp"><p class="hint">Loading the table…</p></div>
+    </div>
+  </section>
+
   <section data-pg="contact" id="join" aria-labelledby="joinTitle">
     <div class="wrap">
       <div class="forms">
@@ -735,15 +764,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792285145"></script>
-<script src="/assets/js/sign.js?v=1792285145"></script>
-<script src="/assets/js/live.js?v=1792285145"></script>
-<script src="/assets/js/gate.js?v=1792285145"></script>
-<script src="/assets/js/fx.js?v=1792285145"></script>
-<script src="/assets/js/casino-scene.js?v=1792285145"></script>
-<script src="/assets/js/chips.js?v=1792285145"></script>
-<script src="/assets/js/bumpers.js?v=1792285145"></script>
-<script src="/assets/js/slots.js?v=1792285145"></script>
-<script src="/assets/js/app.js?v=1792285145"></script>
+<script src="/assets/js/config.js?v=1792285894"></script>
+<script src="/assets/js/sign.js?v=1792285894"></script>
+<script src="/assets/js/live.js?v=1792285894"></script>
+<script src="/assets/js/gate.js?v=1792285894"></script>
+<script src="/assets/js/fx.js?v=1792285894"></script>
+<script src="/assets/js/casino-scene.js?v=1792285894"></script>
+<script src="/assets/js/chips.js?v=1792285894"></script>
+<script src="/assets/js/bumpers.js?v=1792285894"></script>
+<script src="/assets/js/slots.js?v=1792285894"></script>
+<script src="/assets/js/app.js?v=1792285894"></script>
 </body>
 </html>

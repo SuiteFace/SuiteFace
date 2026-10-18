@@ -17,9 +17,9 @@
 
   /* ---------- pages: one site, several pages. Each section lives on one page; links to a section on another page go there. ---------- */
   var PAGE = (document.body && document.body.getAttribute("data-page")) || "home";
-  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html" };
+  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html", bluff: "bluff-table.html" };
   var SEC_PAGE = { how: "how", demo: "how", safety: "how", quiz: "suit", "private-tables": "tables", casinos: "tables", membership: "membership",
-    face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home" };
+    face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home", bluff: "bluff" };
   function pageFor(id) { return SEC_PAGE[id] || null; }
   function goSection(id, keepSearch) {
     var pg = pageFor(id); if (!pg || pg === PAGE) return false;
@@ -3424,6 +3424,72 @@
     var onTable = document.body.getAttribute("data-page") === "club";
     pullFace().then(function () { if (onTable) return liveDeck(false); }, function () { if (onTable) return liveDeck(false); });
   });
+
+  /* =====================================================================
+     THE BLUFF TABLE. An opt-in game: five cards, some real members who also sat down, some House Cards played by
+     SuiteFace's AI dealer. Chat, then call Bluff or Real. The house always tells the truth.
+     ===================================================================== */
+  var bluffPoll = null;
+  function bluffEl() { return $("#bluffApp"); }
+  function renderBluff() {
+    var el = bluffEl(); if (!el) return;
+    if (!liveOn() || !window.SF_LIVE || !window.SF_LIVE.seated) {
+      el.innerHTML = '<div class="bluffcta"><h3>Take your seat to play</h3><p class="hint">The Bluff Table is for SuiteFace members.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Join for $2.10 a month" : "Take your seat") + '</a>' + (window.SF_LIVE && !liveOn() ? '<span class="hint" style="align-self:center">Already a member? Tap <b>Log in</b> at the top.</span>' : "") + "</div></div>";
+      return;
+    }
+    lrpc("my_bluff_stats").then(function (st) {
+      st = st || {};
+      if (!st.seated) {
+        el.innerHTML = '<div class="bluffcta"><h3>Pull up a chair</h3><label class="check"><input type="checkbox" id="bluffOk"> <span>I understand that some cards at this table are <b>House Cards</b> played by SuiteFace\'s AI dealer, that calling Bluff always gets the true answer, and that House Cards never ask to meet, call or for money.</span></label><div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="bluffSit" disabled>🎭 Sit at the Bluff Table</button></div></div>';
+        $("#bluffOk").addEventListener("change", function () { $("#bluffSit").disabled = !this.checked; });
+        $("#bluffSit").addEventListener("click", function () { lrpc("bluff_join", { p_on: true }).then(function () { return lrpc("bluff_deal"); }).then(function () { toast("You're seated. Five cards, coming up.", "spade"); jackpot(1800); renderBluff(); }, function (er) { toast(er.message); }); });
+        return;
+      }
+      Promise.all([lrpc("my_bluff_hand"), lrpc("my_bluff_inbox").catch(function () { return []; })]).then(function (res) {
+        var hand = res[0] || [], inbox = res[1] || [], open = hand.filter(function (h) { return !h.guess; });
+        var sharp = (st.score || 0) >= 5;
+        el.innerHTML = '<div class="bluffbar"><span><b>' + (st.score || 0) + "</b> right of <b>" + (st.calls || 0) + "</b> calls" + (sharp ? ' · <span class="sharp">👁 Sharp Eye</span>' : (st.score ? " · " + (5 - st.score) + " more for Sharp Eye" : "")) + '</span><span class="row"><button class="btn gold sm" type="button" data-bdeal>' + (open.length < 5 ? "Deal me in" : "Hand is full") + '</button><button class="btn ghost sm" type="button" data-bleave>Leave the table</button></span></div>' +
+          '<div class="bluffgrid">' + (hand.length ? hand.map(bluffCard).join("") : '<p class="hint">No cards yet. Tap Deal me in.</p>') + "</div>" +
+          (inbox.length ? '<h3 style="margin-top:22px">People chatting with your card</h3><p class="hint">They\'re trying to work out whether you\'re real. Be yourself.</p><div class="bluffinbox">' + inbox.map(function (x) { return '<button type="button" class="binrow" data-bin="' + x.hand_id + '" data-bname="' + esc(x.name || "Player") + '"><span class="bph"' + (x.photo_url ? ' style="background-image:url(' + esc(x.photo_url) + ')"' : "") + "></span><span><b>" + esc(x.name || "Player") + (x.age ? ", " + x.age : "") + "</b><small>" + (x.last_mine ? "You: " : "") + esc((x.last_body || "").slice(0, 80)) + "</small></span></button>"; }).join("") + "</div>" : "");
+      }, function (er) { el.innerHTML = '<p class="hint">' + esc(er.message || "The table couldn't load.") + "</p>"; });
+    }, function (er) { el.innerHTML = '<p class="hint">' + esc(er.message || "The table couldn't load.") + "</p>"; });
+  }
+  function bluffCard(h) {
+    var called = !!h.guess, tag = h.revealed === "house" ? '<span class="btag house">House Card</span>' : h.revealed === "real" ? '<span class="btag real">Real member</span>' : "";
+    return '<div class="bcard' + (called ? " called" : "") + '"><div class="bph" ' + (h.photo_url ? 'style="background-image:url(' + esc(h.photo_url) + ')"' : "") + '>' + tag + "</div>" +
+      '<div class="bbody"><b>' + esc(h.name || "Player") + (h.age ? ", " + h.age : "") + "</b><small>" + esc(h.city || "") + (h.suit && SUIT[h.suit] ? " · " + SUIT[h.suit].sym + " " + SUIT[h.suit].name : "") + "</small>" +
+      (h.bio ? '<p class="bbio">' + esc(h.bio) + "</p>" : "") + (h.last_body ? '<p class="blast">' + (h.last_mine ? "You: " : "") + esc(h.last_body.slice(0, 70)) + "</p>" : "") +
+      (called ? '<p class="bres ' + (h.correct ? "ok" : "no") + '">' + (h.correct ? "✓ You called it: " : "✗ Not this time: ") + (h.revealed === "house" ? "a House Card." : "a real member.") + "</p>" :
+        '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn sm bbluff" type="button" data-bcall="bluff" data-bh="' + h.hand_id + '">🎭 Bluff</button><button class="btn sm breal" type="button" data-bcall="real" data-bh="' + h.hand_id + '">✓ Real</button></div>') + "</div></div>";
+  }
+  function bluffChat(handId, name, asCard) {
+    var m = modal('<h3 style="font-size:1.5rem">' + esc(name || "Chat") + '</h3><p class="hint">' + (asCard ? "They're chatting with your card. Reply as yourself." : "Real member or House Card? Chat, then call it.") + '</p><div class="bthread" id="bThread"><p class="hint">Loading…</p></div><form id="bForm" class="bform"><input id="bIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' + (asCard ? "" : '<div class="row" style="margin-top:8px"><button class="btn sm bbluff" type="button" data-bcall="bluff" data-bh="' + handId + '">🎭 Call Bluff</button><button class="btn sm breal" type="button" data-bcall="real" data-bh="' + handId + '">✓ Call Real</button></div>'));
+    function load() { lrpc("bluff_thread", { p_hand: handId }).then(function (rows) { var t = $("#bThread", m); if (!t) return; t.innerHTML = (rows || []).length ? rows.map(function (r) { return '<div class="msg ' + (r.mine ? "me" : "them") + '">' + esc(r.body) + "</div>"; }).join("") : '<p class="hint">Say hello. First impressions count.</p>'; t.scrollTop = t.scrollHeight; }); }
+    load(); clearInterval(bluffPoll); var ticks = 0; bluffPoll = setInterval(function () { if (!document.body.contains(m) || ++ticks > 200) { clearInterval(bluffPoll); return; } load(); }, 3000);
+    $("#bForm", m).addEventListener("submit", function (e) {
+      e.preventDefault(); var inp = $("#bIn", m), v = inp.value.trim(); if (!v) return; inp.value = "";
+      var t = $("#bThread", m); if (t) { t.insertAdjacentHTML("beforeend", '<div class="msg me">' + esc(v) + '</div><div class="msg them typing" id="bTyping">…</div>'); t.scrollTop = t.scrollHeight; }
+      var send = asCard ? lrpc("bluff_send", { p_hand: handId, p_body: v }) : fetch(CFG.supabaseUrl + "/functions/v1/bluff-chat", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ hand: handId, text: v }) }).then(function (r) { return r.json(); }).then(function (j) { if (j && j.error) throw new Error(j.error); return j; });
+      send.then(function () { var ty = $("#bTyping", m); if (ty) ty.remove(); load(); }, function (er) { var ty = $("#bTyping", m); if (ty) ty.remove(); toast((er && er.message) || "Couldn't send."); });
+    });
+  }
+  document.addEventListener("click", function (e) {
+    if (!bluffEl()) return;
+    var t = e.target;
+    if (t.closest("[data-bdeal]")) { lrpc("bluff_deal").then(function (n) { toast(n ? "Fresh cards on the table." : "Your hand is full. Call a card to make room."); renderBluff(); }, function (er) { toast(er.message); }); return; }
+    if (t.closest("[data-bleave]")) { if (!confirm("Leave the Bluff Table? Your score stays.")) return; lrpc("bluff_join", { p_on: false }).then(renderBluff); return; }
+    var c = t.closest("[data-bchat]"); if (c) { bluffChat(c.getAttribute("data-bchat"), c.getAttribute("data-bname"), false); return; }
+    var ib = t.closest("[data-bin]"); if (ib) { bluffChat(ib.getAttribute("data-bin"), ib.getAttribute("data-bname"), true); return; }
+    var k = t.closest("[data-bcall]");
+    if (k) { var g = k.getAttribute("data-bcall");
+      lrpc("call_bluff", { p_hand: k.getAttribute("data-bh"), p_guess: g }).then(function (r) {
+        closeModal(); var house = r.truth === "house";
+        modal('<div class="bverdict ' + (r.correct ? "ok" : "no") + '"><span class="big">' + (house ? "🎭" : "💞") + '</span><h3>' + (house ? "Bluff! That was a House Card." : "Real! That's a real member.") + "</h3><p class=\"lede\">" + (r.correct ? "You called it. Score: " + r.score + "." : "Not this time. Score: " + r.score + ".") + (house ? " House Cards are played by SuiteFace's AI dealer." : " If you're curious about them, they might be in your deck one day.") + '</p><div class="row"><button class="btn gold" type="button" data-close>Back to the table</button></div></div>');
+        if (r.correct) jackpot(2200); renderBluff();
+      }, function (er) { toast(er.message); }); }
+  });
+  if (bluffEl()) renderBluff();
+  document.addEventListener("sf:live", function () { setTimeout(renderBluff, 0); });
 
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();

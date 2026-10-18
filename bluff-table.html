@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>/* Day Play / Night Play. Runs in <head> so the page never flashes the wrong theme.
+   Auto (default) follows Central Time: Day Play 7:00 am–6:59 pm, Night Play 7:00 pm–6:59 am, switching live.
+   A visitor can pin Day or Night; the choice is kept on this device. The Joker Lobby is always Night Play. */
+(function () {
+  var KEY = "sf.play", root = document.documentElement, pinned = null;
+  var nightOnly = /joker-lobby/.test(location.pathname);
+  try { pinned = localStorage.getItem(KEY); } catch (e) { }
+  if (pinned !== "day" && pinned !== "night") pinned = null;
+  function centralHour() {
+    try { return +new Intl.DateTimeFormat("en-US", { hour: "numeric", hourCycle: "h23", timeZone: "America/Chicago" }).format(new Date()); }
+    catch (e) { return new Date().getHours(); }
+  }
+  function auto() { var h = centralHour(); return h >= 7 && h < 19 ? "day" : "night"; }
+  function current() { return nightOnly ? "night" : pinned || auto(); }
+  function apply() {
+    var p = current();
+    if (root.getAttribute("data-play") !== p) {
+      root.setAttribute("data-play", p);
+      var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute("content", p === "day" ? "#FBF6EC" : "#17151B");
+      try { document.dispatchEvent(new CustomEvent("sf:play", { detail: { play: p } })); } catch (e) { }
+    }
+    root.setAttribute("data-play-mode", pinned || "auto");
+    label();
+  }
+  var pill = null, menu = null;
+  function label() {
+    if (!pill) return;
+    var p = current();
+    pill.innerHTML = '<span aria-hidden="true">' + (p === "day" ? "☀️" : "🌙") + '</span><span class="t">' + (p === "day" ? "Day Play" : "Night Play") + "</span> <small>" + (pinned ? "· chosen" : "· auto") + "</small>";
+    pill.setAttribute("aria-label", (p === "day" ? "Day Play" : "Night Play") + (pinned ? ", chosen by you" : ", automatic") + ". Change theme");
+    if (menu) Array.prototype.forEach.call(menu.querySelectorAll("button"), function (b) { b.setAttribute("aria-checked", String((b.getAttribute("data-v") === "auto" && !pinned) || b.getAttribute("data-v") === pinned)); });
+  }
+  function set(v) {
+    pinned = v === "day" || v === "night" ? v : null;
+    try { if (pinned) localStorage.setItem(KEY, pinned); else localStorage.removeItem(KEY); } catch (e) { }
+    root.classList.add("sf-play-fade"); apply();
+  }
+  function build() {
+    if (nightOnly || document.querySelector(".sf-play")) return;
+    var wrap = document.createElement("div"); wrap.className = "sf-play";
+    wrap.innerHTML = '<button type="button" class="sf-play-pill" aria-haspopup="true" aria-expanded="false"></button>' +
+      '<div class="sf-play-menu" role="menu" hidden>' +
+      '<button type="button" role="menuitemradio" data-v="auto"><span aria-hidden="true">🕖</span>Automatic<small>Day 7 am · Night 7 pm (Central)</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="day"><span aria-hidden="true">☀️</span>Day Play<small>Bright and easy on the eyes outdoors</small></button>' +
+      '<button type="button" role="menuitemradio" data-v="night"><span aria-hidden="true">🌙</span>Night Play<small>The card room after dark</small></button></div>';
+    document.body.appendChild(wrap);
+    pill = wrap.firstChild; menu = wrap.lastChild;
+    function close() { menu.hidden = true; pill.setAttribute("aria-expanded", "false"); }
+    pill.addEventListener("click", function () { var o = menu.hidden; menu.hidden = !o; pill.setAttribute("aria-expanded", String(o)); if (o) { var c = menu.querySelector('[aria-checked="true"]') || menu.firstChild; c.focus(); } });
+    menu.addEventListener("click", function (e) { var b = e.target.closest("button[data-v]"); if (!b) return; set(b.getAttribute("data-v")); close(); pill.focus(); });
+    document.addEventListener("click", function (e) { if (!wrap.contains(e.target)) close(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) { close(); pill.focus(); } });
+    label();
+  }
+  apply();
+  setInterval(function () { if (!pinned) apply(); }, 30000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) apply(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", build); else build();
+  window.SFPlay = { set: set, play: current, mode: function () { return pinned || "auto"; } };
+})();
+</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Bluff Table: Real Person or House Card? | SuiteFace</title>
+<meta name="description" content="Sit at the Bluff Table: chat with five cards, some real members and some House Cards played by SuiteFace's AI dealer. Call Bluff and the house always tells the truth.">
+<meta name="theme-color" content="#17151B">
+<link rel="canonical" href="https://suiteface.com/bluff-table.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="SuiteFace">
+<meta property="og:title" content="The Bluff Table: Real Person or House Card?"><meta property="og:description" content="SuiteFace is the dating app that deals you a real deck: your best-fit singles nearby, ranked Ace to 2. ID-verified face cards, free to join. No Jokers Needed.">
+<meta property="og:url" content="https://suiteface.com/bluff-table.html"><meta property="og:image" content="https://suiteface.com/assets/brand/og-suiteface-v2.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="SuiteFace: Your best matches, dealt. Three playing cards, an Ace, King and Queen, on green felt."><meta name="twitter:image" content="https://suiteface.com/assets/brand/og-suiteface-v2.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="index,follow,max-image-preview:large">
+
+<link rel="icon" href="/assets/brand/suiteface-favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792285894">
+<link rel="stylesheet" href="/assets/css/day.css?v=1792285894">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792285894">
+</head>
+<body data-page="bluff">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="s-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.1C.9 8.6 3 5 6.6 5c2.1 0 3.6 1.1 5.4 3.2C13.8 6.1 15.3 5 17.4 5 21 5 23.1 8.6 21.6 11.9 19.5 16.4 12 21 12 21z"/></symbol>
+    <symbol id="s-diamond" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5 20 12l-8 9.5L4 12z"/></symbol>
+    <symbol id="s-club" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3.2a4.2 4.2 0 0 1 3.9 5.8 4.2 4.2 0 1 1-2.6 7.3c.3 1.9 1.1 3.3 2.4 4.5H8.3c1.3-1.2 2.1-2.6 2.4-4.5A4.2 4.2 0 1 1 8.1 9 4.2 4.2 0 0 1 12 3.2z"/></symbol>
+    <symbol id="s-spade" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5s8.6 6.3 8.6 11.2a4.3 4.3 0 0 1-7.3 3.1c.3 1.7 1 3 2.2 4.2H8.5c1.2-1.2 1.9-2.5 2.2-4.2a4.3 4.3 0 0 1-7.3-3.1C3.4 8.8 12 2.5 12 2.5z"/></symbol>
+    <!-- line icons: 1.6 stroke, round caps -->
+    <symbol id="i-quiz" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6"/><path d="M12 16.8h.01"/></g></symbol>
+    <symbol id="i-face" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10" r="2.6"/><path d="M8.2 16.6a4.3 4.3 0 0 1 7.6 0"/></g></symbol>
+    <symbol id="i-rank" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h4V10H4zM10 18h4V5h-4zM16 18h4v-6h-4z"/></g></symbol>
+    <symbol id="i-deck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="4" width="12" height="16" rx="2"/><path d="M4.5 7.5v10A2.5 2.5 0 0 0 7 20"/></g></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 7"/></g></symbol>
+    <symbol id="i-pair" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h7A2.5 2.5 0 0 1 16 6.5v4a2.5 2.5 0 0 1-2.5 2.5H9l-3.5 3v-3"/><path d="M19 10v4.5A2.5 2.5 0 0 1 16.5 17H15v3l-3-3"/></g></symbol>
+    <symbol id="i-age" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8.3 7.5 9.5 4.3-1.2 7.5-5 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></g></symbol>
+    <symbol id="i-seal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.5"/><path d="m9 13.6-1.5 7.4 4.5-2.4 4.5 2.4-1.5-7.4"/></g></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5" stroke-dasharray="2.5 3"/><circle cx="12" cy="12" r="2.2"/></g></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></g></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/></g></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 1 3.3 6.5L4 19.5l1-3.4A8 8 0 0 1 4 12z"/></g></symbol>
+    <symbol id="i-chair" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v8H7zM6 12h12v3H6zM8 15v5M16 15v5"/></g></symbol>
+    <symbol id="i-group" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M14.5 15.3A4.3 4.3 0 0 1 21 19"/></g></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></g></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m4 11 8-6.5 8 6.5V20H4z"/></g></symbol>
+    <symbol id="i-cards" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="10" height="14" rx="2" transform="rotate(-8 9 12)"/><rect x="10" y="5" width="10" height="14" rx="2" transform="rotate(8 15 12)"/></g></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></g></symbol>
+  </defs>
+</svg>
+<div class="promo" id="promoBar" role="region" aria-label="Launch offer">
+  <div class="wrap promo-in">
+    <span class="sfchip" data-chip="2.10" data-size="30"></span>
+    <p><b>Launch offer:</b> the $21 buy-in is waived. Join for <b>$2.10 a month</b> through <span id="promoEnds">October 31</span>.</p>
+    <a class="promo-cta" href="membership.html">Claim my seat</a>
+  </div>
+</div>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="SuiteFace home"><span class="hat"><svg xmlns="http://www.w3.org/2000/svg" viewBox="60 200 904 640" aria-hidden="true"><g transform="translate(512 560) scale(1.05) translate(-512 -540)">
+<path d="M392 690 C380 560 350 400 300 300 C380 300 460 360 490 450 C510 520 515 610 512 680 Z" fill="#C8102E" stroke="#2B2730" stroke-width="10" stroke-linejoin="round"/>
+<path d="M632.0 690 C644.0 560 674.0 400 724.0 300 C644.0 300 564.0 360 534.0 450 C514.0 520 509.0 610 512.0 680 Z" fill="#FAF7F0" stroke="#2B2730" stroke-width="10" stroke-linejoin="round"/>
+<path d="M300 700 C270 600 220 500 130 470 C170 430 250 430 300 470 C360 520 400 610 410 690 Z" fill="#FAF7F0" stroke="#2B2730" stroke-width="10" stroke-linejoin="round"/>
+<path d="M724.0 700 C754.0 600 804.0 500 894.0 470 C854.0 430 774.0 430 724.0 470 C664.0 520 624.0 610 614.0 690 Z" fill="#C8102E" stroke="#2B2730" stroke-width="10" stroke-linejoin="round"/>
+<path d="M250 690 Q512 640 774 690 L774 790 Q512 742 250 790 Z" fill="#B8862F"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#FAF7F0" transform="translate(287.00 718.26) scale(0.2600)"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#FAF7F0" transform="translate(357.70 705.89) scale(0.2600)"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#FAF7F0" transform="translate(428.40 698.47) scale(0.2600)"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#FAF7F0" transform="translate(499.10 696.00) scale(0.2600)"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#FAF7F0" transform="translate(569.80 698.48) scale(0.2600)"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#FAF7F0" transform="translate(640.50 705.92) scale(0.2600)"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#FAF7F0" transform="translate(711.20 718.30) scale(0.2600)"/>
+<circle cx="130" cy="470" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 4 C24 28 5 43 5 59 C5 73 15 81 27 81 C36 81 43 77 47 71 L45.5 79 C44 87 38 93 31 96 L69 96 C62 93 56 87 54.5 79 L53 71 C57 77 64 81 73 81 C85 81 95 73 95 59 C95 43 76 28 50 4 Z" fill="#2B2730" transform="translate(99.00 439.00) scale(0.6200)"/>
+<circle cx="300" cy="300" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 92 C22 72 4 54 4 33 C4 16 16 6 29.5 6 C39 6 46 11.5 50 20 C54 11.5 61 6 70.5 6 C84 6 96 16 96 33 C96 54 78 72 50 92 Z" fill="#C8102E" transform="translate(269.00 269.00) scale(0.6200)"/>
+<circle cx="724" cy="300" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 7 A20.5 20.5 0 1 1 49.99 7 Z M28 39 A20.5 20.5 0 1 1 27.99 39 Z M72 39 A20.5 20.5 0 1 1 71.99 39 Z M50 46 A12 12 0 1 1 49.99 46 Z M47 58 L45.5 79 C44 87 38 93 31 96 L69 96 C62 93 56 87 54.5 79 L53 58 Z" fill="#2B2730" transform="translate(693.00 269.00) scale(0.6200)"/>
+<circle cx="894" cy="470" r="58" fill="#FAF7F0" stroke="#B8862F" stroke-width="14"/>
+<path d="M50 3 Q63 27 88 50 Q63 73 50 97 Q37 73 12 50 Q37 27 50 3 Z" fill="#C8102E" transform="translate(863.00 439.00) scale(0.6200)"/>
+</g></svg></span><span class="wm" id="navWm"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 0 754 142" role="img" aria-label="SuiteFace"><path d="M53.203125 135.71875C81.484375 135.71875 98.125 122.046875 98.125 100.875C98.125 81.34375 82.96875 71.34375 63.359375 66.8125L52.8125 64.234375C42.96875 61.890625 34.21875 58.21875 34.21875 49.546875C34.21875 41.734375 41.09375 36.109375 53.28125 36.109375C65.234375 36.109375 72.65625 41.5 73.515625 50.796875H96.5625C96.171875 30.328125 79.296875 16.03125 53.515625 16.03125C28.203125 16.03125 9.765625 30.09375 9.765625 51.109375C9.765625 68.0625 21.5625 77.984375 41.25 82.75L54.0625 85.953125C66.71875 89.078125 74.140625 92.75 74.140625 100.71875C74.140625 109.546875 65.703125 115.5625 52.96875 115.5625C40.078125 115.5625 30.625 109.703125 29.84375 97.90625H6.640625C7.34375 122.671875 25.234375 135.71875 53.203125 135.71875Z M140.84375 135.09375C154.125 135.09375 163.03125 128.21875 167.953125 115.875L168.265625 134.0H190.453125V46.65625H166.9375V97.203125C166.9375 108.765625 159.90625 115.484375 149.984375 115.484375C140.140625 115.484375 134.203125 109.0 134.203125 98.140625V46.65625H110.765625V102.203125C110.765625 122.671875 122.71875 135.09375 140.84375 135.09375Z" fill="#FAF7F0"/>
+<path d="M206.375 134.0H229.8125V46.65625H206.375Z" fill="#FAF7F0"/>
+<path d="M50 92 C22 72 4 54 4 33 C4 16 16 6 29.5 6 C39 6 46 11.5 50 20 C54 11.5 61 6 70.5 6 C84 6 96 16 96 33 C96 54 78 72 50 92 Z" fill="#C8102E" transform="translate(197.98 1.82) scale(0.4022)"/>
+<path d="M289.09375 46.65625H272.765625V25.875H249.328125V46.65625H237.296875V64.546875H249.328125V110.484375C249.328125 126.5 258.859375 135.25 276.359375 135.25C281.046875 135.25 286.28125 134.703125 291.515625 133.140625L288.15625 115.5625C286.4375 116.03125 282.53125 116.578125 280.734375 116.578125C275.03125 116.578125 272.765625 114.0 272.765625 108.453125V64.546875H289.09375Z" fill="#FAF7F0"/>
+<path d="M339.78125 135.71875C360.09375 135.71875 374.0 126.265625 378.296875 111.734375L357.046875 107.75C354.546875 114.46875 348.375 118.0625 340.171875 118.0625C328.375 118.0625 320.40625 110.71875 319.859375 96.421875H379.625V89.859375C379.625 60.015625 361.421875 45.5625 338.609375 45.5625C313.0625 45.5625 296.65625 63.84375 296.65625 90.796875C296.65625 118.375 313.0625 135.71875 339.78125 135.71875ZM320.015625 81.734375C320.953125 70.953125 327.671875 63.21875 338.84375 63.21875C349.703125 63.21875 355.875 70.328125 357.046875 81.734375Z" fill="#2F8A62"/>
+<path d="M392.1875 134.0H416.015625V89.3125H463.59375V69.859375H416.015625V37.359375H468.75V17.59375H392.1875Z M505.921875 135.71875C518.8125 135.71875 527.25 130.015625 531.46875 121.890625H532.25V134.0H554.4375V75.171875C554.4375 54.0 536.15625 45.5625 517.40625 45.5625C497.875 45.5625 483.8125 54.234375 479.359375 69.390625L500.84375 72.984375C502.71875 67.359375 508.265625 62.90625 517.328125 62.90625C526.078125 62.90625 531.0 67.125 531.0 74.546875V74.9375C531.0 80.640625 524.828125 81.265625 509.828125 82.75C492.640625 84.390625 476.859375 90.015625 476.859375 109.546875C476.859375 126.8125 489.28125 135.71875 505.921875 135.71875ZM512.5625 119.234375C504.828125 119.234375 499.359375 115.71875 499.359375 108.921875C499.359375 101.890625 505.140625 98.53125 513.8125 97.28125C518.96875 96.578125 528.265625 95.328125 531.15625 93.296875V102.75C531.15625 111.96875 523.5 119.234375 512.5625 119.234375Z M609.5 135.71875C630.4375 135.71875 645.203125 124.390625 648.484375 106.03125L626.6875 102.046875C624.8125 111.5 618.796875 117.28125 609.734375 117.28125C597.234375 117.28125 590.671875 106.265625 590.671875 90.640625C590.671875 74.859375 597.234375 64.0 609.734375 64.0C618.796875 64.0 624.578125 69.625 626.53125 78.6875L648.328125 74.625C645.046875 56.65625 630.203125 45.5625 609.5 45.5625C583.171875 45.5625 566.765625 63.6875 566.765625 90.71875C566.765625 117.59375 583.171875 135.71875 609.5 135.71875Z M700.03125 135.71875C720.34375 135.71875 734.25 126.265625 738.546875 111.734375L717.296875 107.75C714.796875 114.46875 708.625 118.0625 700.421875 118.0625C688.625 118.0625 680.65625 110.71875 680.109375 96.421875H739.875V89.859375C739.875 60.015625 721.671875 45.5625 698.859375 45.5625C673.3125 45.5625 656.90625 63.84375 656.90625 90.796875C656.90625 118.375 673.3125 135.71875 700.03125 135.71875ZM680.265625 81.734375C681.203125 70.953125 687.921875 63.21875 699.09375 63.21875C709.953125 63.21875 716.125 70.328125 717.296875 81.734375Z" fill="#E5505E"/></svg></span><sup class="tm" aria-label="trademark">™</sup></a>
+    <button class="btn ghost sm menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="how-it-works.html" data-pgnav="how">How it works</a>
+      <a href="find-your-suit.html" data-pgnav="suit">Find your suit</a>
+      <a href="tables.html" data-pgnav="tables">Private Tables</a>
+      <a href="membership.html" data-pgnav="membership">Membership</a>
+      <a href="joker-lobby.html">🃏 Joker Lobby</a>
+      <a href="bluff-table.html" data-pgnav="bluff">🎭 Bluff Table</a>
+      <a href="my-table.html" data-pgnav="club" data-need="member">My table</a>
+      <a href="my-table.html#dealer" data-need="dealer">Dealer</a>
+      <a href="my-table.html#pitboss" data-need="pitboss">Pit Boss</a>
+      <a href="my-table.html#owner" data-need="owner">Owner</a>
+    </nav>
+    <div class="who">
+      <button class="rolechip" type="button" id="roleBtn" aria-haspopup="dialog"><span class="dot"></span><span id="roleName">Guest</span></button>
+      <button class="btn gold sm" type="button" id="loginBtn">Log in</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ============ HERO / MARQUEE ============ -->
+  <section data-pg="home" class="hero c-hero" aria-labelledby="heroTitle">
+    <div class="wrap">
+      <div class="copy">
+        <h1 id="heroTitle">Your best matches, dealt.</h1>
+        <p class="c-lead">No endless scroll. SuiteFace deals you real people near you who fit what you're looking for, best match first.</p>
+        <div class="actions">
+          <a class="btn gold" href="membership.html">Get dealt in</a>
+          <a class="textlink" href="find-your-suit.html">Find my suit</a>
+        </div>
+        <p class="fine" id="heroOffer"><b>Launch offer:</b> join for $2.10 a month. The $21 buy-in is waived through October 31.</p>
+      </div>
+      <div class="c-stage deal" aria-hidden="true">
+        <div class="pcard red c1"><span class="idx"><b>A</b><svg><use href="#s-heart"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-heart"/></svg></span><span class="idx bot"><b>A</b><svg><use href="#s-heart"/></svg></span></div>
+        <div class="pcard c2"><span class="idx"><b>K</b><svg><use href="#s-spade"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-spade"/></svg></span><span class="idx bot"><b>K</b><svg><use href="#s-spade"/></svg></span></div>
+        <div class="pcard c3"><span class="idx"><b>Q</b><svg><use href="#s-club"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-club"/></svg></span><span class="idx bot"><b>Q</b><svg><use href="#s-club"/></svg></span></div>
+        <div class="phone">
+          <div class="kcall" aria-hidden="true"><span><b>Meet Kelly.</b> This is her hand, dealt today.</span><svg class="arr" viewBox="0 0 120 60"><path d="M4 12 C 46 6, 84 16, 108 44" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M96 42 L110 47 L108 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="screen">
+            <span class="notch"></span>
+            <div class="sbar"><span>9:41</span><span>●●●</span></div>
+            <div class="apphd"><span class="who"><img class="me" src="assets/people/kelly.jpg" alt="Kelly"><b>Your Hand</b></span><span>Dealt today</span></div>
+            <div class="seg"><i class="on">All</i><i><svg style="color:#8E2230"><use href="#s-heart"/></svg></i><i><svg style="color:#8E2230"><use href="#s-diamond"/></svg></i><i><svg><use href="#s-club"/></svg></i><i><svg><use href="#s-spade"/></svg></i></div>
+            <div class="ace"><img class="avatar" src="assets/people/jordan.jpg" alt="Jordan" width="54" height="54" loading="eager"><span><small>Ace of Hearts</small><b>Jordan, 34</b><br><span class="tag">ID verified</span></span><span class="acebump" data-bumpers="veteran,educator" data-verified="veteran"></span></div>
+            <div class="grid">
+              <div class="mc"><img class="ph" src="assets/people/ellis.jpg" alt="" loading="lazy"><b>Ellis<em class="k">K<svg><use href="#s-spade"/></svg></em></b><span>3 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/ryan.jpg" alt="" loading="lazy"><b>Ryan<em class="k">Q<svg><use href="#s-club"/></svg></em></b><span>2 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/matteo.jpg" alt="" loading="lazy"><b>Matteo<em class="r">J<svg><use href="#s-diamond"/></svg></em></b><span>5 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/ben.jpg" alt="" loading="lazy"><b>Ben<em class="r">10<svg><use href="#s-heart"/></svg></em></b><span>4 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/chris.jpg" alt="" loading="lazy"><b>Chris<em class="k">9<svg><use href="#s-spade"/></svg></em></b><span>6 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/daniel.jpg" alt="" loading="lazy"><b>Daniel<em class="k">8<svg><use href="#s-club"/></svg></em></b><span>8 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/luke.jpg" alt="" loading="lazy"><b>Luke<em class="r">7<svg><use href="#s-diamond"/></svg></em></b><span>3 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/nikolai.jpg" alt="" loading="lazy"><b>Nikolai<em class="r">6<svg><use href="#s-heart"/></svg></em></b><span>9 miles</span></div>
+              <div class="mc"><img class="ph" src="assets/people/joe.jpg" alt="" loading="lazy"><b>Joe<em class="k">5<svg><use href="#s-club"/></svg></em></b><span>7 miles</span></div>
+            </div>
+            <div class="tabbar"><svg class="on"><use href="#i-cards"/></svg><svg><use href="#i-msg"/></svg><svg><use href="#i-chair"/></svg><svg><use href="#i-user"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ HOME: just enough to want in ============ -->
+  <section data-pg="home" class="h-steps" aria-labelledby="hStepsT">
+    <div class="wrap">
+      <h2 id="hStepsT">Three moves to your first pair</h2><div class="reel-div"></div>
+      <ol class="h3up">
+        <li><span class="ic" aria-hidden="true"><svg><use href="#i-quiz"/></svg></span><h3>Find your suit</h3><p>Twelve quick questions tell you how you show up in love.</p></li>
+        <li><span class="ic" aria-hidden="true"><svg><use href="#i-deck"/></svg></span><h3>Get your hand</h3><p>The best fits near you, 13 in each suit, ranked Ace to 2.</p></li>
+        <li><span class="ic" aria-hidden="true"><svg><use href="#i-pair"/></svg></span><h3>Make a pair</h3><p>Play each other's card and the Side Table opens.</p></li>
+      </ol>
+      <p class="h-more"><a class="textlink" href="how-it-works.html">See how it works</a></p>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-price" aria-labelledby="hPriceT">
+    <div class="wrap h-price-in">
+      <div class="h-chips" aria-hidden="true">
+        <span class="sfchip h-c21" data-chip="21" data-size="150"></span>
+        <span class="sfchip h-c210" data-chip="2.10" data-size="170" data-spin></span>
+      </div>
+      <div class="h-price-copy">
+        <h2 id="hPriceT">One buy-in. Then pocket change.</h2>
+        <p class="lede" id="hPriceLine">The $21 buy-in is waived through October 31. Join for $2.10 a month and cancel any time.</p>
+        <p class="lede h-guar">If we can't deal you at least 12 cards within 10 days, you can have your buy-in back.</p>
+        <div class="row"><a class="btn gold" href="membership.html">Get dealt in</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-suit" aria-labelledby="hSuitT">
+    <div class="wrap h-suit-in">
+      <div>
+        <h2 id="hSuitT">Which suit are you?</h2>
+        <p class="lede">Diamond, Club, Heart or Spade. Two minutes, twelve questions, one honest answer about how you love.</p>
+        <div class="row" style="margin-top:22px"><a class="btn gold" href="find-your-suit.html">Find my suit</a></div>
+      </div>
+      <div class="h-suitcards" aria-hidden="true">
+        <span class="hsc red"><svg><use href="#s-diamond"/></svg></span>
+        <span class="hsc"><svg><use href="#s-club"/></svg></span>
+        <span class="hsc red"><svg><use href="#s-heart"/></svg></span>
+        <span class="hsc"><svg><use href="#s-spade"/></svg></span>
+      </div>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-bluff" aria-labelledby="hBluffT">
+    <div class="wrap h-bluff-in">
+      <div><p class="eyebrow">New game</p><h2 id="hBluffT">Can you read a room?</h2>
+        <p class="lede">Sit at the <b>Bluff Table</b> and you're dealt five cards. Some are real members. Some are House Cards, played by SuiteFace's AI dealer. Chat, trust your gut, and call <b>Bluff</b> or <b>Real</b>. The house always tells the truth.</p>
+        <div class="row"><a class="btn gold" href="bluff-table.html">Take a seat at the Bluff Table</a></div></div>
+      <div class="bluffart" aria-hidden="true"><span class="bc a">?</span><span class="bc b">?</span><span class="bc c">?</span></div>
+    </div>
+  </section>
+
+  <section data-pg="home" class="h-final" aria-labelledby="hFinalT">
+    <div class="wrap h-final-in">
+      <h2 id="hFinalT">Your seat is waiting.</h2>
+      <p class="lede">Real people near you, verified faces at the top of your deck, and no endless scroll. No Jokers Needed.</p><div class="reel-div"></div>
+      <div class="row"><a class="btn gold" href="membership.html">Get dealt in for $2.10</a><a class="textlink" href="tables.html">Not here to date? Host a Private Table</a></div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT PLAYS ============ -->
+  <section data-pg="how" id="how" aria-labelledby="howTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">How it plays</p>
+        <h2 id="howTitle">Six moves from stranger to Pair</h2>
+        <p class="lede">Most apps hand you an endless scroll. SuiteFace hands you a real deck: no filler, no Jokers. Every card is someone who fits what you asked for.</p>
+      </div>
+      <ol class="steps" id="howSteps">
+        <li><button class="stepbtn" type="button" data-ex="1" aria-haspopup="dialog"><span class="ic" aria-hidden="true"><svg><use href="#i-quiz"/></svg></span><span class="no">1</span><b>Find your suit</b><span>A two-minute style quiz. Your suit is how you show up in love.</span><em class="peek">See an example ›</em></button><div class="clip" data-mini="1" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="2" aria-haspopup="dialog"><span class="ic" aria-hidden="true"><svg><use href="#i-face"/></svg></span><span class="no">2</span><b>Set your Face</b><span>Photo, Calling Card, a few lines about you. Shown only to your deck.</span><em class="peek">See an example ›</em></button><div class="clip" data-mini="2" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="3" aria-haspopup="dialog"><span class="ic" aria-hidden="true"><svg><use href="#i-rank"/></svg></span><span class="no">3</span><b>Call trumps</b><span>Rank the four suits by who you click with. Your trump leads your Hand.</span><em class="peek">See an example ›</em></button><div class="clip" data-mini="3" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="4" aria-haspopup="dialog"><span class="ic" aria-hidden="true"><svg><use href="#i-deck"/></svg></span><span class="no">4</span><b>Get your hand</b><span>The best fits near you who pass your gates: 13 of each suit, Ace to 2.</span><em class="peek">See an example ›</em></button><div class="clip" data-mini="4" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="5" aria-haspopup="dialog"><span class="ic" aria-hidden="true"><svg><use href="#i-play"/></svg></span><span class="no">5</span><b>Burn or Play</b><span>Burn a card and it's gone for good. Play a card to say you're interested.</span><em class="peek">See an example ›</em></button><div class="clip" data-mini="5" aria-hidden="true"></div></li>
+        <li><button class="stepbtn" type="button" data-ex="6" aria-haspopup="dialog"><span class="ic" aria-hidden="true"><svg><use href="#i-pair"/></svg></span><span class="no">6</span><b>Make a Pair</b><span>When you both play each other's card, the Side Table opens and you can talk.</span><em class="peek">See an example ›</em></button><div class="clip" data-mini="6" aria-hidden="true"></div></li>
+      </ol>
+    </div>
+  </section>
+
+
+  <!-- ============ DEMO (guests) ============ -->
+  <section data-pg="how" id="demo" aria-labelledby="demoTitle" data-only="guest">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Demo table</p>
+        <h2 id="demoTitle">Watch a few hands play out</h2>
+        <p class="lede">Made-up players, real rules. Pick a story and step through it, or let it play. Buy in to get your own hand.</p>
+      </div>
+      <div class="chips" id="demoTabs" role="tablist" aria-label="Demo stories"></div>
+      <div class="feltbox demo-stage" style="margin-top:16px">
+        <div class="demo-cards" id="demoCards" aria-hidden="true"></div>
+        <div class="demo-copy">
+          <p class="demo-step" id="demoStep"></p>
+          <h3 id="demoHead"></h3>
+          <p id="demoText"></p>
+          <div class="demo-dots" id="demoDots"></div>
+          <div class="row"><button class="btn ghost sm" type="button" id="demoBack">Back</button><button class="btn gold sm" type="button" id="demoNext">Next</button><button class="btn ghost sm" type="button" id="demoPlay">Autoplay</button></div>
+        </div>
+      </div>
+      <div class="hero-cta"><a class="btn gold" href="#membership">Buy in · $21</a><button class="btn ghost" type="button" data-login>Already a member? Log in</button></div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section data-pg="suit" id="quiz" aria-labelledby="quizTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Your suit</p>
+        <h2 id="quizTitle">Which suit are you?</h2>
+        <p class="lede">One card at a time, about two minutes. Tap what sounds most like you on a good day. It's a playful read on how you love, not a test, and you can always choose a different suit yourself.</p>
+      </div>
+      <div class="suit-styles" id="styleCards"></div>
+      <div class="feltbox quiz" id="quizBox" style="margin-top:22px">
+        <div class="quiz-top">
+          <span class="qcount" id="qCount">Step 1 of 15</span>
+          <div class="meter" style="flex:1"><b id="qMeter"></b></div>
+        </div>
+        <p class="qcheer" id="qCheer" aria-live="polite"></p>
+        <p class="qtext" id="qText"></p>
+        <div class="answers" id="qAnswers"></div>
+        <div class="quiz-nav"><button class="btn ghost sm" id="qBack" disabled>Back</button><button class="btn ghost sm" id="qRestart">Start over</button></div>
+      </div>
+      <div class="panel result" id="quizResult" hidden></div>
+    </div>
+  </section>
+
+  <!-- ============ MY FACE ============ -->
+  <section data-pg="club" id="face" data-need="member" aria-labelledby="faceTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">My Face</p>
+        <h2 id="faceTitle">Build the card people will see</h2>
+        <p class="lede">Everything here shapes your deck. Your trump order decides which suits lead your Hand, and your gates decide who makes your hand at all.</p>
+      </div>
+      <div class="profile">
+        <form class="panel form-grid" id="faceForm" novalidate>
+          <div class="field social-build">
+            <span style="font-weight:700">Build my Face from a social account</span>
+            <p class="hint">Link an account to fill in your photo, name, @username and more. You review everything before it shows on your card.</p>
+            <div class="soc" id="socBtns">
+              <button type="button" class="socb" data-prov="facebook">Facebook</button>
+              <button type="button" class="socb" data-prov="tiktok">TikTok</button>
+              <button type="button" class="socb" data-prov="snapchat">Snapchat</button>
+              <button type="button" class="socb" data-prov="x">X</button>
+              <button type="button" class="socb" data-prov="google">Google</button>
+              <button type="button" class="socb" data-prov="apple">Apple</button>
+            </div>
+            <div class="hint" id="socLinked"></div>
+          </div>
+          <div class="field iam" id="iamBox">
+            <span class="flabel">I identify as</span><div class="chips" id="iamChips" role="group" aria-label="I identify as"></div>
+            <span class="flabel" style="margin-top:10px">Looking for <small class="hint">(check all that apply)</small></span><div class="chips" id="seekChips" role="group" aria-label="Looking for"></div>
+            <span class="hint" id="iamSum"></span>
+            <span class="flabel" style="margin-top:12px"><i data-slot="bell" data-size="16"></i> Your Rooms <small class="hint">(check all that apply)</small></span>
+            <p class="hint" style="margin:0">Rooms are the house's themed floors. Join one and you can play a deck of only players who joined it too. You can only join a Room your own answers fit.</p>
+            <div class="chips" id="roomChips" role="group" aria-label="Your Rooms"></div>
+            <div id="maskBox" class="maskbox" hidden></div>
+          </div>
+          <div class="field">
+            <span id="photoLbl" style="font-weight:600;font-size:.92rem">Portrait</span>
+            <div class="drop" id="drop" tabindex="0" role="button" aria-labelledby="photoLbl" aria-describedby="photoHint">
+              <div class="ph" id="ph">?</div>
+              <div><b>Drop a photo or click to upload</b><p class="hint" id="photoHint">JPG, PNG or WebP. It's resized and saved to your account when you tap Save my Face.</p></div>
+            </div>
+            <input type="file" id="photo" accept="image/*" hidden>
+            <div class="camrow"><button class="btn gold sm" type="button" id="camBtn">📷 Take a photo now</button><span class="hint">Taken here, live = <b class="livebadge">📷 Live Photo</b> on your card. The <b class="sealbadge">✓ ID Seal</b> still needs a driver's license, state ID or passport.</span></div>
+          </div>
+          <div class="field verpanel" id="verPanel"></div>
+          <div class="field hrdeck" id="hrDeck" hidden></div>
+          <div class="field comppanel" id="compPanel" hidden></div>
+          <div class="field headsup" id="headsUp" hidden></div>
+          <div class="two">
+            <div class="field"><label for="fName">Face Name</label><input type="text" id="fName" maxlength="40" placeholder="Jordan" autocomplete="given-name"><span class="err" id="fNameErr"></span></div>
+            <div class="field"><label for="fHandle">Calling Card <small class="hint">(your @tag)</small></label><div class="atfield"><span aria-hidden="true">@</span><input type="text" id="fHandle" maxlength="24" placeholder="jordan.plays" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="handleHint"></div><span class="hint" id="handleHint">Just type your name. The @ is added for you.</span><div id="handleSug" class="handlesug" aria-live="polite"></div><span class="err" id="fHandleErr"></span></div>
+          </div>
+          <div class="two">
+            <div class="field"><span class="flabel" id="dobLbl">Birthday <small class="hint">(only your age shows)</small></span><div class="dob" role="group" aria-labelledby="dobLbl"><select id="dobM" aria-label="Month"></select><select id="dobD" aria-label="Day"></select><select id="dobY" aria-label="Year"></select></div><span class="hint" id="dobAge"></span><span class="err" id="fAgeErr"></span></div>
+            <div class="field"><label for="fZip">Where you are</label>
+              <div class="locrow"><input type="text" id="fZip" inputmode="numeric" maxlength="5" placeholder="ZIP" autocomplete="postal-code" aria-label="ZIP code">
+              <div class="ac"><input type="text" id="fCityLoc" maxlength="60" placeholder="or city: Mobile, AL" autocomplete="off" aria-label="City" role="combobox" aria-expanded="false"><ul class="aclist" hidden></ul></div></div>
+              <button type="button" class="btn ghost sm" id="geoBtn">Use my current location</button>
+              <span class="hint" id="zipHint">Your cards are measured from your ZIP. Only "about X miles" is ever shown.</span><span class="err" id="fZipErr"></span></div>
+          </div>
+          <div class="field"><label for="fBio">Face Value <span class="hint">(your bio)</span></label><textarea id="fBio" maxlength="200" placeholder="Sunday farmers market, terrible at mini golf, great at finding the best biscuit in town."></textarea><span class="hint"><span id="bioCount">0</span>/200</span></div>
+          <div class="field"><span style="font-weight:600;font-size:.92rem">Your table <span class="hint">(what you're looking for)</span></span><p class="hint" style="margin:0">Pick your table and your card wears its felt, so everyone can see at a glance what you're here for.</p><div class="tables" id="lookChips"></div></div>
+          <div class="field"><span style="font-weight:600;font-size:.92rem">Show me</span><div class="chips" id="showChips"></div></div>
+          <div class="two">
+            <div class="field"><label for="fAgeMin">Age range: <span id="ageRangeTxt">25–40</span></label>
+              <div style="display:flex;gap:10px"><input type="range" id="fAgeMin" min="18" max="70" value="25" aria-label="Minimum age"><input type="range" id="fAgeMax" min="18" max="70" value="40" aria-label="Maximum age"></div></div>
+            <div class="field"><label for="fDist">Within <span id="distTxt">25</span> miles</label><input type="range" id="fDist" min="2" max="100" value="25"></div>
+          </div>
+          <div class="field verfield"><label for="fVerOnly">Verified only <span class="hint">(a dealbreaker: who can be dealt to you)</span></label>
+            <select id="fVerOnly"><option value="any">Anyone, verified or not</option><option value="photo">📷 Photo-verified people only</option><option value="id">🪪 ID-verified people only</option><option value="both">📷 + 🪪 Photo and ID verified only</option></select>
+            <span class="hint" id="verOnlyHint">Photo verified: their photo was taken live with a phone or computer camera, or matched to the photo on their ID. ID verified: a driver's license, state ID, passport or military ID was checked, and their age and height come from it.</span></div>
+          <div class="field">
+            <span style="font-weight:600;font-size:.92rem">Call trumps <span class="hint">(drag or use the arrows; #1 leads your Hand)</span></span>
+            <ul class="rank-list" id="rankList"></ul>
+          </div>
+          
+          <div class="field"><span style="font-weight:600;font-size:.92rem">Face strength <span class="hint" id="pct">0%</span></span><div class="meter"><b id="faceMeter"></b></div></div>
+          <div class="field" id="jokerStatus"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn gold" type="submit">Save my Face</button><button class="btn ghost" type="button" id="faceReset">Reshuffle (clear)</button></div>
+        </form>
+        <div class="facecard" aria-live="polite">
+          <div class="mycard" id="myCard"></div>
+          <p class="hint" style="text-align:center">This is how your card looks in someone's Hand.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE TABLE ============ -->
+  <section data-pg="club" id="table" data-need="member" aria-labelledby="tableTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Your Hand</p>
+        <h2 id="tableTitle">Your deck, dealt</h2>
+        <div class="roombar" id="roomBar" role="group" aria-label="Choose your Room"></div>
+        <p class="lede">These are illustrative sample profiles so you can feel how it plays. Tap a card to flip it. <b>Burn</b> sends it away for good. <b>Play</b> says you're interested. Play the right card and you might make a Pair.</p>
+      </div>
+      <div class="feltbox">
+        <div class="table-top">
+          <div>
+            <div class="pile" id="pile" aria-hidden="true"><div class="cb"></div><div class="cb"></div><div class="cb"></div></div>
+            <p class="pile-info"><b id="leftCount">52</b> left in your deck<br><span id="burnCount">0</span> burned · <span id="playCount">0</span> played</p>
+          </div>
+          <div style="min-width:0">
+            <div class="dealt" id="dealt" aria-live="polite"></div>
+            <div class="deck-bar">
+              <button class="btn gold" id="dealBtn">Deal my Hand</button>
+              <button class="btn ghost sm" id="deckBtn">See your full deck</button>
+              <button class="btn ghost sm" id="shuffleBtn">Fresh Shuffle</button>
+              <span class="sp"></span>
+              <span class="hint" id="trumpHint"></span>
+            </div>
+          </div>
+        </div>
+        <div class="suit-key" id="suitKey"></div>
+      </div>
+      <div class="panel" style="margin-top:18px">
+        <h3 style="font-size:1.2rem">Pairs</h3>
+        <div class="keepers" id="pairs"><span class="hint">No Pairs yet. Play a few cards.</span></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ TABLE MAP ============ -->
+  <section data-pg="club" id="map" data-need="member" aria-labelledby="mapTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Table Map</p>
+        <h2 id="mapTitle">Where your hand sits</h2>
+        <p class="lede">Every dot is a real US ZIP code. Your deck is drawn from the people inside your circle, placed at their ZIP, never their address. Sample members are fictional.</p>
+      </div>
+      <div class="feltbox mapbox">
+        <div class="map-bar">
+          <div class="chips" role="group" aria-label="Map view"><button class="chip" type="button" data-view="area" aria-pressed="true">Your area</button><button class="chip" type="button" data-view="us" aria-pressed="false">Nationwide</button></div>
+          <form class="locform" id="locForm" novalidate><div class="ac"><input type="text" id="locIn" maxlength="60" placeholder="ZIP or city" autocomplete="off" aria-label="Center the map on a ZIP code or city" role="combobox" aria-expanded="false"><ul class="aclist" hidden></ul></div><button class="btn gold sm" type="submit">Go</button><button class="btn ghost sm" type="button" id="geoBtn2">Use my location</button></form>
+        </div>
+        <span class="hint" id="mapStats">Loading ZIP codes…</span>
+        <div class="map-wrap"><canvas id="mapCanvas" role="img" aria-label="Map of your deck around your ZIP code"></canvas><div class="map-tip" id="mapTip" hidden></div></div>
+        <div class="suit-key" id="mapKey"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRIVATE TABLES (database: casinos) ============ -->
+  <section data-pg="tables" id="private-tables" aria-labelledby="casTitle">
+    <span id="casinos" class="anchor-alias" aria-hidden="true"></span>
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Private Tables · built and hosted by players</p>
+        <h2 id="casTitle">Not here to date? Pull up a chair.</h2>
+        <p class="lede">A Private Table is your own circle on SuiteFace: a friendship crew, a small group of Christian men, a prayer group, service volunteers, a board-game night, your Greek chapter, alumni or club. You name it, you host it, and you decide how many seats it has. Pick the <b>Friendship only</b> Table on your Face and you'll never be dealt into anyone's dating deck.</p>
+      </div>
+      <div class="casgrid">
+        <div class="feltbox casfind">
+          <div class="chips casKinds" id="casKinds" role="group" aria-label="Kind of table"></div>
+          <form class="casbar" id="casFind" novalidate>
+            <input type="text" id="casZip" inputmode="numeric" maxlength="5" placeholder="ZIP code" aria-label="ZIP code">
+            <input type="search" id="casQ" maxlength="40" placeholder="Search names" aria-label="Search Private Table names">
+            <button class="btn gold sm" type="submit">Find a table</button>
+          </form>
+          <div class="caslist" id="casList" aria-live="polite"></div>
+        </div>
+        <aside class="casbuild">
+          <div class="casbuild-art" id="casArt" aria-hidden="true"></div>
+          <h3>Host a Private Table</h3>
+          <div class="pricing chipprice"><div><span class="sfchip" data-chip="21" data-size="64"></span><span class="hint">once · 12 seats · 7 ZIPs</span></div><div class="plus">+</div><div><span class="sfchip" data-chip="2.10" data-size="64"></span><span class="hint">per extra seat or ZIP</span></div></div>
+          <p class="hint" style="margin:0">Up to 52 seats. Go wider: <b>$210 per state</b> or <b>$2,100 nationwide</b>. Great for alumni, Greek life, clubs and faith groups.</p>
+          <ul class="ticks">
+            <li>Your name on the felt. You hold the naming rights while it's open.</li>
+            <li>Set the seats. When they're full, the table is full.</li>
+            <li>Run as many games as you like: Tuesday prayer, Saturday service, game night.</li>
+            <li>Approve every request, and chat with your table live.</li>
+            <li>Your card shows <b>♠ Host</b> of your table. Joining is always free.</li>
+          </ul>
+          <button class="btn gold" type="button" data-build-casino>Host a table · $21</button>
+          <p class="hint">Save a draft and pay later. Every name gets a quick check before it opens. See <a href="terms.html" target="_blank" rel="noopener">Terms 4.11</a> and Agreement H.</p>
+        </aside>
+      </div>
+      <div class="casmine" id="casMine" hidden></div>
+      <div class="casreview" id="casReview" hidden></div>
+    </div>
+  </section>
+
+  <!-- ============ SAFETY ============ -->
+  <section data-pg="how" id="safety" aria-labelledby="safeTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">House Rules</p>
+        <h2 id="safeTitle">Safe at every table</h2>
+      </div>
+      <div class="rules">
+        <div class="panel"><h3>18+ only</h3><p>Every player confirms their age at sign-up. No exceptions.</p></div>
+        <div class="panel"><h3>Pairs before talk</h3><p>No cold messages. The Side Table opens only when you both play each other's card.</p></div>
+        <div class="panel"><h3>Sealed Faces</h3><p>Photo verification earns a Seal, so you know the face on the card is real.</p></div>
+        <div class="panel"><h3>Approximate distance</h3><p>We show "about 4 miles," never an address or a live location.</p></div>
+        <div class="panel"><h3>Report &amp; Block on every card</h3><p>One tap, always plain words. Our Judges review every report.</p></div>
+        <div class="panel"><h3>Burns stay private</h3><p>Nobody ever learns you burned their card, and it never affects anyone else's deck.</p></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============ MEMBERSHIP ============ -->
+  <section data-pg="membership" id="membership" aria-labelledby="memTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Membership</p>
+        <h2 id="memTitle">One Buy-In. Then pocket change.</h2>
+      </div>
+      <div class="member">
+        <div class="chipwrap memchips" aria-hidden="true">
+          <span class="sfchip mc21" id="memChip21" data-chip="21" data-size="170" data-label="one-time buy-in"></span>
+          <span class="sfchip mc210" data-chip="2.10" data-size="190" data-spin data-label="a month"></span>
+        </div>
+        <div class="panel form-grid price">
+          <div class="pricing">
+            <div><span class="big">$21.00</span><span class="hint">one-time Buy-In, today</span></div>
+            <div class="plus">+</div>
+            <div><span class="big">$2.10</span><span class="hint">a month, starting one month after you join</span></div>
+          </div>
+          <div class="launchbox" id="launchBox" hidden>
+            <p class="eyebrow">Launch offer · ends <span id="launchEnds">Oct 31</span></p>
+            <h3>The $21 Buy-In is waived</h3>
+            <p class="hint" style="margin:0">For our first 15 days, join for just <b>$2.10 a month</b>. <span id="launchLeft"></span></p>
+            <div class="launchopts" role="radiogroup" aria-label="Choose how you join">
+              <button type="button" class="lopt" role="radio" aria-checked="true" data-plan="launch"><b>Launch seat</b><span>$0 Buy-In · $2.10 today, then $2.10 a month</span></button>
+              <button type="button" class="lopt f1kopt" role="radio" aria-checked="false" data-plan="first"><span class="f1kbadge" data-founder="" data-size="92"></span><b class="f1kt">★ First 1,000<small>Founding Player</small></b><span class="f1kd">Skip the waiver: $21 Buy-In today, then $2.10 a month from day 30. Your card wears this numbered <strong>First 1,000 Founding Player</strong> badge forever, numbered in the order you join. Only 1,000 will ever exist. Non-refundable.</span><em id="f1kLeft"></em></button>
+            </div>
+            <p class="hint" style="margin:0">🎟️ <b>Invite friends:</b> every friend who joins credits your account $2.10 (up to 12 credits) and unlocks a unique referral sticker for your card.</p>
+          </div>
+          <ul class="incl">
+            <li>Your full deck, re-dealt as people join</li>
+            <li>Unlimited Burns, Plays and Pairs</li>
+            <li>The Side Table for every Pair</li>
+            <li>Photo Seal, Report and Block, always included</li>
+          </ul>
+          <button type="button" class="hrcta" data-highroller><span aria-hidden="true" class="hrgem"><svg><use href="#s-diamond"/></svg></span><span><b>The High Roller Room</b>Verify $1M+ or buy in for $5,000. A private deck of High Rollers and exclusive offers.</span><em>›</em></button>
+          <div class="guarantee"><span class="gbadge" aria-hidden="true">12</span><div><b>The 12-Card Deck Guarantee</b><span>If we can't deal you at least 12 cards within 10 days, you choose: get your $21 back, or stay with full access while your table fills.</span></div></div>
+          <div class="notice pv rules-box"><b>Pausing:</b> pause <b>once every 210 days</b> for up to 21 days, and your $2.10 billing stops while you're paused. If a pause runs past 21 days, your membership ends, and coming back means a new $21.00 Buy-In.</div>
+          <label class="agree"><input type="checkbox" id="agree"> <span>I understand that SuiteFace charges <b>$21.00 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership. I agree to the <a href="terms.html">Terms of Service</a>.</span></label>
+          <div class="comp"><label for="compCode"><span class="chipmark" aria-hidden="true">COMP</span> Have a comp from the house?</label><div class="comprow"><input type="text" id="compCode" placeholder="Enter your comp code" autocomplete="off" autocapitalize="characters" maxlength="30"><button class="btn ghost sm" type="button" id="compApply">Apply</button></div><span class="hint" id="compMsg">Comps are applied at checkout. One per member.</span></div>
+          <span class="err" id="agreeErr"></span>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <a class="btn gold" id="payBtn" href="#membership" rel="noopener">Pay $21.00 with Stripe</a>
+            <a class="btn ghost sm" id="portalBtn" href="#membership" rel="noopener">Manage, pause or cancel</a>
+          </div>
+          <p class="hint">Payments are handled by Stripe. SuiteFace never sees or stores your card number. Cancel any time to stop future charges.</p>
+          <details id="terms" class="terms"><summary>Membership terms</summary>
+            <ol>
+              <li><b>Buy-In.</b> Joining costs a one-time $21.00 USD membership fee, charged when you sign up.</li>
+              <li><b>Monthly membership.</b> After that, membership is $2.10 USD per month, charged to the same payment method every month starting one month after you join, until you cancel.</li>
+              <li><b>Pausing.</b> You can pause once every 210 days (counted from the day your last pause began), for up to 21 days. No monthly charges are made while paused, and your deck is hidden from others.</li>
+              <li><b>Pauses over 21 days.</b> If you don't resume within 21 days, your membership ends. To return, you'll pay a new $21.00 Buy-In, then $2.10 a month.</li>
+              <li><b>Cancelling.</b> Cancel any time from "Manage, pause or cancel" or by emailing help@suiteface.com. Cancelling stops future charges. Rejoining later requires a new $21.00 Buy-In.</li>
+              <li><b>Launch offer.</b> From Oct 17 through 11:59 pm CT Oct 31, 2026, the $21.00 Buy-In is waived: you pay $2.10 today and $2.10 a month. Rejoining after your membership ends requires the Buy-In.</li>
+              <li><b>First 1,000.</b> During the launch offer you may pay the $21.00 Buy-In instead to get a numbered First 1,000 badge. It's non-refundable, including under the 12-Card Deck Guarantee.</li>
+              <li><b>Referrals.</b> Each friend who joins with your invite link credits your account $2.10, up to 12 credits, and unlocks a unique sticker.</li>
+              <li><b>Refunds.</b> Charges are non-refundable except under the 12-Card Deck Guarantee for a regular Buy-In, or where the law requires.</li>
+              <li><b>Age.</b> Membership is for adults 18 and over.</li>
+            </ol>
+            <p class="hint">Full details: <a href="terms.html">Terms of Service</a> 4.1–4.1d and Agreement B.</p>
+          </details>
+        </div>
+      </div>
+      <div class="chiplegend" aria-labelledby="chipT">
+        <h3 id="chipT">The house chips</h3>
+        <p class="hint">Every price at SuiteFace is one of five chips.</p>
+        <ul>
+          <li><span class="sfchip" data-chip="0.21" data-size="76"></span><b>21¢</b><span>Small fees</span></li>
+          <li><span class="sfchip" data-chip="2.10" data-size="76"></span><b>$2.10</b><span>Your month, The Raise, an extra seat or ZIP</span></li>
+          <li><span class="sfchip" data-chip="21" data-size="76"></span><b>$21</b><span>The buy-in, a Private Table</span></li>
+          <li><span class="sfchip" data-chip="210" data-size="76"></span><b>$210</b><span>Joker Lobby, a whole state, ZIP sponsors</span></li>
+          <li><span class="sfchip" data-chip="2100" data-size="76"></span><b>$2,100</b><span>Joker buy-out, nationwide, High Roller sponsors</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INVITE ============ -->
+  <section data-pg="club" id="invite" data-need="member" aria-labelledby="invTitle">
+    <div class="wrap">
+      <div class="invite">
+        <div class="form-grid">
+          <p class="eyebrow">Invite to the Table</p>
+          <h2 id="invTitle">Save a seat for a friend</h2>
+          <p class="lede">Bring your single friends. Every seat you fill makes the decks near you deeper and better.</p>
+          <form class="panel form-grid" id="inviteForm" novalidate>
+            <div class="field"><label for="iName">Friend's first name</label><input type="text" id="iName" maxlength="30" placeholder="Taylor"><span class="err" id="iNameErr"></span></div>
+            <div class="field"><label for="iNote">A note (optional)</label><input type="text" id="iNote" maxlength="120" placeholder="You'd be an Ace in somebody's Hand."></div>
+            <button class="btn red" type="submit">Make their invite</button>
+            <div id="inviteOut" hidden class="form-grid">
+              <div class="linkbox"><input type="text" id="inviteLink" readonly aria-label="Invite link"><button class="btn gold sm" type="button" id="copyLink">Copy</button></div>
+              <div class="share-row">
+                <a class="btn ghost sm" id="shareEmail" href="#" target="_blank" rel="noopener">Email it</a>
+                <a class="btn ghost sm" id="shareSms" href="#">Text it</a>
+                <button class="btn ghost sm" type="button" id="shareNative" hidden>Share…</button>
+              </div>
+              <p class="hint">Copy the link and send it however you like. Email and text buttons open your own apps, if your device allows it.</p>
+            </div>
+          </form>
+        </div>
+        <div>
+          <div class="round" id="round"><div class="mid">Your<br>Table</div></div>
+          <p class="hint" style="text-align:center;margin-top:12px"><span id="seatCount">0</span> of 5 seats saved</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JOIN / CONTACT ============ -->
+  <section data-pg="bluff" id="bluff" aria-labelledby="bluffTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">The Bluff Table</p>
+        <h1 id="bluffTitle">Real person, or House Card?</h1>
+        <p class="lede">Every hand here is five cards. Some are real SuiteFace members who also took a seat. Some are <b>House Cards</b>, played by SuiteFace's AI dealer. Chat with any of them, then call it. <b>The house always tells the truth.</b></p>
+      </div>
+      <div class="bluffrules">
+        <div><b>🎴 Five cards, always</b><span>The table always deals a full hand, so you're never sitting alone.</span></div>
+        <div><b>💬 Chat with anyone</b><span>Real members answer themselves. The house plays its own cards.</span></div>
+        <div><b>🎭 Call Bluff or Real</b><span>Tap a card and call it. You find out on the spot, and every right call raises your score.</span></div>
+        <div><b>👁 Sharp Eye</b><span>Five right calls earns the Sharp Eye badge on your card.</span></div>
+        <div><b>🔒 Honest by design</b><span>House Cards never ask to meet, never ask for money or your number, and don't do video. After 7 days every card is revealed. Ask one sincerely if it's real, and it'll tell you.</span></div>
+        <div><b>💞 Your real deck stays real</b><span>House Cards only sit at this table. They're never dealt into Your Hand.</span></div>
+      </div>
+      <div id="bluffApp" class="bluffapp"><p class="hint">Loading the table…</p></div>
+    </div>
+  </section>
+
+  <section data-pg="contact" id="join" aria-labelledby="joinTitle">
+    <div class="wrap">
+      <div class="forms">
+        <div class="form-grid">
+          <p class="eyebrow">Get Dealt In</p>
+          <h2 id="joinTitle">Take a seat at launch</h2>
+          <p class="lede">Join the waitlist for your city, send us a note, or tell us what you think. Every message reaches the SuiteFace team.</p>
+          <div class="mail"><code id="mailAddr">help@suiteface.com</code><button class="btn ghost sm" type="button" id="copyMail">Copy</button></div>
+        </div>
+        <div class="panel">
+          <div class="tabs" role="tablist" aria-label="Forms">
+            <button class="chip" role="tab" aria-selected="true" aria-pressed="true" data-form="WAITLIST">Waitlist</button>
+            <button class="chip" role="tab" aria-selected="false" aria-pressed="false" data-form="CONTACT">Contact</button>
+            <button class="chip" role="tab" aria-selected="false" aria-pressed="false" data-form="PAUSE">Pause membership</button>
+            <button class="chip" role="tab" aria-selected="false" aria-pressed="false" data-form="PARTNER">Business &amp; partners</button>
+          </div>
+          <form class="form-grid" id="mainForm" novalidate></form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEALER (staff) ============ -->
+  <section data-pg="club" id="dealer" data-need="dealer" aria-labelledby="dealerTitle" hidden>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Dealer console · staff</p><h2 id="dealerTitle">Run the tables</h2>
+        <p class="lede">Safety first, then Jokers, appeals and pauses. Sample data in this preview.</p></div>
+      <div class="chips" id="dealerTabs" role="tablist" aria-label="Dealer queues"></div>
+      <div class="panel" id="dealerBody" style="margin-top:14px"></div>
+    </div>
+  </section>
+  <!-- ============ PIT BOSS (IT) ============ -->
+  <section data-pg="club" id="pitboss" data-need="pitboss" aria-labelledby="pitTitle" hidden>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Pit Boss console · IT</p><h2 id="pitTitle">Keep the lights on</h2>
+        <p class="lede">These checks run live in this browser, so they're useful for troubleshooting a member's device too.</p></div>
+      <div class="diag" id="diag"></div>
+      <div class="row" style="margin-top:14px"><button class="btn gold sm" type="button" id="diagRun">Run checks again</button><button class="btn ghost sm" type="button" id="diagCopy">Copy diagnostics</button><button class="btn ghost sm" type="button" id="diagReset">Reset demo data on this device</button></div>
+      <div class="panel" style="margin-top:14px"><h3 style="font-size:1.2rem">Error log</h3><pre class="errlog" id="errLog">No errors captured.</pre></div>
+    </div>
+  </section>
+  <!-- ============ OWNER ============ -->
+  <section data-pg="club" id="owner" data-need="owner" aria-labelledby="ownerTitle" hidden>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Owner console</p><h2 id="ownerTitle">The house view</h2>
+        <p class="lede">Sample data in this preview. The live version reads Stripe and the member database.</p></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="panel" style="margin-top:16px"><h3 style="font-size:1.2rem">New Buy-Ins by week</h3><div class="bars" id="ownerBars"></div></div>
+      <div class="panel" style="margin-top:16px"><h3 style="font-size:1.2rem">House rules in force</h3><div id="ownerRules"></div></div>
+      <div class="panel staffpanel" style="margin-top:16px">
+        <h3 style="font-size:1.2rem">🔐 Staff approvals</h3>
+        <p class="hint">Only the Owner can give or remove a staff role, and every change needs the approval passcode. The passcode is checked on the server and stored only as a one-way scramble, so nobody (including Claude) can read it back. Staff must already have a SuiteFace account with the ✓ ID Seal. Five wrong passcodes lock approvals for an hour.</p>
+        <form id="stApprove" class="form-grid" autocomplete="off">
+          <div class="two"><div class="field"><label for="stEmail">Their account email</label><input id="stEmail" type="email" required placeholder="name@example.com"></div>
+          <div class="field"><label for="stRole">Role</label><select id="stRole"><option value="dealer">Dealer: member support and safety</option><option value="pitboss">Pit Boss: IT and system health</option><option value="player">Remove staff role (back to Player)</option></select></div></div>
+          <div class="two"><div class="field"><label for="stPass">Approval passcode</label><input id="stPass" type="password" required autocomplete="off"></div>
+          <div class="field"><label for="stNote">Note <span class="hint">(why, for the log)</span></label><input id="stNote" maxlength="300" placeholder="Hired as weekend support"></div></div>
+          <div class="row"><button class="btn gold" type="submit">Approve</button><button class="btn ghost" type="button" id="stSetPass">Set or change the passcode</button></div>
+          <p class="hint" id="stOut" role="status"></p>
+          <div class="hcbox"><h4 style="margin:14px 0 4px">🎩 House comp code</h4><p class="hint">Makes any member feature free, but only for signed-in accounts whose verified email is thesuiteface@gmail.com or ends in @suiteface.com or @gofirehorsego.com. Stored scrambled; nobody can read it back. Setting it again replaces the old code.</p>
+          <div class="row"><label class="sr" for="hcNew">New house comp code</label><input id="hcNew" type="password" autocomplete="off" placeholder="Type the comp code"><button class="btn ghost" type="button" id="hcSet">Set comp code</button></div><p class="hint" id="hcOut" role="status"></p></div>
+        </form>
+        <div class="holdbox" id="holdBox"><h4 style="margin:18px 0 4px">New sign-ups</h4><p class="hint">Everyone who created an account, newest first. Your own and test accounts are left out.</p><div id="signupList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">Quiz reviews</h4><p class="hint">Accounts that picked every hidden tell in the suit quiz. They can't be dealt a deck until you clear them.</p><div id="holdList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">Joker challenges to rule on</h4><p class="hint">"Something else" challenges. <b>False</b> removes the Joker and backfires it on the maker for 45 days. Your ruling is final.</p><div id="chalList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">High Roller decks to ship</h4><p class="hint">Every confirmed High Roller gets a real SuiteFace deck within 180 days. Soonest due first.</p><div id="hrShipList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">Suit quiz leads</h4><p class="hint">The latest people who took the quiz.</p><div id="leadList"><p class="hint">Loading…</p></div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap cols">
+    <div class="form-grid">
+      <span class="wm tmwrap" style="max-width:220px;display:block"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 0 754 142" role="img" aria-label="SuiteFace"><path d="M53.203125 135.71875C81.484375 135.71875 98.125 122.046875 98.125 100.875C98.125 81.34375 82.96875 71.34375 63.359375 66.8125L52.8125 64.234375C42.96875 61.890625 34.21875 58.21875 34.21875 49.546875C34.21875 41.734375 41.09375 36.109375 53.28125 36.109375C65.234375 36.109375 72.65625 41.5 73.515625 50.796875H96.5625C96.171875 30.328125 79.296875 16.03125 53.515625 16.03125C28.203125 16.03125 9.765625 30.09375 9.765625 51.109375C9.765625 68.0625 21.5625 77.984375 41.25 82.75L54.0625 85.953125C66.71875 89.078125 74.140625 92.75 74.140625 100.71875C74.140625 109.546875 65.703125 115.5625 52.96875 115.5625C40.078125 115.5625 30.625 109.703125 29.84375 97.90625H6.640625C7.34375 122.671875 25.234375 135.71875 53.203125 135.71875Z M140.84375 135.09375C154.125 135.09375 163.03125 128.21875 167.953125 115.875L168.265625 134.0H190.453125V46.65625H166.9375V97.203125C166.9375 108.765625 159.90625 115.484375 149.984375 115.484375C140.140625 115.484375 134.203125 109.0 134.203125 98.140625V46.65625H110.765625V102.203125C110.765625 122.671875 122.71875 135.09375 140.84375 135.09375Z" fill="#C8102E"/>
+<path d="M206.375 134.0H229.8125V46.65625H206.375Z" fill="#C8102E"/>
+<path d="M50 4 C24 28 5 43 5 59 C5 73 15 81 27 81 C36 81 43 77 47 71 L45.5 79 C44 87 38 93 31 96 L69 96 C62 93 56 87 54.5 79 L53 71 C57 77 64 81 73 81 C85 81 95 73 95 59 C95 43 76 28 50 4 Z" fill="#FAF7F0" transform="translate(195.38 -3.39) scale(0.4544)"/>
+<path d="M289.09375 46.65625H272.765625V25.875H249.328125V46.65625H237.296875V64.546875H249.328125V110.484375C249.328125 126.5 258.859375 135.25 276.359375 135.25C281.046875 135.25 286.28125 134.703125 291.515625 133.140625L288.15625 115.5625C286.4375 116.03125 282.53125 116.578125 280.734375 116.578125C275.03125 116.578125 272.765625 114.0 272.765625 108.453125V64.546875H289.09375Z" fill="#C8102E"/>
+<path d="M339.78125 135.71875C360.09375 135.71875 374.0 126.265625 378.296875 111.734375L357.046875 107.75C354.546875 114.46875 348.375 118.0625 340.171875 118.0625C328.375 118.0625 320.40625 110.71875 319.859375 96.421875H379.625V89.859375C379.625 60.015625 361.421875 45.5625 338.609375 45.5625C313.0625 45.5625 296.65625 63.84375 296.65625 90.796875C296.65625 118.375 313.0625 135.71875 339.78125 135.71875ZM320.015625 81.734375C320.953125 70.953125 327.671875 63.21875 338.84375 63.21875C349.703125 63.21875 355.875 70.328125 357.046875 81.734375Z" fill="#2F8A62"/>
+<path d="M392.1875 134.0H416.015625V89.3125H463.59375V69.859375H416.015625V37.359375H468.75V17.59375H392.1875Z M505.921875 135.71875C518.8125 135.71875 527.25 130.015625 531.46875 121.890625H532.25V134.0H554.4375V75.171875C554.4375 54.0 536.15625 45.5625 517.40625 45.5625C497.875 45.5625 483.8125 54.234375 479.359375 69.390625L500.84375 72.984375C502.71875 67.359375 508.265625 62.90625 517.328125 62.90625C526.078125 62.90625 531.0 67.125 531.0 74.546875V74.9375C531.0 80.640625 524.828125 81.265625 509.828125 82.75C492.640625 84.390625 476.859375 90.015625 476.859375 109.546875C476.859375 126.8125 489.28125 135.71875 505.921875 135.71875ZM512.5625 119.234375C504.828125 119.234375 499.359375 115.71875 499.359375 108.921875C499.359375 101.890625 505.140625 98.53125 513.8125 97.28125C518.96875 96.578125 528.265625 95.328125 531.15625 93.296875V102.75C531.15625 111.96875 523.5 119.234375 512.5625 119.234375Z M609.5 135.71875C630.4375 135.71875 645.203125 124.390625 648.484375 106.03125L626.6875 102.046875C624.8125 111.5 618.796875 117.28125 609.734375 117.28125C597.234375 117.28125 590.671875 106.265625 590.671875 90.640625C590.671875 74.859375 597.234375 64.0 609.734375 64.0C618.796875 64.0 624.578125 69.625 626.53125 78.6875L648.328125 74.625C645.046875 56.65625 630.203125 45.5625 609.5 45.5625C583.171875 45.5625 566.765625 63.6875 566.765625 90.71875C566.765625 117.59375 583.171875 135.71875 609.5 135.71875Z M700.03125 135.71875C720.34375 135.71875 734.25 126.265625 738.546875 111.734375L717.296875 107.75C714.796875 114.46875 708.625 118.0625 700.421875 118.0625C688.625 118.0625 680.65625 110.71875 680.109375 96.421875H739.875V89.859375C739.875 60.015625 721.671875 45.5625 698.859375 45.5625C673.3125 45.5625 656.90625 63.84375 656.90625 90.796875C656.90625 118.375 673.3125 135.71875 700.03125 135.71875ZM680.265625 81.734375C681.203125 70.953125 687.921875 63.21875 699.09375 63.21875C709.953125 63.21875 716.125 70.328125 717.296875 81.734375Z" fill="#E9E2D6"/></svg><sup class="tm" aria-label="trademark">™</sup></span>
+      <p>No Jokers Needed™. Same Deck. Different Hands. Your Choice.</p>
+      <div class="sf-badges"><span class="sf-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8.3 7.5 9.5 4.3-1.2 7.5-5 7.5-9.5V6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>U.S. patent pending (USPTO)</span><span class="sf-badge">Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener">GoFirehorseGo</a></span></div>
+      <p class="hint copyright">© <span id="cpYear">2026</span> SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™, the SuiteFace Joker logo™, No Jokers Needed™, Your Hand™, Play Hand™, Joker Lobby™, Ask the Dealer™, The Raise™, High Roller Room™ and SuiteFace Private Tables™ are trademarks of SuiteFace Inc. Patent pending.</p>
+    </div>
+    <div><h4>Play</h4><ul><li><a href="how-it-works.html">How it works</a></li><li><a href="find-your-suit.html">Find your suit</a></li><li><a href="tables.html">Private Tables</a></li><li><a href="membership.html">Membership</a></li><li><a href="how-cards-work.html">How cards are dealt</a></li><li><a href="joker-lobby.html">Joker Lobby</a></li><li><a href="my-table.html">My table (members)</a></li></ul></div>
+    <div><h4>SuiteFace Inc.</h4><ul><li><a href="membership.html">Membership · $21 + $2.10/mo</a></li><li><a href="guides.html">Dating guides</a></li><li><a href="christian-dating-app.html">Christian dating</a></li><li><a href="online-dating-safety.html">Dating safety tips</a></li><li><a href="legal.html">Legal center</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="safety.html">Safety Guide</a></li><li><a href="fit.html">House Fit Rules</a></li><li><a href="joker-lobby.html">Joker Maker Lobby</a></li><li><a href="contact.html">Contact</a></li><li><a href="my-table.html#invite">Invite a friend</a></li><li>help@suiteface.com</li><li>© 2026 SuiteFace Inc.</li></ul></div>
+  </div>
+</footer>
+
+<div class="fabdock" id="fabDock">
+  <button class="fabmin" id="fabMin" type="button" aria-expanded="true" aria-controls="fabBtns" aria-label="Hide Help and Feedback" title="Hide"><span aria-hidden="true">–</span></button>
+  <div class="fabbtns" id="fabBtns">
+    <button class="btn gold fab helpfab" id="helpBtn" type="button" aria-haspopup="dialog">Help</button>
+    <button class="btn felt fab" id="fbBtn" type="button">Feedback</button>
+  </div>
+</div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script src="/assets/js/config.js?v=1792285894"></script>
+<script src="/assets/js/sign.js?v=1792285894"></script>
+<script src="/assets/js/live.js?v=1792285894"></script>
+<script src="/assets/js/gate.js?v=1792285894"></script>
+<script src="/assets/js/fx.js?v=1792285894"></script>
+<script src="/assets/js/casino-scene.js?v=1792285894"></script>
+<script src="/assets/js/chips.js?v=1792285894"></script>
+<script src="/assets/js/bumpers.js?v=1792285894"></script>
+<script src="/assets/js/slots.js?v=1792285894"></script>
+<script src="/assets/js/app.js?v=1792285894"></script>
+</body>
+</html>
