@@ -1605,6 +1605,7 @@
     return '<div class="avatar" style="' + (extra || "") + 'background:radial-gradient(circle at 30% 25%,hsl(' + p.hue + ' 45% 52%),' + bg + ')">' + esc(initials(p.name)) + "</div>";
   }
   function jmeter(p, big) {
+    if (p.self) return ""; // Joker Policy: a member never sees their own count.
     if (p.joker) return '<span class="jm jm-on">JOKER</span>';
     var n = p.jk || 0, pips = ""; for (var i = 0; i < 10; i++) pips += '<i class="' + (i < n ? "on" : "") + '"></i>';
     return '<span class="jm' + (n >= 7 ? " hot" : n >= 4 ? " warm" : "") + '" title="Jokers from confirmed dates in the last 180 days">' + (big ? "Joker meter " : "Jokers ") + n + "/10" + (big ? '<span class="pips">' + pips + "</span>" : "") + "</span>";
@@ -4493,7 +4494,7 @@
     return { id: "me-lobby", name: P.name || "Your Name", age: parseInt(P.age, 10) || "", dist: 1, suit: s, rank: "A", looking: P.looking || "longterm",
       interests: P.interests || [], bio: P.bio || "Your Face Value goes here.", hue: 28, shared: [], city: "", wins: P.wins || null, founder: P.founderNo || null,
       hr: P.highRoller || null, photoV: !!(V.photo || (P.photoLive && P.photo)), idV: !!V.id, confirmed: [], bumpers: P.bumpers || [], bumpersOk: P.bumpersOk || [],
-      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null };
+      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null, self: true };
   }
   function lobbySpots(p) {
     var spots = [];
