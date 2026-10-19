@@ -1134,3 +1134,7 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 /* Rendered brass medallions on card backs (Oct 19) */
 .pcard .cover .cv-medal.art{background:none;box-shadow:0 6px 14px -6px rgba(12,18,15,.7);padding:0;overflow:visible}
 .pcard .cover .cv-medal.art picture,.pcard .cover .cv-medal.art img{display:block;width:100%;height:100%;border-radius:50%}
+/* Card backs drawn at full size (Oct 19): gold lattice over the player's own table felt; harlequin for public Jokers */
+.pcard .cover .cv-in.houseback{background:image-set(url(/assets/art/back_lattice.webp) type("image/webp"),url(/assets/art/back_lattice.png) type("image/png")) center/100% 100% no-repeat,
+  radial-gradient(120% 90% at 50% 40%,color-mix(in srgb,var(--felt) 88%,#fff),var(--felt) 60%,color-mix(in srgb,var(--felt) 70%,#0C120F))}
+.pcard .cover .cv-in.jkback{background:image-set(url(/assets/art/back_joker.webp) type("image/webp"),url(/assets/art/back_joker.jpg) type("image/jpeg")) center/cover no-repeat;box-shadow:inset 0 0 0 2px #8E2230,inset 0 0 0 4px #E8C46A}

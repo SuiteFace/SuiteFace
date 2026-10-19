@@ -1823,7 +1823,7 @@
     extra += Math.max(0, items.length - room);
     var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 3, size: 14 }) : "";
     if (extra) stick += '<span class="cv-more" title="' + extra + ' more under More">+' + extra + "</span>";
-    return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.cardBack && CB[p.cardBack] ? " cb-" + p.cardBack : "") + '">' +
+    return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.joker ? " jkback" : p.cardBack && CB[p.cardBack] ? " cb-" + p.cardBack : " houseback") + '">' +
       medalFor(p) +
       (p.couple ? '<div class="cv-couple">🍍 Couple' + (p.couple.name ? " · with " + esc(p.couple.name) : "") + "</div>" : "") + (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
       '<div class="cv-tap">Tap to flip</div></div>' + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>";
