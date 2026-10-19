@@ -704,6 +704,7 @@
       else if (sl.t === "fault") qw.fault = FAULTS[v][0];
     });
     qa = qa.filter(Boolean);
+    qw.others = (Array.isArray(qs.ans.friends) ? qs.ans.friends : []).filter(function (w) { return !!suitOf(w, WORDS); });
   }
   function saveQ() { qs.i = qi; S.set("quizDeck", qs); derive(); }
   derive();
@@ -824,6 +825,7 @@
       ORDER.map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
       '<button class="btn ghost sm" type="button" data-sharecard="' + lean + '">📤 Share my suit</button><button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
       (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your Wild Card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your deck.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") + "</div>";
+    R.insertAdjacentHTML("beforeend", friendsBlock()); syncQuizWords();
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
     lockNote(R);
@@ -869,6 +871,28 @@
       }, function (er) { go.disabled = false; toast((er && er.message) || "Couldn't lock your suit. Try again."); });
     });
   }
+
+  /* Optional, after the result: "What would your friends say?" It never changes the suit. When the words match how the
+     player sees themself, matching gives their card a small "truth" boost (fit_parts). Saved to the account when signed in. */
+  function friendsBlock() {
+    var mine = qw.others, done = mine.length > 0;
+    var both = qw.self.filter(function (w) { return mine.indexOf(w) > -1; });
+    return '<div class="friendsq" id="friendsQ"><h4>' + (done ? "What your friends would say" : "Optional: what would your friends say?") + '</h4>' +
+      '<p class="hint">' + (done ? (both.length ? "You and your friends agree on <b>" + esc(both.join(", ")) + "</b>. That match gives your card a small boost for being genuine." : "Your friends see a different side of you. Both belong on your card.") + " It never changes your suit."
+        : "Tap the words the people who know you best would use. It never changes your suit. When it matches how you see yourself, your card gets a small boost for being genuine.") + "</p>" +
+      '<div class="wordpick">' + wordList(WORDS).map(function (w) { var on = mine.indexOf(w) > -1; return '<button class="ans wchip' + (on ? " picked" : "") + '" type="button" aria-pressed="' + on + '" data-fw="' + esc(w) + '">' + esc(w) + "</button>"; }).join("") + "</div>" +
+      '<button class="btn ghost sm" type="button" data-fsave>' + (done ? "Update" : "Save") + "</button></div>";
+  }
+  function syncQuizWords() { if (window.SF_LIVE && qw.self.length) window.SF_LIVE.rpc("set_my_quiz_words", { p_self: qw.self, p_others: qw.others }).then(function () { }, function () { }); }
+  document.addEventListener("click", function (e) {
+    var t = e.target; if (!t.closest) return;
+    var fw = t.closest("[data-fw]");
+    if (fw) { var on = !fw.classList.contains("picked"); fw.classList.toggle("picked", on); fw.setAttribute("aria-pressed", String(on)); return; }
+    if (t.closest("[data-fsave]")) {
+      qs.ans.friends = $$("#friendsQ [data-fw].picked").map(function (b) { return b.getAttribute("data-fw"); }); saveQ(); syncQuizWords();
+      var box = $("#friendsQ"); if (box) box.outerHTML = friendsBlock(); toast(qw.others.length ? "Saved. Thanks for being honest." : "Cleared.");
+    }
+  });
   function showResult() {
     var c = { diamond: 0, club: 0, heart: 0, spade: 0 };
     /* Points (Oct 19): each scenario 3 (18 total); the words are worth 6 points shared out by the share of words picked in each
@@ -925,6 +949,7 @@
       '<button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
       (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your ' + SUIT[top].name + ' card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your hand.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") +
       "</div>";
+    R.insertAdjacentHTML("beforeend", friendsBlock()); syncQuizWords();
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
     lockNote(R);

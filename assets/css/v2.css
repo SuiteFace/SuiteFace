@@ -1127,3 +1127,7 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 .wordpick .wchip.picked{background:var(--gold)!important;border-color:var(--gold)!important;color:#1E1606!important}
 .wnext{width:100%;justify-content:center}
 .wnext[disabled]{opacity:.55;cursor:default}
+/* Optional friends step under the quiz result */
+.friendsq{margin-top:18px;padding:16px 18px;border-radius:18px;border:1px dashed rgba(232,196,106,.45);display:grid;gap:8px}
+.friendsq h4{margin:0;font-size:1.1rem}
+.friendsq .wordpick{margin:4px 0}
