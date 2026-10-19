@@ -573,6 +573,12 @@
 
   /* ---------- The High Roller Room: ID Seal + verified $1M+ (accounts can add up) or the $5,000 High Roller Buy-In ---------- */
   function openHighRoller() {
+    if (P.highRoller && liveOn()) {
+      if ((P.rooms || []).indexOf("highroller") < 0) P.rooms = (P.rooms || []).concat("highroller");
+      P.room = "highroller"; saveP(); try { renderRooms(); deckDirty = true; buildDeck(); renderTable(false); } catch (e) { }
+      toast("💎 You're a High Roller" + (P.hrUntil ? " through " + new Date(P.hrUntil).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "") + ". Welcome to the room.");
+      if (document.body.getAttribute("data-page") !== "club") location.href = "my-table.html#table"; return;
+    }
     var m = modal('<p class="eyebrow">High-limit floor · ID Seal required</p><h3 style="font-size:2.2rem">💎 The High Roller Room</h3>' +
       '<p class="lede" style="margin:6px 0 10px">A private deck of High Rollers only, the gold high-limit table, and exclusive offers from High Roller Sponsors.</p>' +
       '<div class="hrpaths"><div class="hrpath"><b>Verify $1M+</b><span>Show at least <b>$1,000,000</b> across your bank or brokerage accounts. Several accounts can add up.</span>' +
@@ -4508,7 +4514,7 @@
       lrpc("my_compliments").then(function (rs) { P.compRows = rs || []; P.myComps = null; (rs || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function () { });
       lrpc("my_suit_lock").then(function (L) { if (L) { P.suitLock = L; if (L.locked) { P.mySuit = L.suit; P.wild = !!L.wild; } saveP(); renderCard(); } }, function () { });
       lrpc("my_verification").then(function (v) { if (v) { P.ver = v; saveP(); renderVerPanel(); } }, function () { });
-      lrpc("my_high_roller").then(function (h) { P.highRoller = h && h.in_room ? h.status : null; saveP(); renderCard(); if (P.highRoller) lrpc("my_hr_deck").then(function (d) { P.hrDeck = d || null; renderHrDeck(); }, function () { }); else renderHrDeck(); }, function () { });
+      lrpc("my_high_roller").then(function (h) { P.highRoller = h && h.in_room ? h.status : null; P.hrUntil = h && h.in_room ? h.until : null; saveP(); renderCard(); if (P.highRoller) lrpc("my_hr_deck").then(function (d) { P.hrDeck = d || null; renderHrDeck(); }, function () { }); else renderHrDeck(); }, function () { });
       if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
       (res[2].data || []).forEach(function (r) { if (!IDX[r.question]) return; P.id[r.question] = IDX[r.question][2] === "one" ? r.answers[0] : r.answers; P.vis[r.question] = r.face_up; });
       (res[3].data || []).forEach(function (r) { P.prefs[r.question] = { sel: r.wanted, deal: r.dealbreaker }; });
