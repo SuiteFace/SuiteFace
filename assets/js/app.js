@@ -1088,7 +1088,8 @@
   styleField.addEventListener("click", function (e) {
     var t = e.target.closest("[data-th]"), k = e.target.closest("[data-stk]"), pb = e.target.closest("[data-pack]");
     if (pb) { var pk2 = pb.getAttribute("data-pack"); return buy("pack_" + pk2, PACKS[pk2][0] + " sticker pack", PACKS[pk2][1], function () { renderStyle(); }); }
-    if (t) { var th = THEME[t.getAttribute("data-th")]; var apply = function () { P.theme = th[0]; renderStyle(); onChange(); };
+    if (t) { var th = THEME[t.getAttribute("data-th")]; var apply = function () { var before = P.theme; P.theme = th[0]; renderStyle(); onChange(); if (typeof renderLobby === "function") renderLobby();
+        if (liveOn()) lrpc("set_my_card_theme", { p_theme: th[0] }).catch(function (er) { P.theme = before; saveP(); renderStyle(); toast(er.message); }); };
       if (th[3] && !owns(th[0])) return buy(th[0], th[1] + " theme", th[3], apply); return apply(); }
     if (k && k.hasAttribute("data-earn")) { var ek = k.getAttribute("data-earn"); toast(ek === "first1000" ? "The First 1,000 badge goes to members who chose the $21 Buy-In during the launch offer." : "Unlocks when " + ek.replace("ref", "") + " friend" + (ek === "ref1" ? "" : "s") + " you invited join SuiteFace. Share your invite link from Invite."); return; }
     if (k) { var id = k.getAttribute("data-stk");
@@ -1583,6 +1584,9 @@
     // a few sample cards carry public Joker status (10 disaster reports in 180 days, confirmed by Judges)
     out.forEach(function (p, i) { var r2 = rng(hash(p.id + "jk"))(); p.jk = r2 < .62 ? 0 : r2 < .8 ? 1 : r2 < .9 ? 2 : r2 < .95 ? 3 : r2 < .98 ? 5 : 8; });
     [6, 15].forEach(function (k, j) { if (out[k]) { out[k].jk = 10; out[k].joker = { count: 10 + j, until: ["Feb 3, 2027", "Mar 19, 2027"][j] }; } });
+    // A few sample players show the card themes (fictional examples).
+    var SAMPLE_THEME = { Maya: "gold", Ellis: "midnight", Priya: "velvet", Theo: "neon", Grace: "classic", Sam: "rainbow" };
+    out.forEach(function (p) { if (SAMPLE_THEME[p.name]) p.theme = SAMPLE_THEME[p.name]; });
     return out;
   })();
 
@@ -1837,7 +1841,7 @@
     var face = p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + "</div></div>" + details + '<span class="idx br">J<b class="jk">★</b></span></div>' :
       /* Rendered card face: ivory stock for everyone, the gold court frame for ID-verified Aces, Kings, Queens and Jacks.
          Rank and suit sit on the corners like a real card: top-left, and turned upside down at the bottom-right of the nameplate. */
-      '<div class="face framed' + (p.idV && /^[AKQJ]$/.test(String(p.rank)) ? " court" : "") + '">' +
+      '<div class="face framed' + (p.idV && /^[AKQJ]$/.test(String(p.rank)) ? " court" : "") + '"' + (p.theme && p.theme !== "private" && THEME[p.theme] ? ' data-th="' + esc(p.theme) + '" style="--th:image-set(url(/assets/art/cards/theme_' + esc(p.theme) + '.webp) type(&quot;image/webp&quot;),url(/assets/art/cards/theme_' + esc(p.theme) + '.png) type(&quot;image/png&quot;))"' : "") + ">" +
       '<span class="fidx tl">' + p.rank + pip(p.suit) + "</span>" +
       '<div class="fwin">' + avatar(p) + jmeter(p) +
       '<div class="fbtns"><button type="button" class="fb" data-more>More</button><button type="button" class="fb gold" data-read>Read us</button></div></div>' +
@@ -4203,7 +4207,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, cardStickers: r.card_stickers || null, photo: r.photo_url || null, cardTop: r.card_top || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, cardStickers: r.card_stickers || null, photo: r.photo_url || null, cardTop: r.card_top || null, theme: r.card_theme || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -4219,6 +4223,8 @@
       return lrpc("deck_couples").then(function (cs) { var m = {}; (cs || []).forEach(function (x) { m[x.member_id] = x; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.couple = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_backs").then(function (bs) { var m = {}; (bs || []).forEach(function (x) { m[x.member_id] = x.card_back; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_back = m[r.member_id]; }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
+      return lrpc("deck_themes").then(function (ts) { var m = {}; (ts || []).forEach(function (x) { m[x.member_id] = x.card_theme; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_theme = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_founders").then(function (fs) { var m = {}; (fs || []).forEach(function (x) { m[x.member_id] = x.founder_no; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.founder_no = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
@@ -4321,6 +4327,7 @@
       lrpc("my_wishlist").then(function (u) { P.wishlist = u || ""; if ($("#fWish")) $("#fWish").value = P.wishlist; }, function () { });
       lrpc("my_card_back").then(function (b) { P.cardBack = b || null; saveP(); renderCardBacks(); }, function () { });
       lrpc("my_card_top").then(function (v) { P.cardTop = v || []; saveP(); if (typeof renderLobby === "function") renderLobby(); }, function () { });
+      lrpc("my_card_theme").then(function (v) { if (v) { P.theme = v; saveP(); try { renderStyle(); } catch (e) { } if (typeof renderLobby === "function") renderLobby(); } }, function () { });
       lrpc("my_card_stickers").then(function (v) { P.stickers = v || []; saveP(); try { renderStyle(); } catch (e) { } renderCard(); if (typeof renderLobby === "function") renderLobby(); }, function () { });
       lrpc("my_heads_ups").then(function (h) { P.headsUp = h || null; renderHeadsUp(); }, function () { });
       lrpc("my_compliments").then(function (rs) { P.compRows = rs || []; P.myComps = null; (rs || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function () { });
@@ -4615,7 +4622,7 @@
     return { id: "me-lobby", name: P.name || "Your Name", age: parseInt(P.age, 10) || "", dist: 1, suit: s, rank: "A", looking: P.looking || "longterm",
       interests: P.interests || [], bio: P.bio || "Your Face Value goes here.", hue: 28, shared: [], city: "", wins: P.wins || null, founder: P.founderNo || null,
       hr: P.highRoller || null, photoV: !!(V.photo || (P.photoLive && P.photo)), idV: !!V.id, confirmed: [], bumpers: P.bumpers || [], bumpersOk: P.bumpersOk || [],
-      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null, self: true };
+      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, theme: P.theme || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null, self: true };
   }
   function lobbySpots(p) {
     var spots = [];
