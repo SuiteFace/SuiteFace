@@ -1475,3 +1475,24 @@ html[data-play="day"] .top{background:rgba(247,248,244,.82)!important;border-bot
 .fabdock .fab,.fab{min-height:36px!important;padding:0 14px!important;font:600 .84rem var(--body)!important;box-shadow:0 8px 20px -10px rgba(0,0,0,.45)!important}
 .sf-play{transform:scale(.88);transform-origin:left bottom;opacity:.92}
 .reel-div,.h-moves .reel{display:none!important}
+/* Sticker art, earned coins and generated passport stamps */
+.stkart{width:44px;height:44px;object-fit:contain;display:block}
+.lb-item .stkart,.stkpick .stkart{width:48px;height:48px}
+.cvstk .stkart{width:30px;height:30px}
+.stkcoin{display:inline-grid;justify-items:center;gap:2px}
+.stkcoin small{font:600 .62rem var(--body);white-space:nowrap}
+.cvstk .stkcoin small{display:none}
+.gstamp{display:block;overflow:visible}
+.cvstk .gstamp{width:58px;height:39px}
+.stampplace{display:grid;gap:8px;padding:12px;border-radius:14px;border:1px dashed rgba(18,54,40,.3);margin:6px 0 10px}
+.stampplace label{display:grid;gap:4px;font-size:.88rem}
+.stampplace input,.stampplace select{min-height:40px;border-radius:10px;padding:0 10px}
+.cr-modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+.cr-mode{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:2px;padding:12px;border-radius:14px;border:1px solid var(--line);text-align:left}
+.cr-mode b{font-weight:600}.cr-mode small{font-size:.8rem;color:var(--muted)}
+.cr-mode[aria-checked="true"]{border-color:var(--cream);box-shadow:0 0 0 1px var(--cream)}
+.cr-mode:focus-visible{outline:2px solid #B8862F}
+.cr-steps{margin:12px 0 0;padding-left:1.2em;display:grid;gap:10px}
+.cr-steps li>b{display:block;margin-bottom:4px}
+.cr-steps input#crName{min-height:40px;border-radius:10px;padding:0 10px;width:min(100%,320px)}
+@media (max-width:640px){.cr-modes{grid-template-columns:1fr 1fr}}

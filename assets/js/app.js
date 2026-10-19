@@ -1018,21 +1018,41 @@
     ["midnight", "Midnight Felt", "premium", 2.10, "radial-gradient(circle at 30% 20%,#FFE7A3 0 1px,transparent 2px) 0 0/18px 18px,linear-gradient(135deg,#2B2730,#4A1F5C)", "Starry back room"]
   ];
   /* Sticker packs: [id, look, pack]. Stamps and showtime stickers are original art: no real names, faces or logos. */
-  var PACKS = { earned: ["Earned", 0], free: ["Free", 0], roller: ["High Roller", 2.10], passport: ["Passport Stamps", 2.10], showtime: ["Showtime", 2.10] };
+  var PACKS = { earned: ["Earned", 0], free: ["Free", 0], roller: ["High Roller", 2.10], showtime: ["Showtime", 2.10] };
   function stamp(city, sub, c, shape) { return '<b class="pstamp ' + (shape || "") + '" style="--c:' + c + '">' + city + "<small>" + sub + "</small></b>"; }
+  /* Sticker art (Oct 19): rendered stickers and earned coins. Passport stamps are no longer sold; they're generated from
+     where a Pair actually met (see genStamp). */
+  function stkArt(n, t) { return '<img class="stkart" src="/assets/art/stk/' + n + '.webp" alt="' + t + '" width="64" height="64" loading="lazy" decoding="async">'; }
+  function stkCoin(n, t) { return '<span class="stkcoin" title="' + t + '"><img class="stkart" src="/assets/art/stk/coin_' + n + '.webp" alt="" width="64" height="64" loading="lazy" decoding="async"><small>' + t + "</small></span>"; }
   var STICKERS = [
-    ["dice", "🎲", "free"], ["chip", "🪙", "free"], ["spade", "♠️", "free"],
-    ["rose", "🌹", "roller"], ["crown", "👑", "roller"], ["cocktail", "🍸", "roller"], ["fire", "🔥", "roller"], ["star", "⭐", "roller"], ["paw", "🐾", "roller"], ["kiss", "💋", "roller"], ["sparkle", "✨", "roller"], ["slot", "🎰", "roller"],
-    ["vegas", stamp("LAS VEGAS", "NV ✈ ARRIVED", "#9B1B30"), "passport"], ["paris", stamp("PARIS", "FR · ADMIS", "#6E3A9E", "rnd"), "passport"], ["tokyo", stamp("TOKYO", "JP 入国", "#C23B7A", "rnd"), "passport"],
-    ["nola", stamp("NEW ORLEANS", "LA · LAISSEZ", "#1E7A4C"), "passport"], ["nyc", stamp("NEW YORK", "NY · JFK", "#2B2730"), "passport"], ["cancun", stamp("CANCÚN", "MX · ENTRADA", "#D2622A", "rnd"), "passport"],
-    ["rome", stamp("ROMA", "IT · ARRIVO", "#8A5A1C"), "passport"], ["nashville", stamp("NASHVILLE", "TN · BNA", "#C8961E", "rnd"), "passport"], ["bahamas", stamp("NASSAU", "BS · ARRIVED", "#1E7A4C", "rnd"), "passport"],
-    ["first1000", stamp("FIRST 1,000", "FOUNDING PLAYER", "#C8961E"), "earned"],
-    ["ref1", stamp("SEAT SAVER", "INVITE № 1", "#9B1B30", "rnd"), "earned"], ["ref2", stamp("DOUBLE DOWN", "INVITE № 2", "#1E7A4C"), "earned"], ["ref3", stamp("THREE OF A KIND", "INVITE № 3", "#6E3A9E", "rnd"), "earned"],
-    ["ref4", stamp("FOUR ACES", "INVITE № 4", "#C23B7A"), "earned"], ["ref5", stamp("HIGH FIVE", "INVITE № 5", "#D2622A", "rnd"), "earned"], ["ref6", stamp("HOT HAND", "INVITE № 6", "#9B1B30"), "earned"],
-    ["ref7", stamp("LUCKY SEVEN", "INVITE № 7", "#1E7A4C", "rnd"), "earned"], ["ref8", stamp("CRAZY EIGHTS", "INVITE № 8", "#C8961E"), "earned"], ["ref9", stamp("DEALER'S CHOICE", "INVITE № 9", "#6E3A9E", "rnd"), "earned"],
-    ["ref10", stamp("TABLE BOSS", "INVITE № 10", "#C23B7A"), "earned"], ["ref11", stamp("FULL HOUSE", "INVITE № 11", "#D2622A", "rnd"), "earned"], ["ref12", stamp("ROYAL FLUSH", "INVITE № 12", "#8A5A1C"), "earned"],
-    ["carpet", "🎞️", "showtime"], ["popcorn", "🍿", "showtime"], ["clap", "🎬", "showtime"], ["trophy", "🏆", "showtime"], ["mic", "🎤", "showtime"], ["shades", "🕶️", "showtime"], ["limo", "🚘", "showtime"], ["camera", "📸", "showtime"], ["walk", "🌟", "showtime"]
+    ["dice", stkArt("dice", "Dice"), "free"], ["chip", stkArt("chip", "Chip"), "free"], ["spade", stkArt("spade", "Spade"), "free"],
+    ["rose", stkArt("rose", "Rose"), "roller"], ["crown", stkArt("crown", "Crown"), "roller"], ["cocktail", stkArt("cocktail", "Cocktail"), "roller"], ["fire", stkArt("fire", "Fire"), "roller"], ["star", stkArt("star", "Star"), "roller"], ["paw", stkArt("paw", "Paw"), "roller"], ["kiss", stkArt("kiss", "Kiss"), "roller"], ["sparkle", stkArt("sparkle", "Sparkle"), "roller"], ["slot", stkArt("slot", "Slot machine"), "roller"],
+    ["first1000", stkCoin("first1000", "First 1,000"), "earned"],
+    ["ref1", stkCoin("ref1", "Seat Saver"), "earned"], ["ref2", stkCoin("ref2", "Double Down"), "earned"], ["ref3", stkCoin("ref3", "Three of a Kind"), "earned"],
+    ["ref4", stkCoin("ref4", "Four Aces"), "earned"], ["ref5", stkCoin("ref5", "High Five"), "earned"], ["ref6", stkCoin("ref6", "Hot Hand"), "earned"],
+    ["ref7", stkCoin("ref7", "Lucky Seven"), "earned"], ["ref8", stkCoin("ref8", "Crazy Eights"), "earned"], ["ref9", stkCoin("ref9", "Dealer's Choice"), "earned"],
+    ["ref10", stkCoin("ref10", "Table Boss"), "earned"], ["ref11", stkCoin("ref11", "Full House"), "earned"], ["ref12", stkCoin("ref12", "Royal Flush"), "earned"],
+    ["carpet", stkArt("carpet", "Red carpet"), "showtime"], ["popcorn", stkArt("popcorn", "Popcorn"), "showtime"], ["clap", stkArt("clap", "Clapperboard"), "showtime"], ["trophy", stkArt("trophy", "Trophy"), "showtime"], ["mic", stkArt("mic", "Microphone"), "showtime"], ["shades", stkArt("shades", "Sunglasses"), "showtime"], ["limo", stkArt("limo", "Limo"), "showtime"], ["camera", stkArt("camera", "Camera"), "showtime"], ["walk", stkArt("walk", "Walk of fame star"), "showtime"]
   ];
+  /* Passport stamps: one per place a Pair checked in together. Key: "ps|City|Region|YYYY-MM" where Region is a US state code
+     or a country name. Drawn here so every stamp is unique and needs no artwork. */
+  function genStamp(key, big) {
+    var q = String(key || "").split("|"); if (q[0] !== "ps" || !q[1]) return "";
+    var city = q[1].toUpperCase(), reg = (q[2] || "").toUpperCase(), ym = q[3] || "", h = 0, i;
+    for (i = 0; i < city.length; i++) h = (h * 31 + city.charCodeAt(i)) >>> 0;
+    var inks = ["#9B1B30", "#1E6347", "#6E3A9E", "#2B2730", "#B5475A", "#8A5A1C", "#1E7A4C", "#C8961E"], ink = inks[h % inks.length];
+    var mon = ym ? new Date(ym + "-15T12:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" }).toUpperCase() : "";
+    var rot = (h % 2 ? -1 : 1) * (4 + h % 5), round = h % 3 === 0, cl = city.length > 13 ? 13 : city.length;
+    var fs = city.length > 11 ? 15 : 19;
+    var shape = round ? '<ellipse cx="60" cy="40" rx="56" ry="36" fill="none" stroke="' + ink + '" stroke-width="3"/><ellipse cx="60" cy="40" rx="49" ry="30" fill="none" stroke="' + ink + '" stroke-width="1.2" stroke-dasharray="3 2"/>'
+      : '<rect x="3" y="5" width="114" height="70" rx="9" fill="none" stroke="' + ink + '" stroke-width="3"/><rect x="9" y="11" width="102" height="58" rx="5" fill="none" stroke="' + ink + '" stroke-width="1.2" stroke-dasharray="3 2"/>';
+    return '<svg class="gstamp" viewBox="0 0 120 80" width="' + (big ? 120 : 84) + '" height="' + (big ? 80 : 56) + '" role="img" aria-label="Passport stamp: ' + esc(q[1]) + (reg ? ", " + esc(q[2]) : "") + '" style="transform:rotate(' + rot + 'deg)">' +
+      '<defs><filter id="gsr' + h + '"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="' + (h % 97) + '"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.7 1.12"/><feComposite in="SourceGraphic" operator="in"/></filter></defs>' +
+      '<g filter="url(#gsr' + h + ')">' + shape +
+      '<text x="60" y="' + (round ? 39 : 38) + '" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="' + fs + '" fill="' + ink + '" letter-spacing=".5"' + (city.length > 9 ? ' textLength="' + Math.min(96, cl * 8) + '" lengthAdjust="spacingAndGlyphs"' : "") + ">" + esc(city) + "</text>" +
+      '<text x="60" y="' + (round ? 54 : 55) + '" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="8.5" fill="' + ink + '" letter-spacing="1.4">' + esc(reg) + (reg && mon ? " · " : "") + esc(mon) + "</text>" +
+      '<text x="60" y="' + (round ? 22 : 22) + '" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="6.5" fill="' + ink + '" letter-spacing="2">MET HERE</text></g></svg>';
+  }
   var THEME = {}; THEMES.forEach(function (t) { THEME[t[0]] = t; });
   P.theme = P.theme === "straight" ? "classic" : (P.theme || "private"); P.stickers = P.stickers || []; P.owned = P.owned || []; P.bumpers = P.bumpers || []; P.bumpersOk = P.bumpersOk || [];
   function owns(id) { return P.owned.indexOf(id) > -1; }
@@ -1721,7 +1741,7 @@
   })();
   setTimeout(renderCardBacks, 0);
 
-  /* "Read us": your card and theirs, read together. Live members get the AI dealer's reading; the sample deck gets a
+  /* "Our Story": your card and theirs, read together. Live members get the AI dealer's reading; the sample deck gets a
      house reading built from the cards. Zodiac shows only when both of you follow it. */
   var PAIRNOTE = {
     "heart|heart": ["Two steady hearts: loyalty comes easy, and nobody has to wonder where they stand.", "Someone has to make the plan. Take turns being the one who books it."],
@@ -1808,7 +1828,7 @@
     if (ord.length) out.sort(function (a, b) { var x = ord.indexOf(a.t), y = ord.indexOf(b.t); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y); });
     return out;
   }
-  function stickerChip(id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="cvstk stk-' + k[2] + '" title="Sticker">' + k[1] + "</span>" : ""; }
+  function stickerChip(id) { if (/^ps\|/.test(id)) return '<span class="cvstk stk-passport" title="Passport stamp">' + genStamp(id) + "</span>"; var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="cvstk stk-' + k[2] + '" title="Sticker">' + k[1] + "</span>" : ""; }
   /* Card-back emblem: only a real Joker carries the Joker hat. Everyone else shows their own suit;
      house previews (no player) show all four suits. */
   function rosette() { var q = [["heart", 0, 0, "#C8102E"], ["spade", 50, 0, "#F2ECDD"], ["club", 0, 50, "#F2ECDD"], ["diamond", 50, 50, "#C8102E"]];
@@ -1852,7 +1872,7 @@
       '<div class="face framed' + (p.idV && /^[AKQJ]$/.test(String(p.rank)) ? " court" : "") + (p.hr && !p.joker ? " hrface" : "") + '"' + (p.theme && p.theme !== "private" && THEME[p.theme] ? ' data-th="' + esc(p.theme) + '" style="--th:image-set(url(/assets/art/cards/theme_' + esc(p.theme) + '.webp) type(&quot;image/webp&quot;),url(/assets/art/cards/theme_' + esc(p.theme) + '.png) type(&quot;image/png&quot;))"' : "") + ">" +
       '<span class="fidx tl">' + p.rank + pip(p.suit) + "</span>" +
       '<div class="fwin">' + avatar(p) + jmeter(p) + (p.hr && !p.joker ? '<button type="button" class="hrtag' + (p.hr === "buyin" ? " gold" : "") + '" data-highroller title="What is a High Roller?">◆ High Roller</button>' : "") +
-      '<div class="fbtns"><button type="button" class="fb" data-more>More</button>' + (p.socials && Object.keys(p.socials).length ? '<button type="button" class="fb" data-more aria-label="Social links">Links</button>' : "") + '<button type="button" class="fb gold" data-read>Read us</button></div></div>' +
+      '<div class="fbtns"><button type="button" class="fb" data-more>More</button>' + (p.socials && Object.keys(p.socials).length ? '<button type="button" class="fb" data-more aria-label="Social links">Links</button>' : "") + '<button type="button" class="fb gold" data-read>Our Story</button></div></div>' +
       '<div class="fband"><div class="fname"><div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="style"><b>' + SUIT[p.suit].word + "</b> · " + Math.max(1, Math.round(p.dist)) + ' mi</div></div><span class="fidx br" aria-hidden="true">' + p.rank + pip(p.suit) + "</span></div>" +
       (p.hr && !p.joker ? '<span class="hrtrim' + (p.hr === "buyin" ? " gold" : "") + '" aria-hidden="true"></span><span class="hrstars' + (p.hr === "buyin" ? " gold" : "") + '" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>' : "") +
       details + "</div>";
@@ -1926,7 +1946,7 @@
     if (e.target.closest("[data-block]")) { e.stopPropagation(); remove(id, "burned", slot); toast(p.name.split(" ")[0] + " is blocked and won't be dealt again."); return; }
     if (e.target.closest("[data-burn]")) { remove(id, "burned", slot); toast("Burned. " + p.name.split(" ")[0] + " won't be dealt to you again."); return; }
     if (e.target.closest("[data-playcard]")) { playCard(p, slot); return; }
-    // Quiet signals that teach the dealer (live only): flipping a card, opening More, asking for a Read us.
+    // Quiet signals that teach the dealer (live only): flipping a card, opening More, asking for a Our Story.
     var sig = function (k) { if (liveOn() && LIVE_ROWS && /^[0-9a-f-]{36}$/.test(id)) lrpc("card_signal", { target: id, kind: k }).catch(function () { }); };
     if (e.target.closest("[data-more]")) { e.stopPropagation(); slot.querySelector(".pcard").classList.toggle("more"); sig("more"); return; }
     if (e.target.closest("[data-read]")) { e.stopPropagation(); readUs(p); sig("read"); return; }
@@ -4685,6 +4705,27 @@
     var cb = P.cardBack && CB[P.cardBack];
     $("#lbBack").innerHTML = '<div class="lb-backrow">' + (typeof cbPreview === "function" ? cbPreview(P.cardBack || null, 74) : "") + '<div><h3>Card back</h3><p class="hint">' + (cb ? "<b>" + esc(cb[0]) + "</b> is on the back of your card." : "You're using the house design.") + '</p><a class="btn ghost sm" href="card-backs.html">Choose a card back</a></div></div>';
   }
+  /* Passport: stamps earned by checking in on dates. Places outside the U.S. are named once by the player. */
+  var STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY PR".split(" ");
+  function passportPane() {
+    var list = P.stamps || (liveOn() ? [] : [{ stamp_key: "ps|Birmingham|AL|2026-10", status: "ok", example: 1 }, { stamp_key: "ps|Rome|Italy|2026-09", status: "ok", example: 1 }]);
+    var ok = list.filter(function (x) { return x.status === "ok" && x.stamp_key; }), need = list.filter(function (x) { return x.status === "needs_place"; });
+    var h = '<div class="lb-pack"><span class="stkhead">Passport <span class="hint">· one stamp for every place you meet a Pair</span></span>';
+    if (need.length) h += need.map(function (x) { return '<form class="stampplace" data-stampid="' + x.id + '"><b>Where did you meet?</b><label>City<input name="city" maxlength="40" required></label><label>Country<select name="country"><option value="US">United States</option><option value="other">Another country</option></select></label><label class="st">State<select name="region">' + STATES.map(function (st) { return "<option>" + st + "</option>"; }).join("") + '</select></label><label class="co" hidden>Country name<input name="cname" maxlength="40"></label><button class="btn gold sm" type="submit">Make my stamp</button></form>'; }).join("");
+    h += ok.length ? '<div class="lb-grid">' + ok.map(function (x) { var on = P.stickers.indexOf(x.stamp_key) > -1;
+        return '<button type="button" class="lb-item wide' + (on ? " on" : "") + '"' + (x.example ? "" : ' data-drag="stk:' + esc(x.stamp_key) + '" data-lbstk="' + esc(x.stamp_key) + '"') + ' aria-pressed="' + on + '">' + genStamp(x.stamp_key) + "</button>"; }).join("") + "</div>" + (liveOn() ? "" : '<p class="hint">Examples. Your stamps land when you and a Pair check in on a date.</p>')
+      : '<p class="hint">Your first stamp lands when you and a Pair check in together on a date: the city and state where you met, or the city and country outside the U.S.</p>';
+    return h + "</div>";
+  }
+  function loadStamps() { if (!liveOn()) return; lrpc("my_passport_stamps").then(function (r) { P.stamps = r || []; saveP(); if (typeof lobbyPane === "function" && LOBBY.tab === "stickers") lobbyPane(); }, function () { }); }
+  document.addEventListener("sf:live", function () { setTimeout(loadStamps, 300); });
+  document.addEventListener("change", function (e) { var f = e.target.closest && e.target.closest(".stampplace"); if (!f || e.target.name !== "country") return; var us = e.target.value === "US"; $(".st", f).hidden = !us; $(".co", f).hidden = us; });
+  document.addEventListener("submit", function (e) {
+    var f = e.target.closest && e.target.closest(".stampplace"); if (!f) return; e.preventDefault();
+    var us = f.country.value === "US";
+    lrpc("set_stamp_place", { p_id: +f.getAttribute("data-stampid"), p_city: f.city.value, p_region: us ? f.region.value : "", p_country: us ? "US" : f.cname.value })
+      .then(function () { toast("Stamped. Place it on your card any time."); jackpot(1500); loadStamps(); }, function (er) { toast(er.message); });
+  });
   function lobbyPane() {
     var pane = $("#lbPane"); if (!pane) return; var t = LOBBY.tab, h = "";
     $$("#lbTabs [data-lbtab]").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-lbtab") === t ? "true" : "false"); });
@@ -4694,7 +4735,7 @@
         return '<div class="lb-pack"><span class="stkhead">' + esc(PACKS[pk][0]) + (paid ? ' <span class="hint">· $2.10 in chips</span>' : pk === "earned" ? ' <span class="hint">· First 1,000 and friends who join</span>' : pk === "free" ? "" : ' <span class="free">Free</span>') + '</span><div class="lb-grid">' +
           list.map(function (k) { var on = P.stickers.indexOf(k[0]) > -1, lock = (paid && !owns("pack_" + pk)) || (pk === "earned" && !earnedHas(k[0]));
             return '<button type="button" class="lb-item' + (on ? " on" : "") + (lock ? " lock" : "") + (pk === "passport" || pk === "earned" ? " wide" : "") + '"' + (lock ? "" : ' data-drag="stk:' + k[0] + '"') + ' data-lbstk="' + k[0] + '"' + (lock ? ' data-lblock="' + pk + '"' : "") + ' aria-pressed="' + on + '">' + k[1] + (lock ? "<em>🔒</em>" : "") + "</button>"; }).join("") + "</div></div>";
-      }).join("");
+      }).join("") + passportPane();
     } else if (t === "bumpers") {
       h = '<p class="hint">Up to 3: what you\'d proudly put on your car. Self-declared until the house checks it; checked ones wear a brass ✓.</p><div class="lb-grid">' + (window.SFBumpers ? SFBumpers.list.map(function (b) { var on = P.bumpers.indexOf(b[0]) > -1;
         return '<button type="button" class="lb-item wide' + (on ? " on" : "") + '" data-drag="bump:' + b[0] + '" data-lbbump="' + b[0] + '" aria-pressed="' + on + '">' + SFBumpers.html(b[0], { verified: P.bumpersOk.indexOf(b[0]) > -1 }) + "</button>"; }).join("") : "") + "</div>";
@@ -4812,14 +4853,23 @@
     var el = $("#crews"); if (!el || !liveOn()) return;
     lrpc("my_crew").then(function (d) {
       CR.st = d = d || {}; el.hidden = false; var c = d.crew, inv = d.invites || [], ms = d.matches || [];
-      var h = '<h3 style="font-size:1.2rem;margin:0 0 4px">👯 Double &amp; group dates</h3><p class="hint" style="margin:0 0 10px">Team up with friends and play as one hand. Each of you is matched one-on-one with someone in the other group, and every card is ranked for fit.</p>';
+      var mode = S.get("crewMode", "solo"), fs = ((FR.data && FR.data.friends) || []);
+      var h = '<h3 style="font-size:1.2rem;margin:0 0 4px">How do you want to play?</h3>';
       h += inv.map(function (i) { return '<div class="fr-row ask"><span class="fr-who"><b>' + esc(i.from) + " invited you to a " + (i.size === 2 ? "double date" : "group date of " + i.size) + "</b><small>" + esc(i.name || "Crew") + '</small></span><span class="fr-act"><button class="btn gold sm" type="button" data-crewyes="' + i.id + '">Join the crew</button><button class="btn ghost sm" type="button" data-crewno="' + i.id + '">Not now</button></span></div>'; }).join("");
       if (ms.length) h += '<div class="cr-ms">' + ms.map(function (x) { return '<div class="fr-row"><span class="fr-who"><b>🎉 Group date match</b><small>with ' + esc(x.other || "") + '</small></span><span class="fr-act"><button class="btn gold sm" type="button" data-crewchat="' + x.id + '">💬 Group chat</button></span></div>'; }).join("") + "</div>";
       if (!c) {
-        var fs = ((FR.data && FR.data.friends) || []);
-        h += '<div class="cr-new"><div class="cr-row"><label for="crSize">Play as</label><select id="crSize"><option value="2">Double date (you + 1 friend)</option><option value="3">Group date (you + 2 friends)</option><option value="4">Group date (you + 3 friends)</option></select></div>' +
-          '<div class="cr-row"><label for="crName">Crew name</label><input id="crName" maxlength="40" placeholder="Brunch Bunch"></div>' +
-          (fs.length ? '<p class="hint" style="margin:6px 0">Bring friends:</p><div class="cr-pick">' + fs.map(function (f) { return '<label class="chk"><input type="checkbox" data-crpick="' + f.id + '"> ' + esc(f.name) + "</label>"; }).join("") + '</div><button class="btn gold sm" type="button" id="crGo">Start the crew</button>' : '<p class="hint">Add a friend first (from a Pair, the Booth or a Private Table), then team up here.</p>') + "</div>";
+        h += '<div class="cr-modes" role="radiogroup" aria-label="How you play">' + [["solo", "Solo", "Just you. Your own hand."], ["2", "Double date", "You + 1 friend"], ["3", "Group of 3", "You + 2 friends"], ["4", "Group of 4", "You + 3 friends"]].map(function (o) {
+          return '<button type="button" role="radio" class="cr-mode" aria-checked="' + (mode === o[0]) + '" data-crmode="' + o[0] + '"><b>' + o[1] + "</b><small>" + o[2] + "</small></button>"; }).join("") + "</div>";
+        if (mode === "solo") h += '<p class="hint" style="margin:8px 0 0">You\'re playing solo. Your deck and your Pairs are just yours.</p>';
+        else {
+          var need = +mode - 1;
+          h += '<ol class="cr-steps"><li><b>Pick ' + need + " friend" + (need === 1 ? "" : "s") + "</b>" +
+            (fs.length ? '<div class="cr-pick">' + fs.map(function (f) { return '<label class="chk"><input type="checkbox" data-crpick="' + f.id + '"> ' + esc(f.name) + "</label>"; }).join("") + "</div>"
+              : '<p class="hint">You don\'t have friends on SuiteFace yet. Open <b>More</b> on a Pair\'s card (or after a Booth) and tap <b>Add friend</b>. Or <a href="#invite">invite a friend</a> to join.</p>') + "</li>" +
+            '<li><b>Name your crew</b><input id="crName" maxlength="40" placeholder="Brunch Bunch" aria-label="Crew name"></li>' +
+            '<li><b>Send the invites</b><input type="hidden" id="crSize" value="' + mode + '"><button class="btn gold sm" type="button" id="crGo"' + (fs.length ? "" : " disabled") + ">Invite my crew</button></li>" +
+            '<li><b>Deal your hand</b><span class="hint">Once everyone joins, you\'re matched one-on-one with someone in the other group.</span></li></ol>';
+        }
       } else {
         h += '<div class="cr-crew"><div class="cr-head"><b>' + esc(c.name || "Your crew") + '</b> <span class="hint">' + (c.size === 2 ? "Double date" : "Group date of " + c.size) + " · " + (c.status === "active" ? "ready to play" : "waiting on friends") + '</span><button class="linkish" type="button" id="crLeave">Leave crew</button></div><div class="cr-team">' + (c.members || []).map(function (p) { return '<span class="' + (p.status === "in" ? "" : "cr-wait") + '" title="' + (p.status === "in" ? "In" : "Invited") + '">' + crewCard(p, null, true) + "</span>"; }).join("") + "</div>" +
           (c.status === "active" ? '<button class="btn gold sm" type="button" id="crDeal">🃏 Deal our hand</button><div id="crHands"></div>' : '<p class="hint">Everyone has to join before you can play.</p>') + "</div>";
@@ -4847,6 +4897,7 @@
   }
   document.addEventListener("click", function (e) {
     var b;
+    if ((b = e.target.closest("[data-crmode]"))) { S.set("crewMode", b.getAttribute("data-crmode")); renderCrews(); return; }
     if (e.target.closest("#crGo")) { var n = +$("#crSize").value, pick = $$("[data-crpick]").filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute("data-crpick"); });
       if (pick.length !== n - 1) { toast("Pick " + (n - 1) + " friend" + (n === 2 ? "" : "s") + " for this crew."); return; }
       lrpc("crew_create", { p_size: n, p_name: $("#crName").value, p_invite: pick }).then(function () { toast("Crew started. Your friends just got an invite."); renderCrews(); }, function (x) { toast(x.message); }); return; }
