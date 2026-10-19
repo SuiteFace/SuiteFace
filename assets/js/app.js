@@ -1614,6 +1614,8 @@
     // A few sample players show the card themes (fictional examples).
     var SAMPLE_THEME = { Maya: "gold", Ellis: "midnight", Priya: "velvet", Theo: "neon", Grace: "classic", Sam: "rainbow" };
     out.forEach(function (p) { if (SAMPLE_THEME[p.name]) p.theme = SAMPLE_THEME[p.name]; });
+    var AVS = [{ fri: ["evening"], sat: ["afternoon", "evening"] }, { tue: ["evening"], thu: ["evening"] }, { sat: ["morning"], sun: ["morning", "afternoon"] }, { mon: ["evening"], wed: ["evening"], fri: ["evening"] }, { sun: ["afternoon"] }];
+    out.forEach(function (p, i) { if (i % 5 !== 4) p.avail = AVS[i % AVS.length]; });
     out.forEach(function (p) { if (p.name === "Nikolai") { p.hr = "verified"; p.idV = true; } if (p.name === "Jordan") { p.hr = "buyin"; } });
     return out;
   })();
@@ -1865,13 +1867,13 @@
     var lookTxt = (TABLE[p.looking] || TABLE.longterm)[1];
     if (p.joker) col += " jokercard";
     if (p.hr && !p.joker) col += " hrcard" + (p.hr === "buyin" ? " hrgold" : "");
-    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.cardStickers && p.cardStickers.length ? '<span class="vline cstkline"><b>Stickers:</b> ' + p.cardStickers.map(stickerChip).join("") + "</span>" : "") + (p.venueStickers && p.venueStickers.length ? '<span class="vline vstickline"><b>Date spots:</b> ' + p.venueStickers.map(function (v) { return venueSticker(v, 16); }).join("") + "</span>" : "") + (p.wins && topWin(p.wins) ? '<span class="vline winline">' + winIcon(topWin(p.wins), 20) + " " + esc(WINS[topWin(p.wins)].long) + ' · <a href="winners.html">Winners\' Row</a></span>' : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + ' · <button type="button" class="linkish" data-highroller>Become a High Roller ›</button></span>' : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + socialLinksHTML(p.socials) + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
+    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.cardStickers && p.cardStickers.length ? '<span class="vline cstkline"><b>Stickers:</b> ' + p.cardStickers.map(stickerChip).join("") + "</span>" : "") + (p.venueStickers && p.venueStickers.length ? '<span class="vline vstickline"><b>Date spots:</b> ' + p.venueStickers.map(function (v) { return venueSticker(v, 16); }).join("") + "</span>" : "") + (p.wins && topWin(p.wins) ? '<span class="vline winline">' + winIcon(topWin(p.wins), 20) + " " + esc(WINS[topWin(p.wins)].long) + ' · <a href="winners.html">Winners\' Row</a></span>' : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + ' · <button type="button" class="linkish" data-highroller>Become a High Roller ›</button></span>' : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + socialLinksHTML(p.socials) + (function () { var nf = nextFree(p.avail); return nf ? '<span class="vline"><b>Next free to meet:</b> ' + esc(nf.long.replace(/^Free /, "")) + "</span>" : ""; })() + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
     var face = p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + "</div></div>" + details + '<span class="idx br">J<b class="jk">★</b></span></div>' :
       /* Rendered card face: ivory stock for everyone, the gold court frame for ID-verified Aces, Kings, Queens and Jacks.
          Rank and suit sit on the corners like a real card: top-left, and turned upside down at the bottom-right of the nameplate. */
       '<div class="face framed' + (p.idV && /^[AKQJ]$/.test(String(p.rank)) ? " court" : "") + (p.hr && !p.joker ? " hrface" : "") + '"' + (p.theme && p.theme !== "private" && THEME[p.theme] ? ' data-th="' + esc(p.theme) + '" style="--th:image-set(url(/assets/art/cards/theme_' + esc(p.theme) + '.webp) type(&quot;image/webp&quot;),url(/assets/art/cards/theme_' + esc(p.theme) + '.png) type(&quot;image/png&quot;))"' : "") + ">" +
       '<span class="fidx tl">' + p.rank + pip(p.suit) + "</span>" +
-      '<div class="fwin">' + avatar(p) + jmeter(p) + (p.hr && !p.joker ? '<button type="button" class="hrtag' + (p.hr === "buyin" ? " gold" : "") + '" data-highroller title="What is a High Roller?">◆ High Roller</button>' : "") +
+      '<div class="fwin">' + avatar(p) + jmeter(p) + (function () { var nf = nextFree(p.avail); return nf && !p.joker ? '<span class="freetag' + (p.hr ? " under" : "") + (nf.soon ? " soon" : "") + '">' + esc(nf.short) + "</span>" : ""; })() + (p.hr && !p.joker ? '<button type="button" class="hrtag' + (p.hr === "buyin" ? " gold" : "") + '" data-highroller title="What is a High Roller?">◆ High Roller</button>' : "") +
       '<div class="fbtns"><button type="button" class="fb" data-more>More</button>' + (p.socials && Object.keys(p.socials).length ? '<button type="button" class="fb" data-more aria-label="Social links">Links</button>' : "") + '<button type="button" class="fb gold" data-read>Our Story</button></div></div>' +
       '<div class="fband"><div class="fname"><div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="style"><b>' + SUIT[p.suit].word + "</b> · " + Math.max(1, Math.round(p.dist)) + ' mi</div></div><span class="fidx br" aria-hidden="true">' + p.rank + pip(p.suit) + "</span></div>" +
       (p.hr && !p.joker ? '<span class="hrtrim' + (p.hr === "buyin" ? " gold" : "") + '" aria-hidden="true"></span><span class="hrstars' + (p.hr === "buyin" ? " gold" : "") + '" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>' : "") +
@@ -1978,19 +1980,34 @@
   }
   $("#pairs").addEventListener("click", function (e) { var b = e.target.closest("[data-pair]"); if (!b) return; var p = POOL.filter(function (x) { return x.id === b.getAttribute("data-pair"); })[0]; if (p) pairModal(Object.assign({}, p, fitOf(p), BY[p.id] ? { rank: BY[p.id].rank } : {}), true); });
   // all 52 overview
-  $("#deckBtn").addEventListener("click", function () {
+  /* Explore my matches: every card in your deck as photos, with quick filters. Tap one to deal it into your hand. */
+  var EXF = "all";
+  function exploreHTML() {
+    var list = DECK.slice().sort(handOrder), f = EXF;
+    var keep = function (p) { if (f === "all") return true; if (SUIT[f]) return p.suit === f; if (f === "ten") return /^(A|K|Q|J|10)$/.test(String(p.rank)); if (f === "free") { var nf = nextFree(p.avail); return nf && nf.soon; } return true; };
+    var shown = list.filter(keep);
+    var chips = [["all", "All " + list.length], ["ten", "10 or higher"], ["free", "Free this week"]].concat(ORDER.map(function (s) { return [s, SUIT[s].sym + " " + SUIT[s].name]; }));
+    return '<div class="exf" role="group" aria-label="Filter">' + chips.map(function (c) { return '<button type="button" class="exchip" aria-pressed="' + (f === c[0]) + '" data-exf="' + c[0] + '">' + c[1] + "</button>"; }).join("") + "</div>" +
+      (shown.length ? '<div class="exgrid">' + shown.map(function (p) {
+        var st = G.burned.indexOf(p.id) > -1 ? "Burned" : G.played.indexOf(p.id) > -1 ? "Played" : G.dealt.indexOf(p.id) > -1 ? "In your hand" : "", nf = nextFree(p.avail), red = SUIT[p.suit] && SUIT[p.suit].red;
+        return '<button type="button" class="excard' + (st ? " st" : "") + '" data-exid="' + esc(p.id) + '"' + (st === "Burned" ? " disabled" : "") + ">" +
+          '<span class="exph">' + (p.joker ? '<span class="exjk">' + (BRAND.hat || "") + "</span>" : avatar(p)) + '<span class="exrk' + (red ? " red" : "") + '">' + (p.joker ? "J★" : p.rank + (SUIT[p.suit] ? SUIT[p.suit].sym : "")) + "</span>" + (st ? '<span class="exst">' + st + "</span>" : "") + "</span>" +
+          "<b>" + esc(p.name.split(" ")[0]) + (p.age ? ", " + p.age : "") + "</b><small>" + (p.joker ? "Public Joker" : Math.max(1, Math.round(p.dist || 1)) + " mi" + (nf ? " · " + esc(nf.long) : "")) + "</small></button>";
+      }).join("") + "</div>" : '<p class="hint">No cards match that filter.</p>');
+  }
+  function openExplore() {
     if (deckDirty) buildDeck();
-    var rows = P.trumps.map(function (s) {
-      var cards = DECK.filter(function (p) { return p.suit === s; });
-      return '<div class="s" style="color:' + suitColor(s) + '" title="' + SUIT[s].name + '">' + pip(s) + "</div>" + RANKS.map(function (rk, i) {
-        var p = cards[i]; if (!p) return '<div class="mini empty" aria-label="empty"></div>';
-        var st = G.burned.indexOf(p.id) > -1 ? "burned" : G.played.indexOf(p.id) > -1 ? "played" : G.dealt.indexOf(p.id) > -1 ? "dealt" : "";
-        return '<div class="mini ' + st + '" title="' + esc(p.name) + ", " + rk + " of " + SUIT[s].name + (st ? " (" + st + ")" : "") + " · " + (p.joker ? "JOKER" : "Jokers " + (p.jk || 0) + "/10") + '">' + esc(initials(p.name)) + "</div>";
-      }).join("");
-    }).join("");
-    modal('<h3 style="font-size:2rem">Your Hand</h3><p class="lede" style="margin:6px 0 14px">Rows follow your trump order. Columns run Ace to 2. Gold outline: in your Hand. Red: played. Grey: burned.</p><div class="scrollx"><div class="deckgrid"><div></div>' +
-      RANKS.map(function (r) { return '<div class="h">' + r + "</div>"; }).join("") + rows + "</div></div>" +
-      (DECK.length < 52 ? '<p class="hint" style="margin-top:12px">Only ' + DECK.length + " cards pass your gates in the sample deck. Widen your age range or distance to fill your deck.</p>" : ""));
+    if (liveOn() && !DECK.length) { toast(/Play a deck first/i.test(LIVE_ERR || "") ? "Play your deck first: it's $2.10 for 7 days." : "Your deck is empty right now."); return; }
+    var m = modal('<h3 style="font-size:1.7rem;margin:0">Explore my matches</h3><p class="lede" style="margin:4px 0 12px">Your whole deck, best match first. Tap a card to put it in your hand.</p><div id="exBody">' + exploreHTML() + "</div>");
+    m.classList.add("exmodal");
+  }
+  $("#deckBtn").addEventListener("click", openExplore);
+  document.addEventListener("click", function (e) {
+    var t = e.target; if (!t.closest) return; var b;
+    if ((b = t.closest("[data-exf]"))) { EXF = b.getAttribute("data-exf"); var eb = $("#exBody"); if (eb) eb.innerHTML = exploreHTML(); return; }
+    if ((b = t.closest("[data-exid]"))) { var id = b.getAttribute("data-exid");
+      if (G.dealt.indexOf(id) < 0 && G.played.indexOf(id) < 0 && G.burned.indexOf(id) < 0) { if (G.dealt.length >= HAND) { toast("Your hand is full. Burn or play a card first."); return; } G.dealt.push(id); saveG(); }
+      closeModal(); renderTable(false); setTimeout(function () { var sl = $('#dealt .slot[data-id="' + id + '"]'); if (sl) { sl.scrollIntoView({ behavior: "smooth", block: "center" }); var pc = sl.querySelector(".pcard"); if (pc) pc.classList.add("flipped"); } }, 120); }
   });
 
   /* ---------- your Joker status ---------- */
@@ -3529,6 +3546,7 @@
   }
   function setRole(r) { if (!CAN_SWITCH && r !== "guest" && r !== "player") return; ROLE = r; S.set("role", r); applyRole(); }
   function applyRole() {
+    var mdb = $("#myDeckBtn"); if (mdb) mdb.hidden = ROLE === "guest" || document.body.getAttribute("data-page") === "club";
     $("#roleName").textContent = ROLE_INFO[ROLE][0];
     document.documentElement.setAttribute("data-role", ROLE);
     $("#loginBtn").textContent = (ROLE === "guest" && !SIGNED) ? "Log in" : "Log out";
@@ -4261,7 +4279,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, cardStickers: r.card_stickers || null, photo: r.photo_url || null, cardTop: r.card_top || null, theme: r.card_theme || null, socials: r.socials || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, cardStickers: r.card_stickers || null, photo: r.photo_url || null, cardTop: r.card_top || null, theme: r.card_theme || null, socials: r.socials || null, avail: r.availability || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -4277,6 +4295,8 @@
       return lrpc("deck_couples").then(function (cs) { var m = {}; (cs || []).forEach(function (x) { m[x.member_id] = x; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.couple = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_backs").then(function (bs) { var m = {}; (bs || []).forEach(function (x) { m[x.member_id] = x.card_back; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_back = m[r.member_id]; }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
+      return lrpc("deck_availability").then(function (as) { var m = {}; (as || []).forEach(function (x) { m[x.member_id] = x.availability; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.availability = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_socials").then(function (ss) { var m = {}; (ss || []).forEach(function (x) { m[x.member_id] = x.links; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.socials = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
@@ -4678,7 +4698,7 @@
     return { id: "me-lobby", name: P.name || "Your Name", age: parseInt(P.age, 10) || "", dist: 1, suit: s, rank: "A", looking: P.looking || "longterm",
       interests: P.interests || [], bio: P.bio || "Your Face Value goes here.", hue: 28, shared: [], city: "", wins: P.wins || null, founder: P.founderNo || null,
       hr: P.highRoller || null, photoV: !!(V.photo || (P.photoLive && P.photo)), idV: !!V.id, confirmed: [], bumpers: P.bumpers || [], bumpersOk: P.bumpersOk || [],
-      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, theme: P.theme || null, socials: P.socials || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null, self: true };
+      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, theme: P.theme || null, socials: P.socials || null, avail: P.avail || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null, self: true };
   }
   function lobbySpots(p) {
     var spots = [];
@@ -5078,6 +5098,38 @@
         }, function (x) { err2.textContent = (x && x.message) || "That didn't save. Try again."; });
     });
   }
+  /* ---------- Next free for an in-person date (Oct 19) ---------- */
+  var AV_DAYS = [["mon", "Mon"], ["tue", "Tue"], ["wed", "Wed"], ["thu", "Thu"], ["fri", "Fri"], ["sat", "Sat"], ["sun", "Sun"]], AV_PARTS = [["morning", "Morning", 9], ["afternoon", "Afternoon", 13], ["evening", "Evening", 18]];
+  function nextFree(av) {
+    if (!av) return null; var now = new Date(), i, j;
+    for (i = 0; i < 8; i++) {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i), key = AV_DAYS[(d.getDay() + 6) % 7][0], parts = av[key] || [];
+      for (j = 0; j < AV_PARTS.length; j++) {
+        if (parts.indexOf(AV_PARTS[j][0]) < 0) continue;
+        var end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), AV_PARTS[j][2] + 4);
+        if (end <= now) continue;
+        var day = i === 0 ? (AV_PARTS[j][0] === "evening" ? "tonight" : "today") : i === 1 ? "tomorrow" : AV_DAYS[(d.getDay() + 6) % 7][1];
+        var part = i === 0 && AV_PARTS[j][0] === "evening" ? "" : " " + AV_PARTS[j][1].toLowerCase();
+        return { short: "Free " + day + (i === 0 && AV_PARTS[j][0] === "evening" ? "" : " " + AV_PARTS[j][1].slice(0, 3).toLowerCase()), long: "Free " + day + part, soon: i <= 3 };
+      }
+    }
+    return null;
+  }
+  function renderAvail() {
+    var g = $("#availGrid"); if (!g) return; var av = P.avail || {};
+    g.innerHTML = '<span></span>' + AV_PARTS.map(function (p) { return '<span class="avh">' + p[1] + "</span>"; }).join("") + AV_DAYS.map(function (d) {
+      return '<span class="avd">' + d[1] + "</span>" + AV_PARTS.map(function (p) { var on = (av[d[0]] || []).indexOf(p[0]) > -1; return '<button type="button" class="avc" aria-pressed="' + on + '" data-av="' + d[0] + "|" + p[0] + '" aria-label="' + d[1] + " " + p[1] + '"></button>'; }).join(""); }).join("");
+  }
+  var avTimer = null;
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-av]"); if (!b) return; e.preventDefault();
+    var k = b.getAttribute("data-av").split("|"), av = P.avail = P.avail || {}, list = av[k[0]] = av[k[0]] || [], i = list.indexOf(k[1]);
+    if (i > -1) list.splice(i, 1); else list.push(k[1]); if (!list.length) delete av[k[0]];
+    saveP(); renderAvail(); renderCard(); if (typeof renderLobby === "function") renderLobby();
+    clearTimeout(avTimer); if (liveOn()) avTimer = setTimeout(function () { lrpc("set_my_availability", { p_av: P.avail }).catch(function (er) { toast(er.message); }); }, 700);
+  });
+  document.addEventListener("sf:live", function () { if (!window.SF_LIVE) return; lrpc("my_availability").then(function (r) { if (r) { P.avail = r; saveP(); renderAvail(); } }, function () { }); });
+  setTimeout(renderAvail, 0);
   /* ---------- Social links on your card (Oct 19). Only usernames are stored; links are built from fixed addresses. ---------- */
   var SOCIALS = [["instagram", "Instagram", "https://instagram.com/"], ["tiktok", "TikTok", "https://www.tiktok.com/@"], ["facebook", "Facebook", "https://facebook.com/"],
     ["snapchat", "Snapchat", "https://www.snapchat.com/add/"], ["youtube", "YouTube", "https://www.youtube.com/@"], ["linkedin", "LinkedIn", "https://www.linkedin.com/in/"],

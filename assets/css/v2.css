@@ -1416,7 +1416,6 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 .pcard .face.framed .hrtag.gold{background:linear-gradient(135deg,#FFF3C4,#E6C26A 45%,#FFF6D8 60%,#C8912E);color:#3A2806}
 .pcard .face.framed .hrtag:focus-visible{outline:2px solid #fff}
 @media (prefers-reduced-motion:reduce){.pcard .face.framed .hrtrim,.pcard .face.framed .hrstars i{animation:none}.pcard .face.framed .hrstars i{opacity:.9}}
-.pcard .face.framed.hrface .fwin>.jm{top:auto;bottom:16cqw;right:3.4cqw}
 .pcard .face.framed .hrtrim{padding:5px;box-shadow:0 0 18px 2px rgba(255,255,255,.75),inset 0 0 12px rgba(255,255,255,.6);animation-duration:2.6s}
 .pcard .face.framed .hrtrim.gold{box-shadow:0 0 20px 3px rgba(255,210,100,.8),inset 0 0 12px rgba(255,230,160,.65)}
 .pcard .face.framed .hrstars i{width:20px;height:20px;animation-duration:1.8s;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 2px #fff)}
@@ -1496,3 +1495,31 @@ html[data-play="day"] .top{background:rgba(247,248,244,.82)!important;border-bot
 .cr-steps li>b{display:block;margin-bottom:4px}
 .cr-steps input#crName{min-height:40px;border-radius:10px;padding:0 10px;width:min(100%,320px)}
 @media (max-width:640px){.cr-modes{grid-template-columns:1fr 1fr}}
+/* Next free tag and availability picker */
+.pcard .face.framed .freetag{position:absolute;z-index:3;top:3.4cqw;left:3.4cqw;padding:1.4cqw 2.6cqw 1.2cqw;border-radius:1.6cqw;font:600 5.4cqw/1 "SF Card SC",Georgia,serif;letter-spacing:.04em;color:#F7F2E6;background:rgba(18,54,40,.86);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.pcard .face.framed .freetag.soon{background:rgba(30,122,76,.92)}
+.pcard .face.framed .freetag.under{top:13.5cqw}
+.availgrid{display:grid;grid-template-columns:44px repeat(3,minmax(0,1fr));gap:5px;max-width:420px;margin-top:6px;align-items:center}
+.availgrid .avh{font-size:.78rem;color:var(--muted);text-align:center}
+.availgrid .avd{font-size:.85rem;font-weight:600}
+.avc{all:unset;box-sizing:border-box;cursor:pointer;height:32px;border-radius:9px;border:1px solid var(--line)}
+.avc[aria-pressed="true"]{background:#1E7A4C;border-color:#1E7A4C}
+.avc:focus-visible{outline:2px solid #B8862F}
+/* Explore my matches */
+.exmodal{max-width:min(980px,96vw)!important}
+.exf{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.exchip{all:unset;cursor:pointer;padding:7px 12px;border-radius:999px;border:1px solid var(--line);font:600 .85rem var(--body)}
+.exchip[aria-pressed="true"]{background:#123628;color:#F7F2E6;border-color:#123628}
+.exgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px;max-height:62vh;overflow:auto;padding:2px}
+.excard{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:3px;text-align:left}
+.excard[disabled]{opacity:.45;cursor:default}
+.exph{position:relative;display:block;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#33473a}
+.exph .avatar{position:absolute;inset:0;width:auto;height:auto;aspect-ratio:auto;border:0;border-radius:0;margin:0;font-size:2rem}
+.exjk{position:absolute;inset:0;display:grid;place-items:center;background:#F3E3B5;padding:18%}
+.exrk{position:absolute;top:6px;left:6px;padding:3px 7px;border-radius:8px;background:rgba(250,246,234,.95);font:400 .95rem "SF Card",Georgia,serif;color:#23202A}
+.exrk.red{color:#A3192E}
+.exst{position:absolute;bottom:6px;left:6px;padding:3px 8px;border-radius:999px;background:rgba(18,54,40,.9);color:#F7F2E6;font:600 .72rem var(--body)}
+.excard b{font-weight:600;font-size:.95rem}.excard small{font-size:.8rem;color:var(--muted)}
+.excard:focus-visible .exph{outline:2px solid #B8862F;outline-offset:2px}
+.pcard .face.framed .freetag,.pcard .face.framed .freetag.under{top:auto;bottom:14.5cqw;left:50%;transform:translateX(-50%);white-space:nowrap}
+.pcard .face.framed.hrface .hrtag{font-size:5cqw;padding:1.4cqw 2.2cqw 1.2cqw}.pcard .face.framed.hrface .fwin>.jm{font-size:5cqw;padding:1.3cqw 2.2cqw 1.1cqw}
