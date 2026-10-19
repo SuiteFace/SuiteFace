@@ -1379,3 +1379,18 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 .chipbal[hidden]{display:none}
 .chipbal .sfchip-art{filter:none}
 .m2-claim .launchbox .hint,.m2-claim .launchbox span{background:none!important;color:#5B6A62!important;padding:0!important;box-shadow:none!important;font:400 .9rem var(--body)!important;border:0!important}
+/* Social links */
+.socgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px}
+.socin{display:grid;grid-template-columns:84px 1fr;align-items:center;gap:8px;font-size:.88rem;font-weight:600}
+.socin input{min-height:40px;border-radius:10px;padding:0 10px;font:500 .92rem var(--body)}
+.socrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
+.socrow select{min-height:38px;border-radius:10px;padding:0 8px}
+.pcard .details .soclinks{display:flex;flex-wrap:wrap;gap:5px;align-items:center;color:#2B2730}
+.pcard .details .socl{display:inline-flex;align-items:center;height:24px;padding:0 9px;border-radius:999px;background:#123628;color:#F7F2E6;font:600 .7rem var(--body);text-decoration:none}
+.pcard .details .socl:hover{background:#1E4A38}
+.pcard .face.framed .fbtns{flex-wrap:nowrap}
+.pcard .face.framed .fbtns .fb{padding-inline:3cqw}
+/* My Face: the card preview follows you down the form */
+@media (min-width:901px){.profile{align-items:start}.facecard{position:sticky!important;top:132px;align-self:start}}
+.socrow select{width:auto;flex:0 0 auto}
+.socin{grid-template-columns:76px minmax(0,1fr)}

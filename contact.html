@@ -79,10 +79,10 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792422565">
-<script src="/assets/js/transit.js?v=1792422565"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792422565">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792422565">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792422744">
+<script src="/assets/js/transit.js?v=1792422744"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792422744">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792422744">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 </head>
 <body data-page="contact">
@@ -460,6 +460,12 @@
               <span class="hint" id="zipHint">Your cards are measured from your ZIP. Only "about X miles" is ever shown.</span><span class="err" id="fZipErr"></span></div>
           </div>
           <div class="field"><label for="fBio">Face Value <span class="hint">(your bio)</span></label><textarea id="fBio" maxlength="200" placeholder="Sunday farmers market, terrible at mini golf, great at finding the best biscuit in town."></textarea><span class="hint"><span id="bioCount">0</span>/200</span></div>
+          <div class="field socfield"><span class="flabel">Social links <span class="hint">(optional)</span></span>
+            <p class="hint" style="margin:0">Add just your username. We build the link, so it always goes to the real platform.</p>
+            <div class="socgrid" id="socGrid"></div>
+            <div class="socrow"><label for="socVis" class="hint">Who sees them</label><select id="socVis"><option value="pairs">Only my Pairs</option><option value="all">Everyone dealt my card</option></select><button class="btn ghost sm" type="button" id="socSave">Save links</button></div>
+            <span class="hint" id="socMsg" role="status"></span>
+          </div>
           <div class="field"><span style="font-weight:600;font-size:.92rem">Relationship goal</span><p class="hint" style="margin:0">We rank your deck by it, and the back of your card shows its color so everyone can see what you're here for.</p><div class="tables" id="lookChips"></div></div>
           <div class="field"><span style="font-weight:600;font-size:.92rem">Show me</span><div class="chips" id="showChips"></div></div>
           <div class="two">
@@ -948,15 +954,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792422565"></script>
-<script src="/assets/js/sign.js?v=1792422565"></script>
-<script src="/assets/js/live.js?v=1792422565"></script>
-<script src="/assets/js/gate.js?v=1792422565"></script>
-<script src="/assets/js/fx.js?v=1792422565"></script>
-<script src="/assets/js/casino-scene.js?v=1792422565"></script>
-<script src="/assets/js/chips.js?v=1792422565"></script>
-<script src="/assets/js/bumpers.js?v=1792422565"></script>
-<script src="/assets/js/slots.js?v=1792422565"></script>
-<script src="/assets/js/app.js?v=1792422565"></script>
+<script src="/assets/js/config.js?v=1792422744"></script>
+<script src="/assets/js/sign.js?v=1792422744"></script>
+<script src="/assets/js/live.js?v=1792422744"></script>
+<script src="/assets/js/gate.js?v=1792422744"></script>
+<script src="/assets/js/fx.js?v=1792422744"></script>
+<script src="/assets/js/casino-scene.js?v=1792422744"></script>
+<script src="/assets/js/chips.js?v=1792422744"></script>
+<script src="/assets/js/bumpers.js?v=1792422744"></script>
+<script src="/assets/js/slots.js?v=1792422744"></script>
+<script src="/assets/js/app.js?v=1792422744"></script>
 </body>
 </html>

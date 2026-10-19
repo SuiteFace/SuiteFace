@@ -1844,14 +1844,14 @@
     var lookTxt = (TABLE[p.looking] || TABLE.longterm)[1];
     if (p.joker) col += " jokercard";
     if (p.hr && !p.joker) col += " hrcard" + (p.hr === "buyin" ? " hrgold" : "");
-    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.cardStickers && p.cardStickers.length ? '<span class="vline cstkline"><b>Stickers:</b> ' + p.cardStickers.map(stickerChip).join("") + "</span>" : "") + (p.venueStickers && p.venueStickers.length ? '<span class="vline vstickline"><b>Date spots:</b> ' + p.venueStickers.map(function (v) { return venueSticker(v, 16); }).join("") + "</span>" : "") + (p.wins && topWin(p.wins) ? '<span class="vline winline">' + winIcon(topWin(p.wins), 20) + " " + esc(WINS[topWin(p.wins)].long) + ' · <a href="winners.html">Winners\' Row</a></span>' : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
+    var details = '<div class="details"><button type="button" class="linkish dclose" data-more>‹ Back to card</button><b style="font:800 1.05rem var(--display);text-transform:uppercase">' + esc(p.name) + ", " + p.age + "</b>" + (p.joker ? '<span class="jnote">Public Joker: ' + p.joker.count + " Jokers from confirmed dates in the last 180 days. Every Joker can be challenged for free.</span>" : "") + jmeter(p, true) + (p.couple ? '<span class="vline">🍍 Plays as a couple with ' + esc(p.couple.name || "their partner") + (p.couple.age ? ", " + p.couple.age : "") + "</span>" : "") + (p.cardStickers && p.cardStickers.length ? '<span class="vline cstkline"><b>Stickers:</b> ' + p.cardStickers.map(stickerChip).join("") + "</span>" : "") + (p.venueStickers && p.venueStickers.length ? '<span class="vline vstickline"><b>Date spots:</b> ' + p.venueStickers.map(function (v) { return venueSticker(v, 16); }).join("") + "</span>" : "") + (p.wins && topWin(p.wins) ? '<span class="vline winline">' + winIcon(topWin(p.wins), 20) + " " + esc(WINS[topWin(p.wins)].long) + ' · <a href="winners.html">Winners\' Row</a></span>' : "") + (p.founder ? '<span class="vline f1kback">' + (window.SFSlots ? SFSlots.founder(p.founder, 30) : "") + " First 1,000 · Founding Player №" + String(p.founder).padStart(4, "0") + "</span>" : "") + (window.SFSlots && p.comps ? SFSlots.strip(p.comps, { labels: true, size: 16 }) : "") + (p.hr ? '<span class="vline">💎 High Roller · ' + (p.hr === "verified" ? "Platinum: verified $1,000,000" : "Gold: High Roller Buy-In") + "</span>" : "") + verBadges(p, true) + (window.SFBumpers ? SFBumpers.strip(p.bumpers, p.bumpersOk) : "") + socialLinksHTML(p.socials) + "<span>" + esc(p.bio) + "</span>" + factsLine(p) + "<span><b>Loves:</b> " + esc(p.interests.join(", ")) + "</span><span><b>Looking for:</b> " + lookTxt + '</span><div class="why">' + esc(why(p, pos)) + '</div><span class="prov">' + (liveOn() ? "" : "Fictional sample profile · ") + '<button type="button" class="linkish" data-report>Report</button> · <button type="button" class="linkish" data-block>Block</button></span></div>';
     var face = p.joker ? '<div class="face"><span class="idx">J<b class="jk">★</b></span><div class="center"><span class="jhat">' + BRAND.hat + '</span><div class="title">Public Joker</div><div class="dist">' + esc(p.name.split(" ")[0]) + ", " + p.age + " · about " + Math.max(1, Math.round(p.dist)) + ' mi</div><div class="style">Until ' + p.joker.until + "</div></div>" + details + '<span class="idx br">J<b class="jk">★</b></span></div>' :
       /* Rendered card face: ivory stock for everyone, the gold court frame for ID-verified Aces, Kings, Queens and Jacks.
          Rank and suit sit on the corners like a real card: top-left, and turned upside down at the bottom-right of the nameplate. */
       '<div class="face framed' + (p.idV && /^[AKQJ]$/.test(String(p.rank)) ? " court" : "") + '"' + (p.theme && p.theme !== "private" && THEME[p.theme] ? ' data-th="' + esc(p.theme) + '" style="--th:image-set(url(/assets/art/cards/theme_' + esc(p.theme) + '.webp) type(&quot;image/webp&quot;),url(/assets/art/cards/theme_' + esc(p.theme) + '.png) type(&quot;image/png&quot;))"' : "") + ">" +
       '<span class="fidx tl">' + p.rank + pip(p.suit) + "</span>" +
       '<div class="fwin">' + avatar(p) + jmeter(p) +
-      '<div class="fbtns"><button type="button" class="fb" data-more>More</button><button type="button" class="fb gold" data-read>Read us</button></div></div>' +
+      '<div class="fbtns"><button type="button" class="fb" data-more>More</button>' + (p.socials && Object.keys(p.socials).length ? '<button type="button" class="fb" data-more aria-label="Social links">Links</button>' : "") + '<button type="button" class="fb gold" data-read>Read us</button></div></div>' +
       '<div class="fband"><div class="fname"><div class="title">' + esc(p.name.split(" ")[0]) + ", " + p.age + '</div><div class="style"><b>' + SUIT[p.suit].word + "</b> · " + Math.max(1, Math.round(p.dist)) + ' mi</div></div><span class="fidx br" aria-hidden="true">' + p.rank + pip(p.suit) + "</span></div>" +
       details + "</div>";
     return '<div class="slot" data-id="' + p.id + '"><div class="pcard ' + col + '" tabindex="0" role="button" aria-label="Face-down card. Press to flip it over."><div class="flip">' + coverHTML(p) + face +
@@ -4220,7 +4220,7 @@
     var jm = String(r.joker || ""), z = cityZip(r.city, r.state), h = hash(r.member_id);
     var c = { id: r.member_id, name: r.face_name || "Player", age: r.age == null ? "" : r.age, suit: r.suit, rank: r.rank, ri: RANKS.indexOf(r.rank), fit: r.fit || 0, shared: shared,
       dist: Number(r.distance_mi) || 0, city: r.city ? r.city + ", " + (r.state || "") : "", looking: r.looking_for, interests: r.interests || [], bio: r.bio || "", id_: id_, hue: h % 360, noise: 0,
-      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, cardStickers: r.card_stickers || null, photo: r.photo_url || null, cardTop: r.card_top || null, theme: r.card_theme || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
+      jk: /JOKER/i.test(jm) ? 10 : (parseInt(jm, 10) || 0), move: r.my_move || null, bumpers: r.bumpers || [], bumpersOk: r.bumpers_ok || [], photoV: !!r.photo_ok, idV: !!r.id_ok, confirmed: r.confirmed || [], hr: r.high_roller || null, comps: r.comps || null, founder: r.founder_no || null, cardBack: r.card_back || null, wins: r.wins || null, venueStickers: r.venue_stickers || null, cardStickers: r.card_stickers || null, photo: r.photo_url || null, cardTop: r.card_top || null, theme: r.card_theme || null, socials: r.socials || null, couple: r.couple ? { name: r.couple.partner_name, age: r.couple.partner_age, photo: r.couple.partner_photo } : null };
     if (/JOKER/i.test(jm)) c.joker = { count: 10, until: "" };
     if (z) { c.lat = z.lat + ((h % 100) / 100 - .5) * .02; c.lon = z.lon + (((h >> 7) % 100) / 100 - .5) * .02; }
     return c;
@@ -4236,6 +4236,8 @@
       return lrpc("deck_couples").then(function (cs) { var m = {}; (cs || []).forEach(function (x) { m[x.member_id] = x; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.couple = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_backs").then(function (bs) { var m = {}; (bs || []).forEach(function (x) { m[x.member_id] = x.card_back; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_back = m[r.member_id]; }); return rows; }, function () { return rows; });
+    }).then(function (rows) {
+      return lrpc("deck_socials").then(function (ss) { var m = {}; (ss || []).forEach(function (x) { m[x.member_id] = x.links; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.socials = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
       return lrpc("deck_themes").then(function (ts) { var m = {}; (ts || []).forEach(function (x) { m[x.member_id] = x.card_theme; }); (rows || []).forEach(function (r) { if (m[r.member_id]) r.card_theme = m[r.member_id]; }); return rows; }, function () { return rows; });
     }).then(function (rows) {
@@ -4635,7 +4637,7 @@
     return { id: "me-lobby", name: P.name || "Your Name", age: parseInt(P.age, 10) || "", dist: 1, suit: s, rank: "A", looking: P.looking || "longterm",
       interests: P.interests || [], bio: P.bio || "Your Face Value goes here.", hue: 28, shared: [], city: "", wins: P.wins || null, founder: P.founderNo || null,
       hr: P.highRoller || null, photoV: !!(V.photo || (P.photoLive && P.photo)), idV: !!V.id, confirmed: [], bumpers: P.bumpers || [], bumpersOk: P.bumpersOk || [],
-      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, theme: P.theme || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null, self: true };
+      cardStickers: P.stickers || [], venueStickers: (LOBBY.venues || []).filter(function (v) { return v.shown; }), comps: P.myComps || null, cardBack: P.cardBack || null, theme: P.theme || null, socials: P.socials || null, jk: 0, id_: {}, photo: P.photo || null, cardTop: P.cardTop || null, self: true };
   }
   function lobbySpots(p) {
     var spots = [];
@@ -4697,6 +4699,8 @@
   document.addEventListener("click", function (e) {
     var t = e.target, b;
     if (!t.closest || !t.closest("#lobby")) return;
+    if (t.closest("#lbCard [data-more]")) { e.preventDefault(); var lp = $("#lbCard .pcard"); if (lp) lp.classList.toggle("more"); return; }
+    if (t.closest("#lbCard .details a")) return;
     if ((b = t.closest("#lbCard .pcard")) || t.closest("#lbFlip")) { e.preventDefault(); LOBBY.flipped = !LOBBY.flipped; var pc = $("#lbCard .pcard"); if (pc) pc.classList.toggle("flipped", LOBBY.flipped); return; }
     if ((b = t.closest("[data-lbtab]"))) { LOBBY.tab = b.getAttribute("data-lbtab"); lobbyPane(); return; }
     if ((b = t.closest("[data-lblock]"))) { var pk = b.getAttribute("data-lblock");
@@ -5002,6 +5006,33 @@
         }, function (x) { err2.textContent = (x && x.message) || "That didn't save. Try again."; });
     });
   }
+  /* ---------- Social links on your card (Oct 19). Only usernames are stored; links are built from fixed addresses. ---------- */
+  var SOCIALS = [["instagram", "Instagram", "https://instagram.com/"], ["tiktok", "TikTok", "https://www.tiktok.com/@"], ["facebook", "Facebook", "https://facebook.com/"],
+    ["snapchat", "Snapchat", "https://www.snapchat.com/add/"], ["youtube", "YouTube", "https://www.youtube.com/@"], ["linkedin", "LinkedIn", "https://www.linkedin.com/in/"],
+    ["x", "X", "https://x.com/"], ["threads", "Threads", "https://www.threads.net/@"], ["pinterest", "Pinterest", "https://www.pinterest.com/"],
+    ["twitch", "Twitch", "https://www.twitch.tv/"], ["bluesky", "Bluesky", "https://bsky.app/profile/"]];
+  function socialLinksHTML(links) {
+    if (!links) return ""; var out = SOCIALS.filter(function (x) { return links[x[0]] && /^[A-Za-z0-9._-]{1,60}$/.test(links[x[0]]); });
+    if (!out.length) return "";
+    return '<span class="vline soclinks"><b>Links:</b> ' + out.map(function (x) { return '<a class="socl" href="' + x[2] + encodeURIComponent(links[x[0]]) + '" target="_blank" rel="noopener noreferrer nofollow" data-noslot>' + x[1] + "</a>"; }).join("") + "</span>";
+  }
+  function renderSocialForm() {
+    var g = $("#socGrid"); if (!g) return; var L = P.socials || {};
+    g.innerHTML = SOCIALS.map(function (x) { return '<label class="socin"><span>' + x[1] + '</span><input type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="60" placeholder="username" data-soc="' + x[0] + '" value="' + esc(L[x[0]] || "") + '"></label>'; }).join("");
+    var v = $("#socVis"); if (v) v.value = P.socialVis || "pairs";
+  }
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest("#socSave")) return; e.preventDefault();
+    var links = {}, bad = null;
+    $$("#socGrid [data-soc]").forEach(function (i) { var v = i.value.trim().replace(/^@/, ""); if (!v) return; if (!/^[A-Za-z0-9._-]{1,60}$/.test(v)) bad = bad || i; links[i.getAttribute("data-soc")] = v; });
+    var msg = $("#socMsg");
+    if (bad) { msg.textContent = "Use just the username for " + bad.closest("label").textContent.trim() + ", without a link or spaces."; bad.focus(); return; }
+    P.socials = links; P.socialVis = $("#socVis").value; saveP(); renderCard(); if (typeof renderLobby === "function") renderLobby();
+    if (liveOn()) lrpc("set_my_social_links", { p_links: links, p_vis: P.socialVis }).then(function () { msg.textContent = "Saved."; }, function (er) { msg.textContent = er.message; });
+    else msg.textContent = "Saved on this device.";
+  });
+  document.addEventListener("sf:live", function () { if (!window.SF_LIVE) return; lrpc("my_social_links").then(function (r) { if (r) { P.socials = r.links || {}; P.socialVis = r.vis || "pairs"; saveP(); renderSocialForm(); } }, function () { }); });
+  setTimeout(renderSocialForm, 0);
   /* ---------- Your deck, free to preview (Oct 19 model) ----------
      Before paying, a player sees their real area deck as numbers: cards, suit matches, cards ranked 10 or higher,
      and the public Jokers near them. $2.10 in chips opens the deck for 7 days. */
