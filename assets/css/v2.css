@@ -1675,3 +1675,9 @@ body.hr-mode #table .deck-bar .btn.gold{background:linear-gradient(180deg,#F3DFA
 /* A Gold (Buy-In) High Roller's own deck is gold */
 body.is-hrgold #pile .cb{background:radial-gradient(circle,#fff8 0 1px,transparent 1.6px) 0 0/10px 10px,linear-gradient(135deg,#FFF6D8 0%,#E9C46B 20%,#FFF1BF 36%,#C9963A 54%,#FBE3A0 70%,#B98432 88%,#F5D98E 100%)!important}
 body.is-hr #table .pile-info .stacklbl::after{content:" · High Roller";font-weight:600;font-size:.8em;color:#C9CCD3}
+/* High Rollers see every other card on their own house deck: obsidian with a champagne diamond lattice (never offered to other players) */
+body.is-hr .pcard:not(.hrcard) .flip>.cover>.cv-in.houseback,body.hr-mode .pcard:not(.hrcard) .flip>.cover>.cv-in.houseback{
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M11 1L21 11 11 21 1 11z' fill='none' stroke='%23E2C47E' stroke-opacity='.38' stroke-width='.8'/%3E%3Ccircle cx='11' cy='11' r='1.1' fill='%23F3DFA6' fill-opacity='.55'/%3E%3C/svg%3E") 0 0/22px 22px,
+    radial-gradient(120% 90% at 50% 30%,#1A3A33,#0B1A16 75%)!important;
+  box-shadow:inset 0 0 0 2px #0B1A16,inset 0 0 0 3px rgba(226,196,126,.85),inset 0 0 0 7px #0B1A16,inset 0 0 0 8px rgba(226,196,126,.45)!important}
+body.is-hr .pcard:not(.hrcard) .flip>.cover>.cv-in.houseback .cv-tap,body.hr-mode .pcard:not(.hrcard) .flip>.cover>.cv-in.houseback .cv-tap{color:rgba(243,223,166,.75)}
