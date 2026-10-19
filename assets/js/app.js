@@ -659,8 +659,8 @@
     ["Plans fall through an hour before. What do you do?", { diamond: "Make a new plan right away.", club: "Wing it. It's an adventure.", heart: "Ask what they'd like to do.", spade: "Ask for more notice next time." }],
     ["You and your date disagree. What do you do first?", { diamond: "Say it straight and fix it.", club: "Break the tension with a laugh.", heart: "Listen until they feel heard.", spade: "Get the facts before I react." }],
     ["You're at a party. Where are you?", { diamond: "Introducing people.", club: "On the dance floor.", heart: "In one long, real conversation.", spade: "Off to the side, taking it all in." }],
-    ["What makes you fall for someone?", { diamond: "They match my drive.", club: "They make me laugh.", heart: "They make me feel safe.", spade: "They keep their word." }],
-    ["What wears you out fastest?", { diamond: "Indecision.", club: "Routine.", heart: "Conflict.", spade: "Sloppiness." }]
+    ["What attracts you to someone most?", { diamond: "Their drive.", club: "Their sense of humor.", heart: "How safe they make me feel.", spade: "Their reliability." }],
+    ["What bothers you most?", { diamond: "Indecision.", club: "Routine.", heart: "Conflict.", spade: "Sloppiness." }]
   ];
   /* Words: how you see yourself, how friends and family see you, and (last) your biggest fault. Each word leans toward a suit. */
   var WORDS = {
@@ -681,7 +681,7 @@
   /* Hidden tells: four sit among the words on the word card, one on the fault card, and one answer on every scenario. Picking all
      five words sends the account to a private staff review before a deck is dealt. They never change the suit result and are never shown. */
   var TELLS = ["Jealous", "Possessive", "Vengeful", "Manipulative", "Hot-tempered"];
-  var QTELL = ["Somewhere I can check who else they're texting.", "Go silent to make a point.", "Make sure I win, whatever it takes.", "Watching who my date talks to.", "They do what I say.", "Being told no."];
+  var QTELL = ["Somewhere I can check who else they're texting.", "Go silent to make a point.", "Make sure I win, whatever it takes.", "Watching who my date talks to.", "How easily they do what I say.", "Being told no."];
   /* The quiz (Oct 19): 8 cards. One "select every word that describes you" card, six quick scenarios, one honest fault. */
   var SLIDES = [{ t: "words", i: 0 }];
   Q.forEach(function (x, i) { SLIDES.push({ t: "q", i: i }); });
