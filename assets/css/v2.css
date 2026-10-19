@@ -237,6 +237,8 @@ body[data-page="backs"] section[data-pg]:not([data-pg="backs"]),
 body[data-page="winners"] section[data-pg]:not([data-pg="winners"]),
 body[data-page="redeem"] section[data-pg]:not([data-pg="redeem"]),
 body[data-page="chips"] section[data-pg]:not([data-pg="chips"]),
+body[data-page="casinos"] section[data-pg]:not([data-pg="casinos"]),
+body:not([data-page="casinos"]) section[data-pg="casinos"],
 section[data-pg="tables"],section[data-pg="bluff"]{display:none!important}
 body:not([data-page="home"]) main > section:first-of-type{padding-top:clamp(40px,6vw,72px)}
 .nav a[aria-current="page"]{color:var(--cream);background:var(--line)}
@@ -1689,3 +1691,40 @@ body.is-hr .pcard:not(.hrcard) .flip>.cover>.cv-in.houseback .cv-tap,body.hr-mod
 .pill.hrok{display:inline-block;font-weight:700;font-size:.8rem;padding:.35rem .8rem;border-radius:999px;background:#F3DFA6;color:#12382B}
 .hrlockcard{width:132px;aspect-ratio:5/7;margin:0 auto 6px;border-radius:12px;display:grid;place-content:center;justify-items:center;gap:8px;background:#F6F3EC;border:1px dashed rgba(169,130,58,.6);color:#A9823A}
 .hrlockcard small{font-size:.72rem;font-weight:700;color:#8A6420}
+
+/* ===== The Casinos (Oct 19) ===== */
+.casinos{max-width:1080px}
+.cas-head{padding-bottom:18px;border-bottom:1px solid rgba(169,130,58,.35);margin-bottom:22px}
+.cas-head h1{font-family:Gloock,Georgia,serif;font-weight:400;font-size:clamp(2.4rem,6vw,3.6rem);letter-spacing:-.01em;margin:0}
+.cas-head .lede{max-width:62ch;margin:6px 0 12px}
+.cw{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:10px 14px;background:#fff;border:1px solid rgba(169,130,58,.4);border-radius:999px;width:max-content;max-width:100%}
+.cw-l{font-size:.95rem}.cw-r{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted)}
+.cw-r select{font:600 .85rem var(--body);border:1px solid var(--line);border-radius:999px;padding:.3rem .6rem;background:#fff;color:#12382B}
+.cas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.cas-door{display:grid;grid-template-rows:auto 1fr auto;background:#fff;border:1px solid rgba(18,56,43,.1);border-radius:18px;overflow:hidden;color:#12382B;scroll-margin-top:140px;transition:transform .15s,box-shadow .15s}
+.cas-door:hover{transform:translateY(-2px);box-shadow:0 18px 34px -24px rgba(18,56,43,.55)}
+.cas-door.here{box-shadow:0 0 0 2px #C9A24E}
+.cd-band{position:relative;height:84px;display:grid;place-items:center;
+  background:radial-gradient(120% 140% at 50% 0%,rgba(255,255,255,.18),transparent 60%),var(--acc,#1E6347);
+  box-shadow:inset 0 -1px 0 rgba(226,196,126,.8)}
+.cas-door.hr .cd-band{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M11 1L21 11 11 21 1 11z' fill='none' stroke='%23E2C47E' stroke-opacity='.45' stroke-width='.8'/%3E%3C/svg%3E") 0 0/22px 22px,radial-gradient(120% 140% at 50% 0%,#1A3A33,#0B1A16)}
+.cd-ic{font-size:2.1rem;width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.92);box-shadow:0 0 0 2px #E2C47E,0 8px 18px -8px rgba(0,0,0,.5)}
+.cd-body{padding:14px 16px 6px}.cd-body h3{margin:0 0 4px;font-family:Gloock,Georgia,serif;font-weight:400;font-size:1.35rem}
+.cd-body p{margin:0 0 6px;font-size:.92rem}.cd-body small{color:#5B6E64;font-size:.8rem}
+.cd-act{display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px 16px}
+.cas-h{font-family:Gloock,Georgia,serif;font-weight:400;font-size:1.9rem;margin:38px 0 4px;scroll-margin-top:140px}
+.cas-grid.soon .cas-door{opacity:.85}
+.cas-grid.soon .cd-band{background:repeating-linear-gradient(135deg,#2B2730 0 14px,#3A3440 14px 28px)}
+.cd-tape{position:absolute;bottom:8px;left:50%;transform:translateX(-50%) rotate(-3deg);font:800 .72rem var(--body);letter-spacing:.08em;text-transform:uppercase;padding:3px 12px;color:#1E1606;background:repeating-linear-gradient(135deg,#E2C47E 0 10px,#F3DFA6 10px 20px);white-space:nowrap}
+.cas-lobby .cl-top{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.cas-lobby .cl-top .cd-ic{background:var(--acc);color:#fff;box-shadow:0 0 0 2px #E2C47E}
+.cl-ey{margin:0;font-size:.78rem;font-weight:700;color:#8A6420}.cas-lobby h3{margin:0;font-family:Gloock,Georgia,serif;font-weight:400;font-size:1.8rem}
+.cl-list{list-style:none;padding:0;margin:12px 0 16px;display:grid;gap:8px}.cl-list li{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}.cl-list b{font-size:.85rem}.cl-list span{font-size:.92rem}
+/* Casino nav */
+.ngp-cas{min-width:320px}.navcas{display:grid;grid-template-columns:1fr 1fr;gap:0 4px;border-block:1px solid var(--line);margin:4px 0;padding:4px 0}
+.navcas a{padding:.4rem .7rem!important}.navcas a b{font-weight:600;font-size:.88rem}
+@media (max-width:560px){.ngp-cas{min-width:0;width:min(92vw,360px)}}
+/* Each casino tints its table felt */
+body[style*="--casino"] #table .feltbox{background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.12),transparent 55%),radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--casino) 75%,#000 0%),color-mix(in srgb,var(--casino) 60%,#000) 75%)!important;box-shadow:inset 0 0 0 1px rgba(226,196,126,.5),0 30px 60px -30px rgba(0,0,0,.6)!important}
+.cw-r{white-space:nowrap}
+@media (max-width:560px){.secnav:has(.ngstaff:not([hidden])) .ngb{font-size:.74rem!important;padding:.4rem .22rem!important}}

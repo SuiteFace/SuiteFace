@@ -17,7 +17,7 @@
 
   /* ---------- pages: one site, several pages. Each section lives on one page; links to a section on another page go there. ---------- */
   var PAGE = (document.body && document.body.getAttribute("data-page")) || "home";
-  var PAGE_FILE = { home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html", bluff: "bluff-table.html", backs: "card-backs.html", winners: "winners.html", redeem: "redeem.html" };
+  var PAGE_FILE = { casinos: "casinos.html", home: "./", how: "how-it-works.html", suit: "find-your-suit.html", tables: "tables.html", membership: "membership.html", club: "my-table.html", contact: "contact.html", bluff: "bluff-table.html", backs: "card-backs.html", winners: "winners.html", redeem: "redeem.html" };
   var SEC_PAGE = { how: "how", demo: "how", safety: "how", quiz: "suit", "private-tables": "tables", casinos: "tables", membership: "membership",
     face: "club", table: "club", map: "club", invite: "club", dealer: "club", pitboss: "club", owner: "club", join: "contact", top: "home", bluff: "bluff", backs: "backs", winners: "winners" };
   function pageFor(id) { return SEC_PAGE[id] || null; }
@@ -1528,6 +1528,8 @@
     var bar = $("#roomBar"); if (bar) { var mine = ["main"].concat(P.rooms.filter(function (id) { return canJoin(ROOM[id]); }));
       if (mine.indexOf(P.room) < 0) P.room = "main";
       document.body.classList.toggle("hr-mode", P.room === "highroller");
+      document.body.setAttribute("data-casino", P.room); var acc = (typeof CASINO === "object" && CASINO && CASINO[P.room]) ? CASINO[P.room].accent : null;
+      if (acc && P.room !== "main" && P.room !== "highroller") document.body.style.setProperty("--casino", acc); else document.body.style.removeProperty("--casino");
       bar.innerHTML = '<span class="rb-l">Playing in</span>' + mine.map(function (id) { var r = ROOM[id]; return '<button type="button" class="chip room" data-play-room="' + id + '" aria-pressed="' + (P.room === id) + '">' + r[2] + " " + esc(r[1]) + "</button>"; }).join("") +
         (mine.length < 2 ? '<a class="rb-add" href="#face">Join a Room ›</a>' : ""); }
   }
@@ -5368,6 +5370,77 @@
     }, function () { });
   }
   document.addEventListener("sf:live", function () { setTimeout(myPay, 900); });
+  /* =====================================================================
+     THE CASINOS: every room is a casino with a free lobby. Entering means playing your deck in that room,
+     paid from the chips in your Wallet (the player names it: Wallet, Purse, Bucket, Rack, Clutch or Bankroll).
+     ===================================================================== */
+  var CASINO = {
+    main: { accent: "#1E6347", line: "Everyone at your table, best match first.", lobby: "The Main Floor is where every seated player near you is dealt. No filters beyond your own: your suit, your trumps, your gates and your distance.", who: "Every seated player" },
+    highroller: { accent: "#0B1A16", line: "A private floor for verified High Rollers.", lobby: "Platinum and gold cards only, an obsidian house deck, masked play, exclusive partner offers and a High Roller deck mailed to you.", who: "Verified $1M+ or the High Roller Buy-In" },
+    christian: { accent: "#7A5A2A", line: "Faith first, on both sides of the table.", lobby: "Everyone here named Christianity as their faith. Denominations show on cards, and church-friendly first dates are suggested first.", who: "Members whose faith is Christian" },
+    jewish: { accent: "#2B4C7E", line: "For Jewish singles near you.", lobby: "Every card here shares your faith. Observance level shows on the card so you can match on what matters.", who: "Members whose faith is Jewish" },
+    muslim: { accent: "#1F6B5A", line: "For Muslim singles near you.", lobby: "Every card here shares your faith, with intentions and family plans up front.", who: "Members whose faith is Muslim" },
+    hindu: { accent: "#B5562A", line: "For Hindu singles near you.", lobby: "Every card here shares your faith and traditions.", who: "Members whose faith is Hindu" },
+    buddhist: { accent: "#9A7B2F", line: "For Buddhist singles near you.", lobby: "Every card here shares your practice. Calm first dates, suggested first.", who: "Members whose faith is Buddhist" },
+    spiritual: { accent: "#6E3A9E", line: "Spiritual, not religious.", lobby: "For people who feel it but don't name a church.", who: "Members who are spiritual, not religious" },
+    secular: { accent: "#3F5A4E", line: "Agnostic, atheist and humanist.", lobby: "For people who live by reason and kindness, no faith required.", who: "Agnostic, atheist and humanist members" },
+    democrat: { accent: "#2D4B8E", line: "Politics in common, from the first hand.", lobby: "Every card here named the same party, so you can skip that debate on date one.", who: "Members who named the Democratic Party" },
+    republican: { accent: "#8E2230", line: "Politics in common, from the first hand.", lobby: "Every card here named the same party, so you can skip that debate on date one.", who: "Members who named the Republican Party" },
+    independent: { accent: "#5B6470", line: "Independent minds.", lobby: "Every card here named Independent, so you start on common ground.", who: "Members who named Independent" },
+    sober: { accent: "#1E7A7A", line: "No drinks needed.", lobby: "Everyone here doesn't drink. Coffee, brunch and daytime dates are suggested first.", who: "Members who never drink or are sober" },
+    parents: { accent: "#C2703A", line: "Single parents, matched with people who get it.", lobby: "Every card here has kids. Schedules, custody weekends and family plans are understood.", who: "Members with kids" },
+    lgbtq: { accent: "#C23B7A", line: "Pride, at every table.", lobby: "A room for LGBTQ+ members near you, matched by who you want to meet.", who: "LGBTQ+ members" }
+  };
+  var CAS_SOON = [["🤝", "Friends Casino", "Meet friends, not dates: a whole floor for new friendships."], ["👯", "Double Down", "Double dates and group dates, played as a team."], ["🌅", "Golden Hour", "Singles 50 and over."], ["✈️", "Jet Set", "For people who travel and want a partner who does too."], ["🏈", "The Sportsbook", "Game days, tailgates and fans who match your team."], ["🐾", "Best in Show", "Dog and cat people, matched with their kind."]];
+  var WALLETS = ["Wallet", "Purse", "Bucket", "Rack", "Clutch", "Bankroll"];
+  function walletName() { return P.walletName && WALLETS.indexOf(P.walletName) > -1 ? P.walletName : "Wallet"; }
+  window.SF_walletName = walletName;
+  function casWalletHTML() {
+    if (!liveOn()) return '<p class="hint">Lobbies are free to tour. To play in one, <a href="membership.html">take a seat</a>, then carry chips in your Wallet (or Purse, Bucket, Rack: your call).</p>';
+    var c = DECKP && DECKP.chips != null ? DECKP.chips : null;
+    return '<div class="cw"><span class="cw-l">Your <b>' + esc(walletName()) + '</b>' + (c != null ? ": <b>" + money(c) + "</b>" : "") + '</span><label class="cw-r">Call it my<select id="walletPick">' + WALLETS.map(function (w) { return "<option" + (w === walletName() ? " selected" : "") + ">" + w + "</option>"; }).join("") + '</select></label><a class="btn ghost sm" href="chips.html">Add chips at the Cage</a></div>';
+  }
+  function casState(id) {
+    var r = ROOM[id]; if (!liveOn()) return { label: "Take a seat to enter", href: "membership.html" };
+    if (id === "highroller" && !P.highRoller) return { label: "Become a High Roller", hr: true };
+    if (r && !canJoin(r)) return { label: "Answer " + ((IDX[r[3]] || [0, r[3]])[1]) + " to enter", href: "my-table.html#face", locked: true };
+    return { label: P.room === id ? "You're playing here ✓" : "Enter with your " + walletName(), enter: true, here: P.room === id };
+  }
+  function renderCasinos() {
+    var nav = $("#navCasinos"); if (nav) nav.innerHTML = ROOMS.map(function (r) { return '<a href="casinos.html#c-' + r[0] + '"><b>' + r[2] + " " + esc(r[1].replace(/ Room$/, "")) + "</b></a>"; }).join("");
+    var g = $("#casGrid"); if (!g) return;
+    $("#casWallet").innerHTML = casWalletHTML();
+    g.innerHTML = ROOMS.map(function (r) { var c = CASINO[r[0]] || {}, st = casState(r[0]);
+      return '<article class="cas-door' + (r[0] === "highroller" ? " hr" : "") + (st.here ? " here" : "") + '" id="c-' + r[0] + '" style="--acc:' + (c.accent || "#1E6347") + '"><div class="cd-band"><span class="cd-ic">' + r[2] + "</span></div>" +
+        '<div class="cd-body"><h3>' + esc(r[1]) + "</h3><p>" + esc(c.line || r[5] || "") + '</p><small>Plays here: ' + esc(c.who || "Every seated player") + "</small></div>" +
+        '<div class="cd-act"><button type="button" class="btn ghost sm" data-caslobby="' + r[0] + '">Tour the lobby</button>' + casBtn(r[0], st) + "</div></article>"; }).join("");
+    $("#casSoon").innerHTML = CAS_SOON.map(function (x) { return '<article class="cas-door soon"><div class="cd-band"><span class="cd-ic">' + x[0] + '</span><span class="cd-tape">Under construction</span></div><div class="cd-body"><h3>' + esc(x[1]) + "</h3><p>" + esc(x[2]) + "</p></div></article>"; }).join("");
+  }
+  function casBtn(id, st) { return st.enter ? '<button type="button" class="btn ' + (st.here ? "ghost" : "gold") + ' sm" data-casenter="' + id + '"' + (st.here ? " disabled" : "") + ">" + esc(st.label) + "</button>" : st.hr ? '<button type="button" class="btn gold sm" data-highroller>' + esc(st.label) + "</button>" : '<a class="btn gold sm" href="' + st.href + '">' + esc(st.label) + "</a>"; }
+  function casLobby(id) {
+    var r = ROOM[id], c = CASINO[id] || {}, st = casState(id);
+    var m = modal('<div class="cas-lobby" style="--acc:' + (c.accent || "#1E6347") + '"><div class="cl-top"><span class="cd-ic">' + r[2] + '</span><div><p class="cl-ey">Lobby · free to explore</p><h3>' + esc(r[1]) + "</h3></div></div>" +
+      '<p class="lede">' + esc(c.lobby || "") + "</p>" +
+      '<ul class="cl-list"><li><b>Who plays here</b><span>' + esc(c.who || "Every seated player") + "</span></li><li><b>How you get in</b><span>" + (id === "highroller" ? "Verify $1M+ or take the High Roller Buy-In. Lasts 365 days." : r[3] ? "Your own answer in My profile has to fit. Nobody can see which rooms you've entered." : "Take your seat.") + "</span></li><li><b>What it costs to play</b><span>Your deck: $2.10 in chips for 7 days, paid from your " + esc(walletName()) + ". Touring is always free.</span></li></ul>" +
+      '<div class="row">' + casBtn(id, st) + '<button type="button" class="btn ghost sm" data-close>Keep touring</button></div></div>');
+    m.classList.add("caslobbymodal");
+  }
+  function casEnter(id) {
+    if (P.rooms.indexOf(id) < 0 && id !== "main") P.rooms.push(id);
+    P.room = id; saveP();
+    var go = function () { toast("You're in the " + ROOM[id][1] + ". Shuffling your deck…"); setTimeout(function () { location.href = "my-table.html#table"; }, 700); };
+    if (liveOn() && DECKP && !DECKP.deck_open) { closeModal(); playDeck(null); return; }
+    go();
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target; if (!t.closest) return; var b;
+    if ((b = t.closest("[data-caslobby]"))) { casLobby(b.getAttribute("data-caslobby")); return; }
+    if ((b = t.closest("[data-casenter]"))) { casEnter(b.getAttribute("data-casenter")); return; }
+  });
+  document.addEventListener("change", function (e) { if (e.target.id === "walletPick") { P.walletName = e.target.value; saveP(); toast("Your chips are in your " + P.walletName + "."); renderCasinos(); paintWallet(); } });
+  function paintWallet() { var b = $("#chipBal"); if (b) b.setAttribute("aria-label", "Your " + walletName()); var cb = $("#cpBal"); if (cb && !cb.hidden && DECKP) cb.innerHTML = "Your " + esc(walletName()) + ": <b>" + money(DECKP.chips || 0) + "</b>"; }
+  setTimeout(function () { renderCasinos(); if (location.hash && /^#c-/.test(location.hash)) { var el = document.querySelector(location.hash); if (el) el.scrollIntoView({ block: "center" }); } }, 0);
+  document.addEventListener("sf:live", function () { setTimeout(function () { (DECKP ? Promise.resolve(DECKP) : lrpc("deck_preview").then(function (h) { DECKP = h; return h; })).then(function () { renderCasinos(); paintWallet(); }, function () { renderCasinos(); }); }, 900); });
   /* ---------- Next free for an in-person date (Oct 19) ---------- */
   var AV_DAYS = [["mon", "Mon"], ["tue", "Tue"], ["wed", "Wed"], ["thu", "Thu"], ["fri", "Fri"], ["sat", "Sat"], ["sun", "Sun"]], AV_PARTS = [["morning", "Morning", 9], ["afternoon", "Afternoon", 13], ["evening", "Evening", 18]];
   function nextFree(av) {
@@ -5488,7 +5561,7 @@
     var b = $("#chipBal"); if (!b) return;
     if (c == null) { b.hidden = true; return; }
     b.hidden = false; $("b", b).textContent = money(c);
-    var cb = $("#cpBal"); if (cb) { cb.hidden = false; cb.innerHTML = "Your chips: <b>" + money(c) + "</b>"; }
+    var cb = $("#cpBal"); if (cb) { cb.hidden = false; cb.innerHTML = "Your " + esc(window.SF_walletName ? SF_walletName() : "chips") + ": <b>" + money(c) + "</b>"; }
   }
   function loadChips() {
     if (!window.SF_LIVE) { chipBalance(null); return; }
