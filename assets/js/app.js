@@ -282,8 +282,8 @@
   (function () {
     var hb = $("#helpBtn"); if (!hb) return;
     var FAQ = [
-      ["How much does SuiteFace cost?", "Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Launch offer: through December 31, 2026 the $21 Buy-In is waived and you join for $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings."],
-      ["What does a comp code do?", "Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days."],
+      ["How much does SuiteFace cost?", "Joining, building your Face and previewing your deck are free. A seat is $21.00 for 365 days and holds your username; it never renews on its own. Launch offer: seats claimed through December 31, 2026 are free for their first year. Each deck is $2.10 in chips and opens every card in your area for 7 days. No subscription."],
+      ["What does a comp code do?", "Enter it in the Comp box before you take your seat. A comp can make your $21 seat free."],
       ["How do I cancel or pause?", "Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund."],
       ["Why isn't my deck full yet?", "Your deck only holds people who pass your gates (distance, ages, who you want to see, dealbreakers) and who want to see you too. Invite friends to fill your table, or widen your distance or ages."],
       ["How is my deck ranked?", "Each card gets a 100-point fit score for you: values, your table, shared interests, trumps, truth, closeness and age. Ace, King, Queen and Jack go only to ID-verified members. See House Fit Rules."],
@@ -1079,7 +1079,14 @@
   }
   function buy(id, label, price, then) {
     if (houseCode() && window.SF_LIVE) { window.SF_LIVE.rpc("house_comp_check", { p_code: houseCode() }).then(function (r) { if (r.error || !r.data) { toast(r.error ? r.error.message : "Comp not valid."); return; } if (!owns(id)) P.owned.push(id); saveP(); toast("🎩 " + label + " comped by the house."); then && then(); }); return; }
-    if (PUBLIC_SITE) { toast("Paid themes and sticker packs open soon. Free and earned ones are ready now."); return; }
+    if (window.SF_LIVE) {
+      var m0 = modal('<h3 style="font-size:1.6rem;margin:0">' + esc(label) + '</h3><p class="lede" style="margin:6px 0 14px">' + priceTag(price) + ' in chips, one time. It\'s yours while your seat is active.</p><div class="row"><button class="btn gold" type="button" id="buyChips">Get it · ' + money(Math.round(price * 100)) + '</button><button class="btn ghost" type="button" data-close>Not now</button></div>');
+      $("#buyChips", m0).onclick = function () { var b = this; b.disabled = true;
+        lrpc("spend_chips", { p_item: id }).then(function (w) { if (!owns(id)) P.owned.push(id); saveP(); chipBalance(w.cents); closeModal(); toast(label + " is yours."); jackpot(2000); then && then(); },
+          function (er) { b.disabled = false; closeModal(); if (/Not enough chips/i.test(er.message)) chipsModal(label + " is " + money(Math.round(price * 100)) + " in chips."); else toast(er.message); }); };
+      return;
+    }
+    if (PUBLIC_SITE) { loginModal("create"); return; }
     var m = modal('<h3 style="font-size:1.8rem">' + esc(label) + '</h3><p class="lede" style="margin:6px 0 12px">' + priceTag(price) + ', one time. It\'s yours for as long as you\'re a member.</p>' +
       '<div class="notice pv"><b>Preview mode.</b> On the live site this opens a secure Stripe checkout (card, Apple Pay, Google Pay, Cash App Pay). Here you can try it free.</div>' +
       '<div class="row" style="margin-top:10px"><button class="btn gold" type="button" id="buyGo">Try it (preview)</button><button class="btn ghost" type="button" data-close>Not now</button></div>');
@@ -1853,8 +1860,9 @@
   function renderTable(redeal) {
     if (deckDirty || !DECK.length) buildDeck();
     var hand = G.dealt.map(function (id) { return BY[id]; }).filter(Boolean).sort(handOrder);
+    if (!hand.length && liveOn() && /Play a deck first/i.test(LIVE_ERR || "")) { deckGate(); return; }
     $("#dealt").innerHTML = hand.length ? hand.map(cardHTML).join("") :
-      liveOn() && LIVE_ERR ? '<p class="lede deckmsg" style="align-self:center">' + esc(LIVE_ERR) + (/Friendship/i.test(LIVE_ERR) ? ' <a href="my-table.html#face">Change your Table in My Face</a>.' : "") + "</p>" :
+      liveOn() && LIVE_ERR ? '<p class="lede deckmsg" style="align-self:center">' + esc(LIVE_ERR) + (/Friendship/i.test(LIVE_ERR) ? ' <a href="my-table.html#face">Change your relationship goal in My Face</a>.' : "") + "</p>" :
       '<p class="lede" style="align-self:center">' + (DECK.length ? "Your deck is shuffled and waiting. Deal your Hand." : liveOn() ? "No real members fit your gates yet. SuiteFace is brand new in many areas: widen your distance or age range, invite friends, and remember your 12-Card Deck Guarantee." : "No one in the sample deck passes your gates. Widen your age range or distance in My Face.") + "</p>";
     if (!hand.length && liveOn() && !DECK.length && (LIVE_ROWS || /Friendship/i.test(LIVE_ERR || ""))) emptyHand();
     $("#leftCount").textContent = remaining().length; $("#burnCount").textContent = G.burned.length; $("#playCount").textContent = G.played.length;
@@ -1862,6 +1870,13 @@
     $("#suitKey").innerHTML = ORDER.map(function (s) { return '<span><span style="color:' + suitColor(s) + '">' + pip(s) + "</span>" + SUIT[s].name + ": " + SUIT[s].line + "</span>"; }).join("");
     renderPairs();
     if (redeal && !REDUCED) animateIn($$("#dealt .slot"));
+  }
+  /* No open deck yet: the table shows the free preview and one button to play it. */
+  function deckGate() {
+    var d = $("#dealt"); if (!d) return;
+    d.innerHTML = '<div class="deckgate"><h3>Your deck</h3><div id="dgBody"><p class="hint">Counting your deck…</p></div></div>';
+    ["#leftCount", "#burnCount", "#playCount"].forEach(function (k) { var x = $(k); if (x) x.textContent = "0"; });
+    lrpc("deck_preview").then(function (h) { DECKP = h; var b = $("#dgBody"); if (b) b.innerHTML = h && h.ready ? deckPreviewHTML(h) : '<p class="hint">Add your ZIP code in My Face to see your deck.</p>'; }, function (x) { var b = $("#dgBody"); if (b) b.textContent = x.message; });
   }
   function animateIn(slots) {
     var pile = $("#pile").getBoundingClientRect();
@@ -1977,7 +1992,8 @@
     var ho = $("#heroOffer"); if (ho) ho.hidden = !LAUNCH.open;
     var pb = $("#promoBar"); if (pb) pb.hidden = !LAUNCH.open || SIGNED_PAID();
     var pe = $("#promoEnds"); if (pe) pe.textContent = launchEndText();
-    var hp = $("#hPriceLine"); if (hp) hp.textContent = LAUNCH.open ? "The $21 buy-in is waived through " + launchEndText() + ". Join for $2.10 a month and cancel any time." : "$21 once to take your seat, then $2.10 a month. Cancel any time.";
+    var hp = $("#hPriceLine"); if (hp) hp.textContent = LAUNCH.open ? "Your seat is free through " + launchEndText() + ". Then $21 a year, and $2.10 a deck." : "$21 holds your seat and username for a year. Each deck is $2.10.";
+    var ml = $("#m2Launch"); if (ml) ml.hidden = !LAUNCH.open;
     var c21 = $("#memChip21"); if (c21) c21.classList.toggle("waived", LAUNCH.open && PLAN === "launch");
     var hc = $(".h-c21"); if (hc) hc.classList.toggle("waived", LAUNCH.open);
     if (!LAUNCH.open) PLAN = "first";
@@ -1988,18 +2004,12 @@
     $("#launchEnds").textContent = new Date(end.getTime() - 1).toLocaleDateString([], { month: "short", day: "numeric", timeZone: "America/Chicago" }) + " at 11:59 pm CT";
     $("#launchLeft").textContent = ms > 0 ? (d ? d + " day" + (d === 1 ? "" : "s") + " " : "") + h + " hr left." : "";
     $("#f1kLeft").textContent = LAUNCH.left.toLocaleString() + " of 1,000 left";
-    var launch = LAUNCH.open && PLAN === "launch";
-    var pr = $("#priceBuy"); if (pr) pr.innerHTML = launch ? '<span class="big"><s>$21.00</s> $0</span><span class="hint">Buy-In waived during the launch offer</span>' : '<span class="big">$21.00</span><span class="hint">one-time Buy-In, today' + (LAUNCH.open ? " · First 1,000 badge" : "") + "</span>";
-    var pm = $("#priceMonth"); if (pm) pm.innerHTML = BILL === "year" ? (launch ? '<span class="big">$21</span><span class="hint">today, then every year</span>' : '<span class="big">$21</span><span class="hint">a year, starting 30 days after you join</span>') : launch ? '<span class="big">$2.10</span><span class="hint">today, then every month</span>' : '<span class="big">$2.10</span><span class="hint">a month, starting 30 days after you join</span>';
-    $("#payBtn").textContent = BILL === "year" ? (launch ? "Join for $21 a year with Stripe" : (LAUNCH.open ? "Pay $21.00 · First 1,000 · yearly" : "Pay $21.00 with Stripe · yearly")) : launch ? "Join for $2.10 with Stripe" : (LAUNCH.open ? "Pay $21.00 · First 1,000" : "Pay $21.00 with Stripe");
-    $$(".billpick [data-bill]").forEach(function (x) { x.setAttribute("aria-checked", String(x.getAttribute("data-bill") === BILL)); });
+    /* Oct 19 model: a seat for 365 days (free during the launch offer), decks in chips. No subscription. */
+    var seated = SIGNED_PAID();
+    $("#payBtn").textContent = seated ? "You're seated · play a deck" : LAUNCH.open ? "Claim my seat free" : "Claim my seat · $21 for the year";
     var ag = $("#agree").parentElement.querySelector("span");
-    var yr = BILL === "year";
-    ag.innerHTML = yr ? (launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and I choose the <b>prepaid year</b>: SuiteFace charges <b>$21.00 USD today</b>, then <b>$21.00 USD every year</b> until I cancel. Unused months aren\'t refunded. I agree to the <a href="terms.html">Terms of Service</a>.'
-        : 'I understand that SuiteFace charges <b>$21.00 USD today</b> for the Buy-In' + (LAUNCH.open ? ' (non-refundable First 1,000 seat)' : '') + ', then <b>$21.00 USD every year</b> starting in 30 days, until I cancel. Unused months of a prepaid year aren\'t refunded. I agree to the <a href="terms.html">Terms of Service</a>.')
-      : launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and SuiteFace charges <b>$2.10 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership (rejoining then requires the Buy-In). I agree to the <a href="terms.html">Terms of Service</a>.'
-      : LAUNCH.open ? 'I choose the <b>First 1,000</b> Buy-In instead of the free launch seat. SuiteFace charges <b>$21.00 USD today, non-refundable</b> (the 12-Card Deck Guarantee doesn\'t apply to it), then <b>$2.10 USD every month</b> starting in 30 days until I cancel. I agree to the <a href="terms.html">Terms of Service</a>.'
-      : 'I understand that SuiteFace charges <b>$21.00 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership. I agree to the <a href="terms.html">Terms of Service</a>.';
+    ag.innerHTML = LAUNCH.open ? 'I understand my seat is <b>free for 365 days</b> under the launch offer, then <b>$21.00 USD a year</b> if I choose to renew (it never renews on its own), and that decks are <b>$2.10 in chips</b>. I agree to the <a href="terms.html">Terms of Service</a>.'
+      : 'I understand SuiteFace charges <b>$21.00 USD today</b> for my seat and username for <b>365 days</b>. It never renews on its own. Decks are <b>$2.10 in chips</b>. I agree to the <a href="terms.html">Terms of Service</a>.';
 
   }
   document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest(".billpick [data-bill]"); if (!b) return; BILL = b.getAttribute("data-bill"); $("#agree").checked = false; launchUI(); });
@@ -2038,7 +2048,7 @@
     }
   })();
   /* ---------- membership (Stripe) ---------- */
-  function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = (BILL === "year" ? "Please tick the box to confirm the yearly charge." : LAUNCH.open && PLAN === "launch" ? "Please tick the box to confirm the $2.10 monthly charge." : "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."); $("#agree").focus(); return false; }
+  function needAgree() { if (SIGNED_PAID() || $("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = "Please tick the box to confirm."; $("#agree").focus(); return false; }
   $("#payBtn").addEventListener("click", function (e) {
     e.preventDefault(); if (!needAgree()) return;
     if (CFG.stripePaymentLink && window.SF_AUTH && (PUBLIC_SITE || window.SF_LIVE)) { liveBuyIn(); return; }
@@ -2047,7 +2057,7 @@
     $("#simBuy").addEventListener("click", function () { closeModal(); setRole("player"); toast("Buy-In complete (demo). Welcome to the table!"); jackpot(4000); burst(innerWidth / 2, innerHeight / 3, 120); location.hash = "face"; });
   });
   (function () {
-    var KNOWN = { PLAYMESSY: "Comp: your $21.00 Buy-In is on the house. Your $2.10 monthly starts in 30 days." };
+    var KNOWN = { PLAYMESSY: "Comp: your $21.00 seat is on the house." };
     var inp = $("#compCode"), msg = $("#compMsg"); if (!inp) return;
     inp.value = S.get("comp", "");
     function apply() {
@@ -2868,9 +2878,9 @@
     offerAt(function () {
       if (window.SF_LIVE || SIGNED || !LAUNCH.open || $("#modal")) return;
       S.set("offerSeen", Date.now());
-      var m = modal('<div class="offerpop"><div class="offerchips" aria-hidden="true"><span class="sfchip waived" data-chip="21" data-size="104" data-label="$21 buy-in"></span><span class="sfchip" data-chip="2.10" data-size="132" data-spin data-label="a month"></span></div>' +
+      var m = modal('<div class="offerpop"><div class="offerchips" aria-hidden="true"><span class="sfchip waived" data-chip="21" data-size="104" data-label="$21 seat"></span><span class="sfchip" data-chip="2.10" data-size="132" data-spin data-label="a deck"></span></div>' +
         '<h3>' + (inv ? "A friend saved you a seat." : "Your seat is on the house.") + '</h3>' +
-        '<p class="lede">Launch offer: the $21 buy-in is waived through ' + esc(launchEndText()) + '. Join for $2.10 a month and cancel any time.</p>' +
+        '<p class="lede">Launch offer: claim your seat free through ' + esc(launchEndText()) + '. See your deck free, then play it for $2.10.</p>' +
         '<div class="row"><a class="btn gold" href="membership.html" data-gate data-close>Claim my seat</a><a class="textlink" href="find-your-suit.html" data-close>Find my suit first</a></div></div>');
       if (window.SFChips) window.SFChips.paint(m);
     });
@@ -3455,15 +3465,18 @@
   function liveBuyIn() {
     if (window.SF_AUTH && !window.SF_AUTH.__ready) { toast("One moment…"); window.SF_AUTH.ready(function () { window.SF_AUTH.__ready = true; liveBuyIn(); }); return; }
     if (!window.SF_LIVE) { try { sessionStorage.setItem("sf.after", "buyin"); } catch (e) { } loginModal("create"); return; }
-    if (ROLE !== "guest") { toast("You're already seated. Welcome back!"); location.hash = "face"; return; }
+    if (ROLE !== "guest") { location.href = "my-table.html#table"; return; }
     if (staffEmail()) { compOr("membership", null, function () { proceed(); }); return; }
     proceed(); return;
     function proceed() {
     var comp = (S.get("comp", "") || "").trim();
-    var launchSeat = PLAN === "launch" && LAUNCH.open;
-    var link = BILL === "year" ? (launchSeat ? CFG.stripeAnnualLaunchLink : CFG.stripeAnnualLink) : (launchSeat && CFG.stripeLaunchLink ? CFG.stripeLaunchLink : CFG.stripePaymentLink);
-    if (!link) link = CFG.stripePaymentLink;
-    window.SF_AUTH.checkout(link, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
+    if (LAUNCH.open) {
+      lrpc("claim_launch_seat").then(function () { toast("Your seat is yours for 365 days. Welcome to the table!"); jackpot(3000);
+        var go = function () { location.href = "my-table.html#table"; };
+        if (window.SF_AUTH && window.SF_AUTH.refresh) window.SF_AUTH.refresh().then(go, go); else go(); }, function (er) { toast(er.message); });
+      return;
+    }
+    window.SF_AUTH.checkout(CFG.stripeSeatYearLink || CFG.stripePaymentLink, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
     }
   }
   if (!CAN_SWITCH && $("#roleBtn")) $("#roleBtn").hidden = true;
@@ -3490,7 +3503,7 @@
       if (!ok && !lock) {
         lock = document.createElement("div"); lock.className = "lockpanel wrap"; lock.setAttribute("data-s", String(SIGNED));
         var t = { face: "Build your Face", table: "Your Hand", map: "The Table Map", invite: "Invite friends to the table" }[sec.id] || "Members only";
-        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Players only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? (LAUNCH.open ? "You're signed in. Take your seat for $2.10 a month: the $21 Buy-In is waived through " + launchEndText() + "." : "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month.") + ' <a href="membership.html#pvHand">See your real hand first ›</a>' : (LAUNCH.open ? "Take a seat to play: $2.10 a month, with the $21 Buy-In waived through " + launchEndText() + ". Already a player? Log in." : "Buy in to play: $21.00 once, then $2.10 a month. Already a player? Log in.")) + '</p><div class="row"><a class="btn gold sm" href="#membership">' + (LAUNCH.open ? "Take a seat · $2.10" : "Buy in · $21") + '</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
+        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Players only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? (LAUNCH.open ? "You're signed in. Your seat is free through " + launchEndText() + "." : "You're signed in. Take your seat: $21.00 for the year.") + ' <a href="membership.html#pvHand">See your deck free ›</a>' : (LAUNCH.open ? "Take a seat to play: free through " + launchEndText() + ", then $2.10 a deck. Already a player? Log in." : "Take a seat to play: $21.00 a year, then $2.10 a deck. Already a player? Log in.")) + '</p><div class="row"><a class="btn gold sm" href="#membership">' + (LAUNCH.open ? "Take a seat · $2.10" : "Buy in · $21") + '</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
         sec.appendChild(lock);
       }
       if (lock) lock.hidden = ok; sec.classList.toggle("is-locked", !ok);
@@ -3711,7 +3724,7 @@
     $("#kpis").innerHTML = k.map(function (x) { return '<div class="kpi"><span class="dl">' + x[0] + "</span><b>" + x[1] + '</b><span class="hint">' + x[2] + "</span></div>"; }).join("");
     var weeks = [41, 55, 48, 63, 72, 66, 81, 93], mx = Math.max.apply(null, weeks);
     $("#ownerBars").innerHTML = weeks.map(function (v, i) { return '<div class="bar"><b style="height:' + (v / mx * 100) + '%"></b><span>' + v + '</span><small>W' + (i + 1) + "</small></div>"; }).join("");
-    $("#ownerRules").innerHTML = '<ul class="incl"><li>Buy-In $21.00 · then $2.10 a month</li><li>One pause per 210 days, up to 21 days; longer ends membership (new $21 Buy-In to return)</li><li>Joker only on your first 3 dates together, within 12 hours of Play Hand</li><li>Win needs both to say Win; a Push not settled as a Win within 24 hours = automatic Loss, no Joker</li><li>10 Jokers in 180 days → Dealer review → public Joker for 180 days</li><li>Members never see their own Joker count</li><li>Joker buy-out $2,100.00 · off until counsel approves</li></ul><p class="hint">All figures on this console are sample data in the preview.</p>';
+    $("#ownerRules").innerHTML = '<ul class="incl"><li>Seat $21.00 for 365 days, no auto-renew · decks $2.10 in chips</li><li>One pause per 210 days, up to 21 days; longer ends membership (new $21 Buy-In to return)</li><li>Joker only on your first 3 dates together, within 12 hours of Play Hand</li><li>Win needs both to say Win; a Push not settled as a Win within 24 hours = automatic Loss, no Joker</li><li>10 Jokers in 180 days → Dealer review → public Joker for 180 days</li><li>Members never see their own Joker count</li><li>Joker buy-out $2,100.00 · off until counsel approves</li></ul><p class="hint">All figures on this console are sample data in the preview.</p>';
   }
 
   /* =====================================================================
@@ -4250,7 +4263,7 @@
       LIVE_ROWS.forEach(function (r) { if (r.my_move) G.played.push(r.member_id); });
       deckDirty = true; buildDeck(); renderTable(!!redeal); mapT0 = performance.now(); renderMap(); liveTable();
       if (!LIVE_ROWS.length) emptyHand();
-    }, function (e) { var msg = (e && e.message) || "Your deck couldn't load. Try again."; LIVE_ERR = msg; if (redeal) toast(msg); var d = $("#dealt"); if (d) d.innerHTML = '<p class="lede deckmsg" style="align-self:center">' + esc(msg) + (/Friendship/i.test(msg) ? ' <a href="my-table.html#face">Change your Table in My Face</a>.' : "") + "</p>"; });
+    }, function (e) { var msg = (e && e.message) || "Your deck couldn't load. Try again."; LIVE_ERR = msg; if (redeal) toast(msg); var d = $("#dealt"); if (d) d.innerHTML = '<p class="lede deckmsg" style="align-self:center">' + esc(msg) + (/Friendship/i.test(msg) ? ' <a href="my-table.html#face">Change your relationship goal in My Face</a>.' : "") + "</p>"; });
   }
   /* An empty live hand says exactly why, and shows a clearly labeled sample hand so the picture cards make sense. */
   var SAMPLE_HAND = [["Jordan", 34, "heart", "A", "jordan.webp", "Teacher and Army veteran. Sunday pancakes, long walks.", ["Hiking", "Cooking"]], ["Ellis", 38, "spade", "K", "ellis.webp", "Architect who still sketches by hand.", ["Design", "Jazz"]],
@@ -4260,7 +4273,7 @@
     var cards = SAMPLE_HAND.map(function (s, i) { var p = { id: "sample" + i, name: s[0], age: s[1], suit: s[2], rank: s[3], photo: "assets/people/" + s[4], bio: s[5], interests: s[6], looking: "longterm", dist: 3 + i * 2, hue: 30 + i * 40, shared: [], city: "Birmingham", jk: 0, self: true, id_: {} };
       try { return cardHTML(p, i).replace(/<div class="card-actions">[\s\S]*?<\/div><\/div>$/, "</div>").replace('class="pcard ', 'class="pcard flipped '); } catch (e) { return ""; } }).join("");
     d.innerHTML = '<div class="emptyhand"><h3>' + (friend ? "Your hand is empty because you're at the Friendship Table." : "No real players fit your hand yet.") + "</h3>" +
-      '<p class="lede">' + (friend ? "Friendship players aren't dealt into dating decks. Switch your Table in My Face to <b>Dating</b>, <b>Long-term</b> or <b>Marriage</b> and you'll be dealt real players nearby." : "SuiteFace only deals real, paying players near you. As people in your area take a seat, their cards land here.") + "</p>" +
+      '<p class="lede">' + (friend ? "Friendship players aren't dealt into dating decks. Switch your relationship goal in My Face to <b>Dating</b>, <b>Long-term</b> or <b>Marriage</b> and you'll be dealt real players nearby." : "SuiteFace only deals real, paying players near you. As people in your area take a seat, their cards land here.") + "</p>" +
       '<div class="row">' + (friend ? '<a class="btn gold" href="my-table.html#face">Switch to dating</a>' : '<button class="btn gold" type="button" data-redeal>Deal again</button>') + '<a class="btn ghost" href="my-table.html#invite">Invite friends</a><a class="btn ghost" href="bluff-table.html">Play the Bluff Table</a></div>' +
       '<p class="samplelabel">Kelly\'s hand, an example · fictional people, not real players</p><p class="hint">This is what a hand looks like with picture cards: one face per person, ranked Ace down, each in their own suit. Tap a card to see its back.</p><div class="samplehand">' + cards + "</div></div>";
   }
@@ -4653,10 +4666,10 @@
     var pane = $("#lbPane"); if (!pane) return; var t = LOBBY.tab, h = "";
     $$("#lbTabs [data-lbtab]").forEach(function (b) { b.setAttribute("aria-selected", b.getAttribute("data-lbtab") === t ? "true" : "false"); });
     if (t === "stickers") {
-      h = '<p class="hint">Up to 3. Tap to place, tap again to peel. Free and earned stickers are ready now; the paid packs open soon.</p>' + Object.keys(PACKS).map(function (pk) {
+      h = '<p class="hint">Up to 3. Tap to place, tap again to peel. Free and earned stickers are ready now; packs are $2.10 in chips.</p>' + Object.keys(PACKS).map(function (pk) {
         var list = STICKERS.filter(function (k) { return k[2] === pk; }), paid = !!PACKS[pk][1];
-        return '<div class="lb-pack"><span class="stkhead">' + esc(PACKS[pk][0]) + (paid ? ' <span class="hint">· opens soon</span>' : pk === "earned" ? ' <span class="hint">· First 1,000 and friends who join</span>' : pk === "free" ? "" : ' <span class="free">Free</span>') + '</span><div class="lb-grid">' +
-          list.map(function (k) { var on = P.stickers.indexOf(k[0]) > -1, lock = paid || (pk === "earned" && !earnedHas(k[0]));
+        return '<div class="lb-pack"><span class="stkhead">' + esc(PACKS[pk][0]) + (paid ? ' <span class="hint">· $2.10 in chips</span>' : pk === "earned" ? ' <span class="hint">· First 1,000 and friends who join</span>' : pk === "free" ? "" : ' <span class="free">Free</span>') + '</span><div class="lb-grid">' +
+          list.map(function (k) { var on = P.stickers.indexOf(k[0]) > -1, lock = (paid && !owns("pack_" + pk)) || (pk === "earned" && !earnedHas(k[0]));
             return '<button type="button" class="lb-item' + (on ? " on" : "") + (lock ? " lock" : "") + (pk === "passport" || pk === "earned" ? " wide" : "") + '"' + (lock ? "" : ' data-drag="stk:' + k[0] + '"') + ' data-lbstk="' + k[0] + '"' + (lock ? ' data-lblock="' + pk + '"' : "") + ' aria-pressed="' + on + '">' + k[1] + (lock ? "<em>🔒</em>" : "") + "</button>"; }).join("") + "</div></div>";
       }).join("");
     } else if (t === "bumpers") {
@@ -4686,7 +4699,9 @@
     if (!t.closest || !t.closest("#lobby")) return;
     if ((b = t.closest("#lbCard .pcard")) || t.closest("#lbFlip")) { e.preventDefault(); LOBBY.flipped = !LOBBY.flipped; var pc = $("#lbCard .pcard"); if (pc) pc.classList.toggle("flipped", LOBBY.flipped); return; }
     if ((b = t.closest("[data-lbtab]"))) { LOBBY.tab = b.getAttribute("data-lbtab"); lobbyPane(); return; }
-    if ((b = t.closest("[data-lblock]"))) { var pk = b.getAttribute("data-lblock"); toast(pk === "earned" ? (b.getAttribute("data-lbstk") === "first1000" ? "The First 1,000 stamp is for founding players." : "Unlocks when friends you invited join. Share your invite link from My table.") : PACKS[pk][0] + " stickers open soon."); return; }
+    if ((b = t.closest("[data-lblock]"))) { var pk = b.getAttribute("data-lblock");
+      if (pk === "earned") toast(b.getAttribute("data-lbstk") === "first1000" ? "The First 1,000 stamp is for founding players." : "Unlocks when friends you invited join. Share your invite link from My table.");
+      else buy("pack_" + pk, PACKS[pk][0] + " sticker pack", PACKS[pk][1], function () { renderLobby(); }); return; }
     if ((b = t.closest("[data-lbstk]"))) { toggleSticker(b.getAttribute("data-lbstk")); return; }
     if ((b = t.closest("[data-lbbump]"))) { toggleBumper(b.getAttribute("data-lbbump"), true); return; }
     if ((b = t.closest("[data-lbpeel]"))) { var kind = b.getAttribute("data-lbpeel"), k = b.getAttribute("data-k");
@@ -4954,11 +4969,10 @@
      who fit them (hand_preview): counts per suit and the top five cards face down. No names, photos or ids until they pay. */
   function renderPreview() {
     var box = $("#pvHand"); if (!box) return; var L = window.SF_LIVE;
-    if (L && L.seated) { box.hidden = true; return; }
     box.hidden = false;
-    if (!L) { $("#pvT").textContent = "See your real hand first"; $("#pvBody").innerHTML = '<button class="btn gold" type="button" data-login>Create my free account</button>'; return; }
-    $("#pvT").textContent = "Dealing your hand…"; $("#pvL").textContent = "";
-    lrpc("hand_preview").then(function (h) { if (!h || !h.ready) pvForm(); else pvShow(h); }, function () { pvForm(); });
+    if (!L) { $("#pvT").textContent = "See your deck first"; $("#pvL").textContent = "Create a free account and we'll show you your real area deck: no sample people, no guessing."; $("#pvBody").innerHTML = '<button class="btn gold" type="button" data-login>Create my free account</button>'; return; }
+    $("#pvT").textContent = "Counting your deck…"; $("#pvL").textContent = "";
+    lrpc("deck_preview").then(function (h) { if (!h || !h.ready) pvForm(); else pvShow(h); }, function () { pvForm(); });
   }
   function pvForm(err) {
     var g = genderCode() || "", by = (/^(\d{4})/.exec(P.dob || "") || [])[1] || "";
@@ -4988,25 +5002,88 @@
         }, function (x) { err2.textContent = (x && x.message) || "That didn't save. Try again."; });
     });
   }
-  function pvShow(h) {
-    var n = h.count || 0, top = h.top || [];
-    if (n) {
-      var a = top[0];
-      $("#pvT").textContent = n === 1 ? "1 real player fits you right now." : n + " real players fit you right now.";
-      $("#pvL").textContent = "Your " + (a.rank === "A" ? "Ace" : a.rank) + " is about " + a.miles + (a.miles === 1 ? " mile" : " miles") + " away" + (a.shared && a.shared.length ? " and loves " + a.shared.join(" and ").toLowerCase() : "") + ". Take your seat to see names, photos and full cards.";
-    } else {
-      $("#pvT").textContent = "You're early to your table.";
-      $("#pvL").textContent = "No real players within " + (h.radius || 25) + " miles of " + h.zip + " fit you yet. We never fill a hand with fake profiles. As players near you sit down, they're dealt to you first, and the 12-Card Deck Guarantee covers you.";
-    }
-    var cards = top.slice(0, 5); while (cards.length < 5) cards.push(null);
-    var bs = h.by_suit || {};
-    $("#pvBody").innerHTML = '<div class="pv-cards">' + cards.map(function (c) {
-        if (!c) return '<div class="pv-c open" aria-hidden="true"><span class="ix">&nbsp;</span><span class="fd">Open seat</span><small>&nbsp;</small></div>';
-        return '<div class="pv-c' + (SUIT[c.suit].red ? " red" : "") + '"><span class="ix">' + c.rank + SUIT[c.suit].sym + '</span><span class="fd">Face down</span><small>' + c.miles + " mi" + (c.shared && c.shared[0] ? " · " + esc(c.shared[0]) : "") + "</small></div>";
-      }).join("") + "</div>" +
-      '<div class="pv-suits">' + ORDER.map(function (k) { return "<span><b>" + (bs[k] || 0) + "</b>" + SUIT[k].sym + " " + SUIT[k].name + "s</span>"; }).join("") + "</div>" +
-      '<div class="row"><a class="btn gold" href="#payBtn" data-pvpay>Take my seat</a><button class="btn ghost" type="button" data-pvedit>Change my answers</button></div>';
+  /* ---------- Your deck, free to preview (Oct 19 model) ----------
+     Before paying, a player sees their real area deck as numbers: cards, suit matches, cards ranked 10 or higher,
+     and the public Jokers near them. $2.10 in chips opens the deck for 7 days. */
+  var DECKP = null;
+  function money(c) { return "$" + (Math.max(0, c || 0) / 100).toFixed(2); }
+  function dateCT(t) { return t ? new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/Chicago" }) : ""; }
+  function deckPreviewHTML(h) {
+    var n = h.count || 0, sw = SUIT[h.suit] ? SUIT[h.suit] : null, jk = h.jokers || [];
+    var stat = function (v, l, cls) { return '<div class="dp-stat' + (cls ? " " + cls : "") + '"><b>' + v + "</b><span>" + l + "</span></div>"; };
+    var html = '<div class="dp"><div class="dp-stats">' + stat(n, n === 1 ? "card in your area" : "cards in your area") +
+      stat(h.suit_match || 0, sw ? sw.sym + " " + sw.name + " matches" : "suit matches", sw && sw.red ? "red" : "") + stat(h.tens_up || 0, "ranked 10 or higher") + "</div>";
+    html += '<div class="dp-jokers"><h4>' + (jk.length ? (jk.length === 1 ? "1 public Joker near you" : jk.length + " public Jokers near you") : "No public Jokers near you") + '</h4>' +
+      (jk.length ? '<ul>' + jk.slice(0, 6).map(function (j) { return '<li><span class="dp-hat" aria-hidden="true">' + (BRAND.hat || "") + "</span><b>" + esc(j.name || "Player") + (j.age ? ", " + j.age : "") + "</b><small>about " + (j.miles || 1) + " mi" + (j.until ? " · Joker until " + dateCT(j.until) : "") + "</small></li>"; }).join("") + "</ul>"
+        : '<p class="hint">Free to check any time. Jokers are players whose dates confirmed a bad experience.</p>') + "</div>";
+    var cta;
+    if (!h.seated) cta = '<button class="btn gold" type="button" data-seatgo>' + (h.launch ? "Claim my seat free" : "Claim my seat · $21 a year") + "</button>";
+    else if (h.deck_open) cta = '<a class="btn gold" href="my-table.html#table">Open my deck</a><span class="hint">Open until ' + dateCT(h.deck_until) + "</span>";
+    else cta = '<button class="btn gold" type="button" data-playdeck' + (n ? "" : " disabled") + ">Play this deck · $2.10</button>" +
+      '<span class="hint">' + (n ? "7 days · You have " + money(h.chips) + " in chips" : "No cards yet. We never fill a deck with fake profiles.") + "</span>";
+    return html + '<div class="dp-cta">' + cta + "</div></div>";
   }
+  function pvShow(h) {
+    DECKP = h; var n = h.count || 0;
+    $("#pvT").textContent = n ? "Your deck is ready." : "You're early to your table.";
+    $("#pvL").textContent = n ? "Real players within " + (h.radius || 25) + " miles of " + h.zip + ". Names and photos open when you play it." : "No real players within " + (h.radius || 25) + " miles of " + h.zip + " fit you yet. As players near you sit down, they're added first.";
+    $("#pvBody").innerHTML = deckPreviewHTML(h) + '<button class="linkish dp-edit" type="button" data-pvedit>Change my answers</button>';
+  }
+  function chipsModal(why) {
+    var c = DECKP ? DECKP.chips : null;
+    var m = modal('<h3 style="font-size:1.6rem;margin:0">Get chips</h3><p class="lede" style="margin:6px 0 14px">' + (why || "Buy a stack once. Every deck after that is one tap.") + (c != null ? " You have " + money(c) + "." : "") + "</p>" +
+      '<div class="cp-stacks">' + [["210", "2.10", "$2.10", "1 deck"], ["2100", "21", "$21", "10 decks"], ["21000", "210", "$210", "100 decks"]].map(function (x) {
+        return '<button type="button" class="cp-stack' + (x[0] === "2100" ? " best" : "") + '" data-stack-buy="' + x[0] + '"><span class="sfchip" data-chip="' + x[1] + '" data-size="64"></span><b>' + x[2] + "</b><span>" + x[3] + "</span></button>"; }).join("") + "</div>" +
+      '<p class="hint" style="margin-top:12px">Chips have no cash value, never expire and are non-refundable except where the law requires.</p>');
+    if (window.SFChips) SFChips.paint(m);
+  }
+  function buyStack(cents) {
+    var link = CFG.stripeChips && CFG.stripeChips[cents];
+    if (!window.SF_LIVE) { loginModal("create"); return; }
+    if (!link || !window.SF_AUTH) { toast("Chips open soon."); return; }
+    try { sessionStorage.setItem("sf.after", "chips"); } catch (e) { }
+    window.SF_AUTH.checkout(link, "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
+  }
+  function playDeck(btn) {
+    if (!window.SF_LIVE) { loginModal("create"); return; }
+    if (btn) btn.disabled = true;
+    lrpc("spend_chips", { p_item: "deck" }).then(function (w) {
+      if (DECKP) { DECKP.chips = w.cents; DECKP.deck_open = true; DECKP.deck_until = w.deck_until; }
+      chipBalance(w.cents); toast("Your deck is open for 7 days. Shuffling…"); jackpot(2500);
+      if (document.body.getAttribute("data-page") === "club" && typeof liveDeck === "function") { LIVE_ERR = ""; liveDeck(true).then(function () { G.dealt = []; renderTable(false); setTimeout(deal, 250); }, function (x) { toast(x.message); }); }
+      else location.href = "my-table.html#table";
+    }, function (er) {
+      if (btn) btn.disabled = false;
+      if (/Not enough chips/i.test(er.message)) chipsModal("A deck is $2.10 in chips."); else toast(er.message);
+    });
+  }
+  function chipBalance(c) {
+    var b = $("#chipBal"); if (!b) return;
+    if (c == null) { b.hidden = true; return; }
+    b.hidden = false; $("b", b).textContent = money(c);
+    var cb = $("#cpBal"); if (cb) { cb.hidden = false; cb.innerHTML = "Your chips: <b>" + money(c) + "</b>"; }
+  }
+  function loadChips() {
+    if (!window.SF_LIVE) { chipBalance(null); return; }
+    lrpc("my_chips").then(function (w) {
+      chipBalance(w.cents);
+      (w.items || []).forEach(function (it) { var id = /^pack_/.test(it) ? it : it; if (!owns(id)) P.owned.push(id); }); saveP();
+      var hi = $("#cpHistory"); if (hi && (w.recent || []).length) { hi.hidden = false;
+        hi.innerHTML = "<h3>Recent</h3><ul>" + w.recent.map(function (r) { var lab = /^bought:/.test(r.reason) ? "Bought chips" : r.reason === "spent:deck" ? "Played a deck" : /^spent:pack_/.test(r.reason) ? "Sticker pack" : r.reason === "spent:raise" ? "The Raise" : /^spent:/.test(r.reason) ? "Card theme" : r.reason;
+          return "<li><span>" + esc(lab) + "<small>" + dateCT(r.at) + "</small></span><b class=\"" + (r.cents > 0 ? "plus" : "") + "\">" + (r.cents > 0 ? "+" : "−") + money(Math.abs(r.cents)) + "</b></li>"; }).join("") + "</ul>"; }
+    }, function () { });
+  }
+  document.addEventListener("sf:live", function () { setTimeout(loadChips, 120); });
+  document.addEventListener("click", function (e) {
+    var t = e.target; if (!t.closest) return;
+    var sb = t.closest("[data-stack-buy]"); if (sb) { e.preventDefault(); buyStack(sb.getAttribute("data-stack-buy")); return; }
+    var pd = t.closest("[data-playdeck]"); if (pd) { e.preventDefault(); playDeck(pd); return; }
+    var sg = t.closest("[data-seatgo]"); if (sg) { e.preventDefault(); var pb = $("#payBtn"); if (pb && document.body.getAttribute("data-page") === "membership") { pb.scrollIntoView({ behavior: "smooth", block: "center" }); var ag = $("#agree"); if (ag) setTimeout(function () { ag.focus(); }, 500); } else location.href = "membership.html#m2Claim"; return; }
+  });
+  (function () { var q = location.search;
+    if (/[?&]bought=1/.test(q)) setTimeout(function () { toast("Chips received. They land in a moment."); jackpot(2500); setTimeout(loadChips, 2500); setTimeout(loadChips, 7000); }, 1000);
+    if (/[?&]seat=1/.test(q)) setTimeout(function () { toast("Payment received. Your seat is yours for 365 days."); jackpot(3000); if (window.SF_AUTH) window.SF_AUTH.refresh(); }, 1000);
+  })();
   document.addEventListener("click", function (e) {
     if (e.target.closest && e.target.closest("[data-pvedit]")) { pvForm(); return; }
     var pv = e.target.closest && e.target.closest("[data-pvpay]"); if (pv) { e.preventDefault(); var pb = $("#payBtn"); if (pb) { pb.scrollIntoView({ behavior: "smooth", block: "center" }); var ag = $("#agree"); if (ag) setTimeout(function () { ag.focus(); }, 500); } }

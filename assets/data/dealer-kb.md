@@ -2,9 +2,9 @@
 SuiteFace Inc., a Florida corporation. Contact: help@suiteface.com only (no phone line). Emergency: 911.
 ## Quick answers
 Q: How much does SuiteFace cost?
-A: Joining and building your Face are free. The Buy-In is $21.00 one time (it includes your first 30 days), then $2.10 a month. Launch offer: through December 31, 2026 the $21 Buy-In is waived and you join for $2.10 a month. 12-Card Deck Guarantee: if we can't deal you at least 12 cards within 10 days, ask for your $21 back or stay while your table fills. Cancel anytime in Settings.
+A: Joining, building your Face and previewing your deck are free. A seat is $21.00 for 365 days and holds your username; it never renews on its own. Launch offer: seats claimed through December 31, 2026 are free for their first year. Each deck is $2.10 in chips and opens every card in your area for 7 days. No subscription.
 Q: What does a comp code do?
-A: Enter it in the Comp box before you buy in. PlayMessy makes the $21 Buy-In free; your $2.10 monthly still starts after 30 days.
+A: Enter it in the Comp box before you take your seat. A comp can make your $21 seat free.
 Q: How do I cancel or pause?
 A: Settings → Membership → Manage billing. You can pause once every 210 days, for up to 21 days; after 21 days your seat ends and a new $21 Buy-In is needed. You can cancel a Buy-In within 3 business days for a full refund.
 Q: Why isn't my deck full yet?
@@ -34,7 +34,7 @@ A: Email help@suiteface.com. SuiteFace doesn't take phone calls; every request i
 === Terms of Service (terms.html) ===
 # Terms of Service & Member Agreement
 
-**SuiteFace Inc., a Florida corporation** ("SuiteFace," "we") · suiteface.com · help@suiteface.com · Version 1.0 · Last updated October 18, 2026
+**SuiteFace Inc., a Florida corporation** ("SuiteFace," "we") · suiteface.com · help@suiteface.com · Version 1.0 · Last updated October 19, 2026
 
 ## How you agree to these Terms
 
@@ -150,47 +150,43 @@ No profile is activated and no payment is processed until the matching agreement
 
 **3.5 Resources.** National Domestic Violence Hotline: 1-800-799-7233 · RAINN Sexual Assault Hotline: 1-800-656-4673 · Emergency: 911.
 
-## 4. Membership, payments and automatic renewal
+## 4. Your seat, decks, chips and payments
 
-**4.1 Free to join.** Creating an account and building your Face is free. You can buy in anytime. We'll show you how full your table is before you pay.
+**4.1 Free to look.** Creating an account, building your Face, taking the suit quiz and previewing your deck are free.
 
-**4.1a The 12-Card Deck Guarantee.** If SuiteFace can't deal you **at least 12 cards within 10 days** of your Buy-In, you choose: **get your $21.00 back** (your membership then ends), or **stay with full access** while more players join your table. Ask from Settings → Membership, or email help@suiteface.com with the subject "Deck Guarantee," anytime in the 30 days after those first 10 days. We refund within 10 days.
+**4.1a Your seat.** A seat costs **$21.00 USD** and lasts **365 days** from the day it starts. It holds your **username** and lets you play decks. **A seat is a one-time payment and never renews on its own.** We'll remind you before it ends; to keep your seat and username, you buy a new seat. If a seat ends and isn't renewed within 30 days, your username may be released.
 
-**4.1b Launch offer (October 17 to December 31, 2026).** For members who buy in between **October 17, 2026 and 11:59 p.m. Central Time on December 31, 2026**, the $21.00 Buy-In is **waived**: you pay **$2.10 today and $2.10 every month** until you cancel. The waiver applies once per person and only while the offer is open. If a launch member's membership later ends (including a pause longer than 21 days), rejoining requires the regular $21.00 Buy-In. Because no Buy-In is paid, the 12-Card Deck Guarantee refund in 4.1a doesn't apply to launch seats; launch members can cancel anytime to stop future charges.
+**4.1b Launch offer (October 17 to December 31, 2026).** Seats claimed between **October 17, 2026 and 11:59 p.m. Central Time on December 31, 2026** are **free for their first 365 days**. The offer applies once per person. Players who claim a seat during the launch offer receive a numbered **★ First 1,000** badge while numbers remain, in the order seats are claimed.
 
-**4.1c The First 1,000.** While the launch offer is open, a member may instead choose to pay the regular **$21.00 Buy-In** to become one of **SuiteFace's First 1,000**. First 1,000 members receive a numbered **★ First 1,000** badge and sticker on their card for as long as they're members; numbers are assigned in the order payments are received, and the badge ends when the first 1,000 are taken or the launch offer closes, whichever comes first. **The First 1,000 Buy-In is non-refundable, including under the 12-Card Deck Guarantee in 4.1a, even if fewer than 12 cards are dealt in the 10 days after the payment is received**, except where the law requires otherwise. Monthly membership of $2.10 then starts 30 days after the Buy-In.
+**4.1c Decks.** A **deck costs $2.10 in chips**. It opens every card dealt to you in your area for **7 days**. Players who join your area during those 7 days are added to it. Cards you have played or burned don't come back in the same deck. After 7 days the deck closes, and you may play a new one. Before you play a deck you can preview, free, how many cards are in your area, how many match your suit, how many are ranked 10 or higher, and the public Jokers near you (see the [Joker Policy](legal.html)).
 
-**4.1d Referral credits and stickers.** Each member has an invite link. When someone who used your link creates an account and completes a paid membership (a Buy-In or a launch seat), SuiteFace credits **$2.10** to your account, applied to your next monthly charges, **up to 12 credits ($25.20) per member**, and unlocks a unique referral sticker for your card (one per successful referral, up to 12). Credits have no cash value, can't be transferred, and end if your membership ends. You can't refer yourself or create accounts to earn credits; SuiteFace may reverse credits and stickers earned in breach of these Terms.
+**4.1d Chips.** Chips are bought in stacks of **$2.10, $21.00 or $210.00** and are spent on decks and optional extras such as card themes, sticker packs and The Raise. **Chips have no cash value, never expire, can't be cashed out, sold or transferred, and are non-refundable** except where a law that can't be waived requires it or SuiteFace confirms a billing error. Chips are a license to use SuiteFace features, not money, a deposit or a wager. SuiteFace has no gambling: nothing is bet, won or paid out.
 
-**4.1e House comps.** SuiteFace may waive any fee, in whole or in part, for its staff, business partners or members at its sole discretion. A comp applies only to the account it was given to, has no cash value, and can't be transferred or resold.
+**4.1e Referral credits and stickers.** Each player has an invite link. When someone who used your link takes a seat, SuiteFace adds **$2.10 in chips** to your account, **up to 12 times**, and unlocks a unique referral sticker for your card. You can't refer yourself or create accounts to earn chips; SuiteFace may reverse chips and stickers earned in breach of these Terms.
+
+**4.1f House comps.** SuiteFace may waive any fee, in whole or in part, for its staff, business partners or players at its sole discretion. A comp applies only to the account it was given to, has no cash value, and can't be transferred or resold.
+
+**4.1g The 12-Card Deck Guarantee.** If you pay $21.00 for a seat and SuiteFace can't show at least **12 cards in your deck preview within 10 days**, you may ask for your $21.00 back (your seat then ends). Email help@suiteface.com with the subject "Deck Guarantee" within the 30 days after those first 10 days. We refund within 10 days.
 
 **4.2 What you pay.**
 
-| Charge | Amount | When |
+| Item | Price | How often |
 |---|---|---|
-| Buy-In | **$21.00** one time | When you buy in. Unlocks your full Face, your deck, and your first 30 days. |
-| Monthly membership | **$2.10 a month** | Starts 30 days after your Buy-In and **renews automatically every month until you cancel.** Required to keep your deck and to contact any member. |
-| Prepaid year (optional, instead of monthly) | **$21.00 a year** | Starts 30 days after your Buy-In (or today, with a launch seat) and **renews automatically every year until you cancel.** See Section 4.2a. |
-| Re-Buy-In | $21.00 | If you return after a pause longer than 21 days, or after cancelling. |
-| Joker Maker Lobby entry | $210.00 per entry | Optional. See Section 6. |
-| Lobby Joker removal | $210.00 | Optional. See Section 6. |
-| Public Joker buy-out | $2,100.00 | Optional. See Section 6. |
+| Seat (holds your username) | $21.00 (free during the launch offer) | Once per 365 days, never automatic |
+| Deck | $2.10 in chips | Each time you choose to play one; open for 7 days |
+| Chip stacks | $2.10, $21.00 or $210.00 | When you choose to buy |
 
-Prices are in US dollars, plus any tax that applies. Payments are processed by Stripe; SuiteFace never sees or stores your full card number.
+**4.3 No automatic renewal.** SuiteFace does not charge you automatically for a seat or for decks. Every seat and every chip stack is a separate purchase you confirm. If SuiteFace ever offers an automatic plan, it will be shown and agreed to separately before any charge.
 
-**4.2a Prepaid year.** Instead of paying monthly, you may choose to pay **$21.00 a year**. It covers the same membership as twelve monthly payments and costs less. If you cancel, your membership runs to the end of the year you paid for and then ends; **unused months are not refunded**, except where a law that can't be waived requires it or SuiteFace confirms a billing error. A pause (Section 4.5) hides your card but doesn't extend or refund a prepaid year.
+**4.4 Receipts.** Stripe emails a receipt for every purchase. Your chip history is in your account.
 
-**4.3 Automatic renewal disclosure.** **By buying in, you authorize SuiteFace to charge your payment method $2.10 every month (or $21.00 every year if you choose the prepaid year), starting 30 days after your Buy-In, until you cancel.** We show these terms before you pay and email a confirmation afterward with instructions to cancel. If the price ever changes, we'll tell you in advance and you can cancel before it takes effect.
+**4.5 Closing your account.** You can close your account at any time from My Face. Closing doesn't refund a seat or chips, except under 4.6, 4.1g or where the law requires.
 
-**4.4 Cancel anytime, online.** Cancel at any time in **Settings → Membership → Manage billing**, the same way you signed up, with no phone call needed. Cancellation takes effect at the end of the month you've paid for; you keep access until then.
+**4.6 Your 3-day right to cancel a seat.** **You may cancel a paid seat for a full $21.00 refund within 3 business days** after you buy it (not counting weekends or federal holidays), by emailing help@suiteface.com with the subject "Cancel seat." We refund within 10 days. This applies to players in every state.
 
-**4.5 Pause.** You may pause **once every 210 days**, counted from the day your last pause began, for up to **21 days** each time. A pause request inside that 210-day window is declined, and the date your next pause opens is shown on your account. While paused, your card is hidden, contact is off, and no monthly charge is made. If you don't resume within 21 days, your membership ends and a new $21.00 Buy-In is required to return.
+**4.7 Other refunds.** Except for 4.6, 4.1g and where the law requires otherwise, **all charges are non-refundable**, including chips, decks and unused deck days. If your state gives you a longer or broader right to cancel, SuiteFace will honor it (see the [State Notices](state-notices.html)).
 
-**4.6 Your 3-day right to cancel the Buy-In.** **You may cancel your Buy-In for a full $21.00 refund within 3 business days** after you buy in (not counting weekends or federal holidays), by emailing help@suiteface.com with the subject "Cancel Buy-In" or using Settings → Membership. We refund within 10 days. This applies to members in every state.
-
-**4.7 Other refunds.** Except for 4.6 and where the law requires otherwise, **all charges are non-refundable**, including partial months, unused deck time and lobby entries. If your state gives you a longer or broader right to cancel, SuiteFace will honor it (see the [State Notices](state-notices.html)).
-
-**4.8 Failed payments.** If a monthly payment fails, Stripe will retry. Contact and deck access pause until payment succeeds.
+**4.8 Earlier memberships.** Players who joined under the earlier monthly membership keep their seat for 365 days from October 19, 2026, at no charge, and are never charged a monthly fee again.
 
 **4.10 The High Roller Room.** The High Roller Room is an optional Room for members with the ✓ ID Seal who either (a) **verify at least $1,000,000** in combined bank or brokerage balances, by linking accounts through Stripe (balance only) or by uploading statements dated within 60 days for staff review, or (b) pay the **one-time $5,000.00 High Roller Buy-In**. Verified members show **💎 High Roller ✓ Verified**, renewed every 12 months; Buy-In members show **💎 High Roller**. SuiteFace never shows anyone your balance, erases balance figures once a decision is made, and deletes uploaded statements after review. The High Roller Buy-In is **non-refundable** except where the law requires otherwise. Membership in the Room says nothing about a person's character or intentions; never send money to anyone you meet. **Masked play:** a High Roller may play masked: other members see an alias, a 3-year age range that includes their real age, and a blurred photo, while every other part of their card stays truthful. Their real name, age, @username and photo are shown to a member only after the two check in together in person through Play Hand. Using an alias to deceive, harass or evade a Joker is a breach of these Terms.
 
@@ -208,7 +204,7 @@ Prices are in US dollars, plus any tax that applies. Payments are processed by S
 
 **4.10g Double and group dates.** Two to four friends can form a crew and play as one hand. Crews are dealt only other crews where every pairing passes both people's dealbreakers, and each pairing is ranked for fit. A group-date match happens only when every member of both crews plays the other crew. Group dates follow all of Section 2: meet in public, and never send money.
 
-**4.11 Private Tables and the Friendship-only Table.** Any member can host a **Private Table**: a group they name and host, such as a friendship circle, a faith small group or prayer group, service volunteers, a board-game night, Greek life, alumni or a club. (Earlier versions of these Terms called Private Tables "Casinos"; every Casino is now a Private Table on the same terms.) A Private Table can run one or more **games** (its regular meetups). Building a Private Table costs a **one-time $21.00**, which includes **12 seats** (not counting the Host) and up to **7 ZIP codes**. Each additional seat is a **one-time $2.10**, up to **52 seats**, and each additional ZIP code is a **one-time $2.10**. A Private Table can instead cover **whole states** for a **one-time $210.00 per state**, or the **entire United States** for a **one-time $2,100.00**, in addition to the $21.00 build. When every seat is taken the table is full, and no one else can join until the Host adds seats or a seat opens. The Host may lower the number of seats, but not below the number of members already seated, and a lowered seat count doesn't earn a refund; seats already paid for can be used again later at no charge. The member who builds a Private Table is its **Host**: they hold its naming rights on SuiteFace for as long as it stays open, run its games, set its seats, approve or remove members, and their card shows the Private Tables they host. A Host may save a Private Table as a draft ("Under construction") before paying; drafts are visible only to the Host and SuiteFace staff and open to members only after payment and review. Every Private Table name is reviewed before it opens. A name may not impersonate, or claim to be the official group of, a school, chapter, church, company or other organization unless the Host is authorized to use it, and SuiteFace may rename, pause or close any Private Table that breaks these Terms. If SuiteFace rejects a Private Table, the Host may rename it and resubmit at no charge, or ask for a refund of the build fee within 30 days. Private Table fees are otherwise non-refundable except where the law requires. Members who choose the **Friendship-only** Table are never dealt into anyone's dating deck and are never shown to dating members as a match; they meet people at Private Tables. Joining a Private Table is free with a SuiteFace account. Every Private Table follows the House Rules, the Safety Guide and the meet-in-public rule.
+**4.11 Private Tables (not currently offered).** Private Tables and the Bluff Table are paused and not available on SuiteFace right now; the terms below apply if they return. Any member can host a **Private Table**: a group they name and host, such as a friendship circle, a faith small group or prayer group, service volunteers, a board-game night, Greek life, alumni or a club. (Earlier versions of these Terms called Private Tables "Casinos"; every Casino is now a Private Table on the same terms.) A Private Table can run one or more **games** (its regular meetups). Building a Private Table costs a **one-time $21.00**, which includes **12 seats** (not counting the Host) and up to **7 ZIP codes**. Each additional seat is a **one-time $2.10**, up to **52 seats**, and each additional ZIP code is a **one-time $2.10**. A Private Table can instead cover **whole states** for a **one-time $210.00 per state**, or the **entire United States** for a **one-time $2,100.00**, in addition to the $21.00 build. When every seat is taken the table is full, and no one else can join until the Host adds seats or a seat opens. The Host may lower the number of seats, but not below the number of members already seated, and a lowered seat count doesn't earn a refund; seats already paid for can be used again later at no charge. The member who builds a Private Table is its **Host**: they hold its naming rights on SuiteFace for as long as it stays open, run its games, set its seats, approve or remove members, and their card shows the Private Tables they host. A Host may save a Private Table as a draft ("Under construction") before paying; drafts are visible only to the Host and SuiteFace staff and open to members only after payment and review. Every Private Table name is reviewed before it opens. A name may not impersonate, or claim to be the official group of, a school, chapter, church, company or other organization unless the Host is authorized to use it, and SuiteFace may rename, pause or close any Private Table that breaks these Terms. If SuiteFace rejects a Private Table, the Host may rename it and resubmit at no charge, or ask for a refund of the build fee within 30 days. Private Table fees are otherwise non-refundable except where the law requires. Members who choose the **Friendship-only** Table are never dealt into anyone's dating deck and are never shown to dating members as a match; they meet people at Private Tables. Joining a Private Table is free with a SuiteFace account. Every Private Table follows the House Rules, the Safety Guide and the meet-in-public rule.
 
 **4.9 Ask the Dealer and The Raise.** **Ask the Dealer** is a free AI help desk. **The Raise** is an optional one-time purchase of **$2.10** per Raise: AI-generated date suggestions based on what is shown on your card and the other member's card. Both are produced by artificial intelligence and may be wrong or out of date. Place suggestions are ideas, not endorsements. A venue that pays SuiteFace to be featured is always labeled **Sponsored**, and partner deals ("Comps") are offered by the venue, not SuiteFace: **check hours, details and safety yourself, always meet in a public place, and call 911 in an emergency.** The Dealer is not a lawyer, counselor or safety service. A Raise is used when you submit it. If the Dealer can't finish, that Raise is returned to you. You may **Fold** once within 7 days of a Raise for one free set of new suggestions. A used Raise is non-refundable except where the law requires otherwise.
 
@@ -367,17 +363,14 @@ I confirm that:
 6. I have never been convicted of a violent or sexual crime and am not required to register as a sex offender.
 7. Everything I put on my profile is true, I created it myself, and I will keep only one account.
 
-### B. Buy-In and Membership Agreement
+### B. Seat, Deck and Chips Agreement
 
-1. I authorize SuiteFace Inc. to charge **$21.00 today** for my Buy-In, which includes my first 30 days.
-2. **I authorize a recurring charge of $2.10 every month, starting 30 days from today, until I cancel.** I can cancel anytime online in Settings.
-3. I can pause **once every 210 days**, for up to **21 days**. A pause longer than 21 days ends my membership, and returning requires a new $21.00 Buy-In.
-4. Charges are **non-refundable** except where the law requires.
-5. Contact with other members requires an active paid membership.
-6. **12-Card Deck Guarantee:** if I'm dealt fewer than 12 cards within 10 days, I may ask for my $21.00 back or choose to stay (Terms 4.1a).
-7. **Launch offer (Oct 17 to Dec 31, 2026):** if I join with a launch seat, the $21.00 Buy-In is waived and I authorize **$2.10 today and every month** until I cancel; rejoining after my membership ends requires the $21.00 Buy-In (Terms 4.1b).
-8. **First 1,000:** if I choose the First 1,000 during the launch offer, I authorize the **$21.00 Buy-In, which is non-refundable even under the 12-Card Deck Guarantee**, and I receive a numbered First 1,000 badge (Terms 4.1c).
-9. **Prepaid year (optional):** if I choose it, I authorize **$21.00 every year** instead of $2.10 every month, starting 30 days from today (or today with a launch seat), until I cancel. Unused months of a prepaid year are not refunded (Terms 4.2a).
+1. My seat costs **$21.00** and lasts **365 days**. It holds my username. **It is a one-time payment and never renews on its own** (Terms 4.1a).
+2. **Launch offer (Oct 17 to Dec 31, 2026):** a seat claimed during the offer is free for its first 365 days (Terms 4.1b).
+3. A **deck costs $2.10 in chips** and opens my area deck for **7 days** (Terms 4.1c).
+4. **Chips have no cash value**, never expire, can't be cashed out or transferred, and are **non-refundable** except where the law requires (Terms 4.1d).
+5. I may cancel a paid seat for a full refund within **3 business days** (Terms 4.6), and the 12-Card Deck Guarantee applies to paid seats (Terms 4.1g).
+6. Contact with other players requires an active seat.
 
 ### C. Joker Maker Lobby Entry Agreement
 
@@ -463,7 +456,7 @@ This agreement is between **SuiteFace Inc., a Florida corporation**, and the bus
 === Privacy Policy (privacy.html) ===
 # Privacy Policy
 
-**SuiteFace Inc., a Florida corporation** · suiteface.com · help@suiteface.com · Version 1.0 · Last updated October 16, 2026
+**SuiteFace Inc., a Florida corporation** · suiteface.com · help@suiteface.com · Version 1.0 · Last updated October 19, 2026
 
 This policy explains what SuiteFace collects, why, who we share it with, and the choices you have. It is part of the [Terms of Service](terms.html). SuiteFace is for adults 18 and older only.
 
@@ -481,6 +474,8 @@ This policy explains what SuiteFace collects, why, who we share it with, and the
 
 - **Account details:** name, email, phone number, date of birth, password or sign-in provider (Google, Apple, Facebook, TikTok, Snapchat).
 - **Your Face (profile):** photos, display name, gender, who you want to meet, suit, interests, bio, and the identity and preference questions you choose to answer. Every question offers "Prefer not to say."
+- **Bumper stickers and card style:** the stickers, bumper stickers and theme you choose to show on your card. Some bumper stickers are sensitive, such as "Disability: Mental," "Disability: Physical" or "Able-bodied." They are always optional, shown only on your card to players dealt it, and **never used to rank, filter or hide anyone**. Remove one any time in My Face.
+- **Chips and purchases:** your chip balance and history, seats and decks you buy (card details stay with Stripe).
 - **Signatures:** the agreements you sign, your typed /Name/ signature, the date you selected and the time.
 - **Activity at the table:** cards dealt, burned and played; Pairs; check-ins; Play Hand results; Jokers you make or receive; challenges; reports and blocks.
 - **Messages** you send through SuiteFace chat.

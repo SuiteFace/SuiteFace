@@ -13,6 +13,9 @@ window.SUITEFACE_CONFIG = {
   stripeLaunchLink: "https://buy.stripe.com/5kQ8wRgsX29Y15YbUm2oE0b",
   stripeAnnualLink: "https://buy.stripe.com/bJeaEZfoT5mabKC4rU2oE0k",
   stripeAnnualLaunchLink: "https://buy.stripe.com/bJe7sNekP3e2eWO4rU2oE0l",
+  // Oct 19 model: a $21 seat for 365 days (one-time payment, no auto-renew) and chip stacks. Decks are $2.10 in chips.
+  stripeSeatYearLink: "https://buy.stripe.com/aFa8wRb8D29Y6qi3nQ2oE0p",
+  stripeChips: { "210": "https://buy.stripe.com/7sYbJ390v01Q9Cu0bE2oE0m", "2100": "https://buy.stripe.com/8x214p4KfeWK4ia4rU2oE0n", "21000": "https://buy.stripe.com/4gM9AV3Gb6qe3e63nQ2oE0o" },
   stripePortalLink: "https://billing.stripe.com/p/login/fZuaEZ5Oj5macOGgaC2oE00",
   stripeJokerBuyoutLink: "https://buy.stripe.com/14A14p90v5ma9CugaC2oE0e",
   stripeJokerLobbyLink: "https://buy.stripe.com/fZu4gB5Oj4i63e6aQi2oE0c",

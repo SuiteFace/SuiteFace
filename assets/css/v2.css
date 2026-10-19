@@ -235,7 +235,9 @@ body[data-page="contact"] section[data-pg]:not([data-pg="contact"]),
 body[data-page="bluff"] section[data-pg]:not([data-pg="bluff"]),
 body[data-page="backs"] section[data-pg]:not([data-pg="backs"]),
 body[data-page="winners"] section[data-pg]:not([data-pg="winners"]),
-body[data-page="redeem"] section[data-pg]:not([data-pg="redeem"]){display:none!important}
+body[data-page="redeem"] section[data-pg]:not([data-pg="redeem"]),
+body[data-page="chips"] section[data-pg]:not([data-pg="chips"]),
+section[data-pg="tables"],section[data-pg="bluff"]{display:none!important}
 body:not([data-page="home"]) main > section:first-of-type{padding-top:clamp(40px,6vw,72px)}
 .nav a[aria-current="page"]{color:var(--cream);background:var(--line)}
 
@@ -1283,3 +1285,97 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 #quizResult p.suitword.big{width:auto!important;height:auto!important}
 /* Player's chosen theme: a true-color border drawn over the card face art */
 .pcard .face.framed[data-th]::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:var(--th) center/100% 100% no-repeat}
+
+/* =====================================================================
+   Oct 19: seat, deck and chips. Simple, modern, one obvious action per block.
+   ===================================================================== */
+.m2{max-width:980px;display:grid;gap:22px}
+.m2-head h2{font:650 clamp(2.1rem,4.6vw,3.2rem)/1.04 var(--body);letter-spacing:-.035em;margin:0}
+.m2-head .lede{margin:8px 0 0;max-width:52ch}
+.m2-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;counter-reset:m2}
+.m2-step{position:relative;background:#fff;border:1px solid rgba(18,54,40,.1);border-radius:22px;padding:20px;display:grid;align-content:start;gap:8px;box-shadow:0 1px 2px rgba(18,54,40,.04)}
+.m2-step::before{counter-increment:m2;content:counter(m2);position:absolute;top:16px;right:18px;font:600 .8rem var(--body);color:rgba(18,54,40,.35)}
+.m2-step h3{margin:4px 0 0;font:600 1.12rem/1.2 var(--body);letter-spacing:-.01em;color:#123628}
+.m2-step p{margin:0;font-size:.95rem;line-height:1.45;color:#4A5A52}
+.m2-step p b{color:#123628;font-weight:600}
+.m2-step .m2-chip{justify-self:start}
+.m2-ico{width:52px;height:52px;border-radius:16px;background:#123628;color:#E2C47E;display:grid;place-items:center;margin:18px 0}
+.m2-ico svg{width:24px;height:24px}
+.m2-launch{color:#8F6410!important}
+@media (max-width:760px){.m2-steps{grid-template-columns:1fr}.m2-step{grid-template-columns:auto 1fr;column-gap:14px}.m2-step>*:not(.m2-chip):not(.m2-ico){grid-column:2}.m2-step .m2-chip,.m2-step .m2-ico{grid-row:1/span 3;margin:0}}
+
+/* The deck preview: the one dark focal panel */
+.m2-preview,.deckgate{background:radial-gradient(120% 90% at 15% 0%,#1B4A38 0%,#123628 50%,#0E2B20 100%)!important;color:#F2ECDD;border:1px solid rgba(242,236,221,.08)!important;border-radius:26px!important;padding:clamp(20px,3.6vw,34px)!important;box-shadow:0 40px 80px -48px rgba(2,12,8,.7)!important;display:grid;gap:14px}
+.m2-preview .pv-head h3,.deckgate h3{margin:0;font:650 clamp(1.5rem,3vw,2rem)/1.1 var(--body)!important;letter-spacing:-.02em;color:#F7F2E6!important}
+.m2-preview .pv-head .hint{color:rgba(242,236,221,.66)!important;margin:6px 0 0}
+.m2-preview .pv-head .eyebrow{display:none}
+.dp{display:grid;gap:14px}
+.dp-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dp-stat{background:rgba(242,236,221,.055);border:1px solid rgba(242,236,221,.1);border-radius:18px;padding:16px 16px 14px;display:grid;gap:4px}
+.dp-stat b{font:650 clamp(2rem,5vw,2.8rem)/1 var(--body);letter-spacing:-.03em;color:#F7F2E6;font-variant-numeric:tabular-nums}
+.dp-stat.red b{color:#F08A97}
+.dp-stat span{font-size:.88rem;color:rgba(242,236,221,.7)}
+.dp-jokers{background:rgba(242,236,221,.035);border:1px solid rgba(242,236,221,.08);border-radius:18px;padding:14px 16px}
+.dp-jokers h4{margin:0 0 8px;font:600 .98rem var(--body);color:#F7F2E6}
+.dp-jokers ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.dp-jokers li{display:grid;grid-template-columns:34px 1fr;column-gap:10px;align-items:center}
+.dp-jokers li b{font-weight:600;color:#F7F2E6}
+.dp-jokers li small{grid-column:2;color:rgba(242,236,221,.6);font-size:.85rem}
+.dp-hat{grid-row:1/span 2;width:34px;height:34px;border-radius:50%;background:#F2ECDD;display:grid;place-items:center;padding:5px}
+.dp-hat svg{width:100%;height:auto}
+.dp-jokers .hint{margin:0;color:rgba(242,236,221,.6)!important}
+.dp-cta{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.dp-cta .btn{min-height:50px;padding:0 26px!important;border-radius:999px!important;background:#E2C47E!important;color:#1A1405!important;border:0!important;font:600 1rem var(--body)!important;box-shadow:0 14px 30px -14px rgba(0,0,0,.6)!important}
+.dp-cta .btn:disabled{opacity:.45}
+.dp-cta .hint{color:rgba(242,236,221,.66)!important}
+.dp-edit{justify-self:start;color:rgba(242,236,221,.6)!important;font-size:.88rem}
+.m2-preview .pv-form label{color:rgba(242,236,221,.8)}
+.m2-preview .pv-form input,.m2-preview .pv-form select{background:rgba(242,236,221,.06);border:1px solid rgba(242,236,221,.16);color:#F7F2E6;border-radius:12px}
+@media (max-width:560px){.dp-stats{grid-template-columns:1fr 1fr}.dp-stats .dp-stat:first-child{grid-column:1/-1}}
+.deckgate{width:100%;max-width:720px;margin-inline:auto}
+
+/* Take your seat */
+.m2-claim{background:#fff;border:1px solid rgba(18,54,40,.1);border-radius:22px;padding:clamp(20px,3.4vw,30px);display:grid;gap:14px}
+.m2-claim-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
+.m2-claim h3{margin:0;font:600 1.3rem var(--body);color:#123628;letter-spacing:-.01em}
+.m2-claim .launchbox{all:unset}.m2-claim .launchbox .hint{margin:0}
+.m2-claim .agree{display:flex;gap:10px;align-items:flex-start;font-size:.93rem;line-height:1.45;color:#3E4C45}
+.m2-claim .agree input{accent-color:#123628;width:18px;height:18px;margin-top:2px;flex:none}
+.m2-actions{display:flex;flex-wrap:wrap;gap:10px}
+.m2-actions .btn{min-height:50px;padding:0 26px!important;border-radius:999px!important;font:600 1rem var(--body)!important;box-shadow:none!important}
+.m2-actions .btn.gold{background:#123628!important;color:#F7F2E6!important;border:0!important}
+.m2-actions .btn.ghost{background:transparent!important;color:#123628!important;border:1px solid rgba(18,54,40,.22)!important}
+.m2-more summary,.m2-claim .terms summary{cursor:pointer;font-size:.92rem;color:#4A5A52}
+.m2-more .comp{margin-top:10px;background:none;border:0;padding:0}
+.m2-fine{font-size:.86rem;margin:0}
+.m2-claim .terms ol{font-size:.9rem;line-height:1.5;color:#4A5A52}
+
+/* Chips page */
+.cp-hero{display:grid;grid-template-columns:1fr minmax(0,360px);gap:20px;align-items:center}
+.cp-hero h2{font:650 clamp(2.4rem,5vw,3.4rem)/1 var(--body);letter-spacing:-.04em;margin:0}
+.cp-bal{font-size:1.05rem;margin:10px 0 0}.cp-bal b{font-weight:650;color:#123628}
+@media (max-width:700px){.cp-hero{grid-template-columns:1fr}.cp-hero .chipplay{justify-self:center}}
+.cp-stacks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cp-stack{all:unset;box-sizing:border-box;cursor:pointer;position:relative;display:grid;justify-items:center;gap:4px;padding:18px 10px 16px;border-radius:20px;background:#fff;border:1px solid rgba(18,54,40,.12);text-align:center;transition:transform .18s,box-shadow .18s,border-color .18s}
+.cp-stack:hover{transform:translateY(-2px);box-shadow:0 18px 30px -20px rgba(18,54,40,.45);border-color:rgba(18,54,40,.3)}
+.cp-stack:focus-visible{outline:2px solid #B8862F;outline-offset:2px}
+.cp-stack b{font:650 1.35rem var(--body);color:#123628;letter-spacing:-.02em;margin-top:6px}
+.cp-stack span:not(.sfchip){font-size:.88rem;color:#5B6A62}
+.cp-stack.best{border-color:#123628;box-shadow:0 0 0 1px #123628}
+.cp-stack em{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font:600 .72rem var(--body);font-style:normal;background:#123628;color:#F7F2E6;padding:4px 10px;border-radius:999px;white-space:nowrap}
+#modal .cp-stack{background:#FBF8F1}
+.cp-uses{background:#fff;border:1px solid rgba(18,54,40,.1);border-radius:22px;padding:18px 20px}
+.cp-uses h3,.cp-history h3{margin:0 0 10px;font:600 1.1rem var(--body);color:#123628}
+.cp-uses ul,.cp-history ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.cp-uses li{display:grid;grid-template-columns:64px 1fr;gap:10px;font-size:.95rem;color:#3E4C45}
+.cp-uses li b{font-weight:650;color:#123628}
+.cp-history{background:#fff;border:1px solid rgba(18,54,40,.1);border-radius:22px;padding:18px 20px}
+.cp-history li{display:flex;justify-content:space-between;gap:10px;font-size:.95rem}
+.cp-history li small{display:block;color:#7A867F;font-size:.8rem}
+.cp-history li b.plus{color:#1E7A4C}
+
+/* Header chip balance */
+.chipbal{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 6px;border-radius:999px;background:#fff;border:1px solid rgba(18,54,40,.14);color:#123628;font:600 .9rem var(--body);text-decoration:none}
+.chipbal[hidden]{display:none}
+.chipbal .sfchip-art{filter:none}
+.m2-claim .launchbox .hint,.m2-claim .launchbox span{background:none!important;color:#5B6A62!important;padding:0!important;box-shadow:none!important;font:400 .9rem var(--body)!important;border:0!important}

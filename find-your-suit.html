@@ -79,10 +79,10 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792421712">
-<script src="/assets/js/transit.js?v=1792421712"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792421712">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792421712">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792422565">
+<script src="/assets/js/transit.js?v=1792422565"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792422565">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792422565">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 </head>
 <body data-page="suit">
@@ -116,7 +116,7 @@
 <div class="promo" id="promoBar" role="region" aria-label="Launch offer">
   <div class="wrap promo-in">
     <span class="sfchip" data-chip="2.10" data-size="30"></span>
-    <p><b>Launch offer:</b> the $21 buy-in is waived. Join for <b>$2.10 a month</b> through <span id="promoEnds">December 31</span>.</p>
+    <p><b>Launch offer:</b> claim your seat free through <span id="promoEnds">December 31</span>. Decks are $2.10.</p>
     <a class="promo-cta" href="membership.html">Claim my seat</a>
   </div>
 </div>
@@ -151,6 +151,7 @@
 <path d="M392.1875 134.0H416.015625V89.3125H463.59375V69.859375H416.015625V37.359375H468.75V17.59375H392.1875Z M505.921875 135.71875C518.8125 135.71875 527.25 130.015625 531.46875 121.890625H532.25V134.0H554.4375V75.171875C554.4375 54.0 536.15625 45.5625 517.40625 45.5625C497.875 45.5625 483.8125 54.234375 479.359375 69.390625L500.84375 72.984375C502.71875 67.359375 508.265625 62.90625 517.328125 62.90625C526.078125 62.90625 531.0 67.125 531.0 74.546875V74.9375C531.0 80.640625 524.828125 81.265625 509.828125 82.75C492.640625 84.390625 476.859375 90.015625 476.859375 109.546875C476.859375 126.8125 489.28125 135.71875 505.921875 135.71875ZM512.5625 119.234375C504.828125 119.234375 499.359375 115.71875 499.359375 108.921875C499.359375 101.890625 505.140625 98.53125 513.8125 97.28125C518.96875 96.578125 528.265625 95.328125 531.15625 93.296875V102.75C531.15625 111.96875 523.5 119.234375 512.5625 119.234375Z M609.5 135.71875C630.4375 135.71875 645.203125 124.390625 648.484375 106.03125L626.6875 102.046875C624.8125 111.5 618.796875 117.28125 609.734375 117.28125C597.234375 117.28125 590.671875 106.265625 590.671875 90.640625C590.671875 74.859375 597.234375 64.0 609.734375 64.0C618.796875 64.0 624.578125 69.625 626.53125 78.6875L648.328125 74.625C645.046875 56.65625 630.203125 45.5625 609.5 45.5625C583.171875 45.5625 566.765625 63.6875 566.765625 90.71875C566.765625 117.59375 583.171875 135.71875 609.5 135.71875Z M700.03125 135.71875C720.34375 135.71875 734.25 126.265625 738.546875 111.734375L717.296875 107.75C714.796875 114.46875 708.625 118.0625 700.421875 118.0625C688.625 118.0625 680.65625 110.71875 680.109375 96.421875H739.875V89.859375C739.875 60.015625 721.671875 45.5625 698.859375 45.5625C673.3125 45.5625 656.90625 63.84375 656.90625 90.796875C656.90625 118.375 673.3125 135.71875 700.03125 135.71875ZM680.265625 81.734375C681.203125 70.953125 687.921875 63.21875 699.09375 63.21875C709.953125 63.21875 716.125 70.328125 717.296875 81.734375Z" fill="#E5505E"/></svg></span><sup class="tm" aria-label="trademark">™</sup></a>
     <div class="who">
       <button class="rolechip" type="button" id="roleBtn" aria-haspopup="dialog"><span class="dot"></span><span id="roleName">Guest</span></button>
+      <a class="chipbal" id="chipBal" href="chips.html" hidden aria-label="Your chips"><span class="sfchip" data-chip="2.10" data-size="22"></span><b>$0.00</b></a>
       <button class="btn gold sm" type="button" id="loginBtn">Log in</button>
     </div>
   </div>
@@ -166,8 +167,8 @@
         <a href="safety.html"><b>Safety</b><small>Meeting safely and Jokers</small></a>
       </div></div>
       <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-play">Play</button><div class="ngp" id="ngp-play">
-        <a href="tables.html" data-pgnav="tables"><b>Private Tables</b><small>Friends, groups and game nights</small></a>
-        <a href="bluff-table.html" data-pgnav="bluff" data-need="member" class="clubnav"><b>Bluff Table</b><small>Real player or House Card?</small></a>
+        <a href="my-table.html#table" data-need="member" class="clubnav"><b>Play a deck</b><small>Every card in your area for 7 days</small></a>
+        <a href="chips.html" data-pgnav="chips"><b>Chips</b><small>$2.10 plays a deck</small></a>
         <a href="joker-lobby.html" data-need="member" class="clubnav"><b>Joker Lobby</b><small>Make or challenge a Joker</small></a>
       </div></div>
       <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-club">Club</button><div class="ngp" id="ngp-club">
@@ -176,7 +177,7 @@
         <a href="my-table.html#friends" data-need="member" class="clubnav"><b>Friends</b><small>Who's online</small></a>
         <a href="card-backs.html" data-pgnav="backs" data-need="member" class="clubnav"><b>Card Backs</b><small>Wear what you love</small></a>
         <a href="membership.html#highroller" data-need="member" class="clubnav"><b>💎 High Roller Room</b><small>Verified high-limit room</small></a>
-        <a href="membership.html" data-pgnav="membership"><b>Membership</b><small>Prices, launch offer and the guarantee</small></a>
+        <a href="membership.html" data-pgnav="membership"><b>Your seat</b><small>$21 a year · free through Dec 31</small></a>
       </div></div>
       <div class="ng ngstaff"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-staff">Staff</button><div class="ngp" id="ngp-staff">
         <a href="my-table.html#dealer" data-need="dealer"><b>Dealer</b><small>Dealer console</small></a>
@@ -198,7 +199,7 @@
           <a class="btn gold" data-gate href="membership.html">Get dealt in</a>
           <a class="textlink" href="find-your-suit.html">Find my suit</a>
         </div>
-        <p class="fine" id="heroOffer"><b>Launch offer:</b> join for $2.10 a month. The $21 buy-in is waived through December 31.</p>
+        <p class="fine" id="heroOffer"><b>Launch offer:</b> your seat is free through December 31. See your deck free, then play it for $2.10.</p>
       </div>
       <div class="c-stage deal" aria-hidden="true">
         <div class="pcard red c1"><span class="idx"><b>A</b><svg><use href="#s-heart"/></svg></span><span class="pip"><svg viewBox="0 0 24 24"><use href="#s-heart"/></svg></span><span class="idx bot"><b>A</b><svg><use href="#s-heart"/></svg></span></div>
@@ -252,7 +253,7 @@
       </div>
       <div class="h-price-copy">
         <h2 id="hPriceT">One buy-in. Then pocket change.</h2>
-        <p class="lede" id="hPriceLine">The $21 buy-in is waived through December 31. Join for $2.10 a month and cancel any time.</p>
+        <p class="lede" id="hPriceLine">Your seat is free through December 31. Then $21 a year, and $2.10 a deck.</p>
         <p class="lede h-guar">If we can't deal you at least 12 cards within 10 days, you can have your $21 Buy-In back (regular Buy-In seats).</p>
         <div class="row"><a class="btn gold" data-gate href="membership.html">Get dealt in</a></div>
       </div>
@@ -272,15 +273,6 @@
         <span class="hsc red"><svg><use href="#s-heart"/></svg><b>Devoted</b><small>Heart</small></span>
         <span class="hsc"><svg><use href="#s-spade"/></svg><b>Thoughtful</b><small>Spade</small></span>
       </div>
-    </div>
-  </section>
-
-  <section data-pg="home" class="h-bluff" aria-labelledby="hBluffT">
-    <div class="wrap h-bluff-in">
-      <div><p class="eyebrow">New game</p><h2 id="hBluffT">Can you read a room?</h2>
-        <p class="lede">Sit at the <b>Bluff Table</b> and you're dealt five cards. Some are real players. Some are House Cards, played by SuiteFace's AI dealer. Chat, trust your gut, and call it: <b>Player Card</b> or <b>House Card</b>. The house always tells the truth.</p>
-        <div class="row"><a class="btn gold" href="bluff-table.html">Take a seat at the Bluff Table</a></div></div>
-      <div class="bluffart" aria-hidden="true"><span class="bc a">?</span><span class="bc b">?</span><span class="bc c">?</span></div>
     </div>
   </section>
 
@@ -304,7 +296,7 @@
         <div id="cityOut" aria-live="polite"></div>
         <ul class="cityboard" id="cityBoard" aria-label="City tables"></ul>
       </div>
-      <div class="row"><a class="btn gold" data-gate href="membership.html">Get dealt in for $2.10</a><a class="textlink" href="tables.html">Not here to date? Host a Private Table</a></div>
+      <div class="row"><a class="btn gold" data-gate href="membership.html">Claim my seat</a><a class="textlink" href="membership.html#pvHand">See your deck free</a></div>
     </div>
   </section>
 
@@ -468,7 +460,7 @@
               <span class="hint" id="zipHint">Your cards are measured from your ZIP. Only "about X miles" is ever shown.</span><span class="err" id="fZipErr"></span></div>
           </div>
           <div class="field"><label for="fBio">Face Value <span class="hint">(your bio)</span></label><textarea id="fBio" maxlength="200" placeholder="Sunday farmers market, terrible at mini golf, great at finding the best biscuit in town."></textarea><span class="hint"><span id="bioCount">0</span>/200</span></div>
-          <div class="field"><span style="font-weight:600;font-size:.92rem">Your table <span class="hint">(what you're looking for)</span></span><p class="hint" style="margin:0">Pick your table and your card wears its felt, so everyone can see at a glance what you're here for.</p><div class="tables" id="lookChips"></div></div>
+          <div class="field"><span style="font-weight:600;font-size:.92rem">Relationship goal</span><p class="hint" style="margin:0">We rank your deck by it, and the back of your card shows its color so everyone can see what you're here for.</p><div class="tables" id="lookChips"></div></div>
           <div class="field"><span style="font-weight:600;font-size:.92rem">Show me</span><div class="chips" id="showChips"></div></div>
           <div class="two">
             <div class="field"><label for="fAgeMin">Age range: <span id="ageRangeTxt">25–40</span></label>
@@ -629,82 +621,92 @@
 
   <!-- ============ MEMBERSHIP ============ -->
   <section data-pg="membership" id="membership" aria-labelledby="memTitle">
-    <div class="wrap">
-      <div class="sec-head">
-        <p class="eyebrow">Membership</p>
-        <h2 id="memTitle">One Buy-In. Then pocket change.</h2>
-      </div>
-      <div class="preview-hand" id="pvHand" aria-live="polite">
-        <div class="pv-head"><p class="eyebrow">Before you pay</p><h3 id="pvT">See your real hand first</h3><p class="hint" id="pvL">Create a free account and we'll show you how many real, paying players near you fit what you're looking for. No sample people, no guessing.</p></div>
+    <div class="wrap m2">
+      <header class="m2-head">
+        <h2 id="memTitle">Your seat. Your deck.</h2>
+        <p class="lede">No subscription. Hold your username for the year, then play a deck when you want one.</p>
+      </header>
+      <ol class="m2-steps">
+        <li class="m2-step">
+          <span class="sfchip m2-chip" id="memChip21" data-chip="21" data-size="88"></span>
+          <h3>Claim your username</h3>
+          <p><b>$21 holds your seat and username for 365 days.</b> It never renews on its own.</p>
+          <p class="m2-launch" id="m2Launch" hidden>Launch offer: <b>free through December 31.</b></p>
+        </li>
+        <li class="m2-step">
+          <span class="m2-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+          <h3>See your deck free</h3>
+          <p>How many cards are in your area, how many match your suit, how many rank 10 or higher, and the public Jokers near you.</p>
+        </li>
+        <li class="m2-step">
+          <span class="sfchip m2-chip" data-chip="2.10" data-size="88" data-spin></span>
+          <h3>Play a deck</h3>
+          <p><b>$2.10 in chips</b> opens every card in your area for 7 days. New players who join that week are added to it.</p>
+        </li>
+      </ol>
+
+      <div class="preview-hand m2-preview" id="pvHand" aria-live="polite">
+        <div class="pv-head"><h3 id="pvT">See your deck first</h3><p class="hint" id="pvL">Create a free account and we'll show you your real area deck: no sample people, no guessing.</p></div>
         <div id="pvBody"><button class="btn gold" type="button" data-login>Create my free account</button></div>
       </div>
-      <div class="member">
-        <div class="chipwrap memchips" aria-hidden="true">
-          <span class="sfchip mc21" id="memChip21" data-chip="21" data-size="170" data-label="one-time buy-in"></span>
-          <span class="sfchip mc210" data-chip="2.10" data-size="190" data-spin data-label="a month"></span>
+
+      <div class="m2-claim" id="m2Claim">
+        <div class="m2-claim-head">
+          <h3>Take your seat</h3>
+          <div class="launchbox" id="launchBox" hidden><p class="hint">The launch offer ends <span id="launchEnds">Dec 31</span>. <span id="launchLeft"></span> <span id="f1kLeft" hidden></span></p></div>
         </div>
-        <div class="panel form-grid price">
-          <div class="pricing">
-            <div id="priceBuy"><span class="big">$21.00</span><span class="hint">one-time Buy-In, today</span></div>
-            <div class="plus">+</div>
-            <div id="priceMonth"><span class="big">$2.10</span><span class="hint">a month, starting 30 days after you join</span></div>
-          </div>
-          <div class="launchbox" id="launchBox" hidden>
-            <p class="eyebrow">Launch offer · ends <span id="launchEnds">Dec 31</span></p>
-            <h3>The $21 Buy-In is waived</h3>
-            <p class="hint" style="margin:0">Through December 31, join for just <b>$2.10 a month</b>. <span id="launchLeft"></span></p>
-            <div class="launchopts" role="radiogroup" aria-label="Choose how you join">
-              <button type="button" class="lopt" role="radio" aria-checked="true" data-plan="launch"><b>Launch seat</b><span>$0 Buy-In · $2.10 today, then $2.10 a month</span></button>
-              <button type="button" class="lopt f1kopt" role="radio" aria-checked="false" data-plan="first"><span class="f1kbadge" data-founder="" data-size="92"></span><b class="f1kt">★ First 1,000<small>Founding Player</small></b><span class="f1kd">Skip the waiver: $21 Buy-In today, then $2.10 a month from day 30. Your card wears this numbered <strong>First 1,000 Founding Player</strong> badge forever, numbered in the order you join. Only 1,000 will ever exist. Non-refundable.</span><em id="f1kLeft"></em></button>
-            </div>
-            <p class="hint" style="margin:0">🎟️ <b>Invite friends:</b> every friend who joins credits your account $2.10 (up to 12 credits) and unlocks a unique referral sticker for your card.</p>
-          </div>
-          <ul class="incl">
-            <li>Your full deck, re-dealt as people join</li>
-            <li>Unlimited Burns, Plays and Pairs</li>
-            <li>The Side Table for every Pair</li>
-            <li>Photo Seal, Report and Block, always included</li>
-          </ul>
-          <button type="button" class="hrcta" data-highroller><span aria-hidden="true" class="hrgem"><svg><use href="#s-diamond"/></svg></span><span><b>The High Roller Room</b>Verify $1M+ or buy in for $5,000. A private deck of High Rollers and exclusive offers.</span><em>›</em></button>
-          <div class="guarantee"><span class="gbadge" aria-hidden="true">12</span><div><b>The 12-Card Deck Guarantee</b><span>If we can't deal you at least 12 cards within 10 days, you choose: get your $21 back (regular Buy-In seats), or stay with full access while your table fills.</span></div></div>
-          <div class="notice pv rules-box"><b>Pausing:</b> pause <b>once every 210 days</b> for up to 21 days, and your $2.10 billing stops while you're paused. If a pause runs past 21 days, your membership ends, and coming back means a new $21.00 Buy-In.</div>
-          <div class="billpick" role="radiogroup" aria-label="How you pay your membership"><button type="button" role="radio" aria-checked="true" data-bill="month"><b>Monthly</b><span>$2.10 a month</span></button><button type="button" role="radio" aria-checked="false" data-bill="year"><b>Prepaid year</b><span>$21 a year · save $4.20</span></button></div>
-          <label class="agree"><input type="checkbox" id="agree"> <span>I understand that SuiteFace charges <b>$21.00 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership. I agree to the <a href="terms.html">Terms of Service</a>.</span></label>
-          <div class="comp housecomp"><label for="compCode"><span class="chipmark" aria-hidden="true">COMP</span> Have a comp from the house?</label><div class="comprow"><input type="text" id="compCode" placeholder="Enter your comp code" autocomplete="off" autocapitalize="characters" maxlength="30"><button class="btn ghost sm" type="button" id="compApply">Apply</button></div><span class="hint" id="compMsg">Comps are applied at checkout. One per player.</span></div>
-          <span class="err" id="agreeErr"></span>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-            <a class="btn gold" id="payBtn" href="#membership" rel="noopener">Pay $21.00 with Stripe</a>
-            <a class="btn ghost sm" id="portalBtn" href="#membership" rel="noopener">Manage, pause or cancel</a>
-          </div>
-          <p class="hint">Payments are handled by Stripe. SuiteFace never sees or stores your card number. Cancel any time to stop future charges.</p>
-          <details id="terms" class="terms"><summary>Membership terms</summary>
-            <ol>
-              <li><b>Buy-In.</b> Joining costs a one-time $21.00 USD membership fee, charged when you sign up.</li>
-              <li><b>Monthly membership.</b> After that, membership is $2.10 USD per month, charged to the same payment method every month starting one month after you join, until you cancel.</li>
-              <li><b>Pausing.</b> You can pause once every 210 days (counted from the day your last pause began), for up to 21 days. No monthly charges are made while paused, and your deck is hidden from others.</li>
-              <li><b>Pauses over 21 days.</b> If you don't resume within 21 days, your membership ends. To return, you'll pay a new $21.00 Buy-In, then $2.10 a month.</li>
-              <li><b>Cancelling.</b> Cancel any time from "Manage, pause or cancel" or by emailing help@suiteface.com. Cancelling stops future charges. Rejoining later requires a new $21.00 Buy-In.</li>
-              <li><b>Launch offer.</b> From Oct 17 through 11:59 pm CT Dec 31, 2026, the $21.00 Buy-In is waived: you pay $2.10 today and $2.10 a month. Rejoining after your membership ends requires the Buy-In.</li>
-              <li><b>First 1,000.</b> During the launch offer you may pay the $21.00 Buy-In instead to get a numbered First 1,000 badge. It's non-refundable, including under the 12-Card Deck Guarantee.</li>
-              <li><b>Referrals.</b> Each friend who joins with your invite link credits your account $2.10, up to 12 credits, and unlocks a unique sticker.</li>
-              <li><b>Refunds.</b> Charges are non-refundable except under the 12-Card Deck Guarantee for a regular Buy-In, or where the law requires.</li>
-              <li><b>Age.</b> Membership is for adults 18 and over.</li>
-            </ol>
-            <p class="hint">Full details: <a href="terms.html">Terms of Service</a> 4.1–4.1d and Agreement B.</p>
-          </details>
+        <label class="agree"><input type="checkbox" id="agree"> <span>I understand my $21.00 seat lasts 365 days and does not renew on its own, and that decks are $2.10 in chips. I agree to the <a href="terms.html">Terms of Service</a>.</span></label>
+        <span class="err" id="agreeErr"></span>
+        <div class="m2-actions">
+          <a class="btn gold" id="payBtn" href="#membership" rel="noopener">Claim my seat</a>
+          <a class="btn ghost" href="chips.html">Get chips</a>
         </div>
+        <details class="m2-more"><summary>Have a comp code?</summary>
+          <div class="comp housecomp"><div class="comprow"><input type="text" id="compCode" placeholder="Enter your comp code" autocomplete="off" autocapitalize="characters" maxlength="30" aria-label="Comp code"><button class="btn ghost sm" type="button" id="compApply">Apply</button></div><span class="hint" id="compMsg">Comps are applied at checkout. One per player.</span></div>
+        </details>
+        <p class="hint m2-fine">Payments are handled by Stripe; SuiteFace never sees your card number. <a id="portalBtn" href="#membership" rel="noopener">Receipts</a> · <button type="button" class="linkish" data-highroller>High Roller Room</button></p>
+        <details id="terms" class="terms"><summary>Seat and deck terms</summary>
+          <ol>
+            <li><b>Your seat.</b> $21.00 USD holds your seat and username for 365 days. It is a one-time payment and does not renew on its own; we remind you before it ends.</li>
+            <li><b>Launch offer.</b> Seats claimed through 11:59 pm CT December 31, 2026 are free for their first 365 days.</li>
+            <li><b>Your username.</b> Your username stays yours while your seat is active.</li>
+            <li><b>Decks.</b> A deck costs $2.10 in chips and opens every card dealt to you in your area for 7 days. Players who join during those 7 days are added to it. Cards you've played or burned don't come back in the same deck.</li>
+            <li><b>Free preview.</b> Before you play a deck you can see how many cards are in your area, how many match your suit, how many rank 10 or higher, and the public Jokers near you.</li>
+            <li><b>Chips.</b> Chips are bought in stacks of $2.10, $21 or $210. They have no cash value, never expire, can't be cashed out or transferred, and are non-refundable except where the law requires.</li>
+            <li><b>Age.</b> SuiteFace is for adults 18 and over.</li>
+          </ol>
+          <p class="hint">Full details: <a href="terms.html">Terms of Service</a>, section 4.</p>
+        </details>
       </div>
-      <div class="chiplegend" aria-labelledby="chipT">
-        <h3 id="chipT">The house chips</h3>
-        <p class="hint">Most SuiteFace prices are one of these five chips.</p>
+    </div>
+  </section>
+
+  <section data-pg="chips" id="chips" aria-labelledby="chipsTitle">
+    <div class="wrap m2 chipspage">
+      <div class="cp-hero">
+        <div>
+          <h2 id="chipsTitle">Chips</h2>
+          <p class="lede">Buy a stack once. Every deck is one tap after that.</p>
+          <p class="cp-bal" id="cpBal" hidden></p>
+        </div>
+        <div class="chipplay" data-chipplay="2.10" data-stack="7"></div>
+      </div>
+      <div class="cp-stacks" role="list">
+        <button type="button" class="cp-stack" data-stack-buy="210" role="listitem"><span class="sfchip" data-chip="2.10" data-size="72"></span><b>$2.10</b><span>1 deck</span></button>
+        <button type="button" class="cp-stack best" data-stack-buy="2100" role="listitem"><span class="sfchip" data-chip="21" data-size="72"></span><b>$21</b><span>10 decks</span><em>Most players</em></button>
+        <button type="button" class="cp-stack" data-stack-buy="21000" role="listitem"><span class="sfchip" data-chip="210" data-size="72"></span><b>$210</b><span>100 decks</span></button>
+      </div>
+      <div class="cp-uses">
+        <h3>What chips play</h3>
         <ul>
-          <li><span class="sfchip" data-chip="0.21" data-size="76"></span><b>21¢</b><span>Small fees</span></li>
-          <li><span class="sfchip" data-chip="2.10" data-size="76"></span><b>$2.10</b><span>Your month, The Raise, an extra seat or ZIP</span></li>
-          <li><span class="sfchip" data-chip="21" data-size="76"></span><b>$21</b><span>The buy-in, a Private Table</span></li>
-          <li><span class="sfchip" data-chip="210" data-size="76"></span><b>$210</b><span>Joker Lobby, a whole state, ZIP sponsors</span></li>
-          <li><span class="sfchip" data-chip="2100" data-size="76"></span><b>$2,100</b><span>Joker buy-out, nationwide, High Roller sponsors</span></li>
+          <li><b>$2.10</b><span>A deck: every card in your area for 7 days</span></li>
+          <li><b>$2.10</b><span>A sticker pack, or a premium card theme</span></li>
+          <li><b>$4.20</b><span>The Vegas Neon theme</span></li>
+          <li><b>$2.10</b><span>The Raise: the Dealer preps your date</span></li>
         </ul>
       </div>
+      <div class="cp-history" id="cpHistory" hidden></div>
+      <p class="hint m2-fine">Chips have no cash value, never expire, can't be cashed out or transferred, and are non-refundable except where the law requires. Payments by Stripe.</p>
     </div>
   </section>
 
@@ -932,7 +934,7 @@
       <div class="sf-badges"><span class="sf-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8.3 7.5 9.5 4.3-1.2 7.5-5 7.5-9.5V6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>U.S. patent pending (USPTO)</span><span class="sf-badge">Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener">GoFirehorseGo</a></span></div>
       <p class="hint copyright">© <span id="cpYear">2026</span> SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™, the SuiteFace Joker logo™, No Jokers Needed™, Your Hand™, Play Hand™, Joker Lobby™, Ask the Dealer™, The Raise™, High Roller Room™ and SuiteFace Private Tables™ are trademarks of SuiteFace Inc. Patent pending.</p>
     </div>
-    <div><h4>Play</h4><ul><li><a href="how-it-works.html">How it works</a></li><li><a href="find-your-suit.html">Find your suit</a></li><li><a href="tables.html">Private Tables</a></li><li><a href="membership.html">Membership</a></li><li><a href="winners.html">Winners' Row</a></li><li><a href="bluff-table.html">Bluff Table</a></li><li><a href="card-backs.html">Card Backs</a></li><li><a href="how-cards-work.html">How cards are dealt</a></li><li><a href="joker-lobby.html">Joker Lobby</a></li><li><a href="my-table.html">My table (players)</a></li></ul></div>
+    <div><h4>Play</h4><ul><li><a href="how-it-works.html">How it works</a></li><li><a href="find-your-suit.html">Find your suit</a></li><li><a href="membership.html">Your seat</a></li><li><a href="winners.html">Winners' Row</a></li><li><a href="chips.html">Chips</a></li><li><a href="card-backs.html">Card Backs</a></li><li><a href="how-cards-work.html">How cards are dealt</a></li><li><a href="joker-lobby.html">Joker Lobby</a></li><li><a href="my-table.html">My table (players)</a></li></ul></div>
     <div><h4>SuiteFace Inc.</h4><ul><li><a href="membership.html">Membership and prices</a></li><li><a href="guides.html">Dating guides</a></li><li><a href="christian-dating-app.html">Christian dating</a></li><li><a href="online-dating-safety.html">Dating safety tips</a></li><li><a href="legal.html">Legal center</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="safety.html">Safety Guide</a></li><li><a href="fit.html">House Fit Rules</a></li><li><a href="contact.html">Contact</a></li><li><a href="redeem.html">Venues: check a date code</a></li><li><a href="my-table.html#invite">Invite a friend</a></li><li><a href="mailto:help@suiteface.com">help@suiteface.com</a></li><li>© 2026 SuiteFace Inc.</li></ul></div>
   </div>
 </footer>
@@ -946,15 +948,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792421712"></script>
-<script src="/assets/js/sign.js?v=1792421712"></script>
-<script src="/assets/js/live.js?v=1792421712"></script>
-<script src="/assets/js/gate.js?v=1792421712"></script>
-<script src="/assets/js/fx.js?v=1792421712"></script>
-<script src="/assets/js/casino-scene.js?v=1792421712"></script>
-<script src="/assets/js/chips.js?v=1792421712"></script>
-<script src="/assets/js/bumpers.js?v=1792421712"></script>
-<script src="/assets/js/slots.js?v=1792421712"></script>
-<script src="/assets/js/app.js?v=1792421712"></script>
+<script src="/assets/js/config.js?v=1792422565"></script>
+<script src="/assets/js/sign.js?v=1792422565"></script>
+<script src="/assets/js/live.js?v=1792422565"></script>
+<script src="/assets/js/gate.js?v=1792422565"></script>
+<script src="/assets/js/fx.js?v=1792422565"></script>
+<script src="/assets/js/casino-scene.js?v=1792422565"></script>
+<script src="/assets/js/chips.js?v=1792422565"></script>
+<script src="/assets/js/bumpers.js?v=1792422565"></script>
+<script src="/assets/js/slots.js?v=1792422565"></script>
+<script src="/assets/js/app.js?v=1792422565"></script>
 </body>
 </html>
