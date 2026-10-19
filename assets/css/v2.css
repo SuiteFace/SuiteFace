@@ -1036,3 +1036,46 @@ html[data-play="day"] .citycheck li.open span,html[data-play="day"] .citycheck .
 .c-stage .mc span{color:#4F6358!important}html[data-play="night"] .c-stage .mc span{color:#A9B8AF!important}
 .citycheck small{color:inherit!important;opacity:.85}
 html[data-play="day"] .memchips small{color:#3F5A4E}
+
+/* ---------- See your real hand before paying (Oct 18) ---------- */
+.preview-hand{margin:0 0 24px;padding:20px 22px;border-radius:22px;background:radial-gradient(120% 140% at 0% 0%,#24704F,#123A2A 70%);border:1px solid rgba(232,196,106,.45);color:#F2ECDD;display:grid;gap:14px}
+.preview-hand h3{margin:2px 0 4px;font-size:1.5rem;color:#FAF7F0}
+.preview-hand .eyebrow{color:#E8C46A}
+.preview-hand .hint,.preview-hand p{color:#DCE5DA}
+.preview-hand .btn.ghost{color:#F2ECDD;border-color:rgba(242,236,221,.35)}
+.pv-form{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end}
+.pv-form label{display:grid;gap:4px;font:700 .88rem var(--body);color:#F2ECDD}
+.pv-form :is(input,select){min-height:46px;border-radius:12px;border:1px solid rgba(242,236,221,.3);background:#0F2A20;color:#F2ECDD;padding:0 12px;font:500 1rem var(--body)}
+.pv-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:520px}
+.pv-c{aspect-ratio:5/7;border-radius:10px;background:#FBF8F2;color:#2B2730;padding:6px;display:grid;grid-template-rows:auto 1fr auto;box-shadow:0 10px 20px -12px rgba(5,12,9,.8)}
+.pv-c.red{color:#B3263A}
+.pv-c .ix{font:900 1.05rem/1 var(--display)}
+.pv-c .fd{border-radius:6px;margin:4px 0;background:repeating-linear-gradient(45deg,#8E2230 0 6px,#7A1C28 6px 12px);display:grid;place-items:center;color:#FFE7A3;font:800 .6rem var(--body);text-align:center}
+.pv-c small{font:700 .64rem/1.2 var(--body);color:#4F6358;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pv-c.open{opacity:.35}
+.pv-suits{display:flex;gap:8px;flex-wrap:wrap}
+.pv-suits span{flex:1;min-width:72px;text-align:center;padding:8px;border-radius:12px;background:rgba(250,247,240,.08);font:600 .8rem var(--body);color:#DCE5DA}
+.pv-suits b{display:block;font:900 1.4rem var(--body);color:#FAF7F0}
+html[data-play="day"] .preview-hand :is(h3,b,label){color:#FAF7F0}
+html[data-play] .preview-hand .hint,html[data-play] .preview-hand p:not(.eyebrow):not(.err){color:#DCE5DA!important}
+html[data-play] .preview-hand .btn.ghost{color:#F2ECDD!important;border-color:rgba(242,236,221,.4)!important;background:transparent!important}
+html[data-play] .preview-hand .err{color:#FFB3BD}
+/* Owner proof report */
+.proofgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:8px 0}
+.proofgrid p{margin:0;padding:10px;border-radius:12px;border:1px solid var(--line);font-size:.82rem;color:var(--cream-dim)}
+.proofgrid b{display:block;font:900 1.4rem var(--body);color:var(--cream)}
+.tblwrap{overflow-x:auto}
+table.proof{width:100%;border-collapse:collapse;font-size:.88rem}
+table.proof :is(th,td){padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+table.proof :is(th:first-child){text-align:left}
+table.proof tbody tr:last-child{font-weight:800}
+/* Monthly or prepaid year */
+.billpick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
+.billpick button{display:grid;gap:2px;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:transparent;color:var(--cream);cursor:pointer;font:inherit}
+.billpick button b{font:800 1rem var(--body)}
+.billpick button span{font:500 .85rem var(--body);color:var(--cream-dim)}
+.billpick button[aria-checked="true"]{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.yourdata{margin-top:24px;padding:18px 20px;border-radius:18px;border:1px solid var(--line);display:grid;gap:8px}
+.yourdata h3{margin:0}
+.btn.ghost.danger{color:#E0344F;border-color:rgba(224,52,79,.5)}
+html[data-play="day"] .btn.ghost.danger{color:#A11C30}

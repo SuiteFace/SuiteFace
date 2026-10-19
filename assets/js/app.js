@@ -291,7 +291,7 @@
       ["How do Jokers work?", "After a Loss on one of your first three dates together, you can make a Joker within 12 hours of Play Hand. Ten Jokers within 180 days shows JOKER on a card for 45 days. Every Joker can be challenged for free. See Joker Rules."],
       ["Someone made me feel unsafe.", "If you're in danger, call 911 now. Then use Report a safety concern on their card. Safety reports go straight to SuiteFace staff and are never handled as a Joker."],
       ["I can't use 'Use my location'.", "Your browser has to allow location for suiteface.com, and it only works on the secure site. You can always type your ZIP code or city instead."],
-      ["How do I change or delete my account?", "Settings lets you edit your Face, change your @username if it's free, download your data, or delete your account."],
+      ["How do I change or delete my account?", "Open My table, then My Face. At the bottom, Your data lets you download everything SuiteFace keeps about you or delete your account. Cancel your membership under Manage billing first so you're never charged again."],
       ["How do I contact SuiteFace?", "Email help@suiteface.com. SuiteFace doesn't take phone calls; every request is answered by email so there's a written record."]
     ];
     var DEALER = CFG.dealerUrl || "";
@@ -370,8 +370,23 @@
       if (trq) { trq.onclick = function (e) {
         var ev = e.target.closest("[data-evid]"); if (ev) { window.SF_LIVE.client.storage.from("report-evidence").createSignedUrl(ev.getAttribute("data-evid"), 300).then(function (r) { if (r.error) toast(r.error.message); else window.open(r.data.signedUrl, "_blank", "noopener"); }); return; }
         var b = e.target.closest("[data-trule]"); if (!b) return; var v = b.getAttribute("data-v") === "1";
-        if (!confirm(v ? "Rule this a VIOLATION? The sender is banned for life with no refund, and their card becomes a permanent Joker." : "Dismiss this report?")) return;
-        window.SF_LIVE.rpc("rule_table_report", { p_message: +b.getAttribute("data-trule"), p_reporter: null, p_violation: v, p_note: null }).then(function (r) { if (r.error) toast(r.error.message); else { toast(v ? "Banned for life. Their card is now a Joker." : "Dismissed."); loadTr(); } }); }; loadTr(); }
+        if (!confirm(v ? "Rule this a VIOLATION? The sender's account is closed with no refund and their card gets a public Joker for 45 days. They can appeal once; a different staff member decides." : "Dismiss this report?")) return;
+        window.SF_LIVE.rpc("rule_table_report", { p_message: +b.getAttribute("data-trule"), p_reporter: null, p_violation: v, p_note: null }).then(function (r) { if (r.error) toast(r.error.message); else { toast(v ? "Ruled a violation. Account closed and a 45-day Joker added." : "Dismissed."); loadTr(); } }); }; loadTr(); }
+      var tap = $("#tableAppeals"), loadAp = function () { if (!tap) return; window.SF_LIVE.rpc("table_rulings_recent").then(function (r) { var rows = r.data || [];
+        tap.innerHTML = rows.length ? rows.map(function (x) { return '<div class="cmrow"><span><b>@' + esc(x.sender_tag || "?") + "</b> · " + new Date(x.ruled_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }) + "<br><small>" + esc(x.body || "") + "</small></span>" +
+          (x.status !== "violation" ? '<span class="hint">' + (x.status === "reversed" ? "Appeal: reversed" : "Appeal: upheld") + "</span>" : x.ruled_by_me ? '<span class="hint">You ruled; another staff member decides</span>' : '<span><button class="chip sm" type="button" data-appeal="' + x.message_id + '" data-rev="0">Uphold</button> <button class="chip sm" type="button" data-appeal="' + x.message_id + '" data-rev="1">Reverse</button></span>') + "</div>"; }).join("") : '<p class="hint">No rulings in the last 60 days.</p>'; }); };
+      if (tap) { loadAp(); tap.onclick = function (e) { var b = e.target.closest("[data-appeal]"); if (!b) return; var rev = b.getAttribute("data-rev") === "1"; var note = prompt(rev ? "Why reverse this ruling? (The ban and Joker are lifted.)" : "Why uphold this ruling?"); if (!note) return;
+        window.SF_LIVE.rpc("decide_table_appeal", { p_message: +b.getAttribute("data-appeal"), p_reverse: rev, p_note: note }).then(function (r) { if (r.error) toast(r.error.message); else { toast(rev ? "Appeal granted. Ban and Joker lifted." : "Ruling upheld."); loadAp(); } }); }; }
+      var loadProof = function () { var el = $("#proofReport"); if (!el) return; var d = +(($("#proofDays") || {}).value || 90);
+        window.SF_LIVE.rpc("owner_proof_report", { p_days: d }).then(function (r) { if (r.error) { el.innerHTML = '<p class="hint">' + esc(r.error.message) + "</p>"; return; } var x = r.data || {};
+          var pct = function (a, b) { return b ? Math.round(a / b * 1000) / 10 + "%" : "–"; }, bl = x.baseline || {}, f = x.funnel || {}, dk = x.decks || {};
+          var row = function (k, o) { return "<tr><th scope=\"row\">" + esc(k) + "</th><td>" + o.dealt + "</td><td>" + pct(o.played, o.dealt) + "</td><td>" + pct(o.pairs, o.dealt) + "</td><td>" + pct(o.talked || 0, o.dealt) + "</td><td>" + pct(o.met, o.dealt) + "</td><td>" + pct(o.won, o.dealt) + "</td></tr>"; };
+          el.innerHTML = '<div class="proofgrid"><p><b>' + (f.quiz_leads || 0) + "</b>quiz leads</p><p><b>" + (f.accounts || 0) + "</b>new accounts</p><p><b>" + (f.seated || 0) + "</b>seated players</p><p><b>" + pct(f.seated_new || 0, f.accounts || 0) + "</b>account to seat</p><p><b>" + (dk.median_cards == null ? "–" : dk.median_cards) + "</b>median cards per hand</p><p><b>" + pct(dk.at_least_12 || 0, dk.players || 0) + "</b>hands with 12+ cards</p></div>" +
+            (bl.dealt ? '<div class="tblwrap"><table class="proof"><thead><tr><th scope="col">Rank</th><th scope="col">Dealt</th><th scope="col">Played</th><th scope="col">Pair</th><th scope="col">Talked</th><th scope="col">Met</th><th scope="col">Win</th></tr></thead><tbody>' + (x.ranking || []).map(function (o) { return row(o.rank, o); }).join("") + row("All cards (baseline)", bl) + "</tbody></table></div>" : '<p class="hint">No real hands dealt in this period yet. The table fills in as seated players play their cards.</p>') +
+            ((x.thin_players || []).length ? '<p class="hint" style="margin-top:10px"><b>Thin hands (under 12 cards):</b> ' + x.thin_players.map(function (t) { return esc(t.zip || "?") + " (" + t.cards + ")"; }).join(", ") + "</p>" : "") +
+            ((x.zips || []).length ? '<p class="hint"><b>Seated players by ZIP:</b> ' + x.zips.map(function (z) { return esc(z.zip) + " · " + z.seated; }).join(", ") + "</p>" : "");
+        }); };
+      loadProof(); var pd = $("#proofDays"); if (pd) pd.onchange = loadProof;
       window.SF_LIVE.rpc("card_back_applications_recent").then(function (r) { var el = $("#cbAppList"); if (!el) return; var rows = r.data || [];
         el.innerHTML = rows.length ? rows.map(function (x) { return '<div class="cmrow"><span><b>' + esc(x.org_name) + "</b> (" + esc(x.kind) + ") · " + esc(x.contact_name) + " · " + esc(x.email) + (x.phone ? " · " + esc(x.phone) : "") + "<br><small>" + esc(new Date(x.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })) + " · price: " + esc(x.proposed_price || "?") + (x.beneficiary ? " · proceeds to " + esc(x.beneficiary) : "") + (x.website ? " · " + esc(x.website) : "") + "</small><br><small>" + esc(x.idea || "") + "</small></span></div>"; }).join("") : '<p class="hint">No applications yet.</p>'; });
       window.SF_LIVE.rpc("recent_signups", { p_limit: 100 }).then(function (r) { var su = $("#signupList"); if (!su) return; var rows = r.data || [];
@@ -1902,7 +1917,7 @@
 
 
   /* ---------- Launch offer (Oct 17 to Dec 31, 2026): Buy-In waived, or choose First 1,000 ---------- */
-  var LAUNCH = { open: false, ends: "2027-01-01T06:00:00Z", left: 1000 }, PLAN = "launch";
+  var LAUNCH = { open: false, ends: "2027-01-01T06:00:00Z", left: 1000 }, PLAN = "launch", BILL = "month";
   function launchEndText() { return new Date(new Date(LAUNCH.ends).getTime() - 1).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/Chicago" }); }
   function SIGNED_PAID() { return !!(window.SF_LIVE && window.SF_LIVE.seated); }
   function launchUI() {
@@ -1925,14 +1940,19 @@
     $("#f1kLeft").textContent = LAUNCH.left.toLocaleString() + " of 1,000 left";
     var launch = LAUNCH.open && PLAN === "launch";
     var pr = $("#priceBuy"); if (pr) pr.innerHTML = launch ? '<span class="big"><s>$21.00</s> $0</span><span class="hint">Buy-In waived during the launch offer</span>' : '<span class="big">$21.00</span><span class="hint">one-time Buy-In, today' + (LAUNCH.open ? " · First 1,000 badge" : "") + "</span>";
-    var pm = $("#priceMonth"); if (pm) pm.innerHTML = launch ? '<span class="big">$2.10</span><span class="hint">today, then every month</span>' : '<span class="big">$2.10</span><span class="hint">a month, starting 30 days after you join</span>';
-    $("#payBtn").textContent = launch ? "Join for $2.10 with Stripe" : (LAUNCH.open ? "Pay $21.00 · First 1,000" : "Pay $21.00 with Stripe");
+    var pm = $("#priceMonth"); if (pm) pm.innerHTML = BILL === "year" ? (launch ? '<span class="big">$21</span><span class="hint">today, then every year</span>' : '<span class="big">$21</span><span class="hint">a year, starting 30 days after you join</span>') : launch ? '<span class="big">$2.10</span><span class="hint">today, then every month</span>' : '<span class="big">$2.10</span><span class="hint">a month, starting 30 days after you join</span>';
+    $("#payBtn").textContent = BILL === "year" ? (launch ? "Join for $21 a year with Stripe" : (LAUNCH.open ? "Pay $21.00 · First 1,000 · yearly" : "Pay $21.00 with Stripe · yearly")) : launch ? "Join for $2.10 with Stripe" : (LAUNCH.open ? "Pay $21.00 · First 1,000" : "Pay $21.00 with Stripe");
+    $$(".billpick [data-bill]").forEach(function (x) { x.setAttribute("aria-checked", String(x.getAttribute("data-bill") === BILL)); });
     var ag = $("#agree").parentElement.querySelector("span");
-    ag.innerHTML = launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and SuiteFace charges <b>$2.10 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership (rejoining then requires the Buy-In). I agree to the <a href="terms.html">Terms of Service</a>.'
+    var yr = BILL === "year";
+    ag.innerHTML = yr ? (launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and I choose the <b>prepaid year</b>: SuiteFace charges <b>$21.00 USD today</b>, then <b>$21.00 USD every year</b> until I cancel. Unused months aren\'t refunded. I agree to the <a href="terms.html">Terms of Service</a>.'
+        : 'I understand that SuiteFace charges <b>$21.00 USD today</b> for the Buy-In' + (LAUNCH.open ? ' (non-refundable First 1,000 seat)' : '') + ', then <b>$21.00 USD every year</b> starting in 30 days, until I cancel. Unused months of a prepaid year aren\'t refunded. I agree to the <a href="terms.html">Terms of Service</a>.')
+      : launch ? 'I understand that under the launch offer the $21.00 Buy-In is waived, and SuiteFace charges <b>$2.10 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership (rejoining then requires the Buy-In). I agree to the <a href="terms.html">Terms of Service</a>.'
       : LAUNCH.open ? 'I choose the <b>First 1,000</b> Buy-In instead of the free launch seat. SuiteFace charges <b>$21.00 USD today, non-refundable</b> (the 12-Card Deck Guarantee doesn\'t apply to it), then <b>$2.10 USD every month</b> starting in 30 days until I cancel. I agree to the <a href="terms.html">Terms of Service</a>.'
       : 'I understand that SuiteFace charges <b>$21.00 USD today</b>, then <b>$2.10 USD every month</b> until I cancel, and that a pause longer than 21 days ends my membership. I agree to the <a href="terms.html">Terms of Service</a>.';
 
   }
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest(".billpick [data-bill]"); if (!b) return; BILL = b.getAttribute("data-bill"); $("#agree").checked = false; launchUI(); });
   $("#launchBox").addEventListener("click", function (e) { var b = e.target.closest("[data-plan]"); if (!b) return; PLAN = b.getAttribute("data-plan"); $("#agree").checked = false; launchUI(); });
   (function () {
     var fallback = function () { LAUNCH.open = new Date(LAUNCH.ends).getTime() > Date.now(); launchUI(); };
@@ -1968,7 +1988,7 @@
     }
   })();
   /* ---------- membership (Stripe) ---------- */
-  function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = (LAUNCH.open && PLAN === "launch" ? "Please tick the box to confirm the $2.10 monthly charge." : "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."); $("#agree").focus(); return false; }
+  function needAgree() { if ($("#agree").checked) { $("#agreeErr").textContent = ""; return true; } $("#agreeErr").textContent = (BILL === "year" ? "Please tick the box to confirm the yearly charge." : LAUNCH.open && PLAN === "launch" ? "Please tick the box to confirm the $2.10 monthly charge." : "Please tick the box to confirm the $21.00 Buy-In and $2.10 monthly charge."); $("#agree").focus(); return false; }
   $("#payBtn").addEventListener("click", function (e) {
     e.preventDefault(); if (!needAgree()) return;
     if (CFG.stripePaymentLink && window.SF_AUTH && (PUBLIC_SITE || window.SF_LIVE)) { liveBuyIn(); return; }
@@ -3386,7 +3406,9 @@
     proceed(); return;
     function proceed() {
     var comp = (S.get("comp", "") || "").trim();
-    var link = PLAN === "launch" && LAUNCH.open && CFG.stripeLaunchLink ? CFG.stripeLaunchLink : CFG.stripePaymentLink;
+    var launchSeat = PLAN === "launch" && LAUNCH.open;
+    var link = BILL === "year" ? (launchSeat ? CFG.stripeAnnualLaunchLink : CFG.stripeAnnualLink) : (launchSeat && CFG.stripeLaunchLink ? CFG.stripeLaunchLink : CFG.stripePaymentLink);
+    if (!link) link = CFG.stripePaymentLink;
     window.SF_AUTH.checkout(link, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
     }
   }
@@ -3414,7 +3436,7 @@
       if (!ok && !lock) {
         lock = document.createElement("div"); lock.className = "lockpanel wrap"; lock.setAttribute("data-s", String(SIGNED));
         var t = { face: "Build your Face", table: "Your Hand", map: "The Table Map", invite: "Invite friends to the table" }[sec.id] || "Members only";
-        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Players only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? (LAUNCH.open ? "You're signed in. Take your seat for $2.10 a month: the $21 Buy-In is waived through " + launchEndText() + "." : "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month.") : (LAUNCH.open ? "Take a seat to play: $2.10 a month, with the $21 Buy-In waived through " + launchEndText() + ". Already a player? Log in." : "Buy in to play: $21.00 once, then $2.10 a month. Already a player? Log in.")) + '</p><div class="row"><a class="btn gold sm" href="#membership">' + (LAUNCH.open ? "Take a seat · $2.10" : "Buy in · $21") + '</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
+        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Players only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? (LAUNCH.open ? "You're signed in. Take your seat for $2.10 a month: the $21 Buy-In is waived through " + launchEndText() + "." : "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month.") + ' <a href="membership.html#pvHand">See your real hand first ›</a>' : (LAUNCH.open ? "Take a seat to play: $2.10 a month, with the $21 Buy-In waived through " + launchEndText() + ". Already a player? Log in." : "Buy in to play: $21.00 once, then $2.10 a month. Already a player? Log in.")) + '</p><div class="row"><a class="btn gold sm" href="#membership">' + (LAUNCH.open ? "Take a seat · $2.10" : "Buy in · $21") + '</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
         sec.appendChild(lock);
       }
       if (lock) lock.hidden = ok; sec.classList.toggle("is-locked", !ok);
@@ -3834,7 +3856,7 @@
         if (!live()) { needLogin("tables"); return; }
         if (c.kind === "flirty18" && !$("#cjJoin", m).__ok) {
           var jb = $("#cjJoin", m);
-          if (!confirm("18+ Flirty table rules:\n\n• Adults only. ID-verified members only.\n• Flirty and suggestive is fine when everyone is into it. Stop the moment anyone isn't.\n• No nudity, no sexual images and no explicit sexual content, ever.\n• No asking for or offering money, gifts or meetups for anything sexual.\n\nBreak a rule and you're banned for life, with no refund, and your card becomes a Joker. Join?")) return;
+          if (!confirm("18+ Flirty table rules:\n\n• Adults only. ID-verified members only.\n• Flirty and suggestive is fine when everyone is into it. Stop the moment anyone isn't.\n• No nudity, no sexual images and no explicit sexual content, ever.\n• No asking for or offering money, gifts or meetups for anything sexual.\n\nBreak a rule and your account is closed with no refund, and your card gets a public Joker for 45 days. You can appeal once. Join?")) return;
           jb.__ok = true;
         }
         call("join_casino", { p_casino: c.id }).then(function (st) { closeModal(); toast(st === "member" ? "You're in! Welcome to " + c.name + "." : st === "waitlist" ? "It's full right now, so you're on the waitlist. The Host can add seats or let you in." : c.seating === "reserved" ? "Asked for a seat. The Host saves seats for players." : "Request sent. The Host will let you in."); find(); }, function (e) {
@@ -4869,6 +4891,93 @@
   document.addEventListener("sf:live", function () { setTimeout(loungeTick, 400); });
   setInterval(function () { if (!document.hidden) loungeTick(); }, 8000);
 
+
+  /* ---------- See your real hand before paying ----------
+     Signed-in players who haven't taken a seat save a starter card (start_card) and see an honest preview of the real players
+     who fit them (hand_preview): counts per suit and the top five cards face down. No names, photos or ids until they pay. */
+  function renderPreview() {
+    var box = $("#pvHand"); if (!box) return; var L = window.SF_LIVE;
+    if (L && L.seated) { box.hidden = true; return; }
+    box.hidden = false;
+    if (!L) { $("#pvT").textContent = "See your real hand first"; $("#pvBody").innerHTML = '<button class="btn gold" type="button" data-login>Create my free account</button>'; return; }
+    $("#pvT").textContent = "Dealing your hand…"; $("#pvL").textContent = "";
+    lrpc("hand_preview").then(function (h) { if (!h || !h.ready) pvForm(); else pvShow(h); }, function () { pvForm(); });
+  }
+  function pvForm(err) {
+    var g = genderCode() || "", by = (/^(\d{4})/.exec(P.dob || "") || [])[1] || "";
+    $("#pvT").textContent = "Tell us who you're looking for"; $("#pvL").textContent = "Four quick answers and we'll show you how many real players fit you nearby. Free, and nothing is shared until you take your seat.";
+    var opt = function (v, t, cur) { return '<option value="' + v + '"' + (v === cur ? " selected" : "") + ">" + t + "</option>"; };
+    $("#pvBody").innerHTML = '<form class="pv-form" id="pvForm" novalidate>' +
+      '<label>First name<input id="pvName" maxlength="40" autocomplete="given-name" value="' + esc(P.name || "") + '"></label>' +
+      '<label>Birth year<input id="pvYear" inputmode="numeric" maxlength="4" placeholder="1990" value="' + esc(by) + '"></label>' +
+      '<label>ZIP code<input id="pvZip" inputmode="numeric" maxlength="5" autocomplete="postal-code" value="' + esc(P.zip || "") + '"></label>' +
+      '<label>I am<select id="pvG">' + opt("", "Choose", g) + opt("woman", "A woman", g) + opt("man", "A man", g) + opt("nonbinary", "Nonbinary", g) + "</select></label>" +
+      '<label>Show me<select id="pvS">' + opt("", "Choose", P.show === "everyone" ? "everyone" : P.show || "") + opt("men", "Men", P.show) + opt("women", "Women", P.show) + opt("everyone", "Everyone", P.show) + "</select></label>" +
+      '<button class="btn gold" type="submit">See my hand</button></form><p class="err" id="pvErr" role="alert">' + esc(err || "") + "</p>";
+    $("#pvForm").addEventListener("submit", function (e) {
+      e.preventDefault(); var nm = $("#pvName").value.trim(), yr = +$("#pvYear").value, zip = $("#pvZip").value.trim(), gg = $("#pvG").value, sh = $("#pvS").value, err2 = $("#pvErr");
+      var age = new Date().getFullYear() - yr;
+      if (!nm) { err2.textContent = "Add your first name."; return; }
+      if (!yr || age < 18 || age > 100) { err2.textContent = yr && age < 18 ? "SuiteFace is for adults 18 and over." : "Add your birth year."; return; }
+      if (!/^\d{5}$/.test(zip)) { err2.textContent = "Enter your 5-digit ZIP code."; return; }
+      if (!gg || !sh) { err2.textContent = "Choose how you identify and who you want to meet."; return; }
+      err2.textContent = "";
+      var look = /^(marriage|longterm|seeing|casual|open)$/.test(P.looking || "") ? P.looking : "longterm";
+      lrpc("start_card", { p_name: nm, p_birth_year: yr, p_zip: zip, p_gender: gg, p_show: sh, p_suit: SUIT[P.mySuit] ? P.mySuit : null, p_looking: look, p_interests: (P.interests || []).slice(0, 12), p_age_min: null, p_age_max: null, p_radius: P.dist || 25 })
+        .then(function (r) {
+          P.name = nm; P.zip = zip; P.show = sh; P.id = P.id || {}; P.id.gender = gg === "woman" ? "Woman" : gg === "man" ? "Man" : "Nonbinary";
+          if (!/^\d{4}-/.test(P.dob || "") || P.dob.slice(0, 4) !== String(yr)) P.dob = yr + "-01-01";
+          if (r && r.age_min) { P.ageMin = r.age_min; P.ageMax = r.age_max; } saveP(); renderPreview();
+        }, function (x) { err2.textContent = (x && x.message) || "That didn't save. Try again."; });
+    });
+  }
+  function pvShow(h) {
+    var n = h.count || 0, top = h.top || [];
+    if (n) {
+      var a = top[0];
+      $("#pvT").textContent = n === 1 ? "1 real player fits you right now." : n + " real players fit you right now.";
+      $("#pvL").textContent = "Your " + (a.rank === "A" ? "Ace" : a.rank) + " is about " + a.miles + (a.miles === 1 ? " mile" : " miles") + " away" + (a.shared && a.shared.length ? " and loves " + a.shared.join(" and ").toLowerCase() : "") + ". Take your seat to see names, photos and full cards.";
+    } else {
+      $("#pvT").textContent = "You're early to your table.";
+      $("#pvL").textContent = "No real players within " + (h.radius || 25) + " miles of " + h.zip + " fit you yet. We never fill a hand with fake profiles. As players near you sit down, they're dealt to you first, and the 12-Card Deck Guarantee covers you.";
+    }
+    var cards = top.slice(0, 5); while (cards.length < 5) cards.push(null);
+    var bs = h.by_suit || {};
+    $("#pvBody").innerHTML = '<div class="pv-cards">' + cards.map(function (c) {
+        if (!c) return '<div class="pv-c open" aria-hidden="true"><span class="ix">&nbsp;</span><span class="fd">Open seat</span><small>&nbsp;</small></div>';
+        return '<div class="pv-c' + (SUIT[c.suit].red ? " red" : "") + '"><span class="ix">' + c.rank + SUIT[c.suit].sym + '</span><span class="fd">Face down</span><small>' + c.miles + " mi" + (c.shared && c.shared[0] ? " · " + esc(c.shared[0]) : "") + "</small></div>";
+      }).join("") + "</div>" +
+      '<div class="pv-suits">' + ORDER.map(function (k) { return "<span><b>" + (bs[k] || 0) + "</b>" + SUIT[k].sym + " " + SUIT[k].name + "s</span>"; }).join("") + "</div>" +
+      '<div class="row"><a class="btn gold" href="#payBtn" data-pvpay>Take my seat</a><button class="btn ghost" type="button" data-pvedit>Change my answers</button></div>';
+  }
+  document.addEventListener("click", function (e) {
+    if (e.target.closest && e.target.closest("[data-pvedit]")) { pvForm(); return; }
+    var pv = e.target.closest && e.target.closest("[data-pvpay]"); if (pv) { e.preventDefault(); var pb = $("#payBtn"); if (pb) { pb.scrollIntoView({ behavior: "smooth", block: "center" }); var ag = $("#agree"); if (ag) setTimeout(function () { ag.focus(); }, 500); } }
+  });
+  document.addEventListener("sf:live", function () { setTimeout(renderPreview, 60); });
+  renderPreview();
+
+  /* ---------- Your data: download, or delete your account ---------- */
+  document.addEventListener("sf:live", function () { var yd = $("#yourData"); if (yd) yd.hidden = !window.SF_LIVE; });
+  document.addEventListener("click", function (e) {
+    var t = e.target; if (!t.closest) return;
+    if (t.closest("#dataExport")) {
+      lrpc("export_my_data").then(function (d) {
+        var blob = new Blob([JSON.stringify(d, null, 2)], { type: "application/json" }), a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = "suiteface-my-data-" + new Date().toISOString().slice(0, 10) + ".json"; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+        toast("Your data is downloading.");
+      }, function (x) { toast(x.message); });
+    }
+    if (t.closest("#dataClose")) {
+      var typed = prompt("This can't be undone. Your card leaves every deck and your profile, answers and photo are cleared.\n\nType DELETE to delete your account."); if (typed == null) return;
+      if (typed.trim().toUpperCase() !== "DELETE") { toast("Type DELETE to confirm."); return; }
+      var L = window.SF_LIVE, mid = L.memberId(), st = L.client.storage.from("faces");
+      st.list(mid).then(function (r) { var files = (r.data || []).map(function (f) { return mid + "/" + f.name; }); return files.length ? st.remove(files) : null; }).catch(function () { })
+        .then(function () { return lrpc("close_my_account", { p_confirm: "DELETE" }); })
+        .then(function () { try { ["profile", "game", "quizDeck", "suitLead", "role"].forEach(function (k) { localStorage.removeItem("sf." + k); }); } catch (e2) { } toast("Your account is deleted. Goodbye, and thank you for playing."); setTimeout(function () { window.SF_AUTH.signOut().then(function () { location.href = "./"; }); }, 1600); },
+          function (x) { toast(x.message); });
+    }
+  });
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();
   wireIam(); renderIam(); renderRooms(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); renderMap();

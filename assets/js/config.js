@@ -11,6 +11,8 @@ window.SUITEFACE_CONFIG = {
   formAccessKey: "",
   stripePaymentLink: "https://buy.stripe.com/4gMcN70tZ8ymcOG9Me2oE0a",
   stripeLaunchLink: "https://buy.stripe.com/5kQ8wRgsX29Y15YbUm2oE0b",
+  stripeAnnualLink: "https://buy.stripe.com/bJeaEZfoT5mabKC4rU2oE0k",
+  stripeAnnualLaunchLink: "https://buy.stripe.com/bJe7sNekP3e2eWO4rU2oE0l",
   stripePortalLink: "https://billing.stripe.com/p/login/fZuaEZ5Oj5macOGgaC2oE00",
   stripeJokerBuyoutLink: "https://buy.stripe.com/14A14p90v5ma9CugaC2oE0e",
   stripeJokerLobbyLink: "https://buy.stripe.com/fZu4gB5Oj4i63e6aQi2oE0c",
