@@ -1394,3 +1394,40 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 @media (min-width:901px){.profile{align-items:start}.facecard{position:sticky!important;top:132px;align-self:start}}
 .socrow select{width:auto;flex:0 0 auto}
 .socin{grid-template-columns:76px minmax(0,1fr)}
+
+/* High Roller face: a rich, moving sparkle on the photo trim and a tag everyone can read. */
+@property --hra{syntax:"<angle>";inherits:false;initial-value:0deg}
+.pcard .face.framed .hrtrim{position:absolute;z-index:3;left:9.6%;right:9.4%;top:12%;bottom:27.5%;border-radius:5.5%/4%;pointer-events:none;padding:3px;
+  background:conic-gradient(from var(--hra),#fff 0deg,#E9EAEE 20deg,#9DA2AD 60deg,#FFFFFF 95deg,#C9CCD3 140deg,#fff 180deg,#8E939E 230deg,#F4F5F7 270deg,#B5B9C2 320deg,#fff 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  box-shadow:0 0 14px rgba(255,255,255,.55);animation:hrspin 3.6s linear infinite}
+.pcard .face.framed.court .hrtrim{left:11.9%;right:9%;top:12.3%}
+.pcard .face.framed .hrtrim.gold{background:conic-gradient(from var(--hra),#FFF6CF 0deg,#F3D27A 25deg,#B07A1E 70deg,#FFF1B8 100deg,#E2B04A 150deg,#FFF8DC 185deg,#9C6A16 235deg,#FBE19A 275deg,#C8912E 325deg,#FFF6CF 360deg);box-shadow:0 0 16px rgba(255,214,110,.6)}
+@keyframes hrspin{to{--hra:360deg}}
+.pcard .face.framed .hrstars i{position:absolute;width:14px;height:14px;background:#fff;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);filter:drop-shadow(0 0 4px #fff);opacity:0;animation:hrtw 2.4s ease-in-out infinite}
+.pcard .face.framed .hrstars.gold i{background:#FFF3C4;filter:drop-shadow(0 0 5px #FFD86E)}
+.pcard .face.framed .hrstars i:nth-child(1){top:-7px;left:12%;animation-delay:0s}
+.pcard .face.framed .hrstars i:nth-child(2){top:30%;right:-7px;animation-delay:.5s}
+.pcard .face.framed .hrstars i:nth-child(3){bottom:-7px;right:22%;animation-delay:1s}
+.pcard .face.framed .hrstars i:nth-child(4){top:62%;left:-7px;animation-delay:1.5s}
+.pcard .face.framed .hrstars i:nth-child(5){top:-7px;right:30%;animation-delay:1.9s;width:10px;height:10px}
+@keyframes hrtw{0%,100%{opacity:0;transform:scale(.3) rotate(0)}45%{opacity:1;transform:scale(1) rotate(45deg)}70%{opacity:.2;transform:scale(.6) rotate(70deg)}}
+.pcard .face.framed .hrtag{all:unset;cursor:pointer;position:absolute;z-index:3;top:3.4cqw;left:3.4cqw;padding:1.5cqw 2.8cqw 1.3cqw;border-radius:1.6cqw;font:600 5.6cqw/1 "SF Card SC",Georgia,serif;letter-spacing:.06em;color:#23202A;background:linear-gradient(135deg,#FFFFFF,#DADDE3 45%,#FFFFFF 60%,#B9BDC6);box-shadow:0 0 0 1px rgba(255,255,255,.9),0 2px 8px rgba(0,0,0,.35)}
+.pcard .face.framed .hrtag.gold{background:linear-gradient(135deg,#FFF3C4,#E6C26A 45%,#FFF6D8 60%,#C8912E);color:#3A2806}
+.pcard .face.framed .hrtag:focus-visible{outline:2px solid #fff}
+@media (prefers-reduced-motion:reduce){.pcard .face.framed .hrtrim,.pcard .face.framed .hrstars i{animation:none}.pcard .face.framed .hrstars i{opacity:.9}}
+.pcard .face.framed.hrface .fwin>.jm{top:auto;bottom:16cqw;right:3.4cqw}
+.pcard .face.framed .hrtrim{padding:5px;box-shadow:0 0 18px 2px rgba(255,255,255,.75),inset 0 0 12px rgba(255,255,255,.6);animation-duration:2.6s}
+.pcard .face.framed .hrtrim.gold{box-shadow:0 0 20px 3px rgba(255,210,100,.8),inset 0 0 12px rgba(255,230,160,.65)}
+.pcard .face.framed .hrstars i{width:20px;height:20px;animation-duration:1.8s;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 2px #fff)}
+.pcard .face.framed .hrstars.gold i{filter:drop-shadow(0 0 7px #FFD86E) drop-shadow(0 0 2px #fff)}
+.pcard .face.framed .hrstars i:nth-child(5){width:16px;height:16px}
+.pcard.hrcard .face.framed{box-shadow:0 0 0 1px rgba(255,255,255,.6),0 0 26px rgba(255,235,180,.55),0 10px 24px -10px rgba(12,18,15,.7)!important}
+
+.pcard .face.framed .hrstars{position:absolute;z-index:4;left:9.6%;right:9.4%;top:12%;bottom:27.5%;pointer-events:none}
+.pcard .face.framed.court .hrstars{left:11.9%;right:9%;top:12.3%}
+.pcard .face.framed .hrstars i:nth-child(6){bottom:-8px;left:35%;animation-delay:.9s;width:14px;height:14px}
+@media (prefers-reduced-motion:reduce){.pcard .face.framed .hrstars i{animation:none;opacity:.9}}
+.pcard .face.framed .hrstars i,.pcard .face.framed .hrstars.gold i{width:24px;height:24px;background:#fff;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 8px rgba(255,200,90,.95)) drop-shadow(0 0 14px rgba(255,255,255,.7))}
+.pcard .face.framed .hrstars i:nth-child(5),.pcard .face.framed .hrstars i:nth-child(6){width:18px;height:18px}
+.pcard .face.framed .hrtrim.gold{background:conic-gradient(from var(--hra),#FFFFFF 0deg,#FFE9A8 18deg,#C8912E 60deg,#FFFFFF 90deg,#E8B850 140deg,#FFFDF0 180deg,#B07A1E 230deg,#FFFFFF 265deg,#D9A43C 320deg,#FFFFFF 360deg)}
