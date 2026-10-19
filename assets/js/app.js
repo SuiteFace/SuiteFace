@@ -980,7 +980,7 @@
   var TABLES = [
     ["marriage", "Marriage-minded", "#9B1B30", "Looking for my forever person"],
     ["longterm", "Long-term", "#1E7A4C", "A real relationship that lasts"],
-    ["seeing", "Dating to see", "#C8961E", "Open to where it goes"],
+    ["seeing", "Dating to see", "#7A3F2A", "Open to where it goes"],
     ["friends", "Friends first", "#D2622A", "Start as friends, see what grows"],
     ["casual", "Casual", "#6E3A9E", "Fun, easygoing, no pressure"],
     ["open", "Open / ENM", "#C23B7A", "Ethically non-monogamous"],
@@ -1533,7 +1533,7 @@
   function renderCard() {
     var s = P.mySuit || P.trumps[0], col = SUIT[s].red ? "var(--red)" : "#2B2730";
     var h = P.handle.trim() ? "@" + P.handle.trim().replace(/^@/, "") : "@yourname";
-    $("#myCard").style.setProperty("--felt-c", P.felt); $("#myCard").classList.toggle("hr", !!P.highRoller); $("#myCard").classList.toggle("hrgold", P.highRoller === "buyin");
+    $("#myCard").style.setProperty("--felt-c", P.felt); $("#myCard").classList.toggle("hr", !!P.highRoller); document.body.classList.toggle("is-hr", !!P.highRoller); document.body.classList.toggle("is-hrgold", P.highRoller === "buyin"); $("#myCard").classList.toggle("hrgold", P.highRoller === "buyin");
     var thm = THEME[P.theme] || THEME.private; $("#myCard").style.setProperty("--ring", thm[4] || "none"); $("#myCard").classList.toggle("themed", !!thm[4]); $("#myCard").setAttribute("data-theme", thm[0]);
     $("#myCard").innerHTML = '<div class="in"><span class="corner c1" style="color:' + col + '">A' + pip(s) + '</span><span class="corner c2" style="color:' + col + '">A' + pip(s) + "</span>" +
       '<div class="por" style="' + (P.photo ? "background-image:url(" + P.photo + ")" : "") + '">' + (P.photo ? "" : esc(initials(P.name))) + (P.photoLive && P.photo ? '<span class="livetag" title="Taken live in SuiteFace">📷 Live</span>' : "") + "</div>" +

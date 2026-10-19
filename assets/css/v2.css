@@ -1659,11 +1659,19 @@ body.hr-mode #table .feltbox>*{position:relative}
 body.hr-mode #table .pile-info .stacklbl{color:#F3DFA6}
 body.hr-mode #table .pile-info .stacklbl::after{content:" · High Roller";font-weight:600;font-size:.8em;color:#C9CCD3}
 /* the Stack in platinum: moiré, diamond pips, slow light sweep */
-body.hr-mode #pile .cb{overflow:hidden;border:5px solid #F4F4F1;
+body.hr-mode #pile .cb,body.is-hr #pile .cb{overflow:hidden;border:5px solid #F4F4F1;
   background:radial-gradient(circle,#fff 0 1px,transparent 1.6px) 0 0/10px 10px,
     linear-gradient(135deg,#F7F7F5 0%,#D6D8DE 20%,#FFFFFF 36%,#C3C6CE 54%,#EEF0F2 70%,#B4B7BF 88%,#E9EAEC 100%);
   box-shadow:inset 0 0 0 2px #E2C47E,inset 0 0 0 4px #FFF3C4,0 10px 22px -10px rgba(0,0,0,.6),0 0 18px rgba(226,196,126,.35)}
-body.hr-mode #pile .cb:last-child::before{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%);animation:hrsweep 5.5s ease-in-out infinite}
-body.hr-mode #pile .cb:last-child::after{inset:30%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l7 10-7 10-7-10z' fill='%2312382B'/%3E%3Cpath d='M12 5l5 7-5 7-5-7z' fill='none' stroke='%23E2C47E' stroke-width='1'/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 1px 0 rgba(255,255,255,.8))}
+body.hr-mode #pile .cb:last-child::before,body.is-hr #pile .cb:last-child::before{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%);animation:hrsweep 5.5s ease-in-out infinite}
+body.hr-mode #pile .cb:last-child::after,body.is-hr #pile .cb:last-child::after{inset:30%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l7 10-7 10-7-10z' fill='%2312382B'/%3E%3Cpath d='M12 5l5 7-5 7-5-7z' fill='none' stroke='%23E2C47E' stroke-width='1'/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 1px 0 rgba(255,255,255,.8))}
 body.hr-mode #table .deck-bar .btn.gold{background:linear-gradient(180deg,#F3DFA6,#C9A24E);color:#12382B}
 @media (prefers-reduced-motion:reduce){body.hr-mode #table .feltbox::before,body.hr-mode #pile .cb:last-child::before{animation:none;opacity:0}}
+
+/* High Roller status always shows on the back: platinum or gold, over any house or chosen back */
+.pcard.hrcard .flip>.cover>.cv-in:not(.jkback){background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.5) 0 1.2px,transparent 2px) 0 0/10px 10px,linear-gradient(135deg,#F7F7F5 0%,#DADBE0 18%,#FFFFFF 34%,#C8CAD0 52%,#F1F2F4 68%,#B9BBC2 86%,#ECEDEF 100%)!important}
+.pcard.hrcard.hrgold .flip>.cover>.cv-in:not(.jkback){background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.5) 0 1.2px,transparent 2px) 0 0/10px 10px,linear-gradient(135deg,#FFF6D8 0%,#E9C46B 20%,#FFF1BF 36%,#C9963A 54%,#FBE3A0 70%,#B98432 88%,#F5D98E 100%)!important}
+
+/* A Gold (Buy-In) High Roller's own deck is gold */
+body.is-hrgold #pile .cb{background:radial-gradient(circle,#fff8 0 1px,transparent 1.6px) 0 0/10px 10px,linear-gradient(135deg,#FFF6D8 0%,#E9C46B 20%,#FFF1BF 36%,#C9963A 54%,#FBE3A0 70%,#B98432 88%,#F5D98E 100%)!important}
+body.is-hr #table .pile-info .stacklbl::after{content:" · High Roller";font-weight:600;font-size:.8em;color:#C9CCD3}
