@@ -803,13 +803,17 @@
       '<div class="chips" style="margin-top:6px"><button class="btn ghost sm" type="button" id="retake">Retake the quiz</button><a class="btn ghost sm" href="safety.html">Read the House Rules</a></div></div>';
     $("#retake").addEventListener("click", resetQuiz);
   }
-  function wildResult(R, lean, c, tot) {
-    R.innerHTML = (window.SFSlots ? '<span class="embwrap">' + SFSlots.emblem("wild") + "</span>" : '<span class="big wildpip" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="m12 2.8 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 16.8l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></span>') + '<div class="form-grid" style="gap:10px"><p class="eyebrow">Your card</p><h3 style="font-size:2.4rem">You\'re a Wild Card</h3>' +
-      '<p class="lede">You don\'t lean hard into any one suit, and that\'s not a flaw. A Wild Card is the rare one at the table: a little of every suit, unattached to any single one. Your answers lean slightly ' + SUIT[lean].name + ', so that\'s where we\'ll seat you first.</p>' +
-      '<div class="bars">' + ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); return '<div class="bar"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") + "</div>" +
+  function wildResult(R, lean, c, tot, band) {
+    band = band && band.length >= 2 ? band : ORDER.slice();
+    var pts = function (s) { return Math.floor(c[s]); };
+    var names = band.map(function (s) { return SUIT[s].name; }), list = names.length === 2 ? names.join(" and ") : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
+    R.innerHTML = (window.SFSlots ? '<span class="embwrap">' + SFSlots.emblem("wild") + "</span>" : '<span class="big wildpip" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="m12 2.8 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 16.8l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg></span>') + '<div class="form-grid" style="gap:10px"><p class="eyebrow">Your card</p><h3 style="font-size:2.4rem">You\'re a Wild Card</h3><p class="suitword big">Versatile</p>' +
+      '<div class="wildband" aria-label="Your suits">' + band.map(function (s) { return '<span class="wb' + (SUIT[s].red ? " red" : "") + '"><b>' + SUIT[s].sym + " " + SUIT[s].name + '</b><em>' + SUIT[s].word + "</em><small>" + pts(s) + " points</small></span>"; }).join("") + "</div>" +
+      '<p class="lede">' + list + " finished within 3 points of each other, so no single suit wins. That's not a flaw: a Wild Card is a little of " + (band.length === 4 ? "every suit" : "each of these suits") + ". " + (function () { var gap = pts(band[0]) - pts(band[1]); return gap > 0 ? "You lean " + SUIT[lean].name + " by " + gap + (gap === 1 ? " point" : " points") + ", so that's where we'll seat you first." : "Your top suits are even, so we'll seat you first in " + SUIT[lean].name + ". Tap \"I'm more…\" to change it."; })() + "</p>" +
+      '<div class="bars">' + ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); return '<div class="bar' + (band.indexOf(s) > -1 ? " win" : "") + '"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pts(s) + " pts</span></div>"; }).join("") + "</div>" +
       '<div class="chips" style="margin-top:6px"><button class="btn gold sm" type="button" data-wild="' + lean + '">That\'s me. Play as a Wild Card</button>' +
       ORDER.map(function (s) { return '<button class="btn ghost sm" type="button" data-use="' + s + '">I\'m more ' + SUIT[s].name + "</button>"; }).join("") +
-      '<button class="btn ghost sm" type="button" data-sharecard="' + top + '">📤 Share my suit</button><button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
+      '<button class="btn ghost sm" type="button" data-sharecard="' + lean + '">📤 Share my suit</button><button class="btn ghost sm" type="button" id="retake">Retake</button></div>' +
       (window.SF_LIVE && window.SF_LIVE.seated ? "" : '<div class="suitcta"><h4>Your Wild Card is ready for the table.</h4><p class="hint">Take your seat to build your Face and get dealt your deck.' + (LAUNCH.open ? " The $21 buy-in is waived right now." : "") + '</p><div class="row"><a class="btn gold" href="membership.html">' + (LAUNCH.open ? "Get dealt in for $2.10" : "Get dealt in") + '</a>' + (window.SF_LIVE ? "" : '<button class="btn ghost" type="button" data-login>Create my account</button>') + "</div></div>") + "</div>";
     requestAnimationFrame(function () { $$("#quizResult .bar b").forEach(function (b) { b.style.width = b.getAttribute("data-w") + "%"; }); });
     $("#retake").addEventListener("click", resetQuiz);
@@ -889,14 +893,17 @@
     var sorted = ORDER.map(function (k) { return Math.floor(c[k]); }).sort(function (x, y) { return y - x; });
     /* Joker: the toxic answers. All five toxic words, six or more toxic picks, or toxic points matching the top suit. */
     var joker = qw.tellW >= 5 || qw.tells >= 6 || (jokerPts > 0 && jokerPts >= sorted[0]);
-    /* Wild Card: no suit leads the next one by at least 7 points. */
-    var wild = !joker && sorted[0] - sorted[1] < 7;
+    /* Wild Card (owner rule, Oct 18): the top suit must win by more than 3 points. If any other suit finishes within
+       3 points of the top suit, the player is a Wild Card, and the card shows every suit in that 3-point band (2, 3 or 4 suits). */
+    var band = ORDER.filter(function (k) { return Math.floor(c[k]) >= sorted[0] - 3; });
+    band.sort(function (x, y) { return c[y] - c[x]; });
+    var wild = !joker && band.length >= 2;
     $("#quizBox").hidden = true; var R = $("#quizResult"); R.hidden = false;
     /* The result is revealed after the player tells us where to send it: name, email and phone. */
     if (!window.SF_LIVE && !S.get("suitLead", null)) { suitGate(R, joker ? "joker" : wild ? "wild" : top, c, tot); return; }
     if (window.SF_LIVE && (joker || qw.tells >= 5) && !S.get("tellsSent", false)) { S.set("tellsSent", true); window.SF_LIVE.rpc("set_quiz_tells", { p_tells: Math.max(qw.tells, 5) }); }
     if (joker) { jokerResult(R); return; }
-    if (wild) { wildResult(R, top, c, tot); return; }
+    if (wild) { wildResult(R, top, c, tot, band); return; }
     R.innerHTML = (window.SFSlots ? '<span class="embwrap">' + SFSlots.emblem(top) + "</span>" : '<span class="big" style="color:' + suitColor(top) + '">' + pip(top, "big") + "</span>") + '<div class="form-grid" style="gap:10px"><p class="eyebrow">Your suit</p><h3 style="font-size:2.4rem">' +
       SUIT[top].sym + " You're a " + SUIT[top].name + '</h3><p class="suitword big">' + SUIT[top].word + "</p><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
       ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); if (s === top) pct = Math.max(pct, 1 + Math.max.apply(null, ORDER.filter(function (k) { return k !== top; }).map(function (k) { return Math.round(c[k] / tot * 100); }))); return '<div class="bar' + (s === top ? " win" : "") + '"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") +

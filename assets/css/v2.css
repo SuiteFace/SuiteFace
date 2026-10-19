@@ -1113,3 +1113,11 @@ html[data-play] .h-final .citycheck input{background:#0F2A20!important;color:#F2
 .hsc small{font:600 clamp(.6rem,1.1vw,.75rem)/1 var(--body);text-align:center;opacity:.7;letter-spacing:.02em}
 .suitword{font:800 .9rem var(--body);font-style:normal;color:var(--gold-hi);letter-spacing:.02em}
 p.suitword.big{margin:-6px 0 0;font-size:1.35rem}
+/* Wild Card result: the suits in the 3-point band */
+.wildband{display:flex;flex-wrap:wrap;gap:8px}
+.wildband .wb{display:grid;gap:1px;padding:10px 14px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb,var(--gold) 10%,transparent);min-width:110px}
+.wildband .wb b{font:800 1rem var(--body);color:var(--cream)}
+.wildband .wb.red b{color:var(--red-soft,#E0344F)}
+.wildband .wb em{font:800 .9rem var(--body);font-style:normal;color:var(--gold-hi)}
+.wildband .wb small{font:600 .78rem var(--body);color:var(--cream-dim)}
+html[data-play="day"] .wildband .wb.red b{color:#A11C30}
