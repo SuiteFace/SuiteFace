@@ -2363,12 +2363,16 @@
   };
   var winVenue = "chapel";
   function photoUrl(p) { return p && CFG.supabaseUrl ? CFG.supabaseUrl + "/storage/v1/object/public/win-photos/" + p.split("/").map(encodeURIComponent).join("/") : ""; }
+  /* Rendered room art: add a room here when its banner arrives (files in src/art as <name>_1536 and _900, .webp and .jpg). */
+  var VENUE_ART = { chapel: "/assets/art/chapel_of_aces" };
   function renderWinners() {
     var root = $("#winRow"); if (!root) return;
     var tabs = $("#winTabs");
     tabs.innerHTML = Object.keys(VENUES).map(function (k) { return '<button type="button" class="chip venuechip v-' + k + '" data-venue="' + k + '" aria-pressed="' + (k === winVenue) + '">' + esc(VENUES[k].name) + ' <span class="count" data-vc="' + k + '"></span></button>'; }).join("");
     var v = VENUES[winVenue];
-    $("#winHead").innerHTML = '<div class="venue v-' + winVenue + '">' + venueArt(winVenue) + '<div><p class="eyebrow">' + esc(v.eyebrow) + '</p><h3>' + esc(v.name) + '</h3><p class="lede">' + esc(v.line) + "</p></div></div>";
+    var art = VENUE_ART[winVenue];
+    $("#winHead").innerHTML = art ? '<div class="venue venue-photo v-' + winVenue + '" style="--art:image-set(url(' + art + '_1536.webp) type(\'image/webp\'), url(' + art + '_1536.jpg) type(\'image/jpeg\'));--art-s:image-set(url(' + art + '_900.webp) type(\'image/webp\'), url(' + art + '_900.jpg) type(\'image/jpeg\'))" role="img" aria-label="' + esc(v.name) + '"><div class="vtext"><p class="eyebrow">' + esc(v.eyebrow) + '</p><h3>' + esc(v.name) + '</h3><p class="lede">' + esc(v.line) + "</p></div></div>"
+      : '<div class="venue v-' + winVenue + '">' + venueArt(winVenue) + '<div><p class="eyebrow">' + esc(v.eyebrow) + '</p><h3>' + esc(v.name) + '</h3><p class="lede">' + esc(v.line) + "</p></div></div>";
     root.innerHTML = '<p class="hint">Loading…</p>';
     rpc("winners_counts", {}).then(function (c) { Object.keys(VENUES).forEach(function (k) { var el = tabs.querySelector('[data-vc="' + k + '"]'); if (el) el.textContent = c && c[k] ? c[k] : ""; }); }, function () { });
     rpc("winners_row", { p_venue: winVenue }).then(function (rows) {

@@ -1079,3 +1079,19 @@ table.proof tbody tr:last-child{font-weight:800}
 .yourdata h3{margin:0}
 .btn.ghost.danger{color:#E0344F;border-color:rgba(224,52,79,.5)}
 html[data-play="day"] .btn.ghost.danger{color:#A11C30}
+
+/* ---------- Rendered room art (Winners' Row) ---------- */
+.venue.venue-photo{position:relative;display:flex;justify-content:flex-end;align-items:center;min-height:clamp(300px,40vw,470px);padding:28px;overflow:hidden;
+  background:linear-gradient(90deg,rgba(20,14,22,0) 30%,rgba(20,14,22,.78) 62%,rgba(20,14,22,.92) 100%),var(--art) 30% center/cover no-repeat}
+.venue.venue-photo .vtext{width:min(42%,440px)}
+.venue.venue-photo .vtext h3{text-shadow:0 2px 18px rgba(20,14,22,.7)}
+.venue.venue-photo .vtext .lede{color:#F2ECDD!important}
+.venue.venue-photo .vtext .eyebrow{color:#E8C46A!important}
+@media (max-width:700px){
+  .venue.venue-photo{align-items:flex-end;min-height:440px;padding:20px;background:linear-gradient(180deg,rgba(20,14,22,0) 30%,rgba(20,14,22,.86) 66%,rgba(20,14,22,.95) 100%),var(--art-s) 52% 20%/auto 72% no-repeat,#1A1420}
+  .venue.venue-photo .vtext{width:100%}
+}
+.h-wins-art{display:grid;gap:12px}
+.h-chapel{margin:0;position:relative;border-radius:20px;overflow:hidden;border:1px solid rgba(232,196,106,.45);box-shadow:0 24px 50px -28px rgba(20,14,22,.7)}
+.h-chapel img{display:block;width:100%;height:auto}
+.h-chapel figcaption{position:absolute;left:12px;bottom:12px;padding:6px 12px;border-radius:999px;background:rgba(20,14,22,.72);color:#FAF7F0;font:800 .85rem var(--body)}
