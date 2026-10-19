@@ -746,7 +746,7 @@
       $("#qText").textContent = "Select every word that describes you.";
       $("#qAnswers").innerHTML = '<p class="qhint">Tap as many as fit. Be honest, not flattering.</p><div class="wordpick" role="group" aria-label="Words that describe you">' + all.map(function (w) {
         return '<button class="ans wchip' + (picked.indexOf(w) > -1 ? " picked" : "") + '" type="button" aria-pressed="' + (picked.indexOf(w) > -1) + '" data-w="' + esc(w) + '">' + esc(w) + "</button>"; }).join("") +
-        '</div><button class="btn gold wnext" type="button" data-wnext' + (picked.length ? "" : " disabled") + ">" + (picked.length ? "Next (" + picked.length + " picked)" : "Pick at least one") + "</button>";
+        '</div><button class="btn gold wnext" type="button" data-wnext' + (picked.length ? "" : " disabled") + ">" + (picked.length ? "Next · " + picked.length + " picked" : "Pick at least one") + "</button>";
       return;
     }
     if (sl.t === "self") { $("#qText").textContent = "Which word fits you best?"; $("#qAnswers").innerHTML = batch(sl, "None of these"); return; }
@@ -764,7 +764,7 @@
       var cur = Array.isArray(qs.ans.words0) ? qs.ans.words0.slice() : [], w = wb.getAttribute("data-w"), k = cur.indexOf(w);
       if (k > -1) cur.splice(k, 1); else cur.push(w);
       qs.ans.words0 = cur; saveQ(); wb.classList.toggle("picked", k < 0); wb.setAttribute("aria-pressed", String(k < 0));
-      var nx = $("#qAnswers [data-wnext]"); if (nx) { nx.disabled = !cur.length; nx.textContent = cur.length ? "Next (" + cur.length + " picked)" : "Pick at least one"; }
+      var nx = $("#qAnswers [data-wnext]"); if (nx) { nx.disabled = !cur.length; nx.textContent = cur.length ? "Next · " + cur.length + " picked" : "Pick at least one"; }
       return;
     }
     if (e.target.closest("[data-wnext]")) { if ((qs.ans.words0 || []).length) { qi++; saveQ(); renderQ(); } return; }

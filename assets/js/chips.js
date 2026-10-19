@@ -17,7 +17,14 @@
   var ALIAS = { "21c": "0.21", ".21": "0.21", "0.21": "0.21", "2.1": "2.10", "2.10": "2.10", "21": "21", "21.00": "21", "210": "210", "2100": "2100", "2,100": "2100" };
   var uid = 0;
   function key(v) { v = String(v).replace(/[$\s]/g, ""); return ALIAS[v] || ALIAS[v.replace(/,/g, "")] || "21"; }
+  /* Rendered chip art (Oct 19). Falls back to the drawn chip if a value has no art. */
+  var ART = { "0.21": "chip_0-21", "2.10": "chip_2-10", "21": "chip_21", "210": "chip_210", "2100": "chip_2100", house: "chip_house" };
+  function art(v, o) {
+    o = o || {}; var k = v === "house" ? "house" : key(v), f = ART[k], size = o.size || 96, lab = k === "house" ? "SuiteFace house" : D[k].label;
+    return '<picture class="sfchip-art' + (o.spin ? " spin" : "") + '" style="width:' + size + "px;height:" + size + 'px"><source type="image/webp" srcset="/assets/art/chips/' + f + '.webp"><img src="/assets/art/chips/' + f + '.png" width="' + size + '" height="' + size + '" alt="' + lab + ' chip" loading="lazy" decoding="async"></picture>';
+  }
   function svg(v, o) {
+    if (!(o && o.drawn)) return art(v, o);
     o = o || {}; var k = key(v), d = D[k], id = "sfc" + (++uid), size = o.size || 96;
     var inserts = "", n = 8;
     for (var i = 0; i < n; i++) {
@@ -46,7 +53,59 @@
     "@media (prefers-reduced-motion:reduce){.sfchip-svg.spin .rimg{animation:none}}" +
     ".sfchip small{font:700 .8rem/1.2 Figtree,system-ui,sans-serif;color:var(--muted,#93A59B);text-align:center}" +
     ".sfchip.waived .sfchip-svg{opacity:.55;filter:grayscale(.4) drop-shadow(0 6px 10px rgba(3,14,10,.25))}" +
-    ".sfchip.waived small{text-decoration:line-through}";
+    ".sfchip.waived small{text-decoration:line-through}" +
+    ".sfchip-art{display:block;border-radius:50%;filter:drop-shadow(0 10px 14px rgba(3,14,10,.35))}" +
+    ".sfchip-art img{display:block;width:100%;height:100%}" +
+    ".sfchip-art.spin img{animation:sfchipspin 24s linear infinite}" +
+    "@media (prefers-reduced-motion:reduce){.sfchip-art.spin img{animation:none}}" +
+    ".sfchip.waived .sfchip-art{opacity:.55;filter:grayscale(.4) drop-shadow(0 6px 10px rgba(3,14,10,.25))}";
+
+  /* "Put into play": a stack of chips lying on the felt; the top chip lifts off, slides out and settles with a spin.
+     Use: <div class="chipplay" data-chipplay="21" data-stack="6"></div>. Plays when it scrolls into view and again on tap.
+     Respects reduced motion (shows the finished state). */
+  function stackHTML(f, n) {
+    var h = "";
+    for (var i = 0; i < n; i++) h += chipLayers(f, i * 9, "cp-st");
+    return h;
+  }
+  function chipLayers(f, z, cls) {
+    var h = '<div class="cp-chip ' + cls + '" style="--z:' + z + 'px">';
+    for (var e = 0; e < 7; e++) h += '<img class="cp-edge" src="/assets/art/chips/' + f + '.webp" alt="" style="--e:' + e + 'px">';
+    return h + '<img class="cp-top" src="/assets/art/chips/' + f + '.webp" alt=""></div>';
+  }
+  function play(el) {
+    if (el.__cp) return el.__cp(); var v = el.getAttribute("data-chipplay") || "21", k = v === "house" ? "house" : key(v), f = ART[k] || ART["21"];
+    var n = Math.max(2, Math.min(9, +(el.getAttribute("data-stack") || 6)));
+    el.innerHTML = '<div class="cp-stage" aria-hidden="true"><div class="cp-table">' + stackHTML(f, n - 1) + chipLayers(f, (n - 1) * 9, "cp-mover") + "</div></div>";
+    el.setAttribute("role", "img"); el.setAttribute("aria-label", (k === "house" ? "A house chip" : "A " + D[k].label + " chip") + " put into play");
+    var mv = el.querySelector(".cp-mover"), top = (n - 1) * 9, reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var end = "translate3d(132px,22px,0px) rotateZ(380deg)";
+    function run() {
+      if (reduce || !mv.animate) { mv.style.transform = end; return; }
+      mv.getAnimations().forEach(function (a) { a.cancel(); });
+      mv.animate([
+        { transform: "translate3d(0,0," + top + "px) rotateZ(0deg)", offset: 0 },
+        { transform: "translate3d(0,0," + (top + 46) + "px) rotateZ(10deg)", offset: .22, easing: "cubic-bezier(.3,.6,.4,1)" },
+        { transform: "translate3d(118px,18px,30px) rotateZ(220deg)", offset: .58, easing: "cubic-bezier(.5,0,.8,.6)" },
+        { transform: "translate3d(132px,22px,0px) rotateZ(340deg)", offset: .74, easing: "cubic-bezier(.2,.7,.3,1)" },
+        { transform: "translate3d(132px,22px,4px) rotateZ(366deg)", offset: .84 },
+        { transform: end, offset: 1 }
+      ], { duration: 1900, fill: "forwards" });
+    }
+    el.__cp = run;
+    el.addEventListener("click", run);
+    if ("IntersectionObserver" in window) { var io = new IntersectionObserver(function (es) { es.forEach(function (x) { if (x.isIntersecting) { run(); io.disconnect(); } }); }, { threshold: .5 }); io.observe(el); } else run();
+  }
+  css += ".chipplay{position:relative;width:min(100%,360px);aspect-ratio:16/10;cursor:pointer;-webkit-tap-highlight-color:transparent}" +
+    ".cp-stage{position:absolute;inset:0;perspective:900px;perspective-origin:50% 0%}" +
+    ".cp-table{position:absolute;left:18%;top:30%;width:34%;aspect-ratio:1;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(-8deg)}" +
+    ".cp-chip{position:absolute;inset:0;transform-style:preserve-3d;transform:translate3d(0,0,var(--z))}" +
+    ".cp-chip img{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;backface-visibility:hidden}" +
+    ".cp-edge{transform:translateZ(calc(var(--e) * -1.2));filter:brightness(.74) sepia(.3) saturate(1.25)}" +
+    ".cp-top{transform:translateZ(.5px)}" +
+    ".cp-st:first-child::after,.cp-mover::after{content:'';position:absolute;inset:-6%;border-radius:50%;transform:translateZ(-9px);background:radial-gradient(closest-side,rgba(3,14,10,.45),rgba(3,14,10,0))}" +
+    ".cp-st:not(:first-child)::after{display:none}";
+  function wire(root) { (root || document).querySelectorAll(".chipplay[data-chipplay]:not([data-cp])").forEach(function (el) { el.setAttribute("data-cp", "1"); play(el); }); }
   function paint(root) {
     (root || document).querySelectorAll(".sfchip[data-chip]:not([data-done])").forEach(function (el) {
       el.setAttribute("data-done", "1");
@@ -55,6 +114,6 @@
     });
   }
   var st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
-  window.SFChips = { svg: svg, paint: paint, denominations: D };
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { paint(); }); else paint();
+  window.SFChips = { svg: svg, art: art, paint: paint, play: play, wire: wire, denominations: D };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { paint(); wire(); }); else { paint(); wire(); }
 })();

@@ -1192,3 +1192,37 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 .pcard .face.framed.court .fband{right:13%;column-gap:2cqw}
 .pcard .face.framed.court .style{font-size:6cqw;letter-spacing:.03em}
 .pcard .face.framed.court .title{font-size:9.8cqw}
+
+/* Quiz, Oct 19 redesign: calm glass surface, thin progress line, quiet type, one obvious primary action. */
+#quizBox{background:radial-gradient(120% 80% at 20% 0%,#1B4A38 0%,#123628 45%,#0E2B20 100%)!important;border:1px solid rgba(242,236,221,.09)!important;border-radius:28px!important;box-shadow:0 50px 90px -50px rgba(2,12,8,.75),inset 0 1px 0 rgba(255,255,255,.05)!important;gap:18px!important;padding:clamp(24px,4.4vw,48px)!important}
+#quizBox .quiz-top{gap:16px}
+#quizBox .qcount{font:500 .82rem/1 var(--body)!important;color:rgba(242,236,221,.6)!important;letter-spacing:.01em!important}
+#quizBox .meter{height:3px!important;border-radius:3px;background:rgba(242,236,221,.12)!important;overflow:hidden}
+#quizBox .meter b{background:#E2C47E!important;border-radius:3px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+#quizBox .qcheer{font:500 .92rem/1.4 var(--body)!important;color:#E2C47E!important;margin:4px 0 0}
+#quizBox .qtext{font:650 clamp(1.6rem,3.4vw,2.35rem)/1.12 var(--body)!important;letter-spacing:-.025em!important;color:#F7F2E6!important;text-transform:none!important}
+#quizBox .qhint{font:400 .95rem/1.4 var(--body);color:rgba(242,236,221,.62)!important;margin:-6px 0 2px!important}
+#quizBox .answers{grid-template-columns:1fr!important;gap:10px}
+/* Scenario answers: glass rows */
+#quizBox .ans:not(.wchip):not(.none){background:rgba(242,236,221,.055)!important;color:#F2ECDD!important;border:1px solid rgba(242,236,221,.12)!important;box-shadow:none!important;border-radius:16px!important;padding:17px 20px!important;font:500 1.02rem/1.4 var(--body)!important;transition:background .18s,border-color .18s,transform .18s!important}
+#quizBox .ans:not(.wchip):not(.none):hover{background:rgba(242,236,221,.1)!important;border-color:rgba(242,236,221,.24)!important;transform:none!important}
+#quizBox .ans:not(.wchip).picked{outline:0!important;background:rgba(226,196,126,.14)!important;border-color:#E2C47E!important}
+#quizBox .ans:focus-visible{outline:2px solid #E2C47E!important;outline-offset:2px}
+/* Words: frosted pills with a check when picked */
+#quizBox .wordpick{display:flex;flex-wrap:wrap;gap:10px;margin:2px 0 0}
+#quizBox .wordpick .wchip{min-height:44px;padding:0 18px!important;border-radius:999px!important;background:rgba(242,236,221,.06)!important;border:1px solid rgba(242,236,221,.16)!important;color:#F2ECDD!important;box-shadow:none!important;font:500 .97rem/1 var(--body)!important;display:inline-flex;align-items:center;gap:8px;transition:background .18s,color .18s,border-color .18s}
+#quizBox .wordpick .wchip:hover{background:rgba(242,236,221,.12)!important}
+#quizBox .wordpick .wchip.picked{background:#F2ECDD!important;color:#123628!important;border-color:#F2ECDD!important;outline:0!important}
+#quizBox .wordpick .wchip.picked::before{content:"";width:14px;height:14px;flex:none;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+/* The one primary action, pinned so it is always in reach */
+#quizBox .wnext{position:sticky;bottom:16px;z-index:3;justify-self:end;margin-top:8px;min-height:52px;padding:0 30px!important;border-radius:999px!important;border:0!important;background:#E2C47E!important;color:#1A1405!important;font:600 1rem/1 var(--body)!important;letter-spacing:0!important;box-shadow:0 14px 30px -12px rgba(0,0,0,.6)!important;display:inline-flex;align-items:center;gap:10px;width:auto!important;height:auto!important}
+#quizBox .wnext::after{content:"";width:16px;height:16px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8h10M9 4l4 4-4 4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8h10M9 4l4 4-4 4' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+#quizBox .wnext:disabled{background:rgba(242,236,221,.1)!important;color:rgba(242,236,221,.5)!important;box-shadow:none!important}
+#quizBox .wnext:disabled::after{display:none}
+@media (max-width:640px){#quizBox .wnext{justify-self:stretch;justify-content:center}}
+/* Secondary controls: quiet text buttons */
+#quizBox .quiz-nav{gap:4px;margin-top:4px;border-top:1px solid rgba(242,236,221,.08);padding-top:14px}
+#quizBox .quiz-nav .btn{background:transparent!important;border:0!important;box-shadow:none!important;color:rgba(242,236,221,.66)!important;font:500 .92rem var(--body)!important;padding:8px 12px!important;min-height:0}
+#quizBox .quiz-nav .btn:hover:not(:disabled){color:#F2ECDD!important}
+#quizBox .quiz-nav .btn:disabled{opacity:.35}
+#quizBox .qtext{min-height:0!important}
