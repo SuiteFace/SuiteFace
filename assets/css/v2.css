@@ -1523,3 +1523,8 @@ html[data-play="day"] .top{background:rgba(247,248,244,.82)!important;border-bot
 .excard:focus-visible .exph{outline:2px solid #B8862F;outline-offset:2px}
 .pcard .face.framed .freetag,.pcard .face.framed .freetag.under{top:auto;bottom:14.5cqw;left:50%;transform:translateX(-50%);white-space:nowrap}
 .pcard .face.framed.hrface .hrtag{font-size:5cqw;padding:1.4cqw 2.2cqw 1.2cqw}.pcard .face.framed.hrface .fwin>.jm{font-size:5cqw;padding:1.3cqw 2.2cqw 1.1cqw}
+/* Sunday Best: ivory linen with a classic double topstitch, no dove */
+.pcard .cover .cv-in.cb-sunday-best{background:repeating-linear-gradient(0deg,rgba(120,100,60,.05) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(120,100,60,.05) 0 1px,transparent 1px 3px),#F6F0E2!important;position:relative}
+.pcard .cover .cv-in.cb-sunday-best::before,.pcard .cover .cv-in.cb-sunday-best::after{content:"";position:absolute;pointer-events:none;border-radius:6px;border:1.5px dashed rgba(169,130,58,.85)}
+.pcard .cover .cv-in.cb-sunday-best::before{inset:7px}
+.pcard .cover .cv-in.cb-sunday-best::after{inset:12px}

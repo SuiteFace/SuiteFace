@@ -1716,7 +1716,7 @@
     "lucky-sevens": ["Lucky Sevens", "Cherries, sevens and clovers on a midnight reel."],
     "magic-city": ["Magic City", "Gold ironwork on deep green, for Birmingham, where SuiteFace began."],
     "midnight-neon": ["Midnight Neon", "Pink and gold neon on a dark sign board."],
-    "sunday-best": ["Sunday Best", "Ivory linen, a gold border and a dove. For the ones who never miss Sunday."]
+    "sunday-best": ["Sunday Best", "Ivory linen with a classic double topstitch. For the ones who never miss Sunday."]
   };
   function cbPreview(id, size) { return '<div class="pcard cbmini" style="--w:' + (size || 120) + 'px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in cb-' + id + '">' + medalFor(null) + "</div></div></div></div>"; }
   function renderCardBacks() {
