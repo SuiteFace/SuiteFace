@@ -39,10 +39,10 @@
   /* ---------- suits ---------- */
   var ORDER = ["diamond", "club", "heart", "spade"];
   var SUIT = {
-    diamond: { name: "Diamond", red: true, sym: "♦", line: "Direct and decisive. Plans the date, books the table.", love: "Shows love by making things happen." },
-    club: { name: "Club", red: false, sym: "♣", line: "Outgoing and playful. The life of the table.", love: "Shows love with fun and big energy." },
-    heart: { name: "Heart", red: true, sym: "♥", line: "Steady and warm. A loyal, patient listener.", love: "Shows love by being there, every time." },
-    spade: { name: "Spade", red: false, sym: "♠", line: "Thoughtful and careful. Quietly all-in.", love: "Shows love through follow-through and detail." }
+    diamond: { name: "Diamond", word: "Driven", red: true, sym: "♦", line: "Direct and decisive. Plans the date, books the table.", love: "Shows love by making things happen." },
+    club: { name: "Club", word: "Playful", red: false, sym: "♣", line: "Outgoing and playful. The life of the table.", love: "Shows love with fun and big energy." },
+    heart: { name: "Heart", word: "Devoted", red: true, sym: "♥", line: "Steady and warm. A loyal, patient listener.", love: "Shows love by being there, every time." },
+    spade: { name: "Spade", word: "Thoughtful", red: false, sym: "♠", line: "Thoughtful and careful. Quietly all-in.", love: "Shows love through follow-through and detail." }
   };
   function pip(s, cls) {
     return '<svg class="pip ' + (cls || "") + '" viewBox="0 0 100 100" aria-hidden="true"><path fill="currentColor" d="' + BRAND.suit[s] + '"/></svg>';
@@ -184,7 +184,7 @@
   /* ---------- style cards ---------- */
   function renderStyles() {
     $("#styleCards").innerHTML = ORDER.map(function (s) {
-      return '<div class="style-card' + (P.mySuit === s ? " mine" : "") + '"><span style="color:' + suitColor(s) + '">' + pip(s) + "</span><b>" + SUIT[s].sym + " " + SUIT[s].name + "</b><span>" + SUIT[s].line + "</span><span>" + SUIT[s].love + "</span></div>";
+      return '<div class="style-card' + (P.mySuit === s ? " mine" : "") + '"><span style="color:' + suitColor(s) + '">' + pip(s) + "</span><b>" + SUIT[s].sym + " " + SUIT[s].name + '</b><em class="suitword">' + SUIT[s].word + "</em><span>" + SUIT[s].line + "</span><span>" + SUIT[s].love + "</span></div>";
     }).join("");
   }
 
@@ -898,7 +898,7 @@
     if (joker) { jokerResult(R); return; }
     if (wild) { wildResult(R, top, c, tot); return; }
     R.innerHTML = (window.SFSlots ? '<span class="embwrap">' + SFSlots.emblem(top) + "</span>" : '<span class="big" style="color:' + suitColor(top) + '">' + pip(top, "big") + "</span>") + '<div class="form-grid" style="gap:10px"><p class="eyebrow">Your suit</p><h3 style="font-size:2.4rem">' +
-      SUIT[top].sym + " You're a " + SUIT[top].name + "</h3><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
+      SUIT[top].sym + " You're a " + SUIT[top].name + '</h3><p class="suitword big">' + SUIT[top].word + "</p><p class='lede'>" + SUIT[top].line + " " + SUIT[top].love + '</p><div class="bars">' +
       ORDER.map(function (s) { var pct = Math.round(c[s] / tot * 100); if (s === top) pct = Math.max(pct, 1 + Math.max.apply(null, ORDER.filter(function (k) { return k !== top; }).map(function (k) { return Math.round(c[k] / tot * 100); }))); return '<div class="bar' + (s === top ? " win" : "") + '"><span>' + SUIT[s].sym + " " + SUIT[s].name + '</span><i><b data-w="' + pct + '" style="background:' + (SUIT[s].red ? "var(--red)" : "var(--cream)") + '"></b></i><span>' + pct + "%</span></div>"; }).join("") +
       '</div>' + (tieNote ? '<p class="hint tie">⚖ ' + esc(tieNote) + "</p>" : "") + '<div class="selfwords"' + (qw.self.length || qw.others.length || qw.fault ? "" : " hidden") + '>' + (qw.self.length ? '<p><b>You see yourself as:</b> ' + esc(qw.self.join(", ")) + "</p>" : "") + (qw.others.length ? '<p><b>Friends and family say:</b> ' + esc(qw.others.join(", ")) + "</p>" : "") +
       (!qw.self.length || !qw.others.length ? "" : both.length ? '<p class="hint">You and the people who know you best agree on <b>' + esc(both.join(", ")) + "</b>. That's the real you.</p>" : '<p class="hint">You and the people who know you see different sides of you. Both belong on your card.</p>') +

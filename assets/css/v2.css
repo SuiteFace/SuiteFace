@@ -1106,3 +1106,10 @@ html[data-play] .h-final .citycheck :is(h3,b,li,span){color:#FAF7F0}
 html[data-play] .h-final .citycheck :is(.hint,small,p){color:#DCE5DA!important}
 html[data-play] .h-final .citycheck li.open span,html[data-play] .h-final .citycheck .open span{color:#9FE0B5}
 html[data-play] .h-final .citycheck input{background:#0F2A20!important;color:#F2ECDD!important;border:1px solid rgba(242,236,221,.35)!important}
+/* One word for each suit (Oct 18): Driven ♦ · Playful ♣ · Devoted ♥ · Thoughtful ♠ */
+.hsc{grid-template-rows:1fr auto auto;padding:14% 6% 12%;gap:2px}
+.hsc svg{width:46%;height:auto;aspect-ratio:1;align-self:center;justify-self:center}
+.hsc b{font:800 clamp(.78rem,1.6vw,1.05rem)/1.1 var(--body);letter-spacing:.01em;text-align:center}
+.hsc small{font:600 clamp(.6rem,1.1vw,.75rem)/1 var(--body);text-align:center;opacity:.7;letter-spacing:.02em}
+.suitword{font:800 .9rem var(--body);font-style:normal;color:var(--gold-hi);letter-spacing:.02em}
+p.suitword.big{margin:-6px 0 0;font-size:1.35rem}
