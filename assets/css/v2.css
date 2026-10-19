@@ -1528,3 +1528,4 @@ html[data-play="day"] .top{background:rgba(247,248,244,.82)!important;border-bot
 .pcard .cover .cv-in.cb-sunday-best::before,.pcard .cover .cv-in.cb-sunday-best::after{content:"";position:absolute;pointer-events:none;border-radius:6px;border:1.5px dashed rgba(169,130,58,.85)}
 .pcard .cover .cv-in.cb-sunday-best::before{inset:7px}
 .pcard .cover .cv-in.cb-sunday-best::after{inset:12px}
+.cp-bonus{font:600 .78rem var(--body);font-style:normal;color:#1E7A4C;background:rgba(30,122,76,.1);padding:3px 8px;border-radius:999px;margin-top:4px}

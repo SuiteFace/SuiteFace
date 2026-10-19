@@ -5187,8 +5187,8 @@
   function chipsModal(why) {
     var c = DECKP ? DECKP.chips : null;
     var m = modal('<h3 style="font-size:1.6rem;margin:0">Get chips</h3><p class="lede" style="margin:6px 0 14px">' + (why || "Buy a stack once. Every deck after that is one tap.") + (c != null ? " You have " + money(c) + "." : "") + "</p>" +
-      '<div class="cp-stacks">' + [["210", "2.10", "$2.10", "1 deck"], ["2100", "21", "$21", "10 decks"], ["21000", "210", "$210", "100 decks"]].map(function (x) {
-        return '<button type="button" class="cp-stack' + (x[0] === "2100" ? " best" : "") + '" data-stack-buy="' + x[0] + '"><span class="sfchip" data-chip="' + x[1] + '" data-size="64"></span><b>' + x[2] + "</b><span>" + x[3] + "</span></button>"; }).join("") + "</div>" +
+      '<div class="cp-stacks">' + [["210", "2.10", "$2.10", "1 deck", ""], ["2100", "21", "$21", "11 decks", "+10% bonus"], ["21000", "210", "$210", "120 decks", "+20% bonus"]].map(function (x) {
+        return '<button type="button" class="cp-stack' + (x[0] === "2100" ? " best" : "") + '" data-stack-buy="' + x[0] + '"><span class="sfchip" data-chip="' + x[1] + '" data-size="64"></span><b>' + x[2] + "</b><span>" + x[3] + "</span>" + (x[4] ? '<i class="cp-bonus">' + x[4] + "</i>" : "") + "</button>"; }).join("") + "</div>" +
       '<p class="hint" style="margin-top:12px">Chips have no cash value, never expire and are non-refundable except where the law requires.</p>');
     if (window.SFChips) SFChips.paint(m);
   }
@@ -5224,7 +5224,7 @@
       chipBalance(w.cents);
       (w.items || []).forEach(function (it) { var id = /^pack_/.test(it) ? it : it; if (!owns(id)) P.owned.push(id); }); saveP();
       var hi = $("#cpHistory"); if (hi && (w.recent || []).length) { hi.hidden = false;
-        hi.innerHTML = "<h3>Recent</h3><ul>" + w.recent.map(function (r) { var lab = /^bought:/.test(r.reason) ? "Bought chips" : r.reason === "spent:deck" ? "Played a deck" : /^spent:pack_/.test(r.reason) ? "Sticker pack" : r.reason === "spent:raise" ? "The Raise" : /^spent:/.test(r.reason) ? "Card theme" : r.reason;
+        hi.innerHTML = "<h3>Recent</h3><ul>" + w.recent.map(function (r) { var lab = /^bought:/.test(r.reason) ? "Bought chips" : /^bonus:/.test(r.reason) ? "Bonus chips" : r.reason === "spent:deck" ? "Played a deck" : /^spent:pack_/.test(r.reason) ? "Sticker pack" : r.reason === "spent:raise" ? "The Raise" : /^spent:/.test(r.reason) ? "Card theme" : r.reason;
           return "<li><span>" + esc(lab) + "<small>" + dateCT(r.at) + "</small></span><b class=\"" + (r.cents > 0 ? "plus" : "") + "\">" + (r.cents > 0 ? "+" : "−") + money(Math.abs(r.cents)) + "</b></li>"; }).join("") + "</ul>"; }
     }, function () { });
   }
