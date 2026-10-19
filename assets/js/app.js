@@ -196,7 +196,7 @@
     function ca(r, s, cls) { return '<span class="cc' + (cls ? " " + cls : "") + '" style="color:' + (SUIT[s].red ? "var(--red)" : "var(--night)") + '">' + r + SUIT[s].sym + "</span>"; }
     var MINI = {
       1: ["Find your suit", [
-        fr("Answer 12 quick questions", '<div class="qq">First date, you\'d rather…</div><div class="ops"><i>Book the place</i><i>Trivia night</i><i>Long walk, real talk</i><i>Spot with great reviews</i></div>'),
+        fr("Answer 8 quick cards", '<div class="qq">Your first date is tonight. What\'s the plan?</div><div class="ops"><i>I pick the place</i><i>Trivia or live music</i><i>A long walk, real talk</i><i>A spot with great reviews</i></div>'),
         fr("Tap the answer that's most you", '<div class="qq">First date, you\'d rather…</div><div class="ops"><i>Book the place</i><i>Trivia night</i><i class="pick">Long walk, real talk <b>♥ +1</b></i><i>Spot with great reviews</i></div><span class="tap"></span>'),
         fr("Your suit is how you show up in love", '<div class="big" style="color:var(--red)">♥</div><div class="qq">You\'re a Heart</div><div class="sm">Caring, steady, all in.</div>')]],
       2: ["Set your Face", [
@@ -655,18 +655,12 @@
 
   /* ---------- quiz ---------- */
   var Q = [
-    ["First date, you'd rather…", { diamond: "Pick the place and book it", club: "Something lively, like trivia night", heart: "A long walk and real conversation", spade: "A spot I've researched with great reviews" }],
-    ["Your friends would call you…", { diamond: "The decider", club: "The fun one", heart: "The dependable one", spade: "The thoughtful one" }],
-    ["When plans change last minute…", { diamond: "I make a new plan fast", club: "Great, an adventure", heart: "I go with what my person needs", spade: "I'd like a heads-up next time" }],
-    ["In a disagreement, you…", { diamond: "Say it straight and solve it", club: "Lighten the mood first", heart: "Listen until they feel heard", spade: "Get the facts right before reacting" }],
-    ["Your ideal weekend…", { diamond: "Checking big goals off the list", club: "Packed with people and plans", heart: "Cozy, close friends, home cooking", spade: "A project, a book, a quiet plan" }],
-    ["Your texting style…", { diamond: "Short and to the point", club: "Voice notes, memes, all caps", heart: "Checking in on how their day went", spade: "Thoughtful replies, a little later" }],
-    ["You fall for someone who…", { diamond: "Matches your ambition", club: "Makes you laugh until it hurts", heart: "Makes you feel safe", spade: "Keeps their word" }],
-    ["Facing a big decision, you…", { diamond: "Trust your gut and go", club: "Talk it out with everyone", heart: "Think about how it affects people", spade: "Make a pros-and-cons list" }],
-    ["At a party you're…", { diamond: "Introducing people to each other", club: "In the middle of the dance floor", heart: "Deep in one great conversation", spade: "Near the snacks, taking it all in" }],
-    ["You show you care by…", { diamond: "Solving the problem", club: "Planning a surprise", heart: "Showing up, no matter what", spade: "Remembering the little details" }],
-    ["What wears you out…", { diamond: "Indecision", club: "Too much routine", heart: "Conflict", spade: "Sloppiness" }],
-    ["Your relationship motto…", { diamond: "Let's build something", club: "Let's have fun", heart: "Let's take care of each other", spade: "Let's get it right" }]
+    ["Your first date is tonight. What's the plan?", { diamond: "I pick the place and book it.", club: "Something fun, like trivia or live music.", heart: "A long walk where we can really talk.", spade: "A spot I've read great reviews on." }],
+    ["Plans fall through an hour before. What do you do?", { diamond: "Make a new plan right away.", club: "Wing it. It's an adventure.", heart: "Ask what they'd like to do.", spade: "Ask for more notice next time." }],
+    ["You and your date disagree. What do you do first?", { diamond: "Say it straight and fix it.", club: "Break the tension with a laugh.", heart: "Listen until they feel heard.", spade: "Get the facts before I react." }],
+    ["You're at a party. Where are you?", { diamond: "Introducing people.", club: "On the dance floor.", heart: "In one long, real conversation.", spade: "Off to the side, taking it all in." }],
+    ["What makes you fall for someone?", { diamond: "They match my drive.", club: "They make me laugh.", heart: "They make me feel safe.", spade: "They keep their word." }],
+    ["What wears you out fastest?", { diamond: "Indecision.", club: "Routine.", heart: "Conflict.", spade: "Sloppiness." }]
   ];
   /* Words: how you see yourself, how friends and family see you, and (last) your biggest fault. Each word leans toward a suit. */
   var WORDS = {
@@ -683,21 +677,17 @@
   };
   function suitOf(word, table) { var f = ""; ORDER.forEach(function (k) { if (table[k].indexOf(word) > -1) f = k; }); return f; }
   function wordList(table) { var all = []; ORDER.forEach(function (k) { all = all.concat(table[k]); }); return all.sort(function (a, b) { return (hash(a) % 97) - (hash(b) % 97); }); }
-  /* The deck of slides: 4 "which word fits you" batches, 2 "what would friends pick" batches, 12 questions, 1 honest-fault batch.
-     Every word batch shows one word per suit plus "None of these". */
-  /* Hidden tells: one sits among the words on each "fits you best" card and on the fault card. Picking all five sends the
-     account to a private staff review before a deck is dealt. They never change the suit result and are never shown. */
+  /* The deck of slides (Oct 19): one "select every word that describes you" card, six scenarios, one honest-fault card. */
+  /* Hidden tells: four sit among the words on the word card, one on the fault card, and one answer on every scenario. Picking all
+     five words sends the account to a private staff review before a deck is dealt. They never change the suit result and are never shown. */
   var TELLS = ["Jealous", "Possessive", "Vengeful", "Manipulative", "Hot-tempered"];
-  var QTELL = ["Somewhere I can check who else they're texting", "The one you don't want to cross", "I make them pay for it later", "I win, whatever it takes",
-    "Keeping tabs on where my person is", "I go silent to make a point", "Does what I say", "I decide for both of us",
-    "Watching who my date talks to", "Keeping them all to myself", "Being told no", "What's yours is mine"];
-  var SLIDES = [];
-  [0, 1, 2, 3].forEach(function (i) { SLIDES.push({ t: "self", i: i }); });
-  [0, 3].forEach(function (i, n) { SLIDES.push({ t: "oth", i: i, n: n }); });
+  var QTELL = ["Somewhere I can check who else they're texting.", "Go silent to make a point.", "Make sure I win, whatever it takes.", "Watching who my date talks to.", "They do what I say.", "Being told no."];
+  /* The quiz (Oct 19): 8 cards. One "select every word that describes you" card, six quick scenarios, one honest fault. */
+  var SLIDES = [{ t: "words", i: 0 }];
   Q.forEach(function (x, i) { SLIDES.push({ t: "q", i: i }); });
   SLIDES.push({ t: "fault", i: 0 });
   var STEPS_Q = SLIDES.length;
-  var QV = 2, qs = S.get("quizDeck", null);
+  var QV = 3, qs = S.get("quizDeck", null);
   if (!qs || qs.v !== QV) qs = { v: QV, ans: {}, i: 0 };
   var qa = [], qw = { self: [], others: [], fault: "", none: 0, tells: 0 }, qi = qs.i;
   function slideKey(sl) { return sl.t + sl.i; }
@@ -705,6 +695,7 @@
     qa = []; qw = { self: [], others: [], fault: "", none: 0, tells: 0, tellQ: 0, tellW: 0 };
     SLIDES.forEach(function (sl) {
       var v = qs.ans[slideKey(sl)]; if (v == null) return;
+      if (sl.t === "words") { (Array.isArray(v) ? v : []).forEach(function (w) { if (TELLS.indexOf(w) > -1) { qw.tells++; qw.tellW++; } else if (suitOf(w, WORDS)) qw.self.push(w); }); return; }
       if (v === "none") { qw.none++; return; }
       if (v === "tell") { qw.tells++; if (sl.t === "q") qw.tellQ++; else qw.tellW++; return; }
       if (sl.t === "q") qa[sl.i] = v;
@@ -735,7 +726,7 @@
     var left = STEPS_Q - qi - 1, sl = SLIDES[qi];
     $("#qCount").textContent = "Card " + (qi + 1) + " of " + STEPS_Q + (left ? " · " + left + " to go" : " · last one");
     var pct = qi / STEPS_Q, cheer =
-      qi === 0 ? "Let's deal you in. Tap the word that fits you best." :
+      qi === 0 ? "Let's deal you in. Tap every word that fits you." :
       sl.t === "oth" && sl.n === 0 ? "Nice. Now think like the people who love you." :
       sl.t === "q" && sl.i === 0 ? "Here come the quick ones. Go with your gut." :
       sl.t === "fault" ? "Last card. The honest one." :
@@ -748,9 +739,18 @@
     var qb = $("#quizBox"); if (qb && !REDUCED) { qb.classList.remove("slide"); void qb.offsetWidth; qb.classList.add("slide"); }
     $("#qMeter").style.width = (qi / STEPS_Q * 100) + "%";
     $("#qBack").disabled = qi === 0;
+    if (sl.t === "words") {
+      var picked = Array.isArray(qs.ans.words0) ? qs.ans.words0 : [];
+      var all = wordList(WORDS).concat(TELLS.slice(0, 4)).sort(function (a, b) { return (hash(a + "w") % 97) - (hash(b + "w") % 97); });
+      $("#qText").textContent = "Select every word that describes you.";
+      $("#qAnswers").innerHTML = '<p class="qhint">Tap as many as fit. Be honest, not flattering.</p><div class="wordpick" role="group" aria-label="Words that describe you">' + all.map(function (w) {
+        return '<button class="ans wchip' + (picked.indexOf(w) > -1 ? " picked" : "") + '" type="button" aria-pressed="' + (picked.indexOf(w) > -1) + '" data-w="' + esc(w) + '">' + esc(w) + "</button>"; }).join("") +
+        '</div><button class="btn gold wnext" type="button" data-wnext' + (picked.length ? "" : " disabled") + ">" + (picked.length ? "Next (" + picked.length + " picked)" : "Pick at least one") + "</button>";
+      return;
+    }
     if (sl.t === "self") { $("#qText").textContent = "Which word fits you best?"; $("#qAnswers").innerHTML = batch(sl, "None of these"); return; }
     if (sl.t === "oth") { $("#qText").textContent = "Which word would your friends pick for you?"; $("#qAnswers").innerHTML = batch(sl, "None of these"); return; }
-    if (sl.t === "fault") { $("#qText").textContent = "Which one is most like your biggest fault?"; $("#qAnswers").innerHTML = '<p class="qhint">Owning it is a strong play. It stays private (Face Down) unless you choose to show it.</p>' + batch(sl, "None of these fit me"); return; }
+    if (sl.t === "fault") { $("#qText").textContent = "What's your biggest fault? Pick one."; $("#qAnswers").innerHTML = '<p class="qhint">Owning it is a strong play. It stays private (Face Down) unless you choose to show it.</p>' + batch(sl, "None of these fit me"); return; }
     $("#qText").textContent = Q[sl.i][0];
     var qk = shuffled(sl.i); qk.splice((sl.i * 2 + 3) % 5, 0, "tell");
     $("#qAnswers").innerHTML = '<div class="qopts">' + qk.map(function (k) {
@@ -758,6 +758,15 @@
     }).join("") + "</div>";
   }
   $("#qAnswers").addEventListener("click", function (e) {
+    var wb = e.target.closest("[data-w]");
+    if (wb && SLIDES[qi] && SLIDES[qi].t === "words") {
+      var cur = Array.isArray(qs.ans.words0) ? qs.ans.words0.slice() : [], w = wb.getAttribute("data-w"), k = cur.indexOf(w);
+      if (k > -1) cur.splice(k, 1); else cur.push(w);
+      qs.ans.words0 = cur; saveQ(); wb.classList.toggle("picked", k < 0); wb.setAttribute("aria-pressed", String(k < 0));
+      var nx = $("#qAnswers [data-wnext]"); if (nx) { nx.disabled = !cur.length; nx.textContent = cur.length ? "Next (" + cur.length + " picked)" : "Pick at least one"; }
+      return;
+    }
+    if (e.target.closest("[data-wnext]")) { if ((qs.ans.words0 || []).length) { qi++; saveQ(); renderQ(); } return; }
     var b = e.target.closest("[data-s]"); if (!b || qi >= STEPS_Q) return;
     $$("#qAnswers .ans").forEach(function (x) { x.classList.toggle("picked", x === b); });
     qs.ans[slideKey(SLIDES[qi])] = b.getAttribute("data-s"); saveQ();
@@ -862,11 +871,12 @@
   }
   function showResult() {
     var c = { diamond: 0, club: 0, heart: 0, spade: 0 };
-    /* Points: each scenario 2, each word card 1, the fault card 1. */
-    qa.forEach(function (s) { c[s] += 2; });
-    qw.self.concat(qw.others).forEach(function (w) { var k = suitOf(w, WORDS); if (k) c[k] += 1; });
+    /* Points (Oct 19): each scenario 3 (18 total); the words are worth 6 points shared out by the share of words picked in each
+       suit, so tapping lots of words can't outweigh the scenarios; the fault card 1. About 25 points in all. */
+    qa.forEach(function (s) { c[s] += 3; });
+    var wn = qw.self.length; if (wn) qw.self.forEach(function (w) { var k = suitOf(w, WORDS); if (k) c[k] += 6 / wn; });
     var fk = suitOf(qw.fault, FAULTS); if (fk) c[fk] += 1;
-    var jokerPts = qw.tellQ * 2 + qw.tellW;
+    var jokerPts = qw.tellQ * 3 + qw.tellW;
     var tot = ORDER.reduce(function (a, k) { return a + c[k]; }, 0) || 1;
     var both = qw.self.filter(function (w) { return qw.others.indexOf(w) > -1; });
     /* House rule: there is always one clear suit. Ties break in this order, and the result says which one decided it. */

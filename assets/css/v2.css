@@ -1121,3 +1121,9 @@ p.suitword.big{margin:-6px 0 0;font-size:1.35rem}
 .wildband .wb em{font:800 .9rem var(--body);font-style:normal;color:var(--gold-hi)}
 .wildband .wb small{font:600 .78rem var(--body);color:var(--cream-dim)}
 html[data-play="day"] .wildband .wb.red b{color:#A11C30}
+/* Quiz word card: select every word that describes you */
+.wordpick{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.wordpick .wchip{width:auto!important;min-height:44px;padding:0 16px!important;border-radius:999px!important;font:700 .95rem var(--body)}
+.wordpick .wchip.picked{background:var(--gold)!important;border-color:var(--gold)!important;color:#1E1606!important}
+.wnext{width:100%;justify-content:center}
+.wnext[disabled]{opacity:.55;cursor:default}
