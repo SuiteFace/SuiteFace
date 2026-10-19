@@ -1561,6 +1561,17 @@
   function fieldLabel(el) { var f = el && el.closest(".field"), l = f && f.querySelector("label,.lbl"); return l ? l.textContent.replace(/Face (Up|Down)/, "").trim() : "This field"; }
   $("#faceForm").addEventListener("input", function (e) { var f = e.target.closest(".needs"); if (f) f.classList.remove("needs"); });
   $("#faceForm").addEventListener("click", function (e) { var f = e.target.closest(".needs"); if (f && e.target.closest(".chip,select")) f.classList.remove("needs"); });
+  /* Answers that can't both be true. Opens the question and says how to fix it. */
+  function identityClash() {
+    var st = asList(P.id.status).join("|"), sty = asList(P.id.style);
+    if (/Married|In a relationship/.test(st) && sty.indexOf("Monogamous") > -1) {
+      var tb = $('.ftabs [data-ft="about"]'); if (tb) tb.click();
+      var box = $('[data-tab="about"]'); if (box && box.classList.contains("deckmode")) { var qm = box.querySelector(".qmode"); if (qm) qm.click(); }
+      var el = $('.idf[data-k="style"]') || $('.idf[data-k="status"]');
+      return { el: el, label: "Relationship style", msg: (/Married/.test(st) ? "You're married" : "You're in a relationship") + " and monogamous, so you can't date here. To fix it, change Relationship status to the one that fits now, or, if you and your partner agreed to see others, pick that style (Open relationship, Polyamorous or Ethically non-monogamous) instead of Monogamous." };
+    }
+    return null;
+  }
   function serverProblem(x) {
     var m = String((x && x.message) || x || ""), el = null, msg = m;
     if (/handle|duplicate key.*handle|members_handle/i.test(m)) { el = F.handle; msg = "That Calling Card is taken or not allowed. Try another."; }
@@ -1578,8 +1589,10 @@
     e.preventDefault();
     if (!validate(true)) {
       var probs = $$("#faceForm .err").filter(function (x) { return x.textContent.trim(); }).map(function (x) { var el = x.closest(".field") || x; return { el: el, label: fieldLabel(el), msg: x.textContent.trim() }; });
+      var cl0 = identityClash(); if (cl0) probs.push(cl0);
       faceProblems(probs); toast("A few things need a look before saving."); return;
     }
+    var clash = identityClash(); if (clash) { faceProblems([clash]); toast(clash.msg); return; }
     faceProblems([]);
     saveP();
     if (liveOn()) { toast("Saving your Face…"); pushFace().then(function () { toast("Face saved. Dealing your hand from real members…", P.mySuit || "heart"); jackpot(3000); burstAt($("#myCard"), 80); return liveDeck(true); }, function (x) { serverProblem(x); }); return; }
