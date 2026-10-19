@@ -2163,16 +2163,34 @@
     if (!n) { $("#iNameErr").textContent = "Add your friend's first name."; $("#iName").focus(); return; }
     $("#iNameErr").textContent = "";
     var from = (P.handle || "").trim().replace(/^@/, "");
-    var link = CFG.siteUrl + "?ref=" + encodeURIComponent(from || "a-friend") + "&seat=" + encodeURIComponent(n) + "#membership";
+    var link = CFG.siteUrl + "membership.html?ref=" + encodeURIComponent(from || "a-friend");
     var note = $("#iNote").value.trim() || "You'd be an Ace in somebody's Hand.";
     var msg = "Hey " + n + "! " + note + " I saved you a seat at SuiteFace, dating dealt like a deck of cards. No Jokers Needed: " + link;
     $("#inviteLink").value = link; $("#inviteOut").hidden = false;
     $("#shareEmail").href = "mailto:?subject=" + encodeURIComponent("I saved you a seat at SuiteFace") + "&body=" + encodeURIComponent(msg);
-    $("#shareSms").href = "sms:?&body=" + encodeURIComponent(msg);
+    var tel = ($("#iTel") && $("#iTel").value) || "";
+    $("#shareSms").href = "sms:" + encodeURIComponent(tel) + "?&body=" + encodeURIComponent(msg);
+    $("#shareWa").href = "https://wa.me/?text=" + encodeURIComponent(msg);
+    $("#shareFb").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(link);
+    $("#shareX").href = "https://x.com/intent/post?text=" + encodeURIComponent(msg);
     var sn = $("#shareNative"); sn.hidden = !navigator.share; sn.onclick = function () { navigator.share({ title: "SuiteFace", text: msg, url: link }).catch(function () { }); };
     if (seats.indexOf(n) < 0) { seats.push(n); if (seats.length > 5) seats.shift(); S.set("seats", seats); }
     renderSeats(); burstAt($("#round"), 40); toast("Seat saved for " + n + ". Send them the link.");
   });
+  /* Contacts (Android Chrome only): pick a friend from the phone's address book. Nothing is uploaded; the name and number
+     only fill this form and the text message. */
+  (function () {
+    var b = $("#pickContact"); if (!b) return;
+    var ok = "contacts" in navigator && "ContactsManager" in window; b.hidden = !ok; if (!ok) return;
+    b.addEventListener("click", function () {
+      navigator.contacts.select(["name", "tel"], { multiple: false }).then(function (list) {
+        var c = list && list[0]; if (!c) return;
+        var nm = ((c.name && c.name[0]) || "").split(" ")[0]; if (nm) $("#iName").value = nm;
+        $("#iTel").value = (c.tel && c.tel[0]) || "";
+        $("#inviteForm").requestSubmit ? $("#inviteForm").requestSubmit() : $("#inviteForm").dispatchEvent(new Event("submit", { cancelable: true }));
+      }, function () { });
+    });
+  })();
   function copy(text, btn) {
     var done = function () { var o = btn.textContent; btn.textContent = "Copied"; setTimeout(function () { btn.textContent = o; }, 1500); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { fallback(); });

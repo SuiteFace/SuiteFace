@@ -79,10 +79,10 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792422971">
-<script src="/assets/js/transit.js?v=1792422971"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792422971">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792422971">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792423055">
+<script src="/assets/js/transit.js?v=1792423055"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792423055">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792423055">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 </head>
 <body data-page="membership">
@@ -725,17 +725,22 @@
           <h2 id="invTitle">Save a seat for a friend</h2>
           <p class="lede">Bring your single friends. Every seat you fill makes the decks near you deeper and better.</p>
           <form class="panel form-grid" id="inviteForm" novalidate>
+            <button class="btn ghost sm" type="button" id="pickContact" hidden>Choose from my contacts</button>
             <div class="field"><label for="iName">Friend's first name</label><input type="text" id="iName" maxlength="30" placeholder="Taylor"><span class="err" id="iNameErr"></span></div>
+            <input type="hidden" id="iTel">
             <div class="field"><label for="iNote">A note (optional)</label><input type="text" id="iNote" maxlength="120" placeholder="You'd be an Ace in somebody's Hand."></div>
             <button class="btn red" type="submit">Make their invite</button>
             <div id="inviteOut" hidden class="form-grid">
               <div class="linkbox"><input type="text" id="inviteLink" readonly aria-label="Invite link"><button class="btn gold sm" type="button" id="copyLink">Copy</button></div>
+              <button class="btn gold" type="button" id="shareNative" hidden>Share to Instagram, Snapchat, TikTok and more</button>
               <div class="share-row">
-                <a class="btn ghost sm" id="shareEmail" href="#" target="_blank" rel="noopener">Email it</a>
                 <a class="btn ghost sm" id="shareSms" href="#">Text it</a>
-                <button class="btn ghost sm" type="button" id="shareNative" hidden>Share…</button>
+                <a class="btn ghost sm" id="shareEmail" href="#" target="_blank" rel="noopener">Email it</a>
+                <a class="btn ghost sm" id="shareWa" href="#" target="_blank" rel="noopener noreferrer" data-noslot>WhatsApp</a>
+                <a class="btn ghost sm" id="shareFb" href="#" target="_blank" rel="noopener noreferrer" data-noslot>Facebook</a>
+                <a class="btn ghost sm" id="shareX" href="#" target="_blank" rel="noopener noreferrer" data-noslot>X</a>
               </div>
-              <p class="hint">Copy the link and send it however you like. Email and text buttons open your own apps, if your device allows it.</p>
+              <p class="hint">On a phone, Share opens your share sheet: pick Instagram, Snapchat, TikTok, Messenger or any app. Instagram and TikTok don't let other sites message your followers directly, so sharing is how invites reach them.</p>
             </div>
           </form>
         </div>
@@ -954,15 +959,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792422971"></script>
-<script src="/assets/js/sign.js?v=1792422971"></script>
-<script src="/assets/js/live.js?v=1792422971"></script>
-<script src="/assets/js/gate.js?v=1792422971"></script>
-<script src="/assets/js/fx.js?v=1792422971"></script>
-<script src="/assets/js/casino-scene.js?v=1792422971"></script>
-<script src="/assets/js/chips.js?v=1792422971"></script>
-<script src="/assets/js/bumpers.js?v=1792422971"></script>
-<script src="/assets/js/slots.js?v=1792422971"></script>
-<script src="/assets/js/app.js?v=1792422971"></script>
+<script src="/assets/js/config.js?v=1792423055"></script>
+<script src="/assets/js/sign.js?v=1792423055"></script>
+<script src="/assets/js/live.js?v=1792423055"></script>
+<script src="/assets/js/gate.js?v=1792423055"></script>
+<script src="/assets/js/fx.js?v=1792423055"></script>
+<script src="/assets/js/casino-scene.js?v=1792423055"></script>
+<script src="/assets/js/chips.js?v=1792423055"></script>
+<script src="/assets/js/bumpers.js?v=1792423055"></script>
+<script src="/assets/js/slots.js?v=1792423055"></script>
+<script src="/assets/js/app.js?v=1792423055"></script>
 </body>
 </html>
