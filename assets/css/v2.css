@@ -1131,3 +1131,6 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 .friendsq{margin-top:18px;padding:16px 18px;border-radius:18px;border:1px dashed rgba(232,196,106,.45);display:grid;gap:8px}
 .friendsq h4{margin:0;font-size:1.1rem}
 .friendsq .wordpick{margin:4px 0}
+/* Rendered brass medallions on card backs (Oct 19) */
+.pcard .cover .cv-medal.art{background:none;box-shadow:0 6px 14px -6px rgba(12,18,15,.7);padding:0;overflow:visible}
+.pcard .cover .cv-medal.art picture,.pcard .cover .cv-medal.art img{display:block;width:100%;height:100%;border-radius:50%}

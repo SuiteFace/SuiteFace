@@ -1803,8 +1803,8 @@
     return '<svg class="rosette" viewBox="0 0 100 100" aria-hidden="true">' + q.map(function (x) { return '<path fill="' + x[3] + '" transform="translate(' + (x[1] + 6) + ' ' + (x[2] + 6) + ') scale(.38)" d="' + BRAND.suit[x[0]] + '"/>'; }).join("") + "</svg>"; }
   function medalFor(p) {
     if (p && p.joker) return '<div class="cv-medal jk" title="Public Joker">' + (BRAND.hat || "") + "</div>";
-    if (p && SUIT[p.suit]) return '<div class="cv-medal suit' + (SUIT[p.suit].red ? " red" : "") + '" title="' + SUIT[p.suit].name + '">' + pip(p.suit) + "</div>";
-    return '<div class="cv-medal">' + rosette() + "</div>";
+    var m = p && SUIT[p.suit] ? p.suit : "house", t = p && SUIT[p.suit] ? SUIT[p.suit].name : "SuiteFace";
+    return '<div class="cv-medal art" title="' + t + '"><picture><source type="image/webp" srcset="/assets/art/medal_' + m + '.webp"><img src="/assets/art/medal_' + m + '.png" alt="" width="146" height="146" loading="lazy" decoding="async"></picture></div>';
   }
   function coverHTML(p) {
     var felt = (TABLE[p.looking] || TABLE.longterm)[2] || "#1E6347", red = SUIT[p.suit] && SUIT[p.suit].red;
