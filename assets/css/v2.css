@@ -1431,3 +1431,47 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 .pcard .face.framed .hrstars i,.pcard .face.framed .hrstars.gold i{width:24px;height:24px;background:#fff;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 8px rgba(255,200,90,.95)) drop-shadow(0 0 14px rgba(255,255,255,.7))}
 .pcard .face.framed .hrstars i:nth-child(5),.pcard .face.framed .hrstars i:nth-child(6){width:18px;height:18px}
 .pcard .face.framed .hrtrim.gold{background:conic-gradient(from var(--hra),#FFFFFF 0deg,#FFE9A8 18deg,#C8912E 60deg,#FFFFFF 90deg,#E8B850 140deg,#FFFDF0 180deg,#B07A1E 230deg,#FFFFFF 265deg,#D9A43C 320deg,#FFFFFF 360deg)}
+
+/* =====================================================================
+   Oct 19 refresh: modern, calm, functional. Tighter rhythm, quiet labels, one clear primary per block.
+   Day Play: deep-green primary on light pages. Night Play and dark panels: champagne primary.
+   ===================================================================== */
+section{padding-block:clamp(40px,6vw,76px)}
+body:not([data-page="home"]) main > section:first-of-type{padding-top:clamp(28px,4vw,48px)}
+h1,h2,h3{text-transform:none!important}
+h2{font-weight:650!important;letter-spacing:-.035em!important;line-height:1.04!important}
+h3{letter-spacing:-.015em}
+.eyebrow{font:500 .86rem/1.2 var(--body)!important;letter-spacing:.01em!important;text-transform:none!important;color:var(--muted)!important}
+.eyebrow::before,.eyebrow::after{display:none!important}
+.lede{max-width:60ch}
+
+/* Buttons: pills, one weight, no bevels */
+.btn{min-height:46px;padding:0 22px!important;font:600 .98rem/1 var(--body)!important;letter-spacing:0!important;border-radius:999px!important;box-shadow:none!important;text-transform:none!important}
+.btn.sm{min-height:38px;padding:0 16px!important;font-size:.9rem!important}
+.btn:active{transform:scale(.98)}
+.btn.gold{background:#E2C47E!important;border-color:#E2C47E!important;color:#1A1405!important}
+.btn.gold:hover{background:#ECD293!important}
+html[data-play="day"] .btn.gold{background:#123628!important;border-color:#123628!important;color:#F7F2E6!important}
+html[data-play="day"] .btn.gold:hover{background:#1B4A38!important}
+html[data-play="day"] :is(.feltbox,#quizBox,#quizResult,.m2-preview,.deckgate,.promo,.h-final,.lockcard,.offerpop,.sfx) .btn.gold{background:#E2C47E!important;border-color:#E2C47E!important;color:#1A1405!important}
+.btn.ghost{background:transparent!important}
+.btn.red{background:#8E2230!important;border-color:#8E2230!important;color:#FFF8F2!important}
+
+/* Panels and cards: hairline, soft, consistent radius */
+.panel{border-radius:22px!important;box-shadow:0 1px 2px rgba(18,54,40,.04),0 20px 40px -32px rgba(18,54,40,.35)!important}
+html[data-play="day"] .panel{border-color:rgba(18,54,40,.1)!important}
+
+/* Launch strip: quiet and slim */
+.promo{background:#0E2B20!important;color:#F2ECDD!important}
+.promo-in{min-height:38px!important;padding-block:4px!important;gap:10px!important}
+.promo p{font-size:.86rem!important}
+.promo .sfchip{display:none}
+.promo-cta{background:#E2C47E!important;color:#1A1405!important;border-radius:999px;padding:6px 12px;font:600 .82rem var(--body);text-decoration:none;white-space:nowrap}
+
+/* Header: frosted, hairline */
+html[data-play="day"] .top{background:rgba(247,248,244,.82)!important;border-bottom:1px solid rgba(18,54,40,.08)!important}
+
+/* Floating helpers: smaller and out of the way */
+.fabdock .fab,.fab{min-height:36px!important;padding:0 14px!important;font:600 .84rem var(--body)!important;box-shadow:0 8px 20px -10px rgba(0,0,0,.45)!important}
+.sf-play{transform:scale(.88);transform-origin:left bottom;opacity:.92}
+.reel-div,.h-moves .reel{display:none!important}
