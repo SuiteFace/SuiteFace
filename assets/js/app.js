@@ -1720,7 +1720,20 @@
   }
   function trumpPos(s) { return P.trumps.indexOf(s); }
   function handOrder(a, b) { return trumpPos(a.suit) - trumpPos(b.suit) || a.ri - b.ri; }
-  function remaining() { return DECK.filter(function (p) { return G.dealt.indexOf(p.id) < 0 && G.burned.indexOf(p.id) < 0 && G.played.indexOf(p.id) < 0; }).sort(handOrder); }
+  /* Deal order for the Stack: best match first, by trump suits, or a random shuffle (kept until you shuffle again). */
+  var DEALORD = S.get("dealOrder", "best");
+  function fitOrder(a, b) { return (b.fit || 0) - (a.fit || 0) || (a.ri || 0) - (b.ri || 0) || (a.dist || 0) - (b.dist || 0); }
+  function shufOrder(a, b) { var m = G.shuf || {}; return (m[a.id] == null ? 1 : m[a.id]) - (m[b.id] == null ? 1 : m[b.id]); }
+  function stackOrder() { return DEALORD === "shuffle" ? shufOrder : DEALORD === "trump" ? handOrder : fitOrder; }
+  function reshuffle() { G.shuf = {}; DECK.forEach(function (p) { G.shuf[p.id] = Math.random(); }); }
+  function setDealOrder(mode) {
+    DEALORD = mode; S.set("dealOrder", mode); if (mode === "shuffle") reshuffle();
+    // put the unplayed hand back in the Stack and deal five fresh, face down, in the new order
+    G.dealt = []; saveG(); renderTable(false); deal(); paintOrder();
+    toast(mode === "best" ? "Dealing best match first." : mode === "trump" ? "Dealing by your trump suits." : "Shuffled. Dealing at random.");
+  }
+  function paintOrder() { $$("[data-order]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-order") === DEALORD)); }); }
+  function remaining() { return DECK.filter(function (p) { return G.dealt.indexOf(p.id) < 0 && G.burned.indexOf(p.id) < 0 && G.played.indexOf(p.id) < 0; }).sort(stackOrder()); }
   function why(p, pos) {
     var bits = [];
     bits.push(SUIT[p.suit].name + " is your #" + (trumpPos(p.suit) + 1) + " trump");
@@ -1916,7 +1929,7 @@
   }
   function renderTable(redeal) {
     if (deckDirty || !DECK.length) buildDeck();
-    var hand = G.dealt.map(function (id) { return BY[id]; }).filter(Boolean).sort(handOrder);
+    var hand = G.dealt.map(function (id) { return BY[id]; }).filter(Boolean); if (DEALORD !== "shuffle") hand.sort(stackOrder());
     if (!hand.length && liveOn() && /Play a deck first/i.test(LIVE_ERR || "")) { deckGate(); return; }
     $("#dealt").innerHTML = hand.length ? hand.map(cardHTML).join("") :
       liveOn() && LIVE_ERR ? '<p class="lede deckmsg" style="align-self:center">' + esc(LIVE_ERR) + (/Friendship/i.test(LIVE_ERR) ? ' <a href="my-table.html#face">Change your relationship goal in My Face</a>.' : "") + "</p>" :
@@ -1956,7 +1969,7 @@
   $("#dealBtn").addEventListener("click", function () { if (!G.dealt.length) { deal(); } else deal(); });
   $("#shuffleBtn").addEventListener("click", function () {
     if (liveOn() && LIVE_ROWS) { toast("Fresh Shuffle: re-dealing your hand…"); G.dealt = []; liveDeck(true).then(function () { setTimeout(deal, 150); }); return; }
-    G = { dealt: [], burned: [], played: [], pairs: G.pairs, hands: G.hands || {}, jokered: G.jokered || [], clock: G.clock || 0 }; buildDeck(); saveG(); renderTable(false);
+    G = { dealt: [], burned: [], played: [], pairs: G.pairs, hands: G.hands || {}, jokered: G.jokered || [], clock: G.clock || 0 }; buildDeck(); if (DEALORD === "shuffle") reshuffle(); saveG(); renderTable(false);
     toast("Fresh Shuffle. Burned and played cards are back in your deck."); setTimeout(deal, 150);
   });
   $("#dealt").addEventListener("click", function (e) {
@@ -2015,12 +2028,13 @@
   // all 52 overview
   /* Explore my matches: every card in your deck as photos, with quick filters. Tap one to deal it into your hand. */
   var EXF = "all";
+  function orderHTML() { return '<div class="dealorder" role="group" aria-label="Deal order"><span>Deal order</span>' + [["best", "Best match first"], ["trump", "My trump suits"], ["shuffle", "Shuffle"]].map(function (o) { return '<button type="button" data-order="' + o[0] + '" aria-pressed="' + (DEALORD === o[0]) + '">' + o[1] + "</button>"; }).join("") + "</div>"; }
   function exploreHTML() {
-    var list = DECK.slice().sort(handOrder), f = EXF;
+    var list = DECK.slice().sort(stackOrder()), f = EXF;
     var keep = function (p) { if (f === "all") return true; if (SUIT[f]) return p.suit === f; if (f === "ten") return /^(A|K|Q|J|10)$/.test(String(p.rank)); if (f === "free") { var nf = nextFree(p.avail); return nf && nf.soon; } return true; };
     var shown = list.filter(keep);
     var chips = [["all", "All " + list.length], ["ten", "10 or higher"], ["free", "Free this week"]].concat(ORDER.map(function (s) { return [s, SUIT[s].sym + " " + SUIT[s].name]; }));
-    return '<div class="exf" role="group" aria-label="Filter">' + chips.map(function (c) { return '<button type="button" class="exchip" aria-pressed="' + (f === c[0]) + '" data-exf="' + c[0] + '">' + c[1] + "</button>"; }).join("") + "</div>" +
+    return orderHTML() + '<div class="exf" role="group" aria-label="Filter">' + chips.map(function (c) { return '<button type="button" class="exchip" aria-pressed="' + (f === c[0]) + '" data-exf="' + c[0] + '">' + c[1] + "</button>"; }).join("") + "</div>" +
       (shown.length ? '<div class="exgrid">' + shown.map(function (p) {
         var st = G.burned.indexOf(p.id) > -1 ? "Burned" : G.played.indexOf(p.id) > -1 ? "Played" : G.dealt.indexOf(p.id) > -1 ? "In your hand" : "", nf = nextFree(p.avail), red = SUIT[p.suit] && SUIT[p.suit].red;
         return '<button type="button" class="excard' + (st ? " st" : "") + '" data-exid="' + esc(p.id) + '"' + (st === "Burned" ? " disabled" : "") + ">" +
@@ -2031,12 +2045,18 @@
   function openExplore() {
     if (deckDirty) buildDeck();
     if (liveOn() && !DECK.length) { toast(/Play a deck first/i.test(LIVE_ERR || "") ? "Play your deck first: it's $2.10 for 7 days." : "Your deck is empty right now."); return; }
-    var m = modal('<h3 style="font-size:1.7rem;margin:0">Explore my matches</h3><p class="lede" style="margin:4px 0 12px">Your whole deck, best match first. Tap a card to put it in your hand.</p><div id="exBody">' + exploreHTML() + "</div>");
+    var m = modal('<h3 style="font-size:1.7rem;margin:0">The Stack</h3><p class="lede" style="margin:4px 0 12px">Every card your hand is dealt from (' + DECK.length + ' in all). Your five come off the top in the deal order you pick. Tap any card to pull it into your hand.</p><div id="exBody">' + exploreHTML() + "</div>");
     m.classList.add("exmodal");
   }
   $("#deckBtn").addEventListener("click", openExplore);
+  (function () { var bar = $(".deck-bar"); if (bar && !$(".dealorder", bar.parentNode)) { bar.insertAdjacentHTML("afterend", '<div class="deckopts">' + orderHTML() + '<button type="button" class="plaintog" data-plain aria-pressed="false">Photo and name only</button></div>'); }
+    if (S.get("plainCards", false)) { document.body.classList.add("sfplain"); $$("[data-plain]").forEach(function (x) { x.setAttribute("aria-pressed", "true"); }); }
+    var pile = $("#pile"); if (pile) { pile.setAttribute("role", "button"); pile.setAttribute("tabindex", "0"); pile.setAttribute("aria-label", "The Stack: see every card your hand is dealt from"); pile.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openExplore(); } }); } })();
   document.addEventListener("click", function (e) {
     var t = e.target; if (!t.closest) return; var b;
+    if ((b = t.closest("[data-order]"))) { var inStack = !!t.closest("#exBody"); setDealOrder(b.getAttribute("data-order")); var eb0 = $("#exBody"); if (inStack && eb0) eb0.innerHTML = exploreHTML(); return; }
+    if ((b = t.closest("[data-plain]"))) { var on = !document.body.classList.contains("sfplain"); document.body.classList.toggle("sfplain", on); S.set("plainCards", on); $$("[data-plain]").forEach(function (x) { x.setAttribute("aria-pressed", String(on)); }); return; }
+    if ((b = t.closest("#pile"))) { openExplore(); return; }
     if ((b = t.closest("[data-exf]"))) { EXF = b.getAttribute("data-exf"); var eb = $("#exBody"); if (eb) eb.innerHTML = exploreHTML(); return; }
     if ((b = t.closest("[data-exid]"))) { var id = b.getAttribute("data-exid");
       if (G.dealt.indexOf(id) < 0 && G.played.indexOf(id) < 0 && G.burned.indexOf(id) < 0) { if (G.dealt.length >= HAND) { toast("Your hand is full. Burn or play a card first."); return; } G.dealt.push(id); saveG(); }
@@ -3584,6 +3604,7 @@
     document.documentElement.setAttribute("data-role", ROLE);
     $("#loginBtn").textContent = (ROLE === "guest" && !SIGNED) ? "Log in" : "Log out";
     $$("[data-only]").forEach(function (el) { el.hidden = ROLE !== el.getAttribute("data-only"); });
+    $$("a.guestnav").forEach(function (a) { a.hidden = !!(SIGNED || ROLE !== "guest"); });
     $$("a[data-need]").forEach(function (a) { var n = a.getAttribute("data-need"); a.hidden = a.classList.contains("clubnav") ? !(SIGNED || ROLE !== "guest") : n !== "member" ? !allowed(n) : false; });
     if (typeof navGroups === "function") navGroups();
     $$("section[data-need]").forEach(function (sec) {
@@ -4364,20 +4385,27 @@
   /* An empty live hand says exactly why, and shows a clearly labeled sample hand so the picture cards make sense. */
   var SAMPLE_HAND = [["Jordan", 34, "heart", "A", "jordan.webp", "Teacher and Army veteran. Sunday pancakes, long walks.", ["Hiking", "Cooking"]], ["Ellis", 38, "spade", "K", "ellis.webp", "Architect who still sketches by hand.", ["Design", "Jazz"]],
     ["Ryan", 33, "club", "Q", "ryan.webp", "Weekend fly fisherman, weekday nurse.", ["Fishing", "Live music"]], ["Matteo", 36, "diamond", "J", "matteo.webp", "Runs a small bakery. Up at 4, happy about it.", ["Food", "Travel"]], ["Ben", 31, "heart", "10", "ben.webp", "Coaches Little League. Terrible singer, sings anyway.", ["Baseball", "Music"]]];
+  var SAMPLE_BY = {};
   var SAMPLE_HAND_W = [["Taylor", 31, "heart", "A", "taylor.webp", "ER nurse who never misses trivia night.", ["Trivia", "Running"]], ["Jane", 39, "spade", "K", "jane.webp", "Books, bourbon and a very loud beagle.", ["Reading", "Dogs"]],
     ["Maya", 29, "club", "Q", "maya.webp", "Graphic designer. Will judge your font.", ["Design", "Coffee"]], ["Priya", 31, "diamond", "J", "priya.webp", "Pharmacist by day, salsa dancer by night.", ["Dancing", "Travel"]], ["Ana", 28, "heart", "10", "ana.webp", "Teaches second grade. Brunch is a sport.", ["Brunch", "Hiking"]]];
   function emptyHand() {
     var d = $("#dealt"); if (!d) return; var friend = P.looking === "friendship" || /Friendship/i.test(LIVE_ERR || "");
     var wantsWomen = P.show === "women" || (P.show !== "men" && genderCode() === "man");
-    var cards = (wantsWomen ? SAMPLE_HAND_W : SAMPLE_HAND).map(function (s, i) { var p = { id: "sample" + i, name: s[0], age: s[1], suit: s[2], rank: s[3], photo: "assets/people/" + s[4], bio: s[5], interests: s[6], looking: "longterm", dist: 3 + i * 2, hue: 30 + i * 40, shared: [], city: "Birmingham", jk: 0, self: true, id_: {} };
-      try { return cardHTML(p, i).replace(/<div class="card-actions">[\s\S]*?<\/div><\/div>$/, "</div>").replace('class="pcard ', 'class="pcard flipped '); } catch (e) { return ""; } }).join("");
+    var EXTRA = [{ hr: "buyin", idV: true, theme: "gold", avail: { fri: ["evening"], sat: ["afternoon", "evening"] }, jk: 0 }, { idV: true, theme: "midnight", avail: { tue: ["evening"], thu: ["evening"] }, jk: 2 }, { hr: "verified", idV: true, avail: { sun: ["morning", "afternoon"] }, jk: 0 }, { theme: "velvet", avail: { wed: ["evening"] }, jk: 1 }, { theme: "classic", jk: 0 }];
+    var cards = (wantsWomen ? SAMPLE_HAND_W : SAMPLE_HAND).map(function (s, i) { var p = Object.assign({ id: "sample" + i, name: s[0], age: s[1], suit: s[2], rank: s[3], ri: i, photo: "assets/people/" + s[4], bio: s[5], interests: s[6], looking: "longterm", dist: 3 + i * 2, hue: 30 + i * 40, shared: [], city: "Birmingham", jk: 0, self: true, id_: {} }, EXTRA[i]); SAMPLE_BY[p.id] = p;
+      try { return cardHTML(p, i).replace(/<div class="card-actions">[\s\S]*?<\/div><\/div>$/, "</div>"); } catch (e) { return ""; } }).join("");
     d.innerHTML = '<div class="emptyhand"><h3>' + (friend ? "Your hand is empty because you're at the Friendship Table." : "No real players fit your hand yet.") + "</h3>" +
       '<p class="lede">' + (friend ? "Friendship players aren't dealt into dating decks. Switch your relationship goal in My Face to <b>Dating</b>, <b>Long-term</b> or <b>Marriage</b> and you'll be dealt real players nearby." : "SuiteFace only deals real, paying players near you. As people in your area take a seat, their cards land here.") + "</p>" +
       '<div class="row">' + (friend ? '<a class="btn gold" href="my-table.html#face">Switch to dating</a>' : '<button class="btn gold" type="button" data-redeal>Deal again</button>') + '<a class="btn ghost" href="my-table.html#invite">Invite friends</a></div>' +
-      '<p class="samplelabel">' + (wantsWomen ? "Jordan" : "Kelly") + '\'s hand, an example · fictional people, not real players</p><p class="hint">This is what a hand looks like with picture cards: one face per person, ranked Ace down, each in their own suit. Tap a card to see its back.</p><div class="samplehand">' + cards + "</div></div>";
+      '<p class="samplelabel">' + (wantsWomen ? "Jordan" : "Kelly") + '\'s hand, an example · fictional people, not real players</p><p class="hint">Five sample cards, dealt face down like a real hand. Tap one to flip it, then try <b>More</b> and <b>Our Story</b>. You\'ll see a High Roller, card themes, the ID seal on court cards, the Joker meter and when each person is free to meet.</p><div class="samplehand">' + cards + "</div></div>";
   }
   document.addEventListener("click", function (e) {
-    var c = e.target.closest && e.target.closest(".samplehand .pcard"); if (c) { c.classList.toggle("flipped"); return; }
+    var c = e.target.closest && e.target.closest(".samplehand .pcard");
+    if (c) { var sp = SAMPLE_BY[(c.closest(".slot") || {}).getAttribute ? c.closest(".slot").getAttribute("data-id") : ""];
+      if (e.target.closest("[data-read]") && sp) { e.stopPropagation(); readUs(sp); return; }
+      if (e.target.closest("[data-more]")) { e.stopPropagation(); c.classList.toggle("more"); return; }
+      if (e.target.closest("[data-highroller]")) return;
+      if (!c.classList.contains("more")) c.classList.toggle("flipped"); return; }
     if (e.target.closest && e.target.closest("[data-redeal]")) { liveDeck(true).catch(function () { }); }
   });
   function liveSaveG() { if (window.SF_LIVE) S.set("live:" + window.SF_LIVE.memberId(), { dealt: G.dealt }); }

@@ -1576,3 +1576,23 @@ html[data-play="day"] .top{background:rgba(247,248,244,.82)!important;border-bot
 /* My Face tabs: readable inactive tabs on the dark bar */
 #faceForm .ftabs .ftab:not([aria-selected="true"]){color:#F2ECDD}
 #faceForm .ftabs .ftab:not([aria-selected="true"]) small{color:#B9C2B8}
+
+/* ===== The Stack, deal order and photo-only view (Oct 19) ===== */
+.deckopts{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:10px}
+.dealorder{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px;padding:4px;border:1px solid rgba(242,236,221,.18);border-radius:999px}
+.dealorder span{font-size:.8rem;color:#C3CEC2;padding:0 6px 0 8px}
+.dealorder button,.plaintog{font:600 .85rem var(--body);color:#F2ECDD;background:transparent;border:0;border-radius:999px;padding:.4rem .8rem;cursor:pointer}
+.dealorder button[aria-pressed="true"]{background:#E2C47E;color:#163A2E}
+.plaintog{border:1px solid rgba(242,236,221,.25)}.plaintog[aria-pressed="true"]{background:#F2ECDD;color:#163A2E}
+.exmodal .dealorder{border-color:var(--line);margin-bottom:10px}.exmodal .dealorder span{color:var(--muted)}
+.exmodal .dealorder button{color:var(--cream)}.exmodal .dealorder button[aria-pressed="true"]{background:var(--gold-hi);color:var(--night)}
+#pile{cursor:pointer}#pile:focus-visible{outline:2px solid #E2C47E;outline-offset:4px;border-radius:12px}
+.pile-info .stacklbl{display:block;font-size:.95rem;color:#E2C47E;margin-bottom:2px}
+/* Photo and name only: hide rank, suit, fit and score on every card */
+body.sfplain .pcard .fidx,body.sfplain .pcard .idx,body.sfplain .pcard .fname .style,body.sfplain .pcard .jmeter,body.sfplain .excard .exrk,body.sfplain .pcard .freetag{display:none!important}
+/* Header menus fit one line on phones */
+.secnav .ngb{white-space:nowrap}
+@media (max-width:560px){.secnav{gap:0!important;justify-content:space-between}.secnav .ngb{font-size:.86rem!important;padding:.42rem .4rem!important;gap:2px}.secnav .ngb::after,.secnav .ngb svg{margin-left:1px}}
+@media (max-width:360px){.secnav .ngb{font-size:.8rem!important;padding:.4rem .3rem!important}}
+.pcard.hrcard .flip>.cover{position:absolute!important;inset:0!important;height:auto!important}
+.pcard.flipped .flip>.cover{pointer-events:none}.pcard:not(.flipped) .flip>.face{pointer-events:none}

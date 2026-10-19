@@ -79,10 +79,10 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792428625">
-<script src="/assets/js/transit.js?v=1792428625"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792428625">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792428625">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792430196">
+<script src="/assets/js/transit.js?v=1792430196"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792430196">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792430196">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 </head>
 <body data-page="winners">
@@ -158,14 +158,16 @@
   </div>
 <div class="subbar"><div class="wrap">
     <nav class="nav secnav" id="nav" aria-label="Main">
-      <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-date">Meet</button><div class="ngp" id="ngp-date">
-        <a href="my-table.html#table" data-need="member" class="clubnav navhand"><b>♠ Your Hand</b><small>Your matches, ranked Ace to 2</small></a>
+      <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-how">How to Play</button><div class="ngp" id="ngp-how">
         <a href="how-it-works.html" data-pgnav="how"><b>How it works</b><small>Suit, hand, play, Pair</small></a>
+        <a href="how-cards-work.html"><b>How cards work</b><small>Ranks, suits, the Stack and the deal</small></a>
         <a href="find-your-suit.html" data-pgnav="suit"><b>Find your suit</b><small>The one-minute quiz</small></a>
-        <a href="my-table.html#pairs" data-need="member" class="clubnav"><b>Your Pairs</b><small>Chat, video and Play Hand</small></a>
-        <a href="my-table.html#crews" data-need="member" class="clubnav"><b>Double dates</b><small>Team up with a friend</small></a>
-        <a href="winners.html" data-pgnav="winners"><b>Winners' Row</b><small>Couples who met here</small></a>
         <a href="safety.html"><b>Safety</b><small>Meeting safely and Jokers</small></a>
+        <a href="agreements.html"><b>Agreements</b><small>Everything you sign, on one page</small></a>
+      </div></div>
+      <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-date">Meet</button><div class="ngp" id="ngp-date">
+        <a href="my-table.html#table" data-need="member" class="clubnav navhand"><b>♠ Your Hand</b><small>Your five, dealt from the Stack</small></a>
+        <a href="membership.html" class="guestnav navhand"><b>♠ Your Hand</b><small>Take a seat to be dealt in</small></a>
       </div></div>
       <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-play">Play</button><div class="ngp" id="ngp-play">
         <a href="my-table.html#table" data-need="member" class="clubnav"><b>Play a deck</b><small>Every card in your area for 7 days</small></a>
@@ -174,10 +176,13 @@
       </div></div>
       <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-club">Lounge</button><div class="ngp" id="ngp-club">
         <a href="my-table.html" data-pgnav="club" data-need="member"><b>My Lounge</b><small>Your card, settings and invites</small></a>
-        <a href="my-table.html#lobby" data-need="member" class="clubnav"><b>Your Lobby</b><small>Decorate your card</small></a>
+        <a href="my-table.html#pairs" data-need="member" class="clubnav"><b>Your Pairs</b><small>Chat, video and Play Hand</small></a>
+        <a href="my-table.html#crews" data-need="member" class="clubnav"><b>Double dates</b><small>Team up with a friend</small></a>
         <a href="my-table.html#friends" data-need="member" class="clubnav"><b>Friends</b><small>Who's online</small></a>
+        <a href="my-table.html#lobby" data-need="member" class="clubnav"><b>Your Lobby</b><small>Decorate your card</small></a>
         <a href="card-backs.html" data-pgnav="backs" data-need="member" class="clubnav"><b>Card Backs</b><small>Wear what you love</small></a>
         <a href="membership.html#highroller" data-need="member" class="clubnav"><b>💎 High Roller Room</b><small>Verified high-limit room</small></a>
+        <a href="winners.html" data-pgnav="winners"><b>Winners' Row</b><small>Couples who met here</small></a>
         <a href="membership.html" data-pgnav="membership"><b>Your seat</b><small>$21 a year · free through Dec 31</small></a>
       </div></div>
       <div class="ng ngstaff"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-staff">Staff</button><div class="ngp" id="ngp-staff">
@@ -381,14 +386,14 @@
         <div class="table-top">
           <div>
             <div class="pile" id="pile" aria-hidden="true"><div class="cb"></div><div class="cb"></div><div class="cb"></div></div>
-            <p class="pile-info"><b id="leftCount">52</b> left in your deck<br><span id="burnCount">0</span> burned · <span id="playCount">0</span> played</p>
+            <p class="pile-info"><b class="stacklbl">The Stack</b><b id="leftCount">52</b> left to deal<br><span id="burnCount">0</span> burned · <span id="playCount">0</span> played</p>
             <p class="learnnote" id="learnNote" hidden></p>
           </div>
           <div style="min-width:0">
             <div class="dealt" id="dealt" aria-live="polite"></div>
             <div class="deck-bar">
               <button class="btn gold" id="dealBtn">Deal my Hand</button>
-              <button class="btn ghost sm" id="deckBtn">Explore my matches</button>
+              <button class="btn ghost sm" id="deckBtn">Explore the Stack</button>
               <button class="btn ghost sm" id="shuffleBtn">Fresh Shuffle</button>
               <span class="sp"></span>
               <span class="hint" id="trumpHint"></span>
@@ -998,15 +1003,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792428625"></script>
-<script src="/assets/js/sign.js?v=1792428625"></script>
-<script src="/assets/js/live.js?v=1792428625"></script>
-<script src="/assets/js/gate.js?v=1792428625"></script>
-<script src="/assets/js/fx.js?v=1792428625"></script>
-<script src="/assets/js/casino-scene.js?v=1792428625"></script>
-<script src="/assets/js/chips.js?v=1792428625"></script>
-<script src="/assets/js/bumpers.js?v=1792428625"></script>
-<script src="/assets/js/slots.js?v=1792428625"></script>
-<script src="/assets/js/app.js?v=1792428625"></script>
+<script src="/assets/js/config.js?v=1792430196"></script>
+<script src="/assets/js/sign.js?v=1792430196"></script>
+<script src="/assets/js/live.js?v=1792430196"></script>
+<script src="/assets/js/gate.js?v=1792430196"></script>
+<script src="/assets/js/fx.js?v=1792430196"></script>
+<script src="/assets/js/casino-scene.js?v=1792430196"></script>
+<script src="/assets/js/chips.js?v=1792430196"></script>
+<script src="/assets/js/bumpers.js?v=1792430196"></script>
+<script src="/assets/js/slots.js?v=1792430196"></script>
+<script src="/assets/js/app.js?v=1792430196"></script>
 </body>
 </html>
