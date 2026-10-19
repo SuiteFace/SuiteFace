@@ -4369,6 +4369,8 @@
     if (/^[a-z0-9._]{3,24}$/.test(P.handle || "")) row.handle = P.handle;
     var ids = IDF.map(function (f) { return { member_id: mid, question: f[0], answers: asList(P.id[f[0]]).filter(Boolean), face_up: P.vis[f[0]] === undefined ? !f[5] : !!P.vis[f[0]] }; }).filter(function (r) { return r.answers.length; });
     var prefs = Object.keys(P.prefs || {}).map(function (k) { var pr = P.prefs[k] || {}; return { member_id: mid, question: k, wanted: (pr.sel || []).filter(function (x) { return x !== OPEN; }), dealbreaker: !!pr.deal }; }).filter(function (r) { return r.wanted.length; });
+    function uniq(list) { var seen = {}; return list.filter(function (r) { if (seen[r.question]) return false; seen[r.question] = 1; return true; }); }
+    ids = uniq(ids); prefs = uniq(prefs);
     function chk(r) { if (r && r.error) throw r.error; return r; }
     return db.from("members").update(row).eq("id", mid).then(chk)
       .then(function () { return db.from("strategies").upsert({ member_id: mid, trump_order: P.trumps, show_me: P.show || "everyone", age_min: P.ageMin, age_max: P.ageMax, radius_miles: P.dist, verified_only: P.verifiedOnly || "any" }).then(chk); })
