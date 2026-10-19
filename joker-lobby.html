@@ -223,8 +223,8 @@ textarea{min-height:110px;resize:vertical}
 footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);border:1px solid var(--gold);color:var(--cream);padding:12px 18px;border-radius:12px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:min(92vw,520px)}
 </style>
-<script src="/assets/js/transit.js?v=1792426555"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792426555">
+<script src="/assets/js/transit.js?v=1792427445"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792427445">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 <link rel="canonical" href="https://suiteface.com/joker-lobby.html">
 <meta property="og:type" content="website">
@@ -323,15 +323,15 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
           </div>
           <div class="step">
             <h3><i>2</i>Why they're a Joker</h3>
-            <p class="fine">Pick 1 to 5.</p>
+            <p class="fine">Pick what you experienced yourself. Only these six are approved. A bad date, no chemistry, a no-show or a breakup isn't a Joker. Threats, violence or assault: <b>Report a safety concern</b> and call 911.</p>
             <div class="chips" id="reasons"></div>
           </div>
           <div class="step">
             <h3><i>3</i>Tell it straight</h3>
             <label class="sr" for="statement">Your statement</label>
-            <textarea id="statement" placeholder="What happened, in your own words (at least 20 characters)."></textarea>
-            <label class="agree"><input type="checkbox" id="attest"> <span>I assert this is <b>true</b>, from my own <b>first-hand, direct experience</b>. I did not create this profile, and I don't know of anyone who created it to target this person. I found this card myself, in my deck or here in the lobby. <b>If it's found false or unjustified, it backfires: I become the Joker for 45 days, final, with no refunds.</b> (You'll sign the full Joker Attestation next.)</span></label>
-            <label class="fine" style="display:block">Evidence (optional): <input type="file" id="evidence" multiple accept="image/*,.pdf"></label>
+            <textarea id="statement" placeholder="What happened to you, in your own words (at least 40 characters). Only what you saw, heard or received yourself."></textarea>
+            <label class="fine" style="display:block">Proof (required): <input type="file" id="evidence" multiple accept="image/*,.pdf"> <small>Screenshots, photos, messages or documents from your own experience.</small></label>
+            <label class="agree"><input type="checkbox" id="attest"> <span>I swear this is <b>true</b> and <b>proven</b>, from my own <b>first-hand, direct experience</b>, <b>never hearsay</b>. It is <b>not</b> from a grudge, jealousy or resentment, and not meant to embarrass this person. I did not create this profile, and I found this card myself. <b>The house reviews it before anyone sees it. If it's found false, hearsay or bad-faith, it backfires: I become the Joker for 45 days, final, with no refunds.</b> (You'll sign the full Joker Attestation next.)</span></label>
           </div>
           <div style="text-align:center">
             <button class="btn red" id="deal" type="button" disabled>🃏 Deal the Joker</button>
@@ -381,12 +381,15 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
               <option value="payback">It's payback for my Joker or report on them</option>
               <option value="both_won">We both called our date a Win</option>
               <option value="maker_gone">The maker's account is closed or they became a public Joker</option>
+              <option value="motive">It's a grudge, jealousy, resentment or meant to embarrass me</option>
+              <option value="hearsay">They didn't experience it themselves (hearsay)</option>
+              <option value="not_conduct">It isn't ignorant, racist, belittling, perverted, criminal or toxic behavior</option>
               <option value="other">Something else (not listed)</option>
             </select></label>
           <label class="jkf"><span>Tell it straight <small>(optional)</small></span><textarea id="chalWhat" maxlength="1000" placeholder="Anything we should know."></textarea></label>
           <div class="sticks"><b>A lobby Joker sticks only if all six are true:</b>
             <ol><li>You and the maker had a direct connection on SuiteFace (a Play, a Pair or a Play Hand).</li><li>The maker signed the first-hand attestation.</li><li>You hadn't blocked or reported the maker before the Joker.</li><li>It isn't payback for your own Joker or report on them in the 14 days before.</li><li>You two never both called a date a Win.</li><li>The maker's account is open and they aren't currently a Joker.</li></ol>
-            <p><b>If any one isn't true, the challenge is accepted and the Joker comes off.</b> Chose "Something else"? The house reviews it, and if the Joker was false it comes off and backfires on its maker.</p></div>
+            <p><b>If any one isn't true, the challenge is accepted and the Joker comes off.</b> Chose a grudge, hearsay, not-one-of-the-six or "Something else"? The house reviews it. If it's true, the Joker comes off, and for a grudge or hearsay it backfires on its maker.</p></div>
           <button class="btn gold" type="button" id="chalGo">Submit challenge</button>
           <p class="fine" id="chalOut" role="status"></p>
         </div>
@@ -405,8 +408,8 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
 <div class="confetti" id="confetti" aria-hidden="true"></div>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script src="assets/js/config.js?v=1792426555"></script>
-<script src="assets/js/sign.js?v=1792426555"></script>
+<script src="assets/js/config.js?v=1792427445"></script>
+<script src="assets/js/sign.js?v=1792427445"></script>
 <script>
 (function(){
   var C = window.SUITEFACE_CONFIG || {};
@@ -455,11 +458,11 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
   if(qs.get("buyout")==="success"){ toast("Public Joker cleared."); }
 
   // demo lobby floor
-  var REASONS=[["no_show","Stood me up / no-show"],["misrepresented","Profile misrepresentation"],["not_single","Wasn't single"],["money","Asked me for money"],["disrespect","Disrespectful or demeaning"],["pressure","Pushed past my boundaries"],["intentions","Lied about intentions"],["intoxicated","Showed up impaired"],["ghosted_after","Ghosted after commitments"],["catfish","Not the person in the photos"],["spam","Selling or recruiting"],["other_firsthand","Other first-hand conduct"]];
+  var REASONS=[["ignorant","Ignorant","Hateful or degrading remarks about a group of people, to you or in front of you"],["racist","Racist","Racist words or treatment aimed at you or said in your presence"],["belittling","Belittling","Put you down, mocked or humiliated you on purpose"],["perverted","Perverted","Unwanted sexual messages, photos, comments or advances"],["criminal","Criminal","Conduct against you that breaks the law: theft, fraud, extortion"],["toxic","Toxic","A pattern of manipulation, intimidation or control you experienced"]];
   var PEOPLE=[["Jordan","jordan.k","35203","Birmingham, AL",31],["Jessie","jess.plays","35209","Homewood, AL",28],["Jamal","jamal_a","35216","Hoover, AL",34],["Jade","jade.r","35205","Birmingham, AL",29],["Jon","jon.d","35124","Pelham, AL",37],["Riley","rileyb","35242","Birmingham, AL",33],["Morgan","morgan.t","35223","Mountain Brook, AL",30]];
   var mode="name", picked=null, chosen=[], used=0;
   var rbox=$("#reasons");
-  REASONS.forEach(function(r){ var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=r[1]; b.setAttribute("aria-pressed","false");
+  REASONS.forEach(function(r){ var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=r[1]; b.title=r[2]; b.setAttribute("aria-pressed","false");
     b.onclick=function(){ var on=b.getAttribute("aria-pressed")==="true"; if(!on && chosen.length>=5){ toast("Pick up to 5 reasons."); return; }
       b.setAttribute("aria-pressed", on?"false":"true"); chosen = on ? chosen.filter(function(c){return c!==r[0];}) : chosen.concat(r[0]); check(); };
     rbox.appendChild(b); });
@@ -482,8 +485,8 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
       b.onclick=function(){ document.querySelectorAll(".who").forEach(function(x){x.setAttribute("aria-pressed","false");}); b.setAttribute("aria-pressed","true"); picked=p; check(); };
       out.appendChild(b); });
   });
-  ["#statement","#attest"].forEach(function(s){ $(s).addEventListener("input", check); $(s).addEventListener("change", check); });
-  function check(){ $("#deal").disabled = !(picked && chosen.length && $("#statement").value.trim().length>=20 && $("#attest").checked && used<12); }
+  ["#statement","#attest","#evidence"].forEach(function(s){ $(s).addEventListener("input", check); $(s).addEventListener("change", check); });
+  function check(){ $("#deal").disabled = !(picked && chosen.length && $("#statement").value.trim().length>=40 && $("#evidence").files.length && $("#attest").checked && used<12); }
   $("#deal").onclick=function(){
     window.SFSign.require("attest", reveal, { about: picked[0]+" (@"+picked[1]+")" });
   };
@@ -492,7 +495,7 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
     st.scrollIntoView({behavior:"smooth",block:"center"});
     setTimeout(function(){ card.classList.add("flip"); burst(); }, 500);
     used++; drawCounter(); check();
-    toast("🃏 "+picked[0]+" is a Joker for 45 days (demo, not saved).");
+    toast("🃏 Sent to the house for review (demo, not saved). If it's approved, "+picked[0]+" shows as a Joker for 45 days.");
   }
   function burst(){ var c=$("#confetti"); var cols=["#C8102E","#E8C46A","#B7D35A","#7A3A92","#2F8A62"]; for(var i=0;i<70;i++){ var p=document.createElement("i"); p.style.left=(Math.random()*100)+"vw"; p.style.background=cols[i%cols.length]; p.style.animationDelay=(Math.random()*.6)+"s"; p.style.transform="rotate("+(Math.random()*360)+"deg)"; c.appendChild(p); setTimeout(function(el){ return function(){ el.remove(); }; }(p), 3400); } }
 
@@ -524,10 +527,10 @@ footer{padding:30px 0 50px;color:var(--muted);font-size:.88rem;text-align:center
   $("#tour").onclick=function(){ $("#floor").hidden=false; $("#modePill").textContent="Demo tour"; $("#floor").scrollIntoView({behavior:"smooth"}); };
 })();
 </script>
-<script src="assets/js/live.js?v=1792426555"></script>
-<script src="assets/js/gate.js?v=1792426555"></script>
-<script src="assets/js/fx.js?v=1792426555"></script>
+<script src="assets/js/live.js?v=1792427445"></script>
+<script src="assets/js/gate.js?v=1792427445"></script>
+<script src="assets/js/fx.js?v=1792427445"></script>
 <p class="sf-credit" style="margin:0;padding:14px 16px calc(70px + env(safe-area-inset-bottom,0px));text-align:center;font:600 .85rem/1.5 Figtree,system-ui,sans-serif;color:var(--muted,#A69DB0)">U.S. patent pending (USPTO). Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener" style="color:var(--gold-hi,#E8C46A);text-decoration:none;font-weight:800">GoFirehorseGo</a>.</p>
-<script src="/assets/js/slots.js?v=1792426555" defer></script>
+<script src="/assets/js/slots.js?v=1792427445" defer></script>
 </body>
 </html>

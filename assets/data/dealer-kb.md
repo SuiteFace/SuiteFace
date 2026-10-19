@@ -233,12 +233,24 @@ SuiteFace may remove content, limit features, suspend or close accounts, and kee
 
 **6.2 Vote Jokers.** After a confirmed Play Hand on one of the **first three dates** two members have together, a member who calls a Loss may make a Joker within 12 hours. From the fourth date on, a Loss can only burn the card, and the only way to make a Joker about that member is the Joker Maker Lobby. When a member receives 10 Jokers from 10 different members within 180 days, their card shows **JOKER** for **45 days**. During the first **15 days** (probation) the card stays visible and can't be paused or hidden. After probation, the member may clear it for **$2,100.00** or wait out the 45 days.
 
-**6.3 Joker Maker Lobby.** **The $210.00 lobby entry is an access fee only.** It buys one entry to the lobby. **It does not purchase, guarantee or influence any Joker, and it is non-refundable for any reason**, including if you make no Joker, if a Joker you make is challenged or removed, or if your account is closed. Inside the lobby you may set one Joker on another **SuiteFace member**, choosing reasons from the house list, writing a statement, and signing the Joker Attestation. A lobby Joker shows for **45 days**. Each account may make **12 lobby Jokers in its lifetime**, and only one per member.
+**6.3 Joker Maker Lobby.** **The $210.00 lobby entry is an access fee only.** It buys one entry to the lobby. **It does not purchase, guarantee or influence any Joker, and it is non-refundable for any reason**, including if you make no Joker, if a Joker you make is challenged or removed, or if your account is closed. Inside the lobby you may set one Joker on another **SuiteFace member** you had a direct connection with on SuiteFace (a Play, a Pair or a Play Hand), choosing reasons from the house list, writing a statement, adding proof, and signing the Joker Attestation. **Every lobby Joker is reviewed by SuiteFace before anyone sees it.** An approved lobby Joker shows for **45 days**.
+
+**6.3a The lobby Joker standard.** A lobby Joker is approved **only** for proven behavior that **you experienced directly** with that member, in one of six categories:
+
+- **Ignorant:** hateful or degrading remarks about a group of people, said to you or in front of you;
+- **Racist:** racist words or treatment aimed at you or said in your presence;
+- **Belittling:** putting you down, mocking or humiliating you on purpose;
+- **Perverted:** unwanted sexual messages, photos, comments or advances after you said no or never invited them;
+- **Criminal:** conduct against you that breaks the law, such as theft, fraud or extortion; and
+- **Toxic:** a pattern of manipulation, intimidation or controlling behavior you experienced with them.
+
+**Proven** means you add proof from your own experience (for example a screenshot, photo, message, receipt or document), and SuiteFace's own records of your messages may be checked too. **Hearsay is never approved**: something you heard about, read about or were told by someone else can't be a Joker, no matter who said it. **A Joker made from a grudge, jealousy, resentment or a wish to embarrass someone is never approved, and if one is found it is removed and backfires on its maker** (Section 6.10). Disappointment, a bad date, chemistry that didn't happen, a no-show or a breakup are not Jokers. If SuiteFace needs more proof, your lobby entry is returned so you can try again with proof. Threats, violence, assault, stalking or anything that made you feel unsafe goes to **Report a safety concern** and, in an emergency, **911**, not the lobby. Each account may make **12 lobby Jokers in its lifetime**, and only one per member.
 
 **6.4 Your attestation, and your responsibility.** When you make any Joker, you swear that:
 
 - **it is true**;
-- **it comes from your own first-hand, direct experience** with that member, not from rumor or anyone else's account;
+- **it comes from your own first-hand, direct experience** with that member, not from rumor, hearsay or anyone else's account;
+- **it is not made from a grudge, jealousy, resentment or a wish to embarrass** that member;
 - **you did not create that member's profile or account**, didn't help anyone create it, and have **no knowledge of a friend or any other person creating it** to target them; and
 - **you found their card on SuiteFace on your own**, in your deck (your best hand) or while searching in the Joker Maker Lobby.
 
@@ -251,9 +263,12 @@ SuiteFace may remove content, limit features, suspend or close accounts, and kee
 - It's payback for my Joker or report on them
 - We both called our date a Win
 - The maker's account is closed or they became a public Joker
+- It's a grudge, jealousy, resentment or meant to embarrass me
+- They didn't experience it themselves (hearsay)
+- What they describe isn't ignorant, racist, belittling, perverted, criminal or toxic behavior
 - Something else (not listed)
 
-SuiteFace checks the challenge **automatically** against its own records, with no judges. **A lobby Joker sticks only if every one of the following is true:**
+SuiteFace checks the first five reasons **automatically** against its own records. **A lobby Joker sticks only if every one of the following is true:**
 
 1. You and the maker had a **direct connection on SuiteFace**: a Play, a Pair or a Play Hand.
 2. The maker **signed the first-hand attestation** when making the Joker.
@@ -262,7 +277,7 @@ SuiteFace checks the challenge **automatically** against its own records, with n
 5. You and the maker **never both called a date a Win**.
 6. The maker's **account is open** and the maker is **not currently a Joker**.
 
-**If any one of them is not true, the challenge is accepted and the Joker is removed right away.** If you choose **Something else**, SuiteFace staff review your challenge and decide (Section 6.10). If the Joker sticks, you can still clear it for $210.00 (Section 6.6) or wait for it to end after 45 days. A challenge never affects safety reports, which staff handle separately.
+**If any one of them is not true, the challenge is accepted and the Joker is removed right away.** If you choose the grudge, hearsay, not-one-of-the-six or **Something else** reason, SuiteFace staff review your challenge and decide (Section 6.10). If the Joker sticks, you can still clear it for $210.00 (Section 6.6) or wait for it to end after 45 days. A challenge never affects safety reports, which staff handle separately.
 
 **6.5a Joker's entrance.** A member who currently has a Joker may enter the Joker Maker Lobby free, using their own @tag and the access code from their Joker notice, to see, challenge or clear their Joker. This entrance doesn't allow making Jokers. Making a Joker always requires a $210.00 lobby entry.
 
@@ -398,14 +413,16 @@ In exchange for being allowed to use SuiteFace, I agree that:
 
 About the member named in my Joker, I swear that:
 
-1. **This Joker is true** and comes from **my own first-hand, direct experience** with this member, not from rumor or anyone else's account.
-2. **I did not create this member's profile or account**, I did not help anyone create it, and **I have no knowledge of a friend or any other person creating it** in order to target this member.
-3. **I discovered this member's card on SuiteFace on my own**, while viewing my deck (my best hand) or while searching in the Joker Maker Lobby.
-4. I am not acting with, or on behalf of, anyone else, and this is not retaliation for a Joker or report made about me.
-5. The reasons I selected and my statement are accurate, and any evidence I upload is genuine and unaltered.
-6. **I take full ownership of this Joker and its claims.** I understand I may be legally responsible if it is false, and I agree to defend and repay SuiteFace Inc. for any claim that results.
-7. If any of this is untrue, SuiteFace may remove the Joker, close my account and keep any fees I paid.
-8. **If this Joker is found false or unjustified, it backfires on me:** I become a Joker for 45 days with no challenge, appeal, buyout, pause or refund, and the house's decision is final (Terms 6.5b and 6.10).
+1. **This Joker is true** and comes from **my own first-hand, direct experience** with this member, not from rumor, hearsay or anyone else's account.
+2. It describes **proven ignorant, racist, belittling, perverted, criminal or toxic behavior** toward me or in my presence, and the proof I add is my own.
+3. **I am not making it from a grudge, jealousy or resentment, or to embarrass this member.** I understand a Joker made for any of those reasons is removed and backfires on me.
+4. **I did not create this member's profile or account**, I did not help anyone create it, and **I have no knowledge of a friend or any other person creating it** in order to target this member.
+5. **I discovered this member's card on SuiteFace on my own**, while viewing my deck (my best hand) or while searching in the Joker Maker Lobby.
+6. I am not acting with, or on behalf of, anyone else, and this is not retaliation for a Joker or report made about me.
+7. The reasons I selected and my statement are accurate, and any evidence I upload is genuine and unaltered.
+8. **I take full ownership of this Joker and its claims.** I understand I may be legally responsible if it is false, and I agree to defend and repay SuiteFace Inc. for any claim that results.
+9. If any of this is untrue, SuiteFace may remove the Joker, close my account and keep any fees I paid.
+10. **If this Joker is found false or unjustified, it backfires on me:** I become a Joker for 45 days with no challenge, appeal, buyout, pause or refund, and the house's decision is final (Terms 6.5b and 6.10).
 
 ### F. Business Partner and ZIP Sponsor Agreement (signed before any House Partner or ZIP Sponsor checkout)
 
@@ -645,7 +662,7 @@ When you're together, both players tap **Check in** to start **Play Hand**. Chec
 === Joker Rules (joker-rules.html) ===
 # Joker Rules
 
-**SuiteFace Inc., a Florida corporation** · Version 1.0 · Last updated October 16, 2026 · Part of the [Terms of Service](terms.html), Section 6
+**SuiteFace Inc., a Florida corporation** · Version 1.0 · Last updated October 19, 2026 · Part of the [Terms of Service](terms.html), Section 6
 
 *No Jokers Needed.* Most players never see one. These are the house rules for the ones who earn it.
 
@@ -673,13 +690,23 @@ When you're together, both players tap **Check in** to start **Play Hand**. Chec
 
 - **$210 entry, non-refundable.** It buys lobby access only, not any Joker.
 - **Members only.** Find a card by name, username or ZIP. Phone or email finds someone only by exact match, and only if you've played a hand together.
-- **To make a Joker:** pick reasons from the house list, tell it straight, and sign the **Joker Attestation**: it's true; it's your own first-hand experience; you **didn't create their profile** and don't know anyone who did; and you **found their card yourself**, in your deck or in the lobby.
-- A lobby Joker shows **JOKER for 45 days**.
+- **To make a Joker:** you must have had a direct connection with them on SuiteFace (a Play, a Pair or a Play Hand). Pick reasons from the house list, tell what happened to you, **add proof**, and sign the **Joker Attestation**: it's true; it's your own first-hand experience, never hearsay; it isn't a grudge, jealousy, resentment or a wish to embarrass; you **didn't create their profile** and don't know anyone who did; and you **found their card yourself**, in your deck or in the lobby.
+- **The house reviews every lobby Joker first.** Nobody sees it until it's approved. If more proof is needed, your entry is returned so you can try again.
+- An approved lobby Joker shows **JOKER for 45 days**.
 - **12 lobby Jokers per account, ever**, and one per member.
 
 ## House reasons
 
-Stood me up / no-show · Profile misrepresentation · Wasn't single · Asked me for money · Disrespectful or demeaning · Pushed past my boundaries · Lied about intentions · Showed up impaired · Ghosted after commitments · Not the person in the photos · Selling or recruiting · Other first-hand conduct
+A lobby Joker is approved **only** for proven behavior you experienced directly, in one of six categories:
+
+- **Ignorant:** hateful or degrading remarks about a group of people, said to you or in front of you.
+- **Racist:** racist words or treatment aimed at you or said in your presence.
+- **Belittling:** put you down, mocked or humiliated you on purpose.
+- **Perverted:** unwanted sexual messages, photos, comments or advances after you said no or never invited them.
+- **Criminal:** conduct against you that breaks the law, such as theft, fraud or extortion.
+- **Toxic:** a pattern of manipulation, intimidation or controlling behavior you experienced with them.
+
+**Never approved:** hearsay (anything you heard, read or were told by someone else); a grudge, jealousy, resentment or a wish to embarrass someone; a bad date, no chemistry, a no-show or a breakup. A Joker found to be any of these comes off and **backfires on its maker**.
 
 ## If you get Jokered
 
@@ -693,7 +720,9 @@ Stood me up / no-show · Profile misrepresentation · Wasn't single · Asked me 
     5. You and the maker **never both called a date a Win**.
     6. The maker's **account is open** and the maker is **not currently a Joker**.
 
-    **If any one isn't true, or your situation isn't on the list, the challenge is accepted and the Joker comes off right away.**
+    **If any one isn't true, the challenge is accepted and the Joker comes off right away.**
+
+    You can also challenge because **it's a grudge, jealousy, resentment or meant to embarrass you**, because **they didn't experience it themselves (hearsay)**, or because **what they describe isn't one of the six**. The house reviews those. If it's true, the Joker comes off, and for a grudge or hearsay it backfires on the maker.
 - **Enter free as a Joker:** if you're wearing a Joker, enter the lobby with your @tag and the access code from your Joker notice to see, challenge or clear it.
 - **Remove a lobby Joker for $210:** it comes off right away, and no new lobby Jokers can land on you for **45 days**.
 - **Clear a public (vote) Joker for $2,100** after the 15-day probation, or wait out the 45 days.

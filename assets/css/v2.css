@@ -1529,3 +1529,50 @@ html[data-play="day"] .top{background:rgba(247,248,244,.82)!important;border-bot
 .pcard .cover .cv-in.cb-sunday-best::before{inset:7px}
 .pcard .cover .cv-in.cb-sunday-best::after{inset:12px}
 .cp-bonus{font:600 .78rem var(--body);font-style:normal;color:#1E7A4C;background:rgba(30,122,76,.1);padding:3px 8px;border-radius:999px;margin-top:4px}
+
+/* ===== Finance console (Oct 19) ===== */
+.fin-head{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.fin-head h2{margin:0}
+.fin-period{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fin-period select,.fin-period input{font:600 .92rem var(--body);color:var(--cream);background:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:.5rem .9rem;color-scheme:dark}
+.fin-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:14px}
+.fk{background:var(--ink);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:2px}
+.fk b{font:700 1.3rem/1.1 var(--display);color:var(--cream);font-variant-numeric:tabular-nums}
+.fk span{font-size:.86rem;color:var(--cream-dim)}.fk small{font-size:.76rem;color:var(--muted)}
+.fk.warn{border-color:var(--red-soft)}.fk.warn b{color:var(--red-soft)}.fk.note{border-style:dashed}
+.fin-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:thin}
+.fin-tabs button{flex:none;font:600 .88rem var(--body);color:var(--cream-dim);background:transparent;border:1px solid var(--line);border-radius:999px;padding:.45rem .9rem;cursor:pointer}
+.fin-tabs button[aria-selected="true"]{background:var(--gold-hi);border-color:var(--gold-hi);color:var(--night)}
+.fin-pane h3{margin:0 0 2px;font-size:1.25rem}.fin-pane h4{margin:18px 0 6px}
+.scrollx{overflow-x:auto}
+.fintbl{width:100%;border-collapse:collapse;font-size:.92rem;margin:10px 0}
+.fintbl th{text-align:left;font-weight:600;color:var(--muted);font-size:.8rem;padding:6px 8px;border-bottom:1px solid var(--line)}
+.fintbl td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.fintbl .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fintbl tr.sec td{font-weight:700;color:var(--gold-hi);padding-top:14px;border-bottom:0}
+.fintbl tr.ind td:first-child{padding-left:20px;color:var(--cream-dim)}
+.fintbl td.cr{padding-left:28px}
+.fintbl tr.tot td{font-weight:700;border-top:1px solid var(--line)}
+.fintbl tr.grand td{font-weight:800;border-top:2px solid var(--gold-hi);border-bottom:3px double var(--gold-hi)}
+.hint.ok{color:var(--felt-hi)}
+.adjform{display:grid;gap:10px;margin:12px 0 4px}
+.adjtop{display:flex;flex-wrap:wrap;gap:10px}.adjtop label{display:grid;gap:4px;font-size:.84rem;font-weight:600;min-width:120px}.adjtop .grow{flex:1 1 220px}
+.adjform input,.adjform select{font:500 .95rem var(--body);color:var(--cream);background:var(--ink-2);border:1px solid var(--line);border-radius:10px;padding:.5rem .7rem;color-scheme:dark;width:100%;box-sizing:border-box}
+.adjl{display:grid;grid-template-columns:1fr 110px 110px;gap:8px;margin-bottom:6px}
+@media (max-width:560px){.adjl{grid-template-columns:1fr 1fr}.adjl select{grid-column:1/-1}}
+.st-pending{color:var(--bulb)}.st-approved{color:var(--gold-hi)}.st-paid{color:var(--felt-hi)}.st-void{color:var(--muted);text-decoration:line-through}
+.fin-access{margin-top:16px}.fin-access:empty{display:none}.fin-access .row{display:flex;gap:8px;flex-wrap:wrap}
+.fin-access input{font:500 .95rem var(--body);color:var(--cream);background:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:.5rem .9rem}
+.mypay{margin-top:14px}
+/* chips comp code */
+.cp-comp{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 4px}
+.cp-comp label{font-size:.86rem;font-weight:600;color:var(--cream-dim)}
+.cp-comp input{flex:1 1 180px;max-width:260px;font:500 .95rem var(--body);color:var(--cream);background:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:.5rem .9rem}
+.cp-comp .hint{flex-basis:100%;margin:0;min-height:1em}
+.cp-compon{color:var(--gold-hi)!important}
+.fin-period select{width:auto;flex:0 0 auto}
+/* My Face wizard: Next sits right beside Skip (Oct 19) */
+.qnav{justify-content:flex-start;gap:8px}.qnav .qnext{margin-left:0}
+/* My Face tabs: readable inactive tabs on the dark bar */
+#faceForm .ftabs .ftab:not([aria-selected="true"]){color:#F2ECDD}
+#faceForm .ftabs .ftab:not([aria-selected="true"]) small{color:#B9C2B8}

@@ -79,10 +79,10 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792426555">
-<script src="/assets/js/transit.js?v=1792426555"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792426555">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792426555">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792427445">
+<script src="/assets/js/transit.js?v=1792427445"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792427445">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792427445">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 </head>
 <body data-page="chips">
@@ -184,6 +184,7 @@
         <a href="my-table.html#dealer" data-need="dealer"><b>Dealer</b><small>Dealer console</small></a>
         <a href="my-table.html#pitboss" data-need="pitboss"><b>Pit Boss</b><small>Troubleshooting console</small></a>
         <a href="my-table.html#owner" data-need="owner"><b>Owner</b><small>Owner console</small></a>
+        <a href="my-table.html#finance" data-need="accounting"><b>Finance</b><small>Statements, journal, payouts</small></a>
       </div></div>
     </nav>
   </div></div>
@@ -707,6 +708,7 @@
         <button type="button" class="cp-stack best" data-stack-buy="2100" role="listitem"><span class="sfchip" data-chip="21" data-size="72"></span><b>$21</b><span>11 decks</span><i class="cp-bonus">+10% bonus · $23.10 in chips</i><em>Most players</em></button>
         <button type="button" class="cp-stack" data-stack-buy="21000" role="listitem"><span class="sfchip" data-chip="210" data-size="72"></span><b>$210</b><span>120 decks</span><i class="cp-bonus">+20% bonus · $252 in chips</i></button>
       </div>
+      <form class="cp-comp" data-chipcomp><label for="cpComp">Comp code</label><input id="cpComp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Have a comp code?"><button class="btn ghost sm" type="submit">Apply</button><p class="hint" data-compmsg aria-live="polite"></p></form>
       <div class="cp-uses">
         <h3>What chips play</h3>
         <ul>
@@ -873,6 +875,7 @@
         <p class="lede">Safety first, then Jokers, appeals and pauses. Sample data in this preview.</p></div>
       <div class="chips" id="dealerTabs" role="tablist" aria-label="Dealer queues"></div>
       <div class="panel" id="dealerBody" style="margin-top:14px"></div>
+      <div class="panel mypay" data-mypay hidden></div>
     </div>
   </section>
   <!-- ============ PIT BOSS (IT) ============ -->
@@ -883,9 +886,40 @@
       <div class="diag" id="diag"></div>
       <div class="row" style="margin-top:14px"><button class="btn gold sm" type="button" id="diagRun">Run checks again</button><button class="btn ghost sm" type="button" id="diagCopy">Copy diagnostics</button><button class="btn ghost sm" type="button" id="diagReset">Reset demo data on this device</button></div>
       <div class="panel" style="margin-top:14px"><h3 style="font-size:1.2rem">Error log</h3><pre class="errlog" id="errLog">No errors captured.</pre></div>
+      <div class="panel mypay" data-mypay hidden></div>
     </div>
   </section>
   <!-- ============ OWNER ============ -->
+  <section data-pg="club" id="finance" data-need="accounting" aria-labelledby="finTitle" hidden>
+    <div class="wrap fin">
+      <div class="fin-head">
+        <div><h2 id="finTitle">Finance</h2><p class="hint">US GAAP, accrual basis, USD. S corporation. Updated live from every payment, chip and payout.</p></div>
+        <div class="fin-period">
+          <label class="sr" for="finRange">Period</label>
+          <select id="finRange"><option value="mtd">This month</option><option value="lm">Last month</option><option value="qtd">Quarter to date</option><option value="ytd">Year to date</option><option value="custom">Custom</option></select>
+          <input type="date" id="finFrom" hidden aria-label="From"><input type="date" id="finTo" hidden aria-label="To">
+          <button class="btn ghost sm" type="button" id="finRefresh">Refresh</button>
+          <button class="btn ghost sm" type="button" id="finCsv">Export journal (CSV)</button>
+        </div>
+      </div>
+      <div class="fin-kpis" id="finKpis"></div>
+      <div class="fin-tabs" role="tablist" aria-label="Finance views">
+        <button role="tab" type="button" data-fintab="is" aria-selected="true">Income statement</button>
+        <button role="tab" type="button" data-fintab="bs">Balance sheet</button>
+        <button role="tab" type="button" data-fintab="eq">Owners' equity</button>
+        <button role="tab" type="button" data-fintab="cf">Cash flow</button>
+        <button role="tab" type="button" data-fintab="tb">Trial balance</button>
+        <button role="tab" type="button" data-fintab="je">Journal</button>
+        <button role="tab" type="button" data-fintab="adj">Adjusting entry</button>
+        <button role="tab" type="button" data-fintab="pay">Staff payouts</button>
+        <button role="tab" type="button" data-fintab="dist">Distributions</button>
+        <button role="tab" type="button" data-fintab="t99">1099s</button>
+      </div>
+      <div class="fin-pane panel" id="finPane"><p class="hint">Loading…</p></div>
+      <div class="fin-access" id="finAccess" data-need="owner"></div>
+    </div>
+  </section>
+
   <section data-pg="club" id="owner" data-need="owner" aria-labelledby="ownerTitle" hidden>
     <div class="wrap">
       <div class="sec-head"><p class="eyebrow">Owner console</p><h2 id="ownerTitle">The house view</h2>
@@ -929,7 +963,7 @@
           <h4 style="margin:18px 0 4px">Proof: does the ranking work?</h4><p class="hint">Real players only. For every card dealt, how often it was played, became a Pair, got a two-way conversation, met in person and was called a Win, by rank. If Aces beat the overall average, the ranking is doing its job.</p><div class="row" style="gap:8px;margin:6px 0"><select id="proofDays" aria-label="Period"><option value="30">Last 30 days</option><option value="90" selected>Last 90 days</option><option value="365">Last year</option></select></div><div id="proofReport"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Card back applications</h4><p class="hint">Brands, artists, causes and churches asking to put a design on SuiteFace card backs. Confirm rights in writing before any design work.</p><div id="cbAppList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Quiz reviews</h4><p class="hint">Accounts that picked every hidden tell in the suit quiz. They can't be dealt a deck until you clear them.</p><div id="holdList"><p class="hint">Loading…</p></div>
-          <h4 style="margin:18px 0 4px">Joker challenges to rule on</h4><p class="hint">"Something else" challenges. <b>False</b> removes the Joker and backfires it on the maker for 45 days. Your ruling is final.</p><div id="chalList"><p class="hint">Loading…</p></div>
+          <h4 style="margin:18px 0 4px">Lobby Jokers to review</h4><p class="hint">Approve only proven ignorant, racist, belittling, perverted, criminal or toxic behavior the maker experienced directly. <b>Never hearsay.</b> A grudge, jealousy, resentment or a wish to embarrass is bad faith: it backfires on the maker.</p><div id="jkRevList"><p class="hint">Loading…</p></div><h4 style="margin:18px 0 4px">Joker challenges to rule on</h4><p class="hint">"Something else" challenges. <b>False</b> removes the Joker and backfires it on the maker for 45 days. Your ruling is final.</p><div id="chalList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">High Roller decks to ship</h4><p class="hint">Every confirmed High Roller gets a real SuiteFace deck within 180 days. Soonest due first.</p><div id="hrShipList"><p class="hint">Loading…</p></div>
           <h4 style="margin:18px 0 4px">Suit quiz leads</h4><p class="hint">The latest people who took the quiz.</p><div id="leadList"><p class="hint">Loading…</p></div></div>
       </div>
@@ -964,15 +998,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792426555"></script>
-<script src="/assets/js/sign.js?v=1792426555"></script>
-<script src="/assets/js/live.js?v=1792426555"></script>
-<script src="/assets/js/gate.js?v=1792426555"></script>
-<script src="/assets/js/fx.js?v=1792426555"></script>
-<script src="/assets/js/casino-scene.js?v=1792426555"></script>
-<script src="/assets/js/chips.js?v=1792426555"></script>
-<script src="/assets/js/bumpers.js?v=1792426555"></script>
-<script src="/assets/js/slots.js?v=1792426555"></script>
-<script src="/assets/js/app.js?v=1792426555"></script>
+<script src="/assets/js/config.js?v=1792427445"></script>
+<script src="/assets/js/sign.js?v=1792427445"></script>
+<script src="/assets/js/live.js?v=1792427445"></script>
+<script src="/assets/js/gate.js?v=1792427445"></script>
+<script src="/assets/js/fx.js?v=1792427445"></script>
+<script src="/assets/js/casino-scene.js?v=1792427445"></script>
+<script src="/assets/js/chips.js?v=1792427445"></script>
+<script src="/assets/js/bumpers.js?v=1792427445"></script>
+<script src="/assets/js/slots.js?v=1792427445"></script>
+<script src="/assets/js/app.js?v=1792427445"></script>
 </body>
 </html>

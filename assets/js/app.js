@@ -403,6 +403,15 @@
       if (cl) { cl.onclick = function (e) { var b = e.target.closest("[data-rule]"); if (!b) return; var f = b.getAttribute("data-false") === "1";
         if (!confirm(f ? "Rule this Joker FALSE? It comes off, and the maker becomes a Joker for 45 days with no way out. This is final." : "Rule that this Joker STANDS? This is final.")) return;
         window.SF_LIVE.rpc("rule_joker_challenge", { p_challenge: b.getAttribute("data-rule"), p_false: f, p_note: null }).then(function (r) { if (r.error) toast(r.error.message); else { toast(f ? "Removed. It backfired on the maker." : "The Joker stands."); loadChal(); } }); }; loadChal(); }
+      var jr = $("#jkRevList"), JKL = { ignorant: "Ignorant", racist: "Racist", belittling: "Belittling", perverted: "Perverted", criminal: "Criminal", toxic: "Toxic" }, loadJkr = function () {
+        window.SF_LIVE.rpc("joker_review_queue").then(function (r) { if (!jr) return; var rows = r.data || [];
+          jr.innerHTML = rows.length ? rows.map(function (x) { var c = x.checks || {}, flags = ["no_hand", "blocked_first", "payback", "both_won", "maker_gone"].filter(function (k) { return c[k]; });
+            return '<div class="cmrow chalrow"><span><b>@' + esc(x.maker_tag || "?") + "</b> wants a Joker on <b>@" + esc(x.subject_tag || "?") + "</b><br><small><b>Says:</b> " + esc((x.reasons || []).map(function (k) { return JKL[k] || k; }).join(", ")) + " · " + esc(x.statement || "") + "</small><br><small><b>Proof:</b> " + ((x.evidence || []).length ? (x.evidence || []).length + " file(s) in storage" : "none") + (flags.length ? ' · <b style="color:var(--red-soft)">Records show: ' + esc(flags.join(", ").replace(/_/g, " ")) + "</b>" : " · records check out") + '</small></span><span class="row"><button class="chip sm" type="button" data-jkr="' + x.id + '" data-d="approved">Approve</button><button class="chip sm" type="button" data-jkr="' + x.id + '" data-d="more_proof">Needs proof</button><button class="chip sm" type="button" data-jkr="' + x.id + '" data-d="bad_faith">Bad faith · backfire</button></span></div>'; }).join("") : '<p class="hint">No lobby Jokers waiting.</p>';
+        }); };
+      if (jr) { jr.onclick = function (e) { var b = e.target.closest("[data-jkr]"); if (!b) return; var d = b.getAttribute("data-d");
+        var q = { approved: "Approve this Joker? It shows for 45 days.", more_proof: "Send it back for more proof? Their lobby entry is returned.", bad_faith: "Rule it bad faith (hearsay, grudge, jealousy, resentment or to embarrass)? It's not approved, and the maker becomes a Joker for 45 days. Final." }[d];
+        if (!confirm(q)) return; var note = d === "approved" ? null : prompt("Note for the record (optional)", "") || null;
+        window.SF_LIVE.rpc("rule_joker_submission", { p_id: b.getAttribute("data-jkr"), p_decision: d, p_note: note }).then(function (r) { if (r.error) toast(r.error.message); else { toast(d === "approved" ? "Approved." : d === "more_proof" ? "Sent back for proof." : "Ruled bad faith. It backfired on the maker."); loadJkr(); } }); }; loadJkr(); }
       var hq = $("#hrShipList"), loadHrq = function () { window.SF_LIVE.rpc("hr_deck_queue").then(function (r) { var rows = r.data || []; if (!hq) return;
         hq.innerHTML = rows.length ? rows.map(function (x) { var due = new Date(x.ship_by).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
           return '<div class="cmrow"><span><b>@' + esc(x.tag || "?") + "</b> · ship by " + esc(due) + " · " + esc(x.status === "needs_address" ? "waiting for address" : x.status) + (x.line1 ? "<br><small>" + esc([x.ship_name, x.line1, x.line2, x.city + ", " + x.state + " " + x.zip].filter(Boolean).join(", ")) + "</small>" : "") + (x.tracking ? "<br><small>Tracking " + esc(x.tracking) + "</small>" : "") + "</span>" + (x.status === "ready" ? '<button class="chip sm" type="button" data-shipped="' + x.member_id + '">Mark shipped</button>' : "") + "</div>"; }).join("") : '<p class="hint">No High Roller decks to send.</p>'; }); };
@@ -2987,7 +2996,6 @@
     ["status", "Relationship status", "one", ["Single, never married", "Separated", "Divorced", "Widow", "Widower", "Married", "In a relationship"], 1, 0, "Love life"],
     ["style", "Relationship style", "many", ["Monogamous", "Open relationship", "Polyamorous", "Swinger", "Ethically non-monogamous", "Still figuring it out"], 1, 1, "Love life"],
     ["kids", "Kids", "one", ["No kids", "Kids at home", "Kids, not at home", "Kids part-time"], 1, 0, "Love life"],
-    ["health", "Health a partner should know about (anything that could pass to someone through close contact)", "one", ["Nothing to share", "Yes, and I'll tell a match privately before we get close", "Prefer not to say"], 0, 1, "Love life"],
     ["wantKids", "Want kids?", "one", ["Want kids", "Open to kids", "Don't want kids", "Not sure"], 1, 0, "Love life"],
     ["education", "Education", "one", ["Some high school", "High school / GED", "Boarding school", "Trade or technical school", "Some college", "In college now", "Associate degree", "Bachelor's degree", "Master's degree", "Doctorate", "Law or medical degree"], 1, 0, "Work & money"],
     ["employment", "Work (check all that apply)", "many", ["Full-time", "Part-time", "Self-employed / business owner", "Gig work", "Student", "Military", "Retired", "Between jobs", "Homemaker / caregiver", "On disability"], 1, 0, "Work & money"],
@@ -3489,7 +3497,8 @@
     player: ["Player", "A paid member: My Face, your hand, the Table Map, Pairs, Play Hand and invites."],
     dealer: ["Dealer", "Staff, approved by the Owner with the passcode: safety reports, member help and account holds. Can't change roles, prices or payments."],
     pitboss: ["Pit Boss", "IT, approved by the Owner with the passcode: system health, errors and the payment webhook. Never sees private member details."],
-    owner: ["Owner", "Everything: player view, every console and the house numbers."]
+    owner: ["Owner", "Everything: player view, every console and the house numbers."],
+    accounting: ["Accounting", "CFO and accounting team: financial statements, journal entries, payouts and distributions. No member safety tools."]
   };
   /* On the public site the view switcher is hidden and everyone is a Guest until they sign in.
      A signed-in member gets their real role from the server (window.SF_LIVE.role). The switcher only
@@ -5098,6 +5107,164 @@
         }, function (x) { err2.textContent = (x && x.message) || "That didn't save. Try again."; });
     });
   }
+  /* =====================================================================
+     FINANCE (owner + Accounting role). Statements come from the general ledger on the server (US GAAP, accrual).
+     ===================================================================== */
+  var FIN = { tab: "is", data: null, accounts: null };
+  function usd(c, paren) { c = Number(c || 0); var s = "$" + (Math.abs(c) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); return c < 0 ? (paren === false ? "−" + s : "(" + s + ")") : s; }
+  function finRange() {
+    var r = $("#finRange").value, n = new Date(), y = n.getFullYear(), m = n.getMonth(), iso = function (d) { return d.toISOString().slice(0, 10); };
+    var today = iso(new Date(Date.UTC(y, m, n.getDate())));
+    if (r === "lm") return [iso(new Date(Date.UTC(y, m - 1, 1))), iso(new Date(Date.UTC(y, m, 0)))];
+    if (r === "qtd") return [iso(new Date(Date.UTC(y, Math.floor(m / 3) * 3, 1))), today];
+    if (r === "ytd") return [iso(new Date(Date.UTC(y, 0, 1))), today];
+    if (r === "custom") return [$("#finFrom").value || today, $("#finTo").value || today];
+    return [iso(new Date(Date.UTC(y, m, 1))), today];
+  }
+  function finRow(label, cents, cls) { return '<tr class="' + (cls || "") + '"><td>' + esc(label) + '</td><td class="num">' + usd(cents) + "</td></tr>"; }
+  function finLoad() {
+    var pane = $("#finPane"); if (!pane || !liveOn()) { if (pane) pane.innerHTML = '<p class="hint">Sign in with an owner or Accounting account to see the books.</p>'; return; }
+    var rg = finRange(); pane.innerHTML = '<p class="hint">Loading…</p>';
+    lrpc("finance_summary", { p_from: rg[0], p_to: rg[1] }).then(function (d) { FIN.data = d; finKpis(); finRender(); }, function (x) { pane.innerHTML = '<p class="hint">' + esc(x.message) + "</p>"; });
+  }
+  function finKpis() {
+    var d = FIN.data, k = d.kpis, is = d.income_statement, cf = d.cash_flow;
+    var tile = function (v, l, sub) { return '<div class="fk"><b>' + v + "</b><span>" + l + "</span>" + (sub ? "<small>" + sub + "</small>" : "") + "</div>"; };
+    $("#finKpis").innerHTML = tile(usd(is.net_revenue), "Net revenue", "this period") + tile(usd(is.net_income), "Net income", "before shareholder taxes") +
+      tile(usd(cf.cash_end), "Cash", "bank + Stripe") + tile(usd(k.chip_liability), "Chip liability", "unspent chips") +
+      tile(usd(k.deferred_seats + k.deferred_decks), "Deferred revenue", "seats + decks") + tile(k.seats_active.toLocaleString(), "Active seats", k.seats_paid_period + " paid this period") +
+      tile(k.decks_played_period.toLocaleString(), "Decks played", k.decks_open_now + " open now") + tile(k.pairs_period.toLocaleString(), "Pairs", k.checkins_period + " in-person check-ins") +
+      (d.balanced ? "" : '<div class="fk warn"><b>Out of balance</b><span>Debits and credits don\'t match. Check the journal.</span></div>') +
+      (k.estimates_open ? '<div class="fk note"><b>' + k.estimates_open + "</b><span>Estimated Stripe fees this period</span><small>True up from the Stripe fee report at month end</small></div>" : "");
+  }
+  function finTable(head, rows) { return '<div class="scrollx"><table class="fintbl"><thead><tr>' + head.map(function (h, i) { return "<th" + (i ? ' class="num"' : "") + ">" + h + "</th>"; }).join("") + "</tr></thead><tbody>" + rows + "</tbody></table></div>"; }
+  function finRender() {
+    var pane = $("#finPane"), d = FIN.data, t = FIN.tab; if (!pane) return;
+    $$("[data-fintab]").forEach(function (b) { b.setAttribute("aria-selected", String(b.getAttribute("data-fintab") === t)); });
+    if (["pay", "dist", "t99", "je", "adj"].indexOf(t) > -1) return finTool(t);
+    if (!d) return finLoad();
+    var per = "<p class=\"hint\">" + esc(d.from) + " to " + esc(d.to) + "</p>", h = "";
+    if (t === "is") {
+      var is = d.income_statement, sec = function (name, f) { return is.lines.filter(f).filter(function (x) { return x.cents; }).map(function (x) { return finRow(x.code + " · " + x.name, x.cents, "ind"); }).join(""); };
+      h = "<h3>Income statement</h3>" + per + finTable(["", "Amount"],
+        '<tr class="sec"><td colspan="2">Revenue</td></tr>' + sec("rev", function (x) { return x.type === "revenue"; }) + finRow("Less: refunds and bonus-chip discounts", -is.refunds, "ind") + finRow("Net revenue", is.net_revenue, "tot") +
+        '<tr class="sec"><td colspan="2">Cost of revenue</td></tr>' + sec("cor", function (x) { return x.section === "Cost of revenue"; }) + finRow("Gross profit", is.gross_profit, "tot") +
+        '<tr class="sec"><td colspan="2">Operating expenses</td></tr>' + sec("opex", function (x) { return x.section === "Operating expenses"; }) + finRow("Operating income", is.operating_income, "tot") +
+        sec("tax", function (x) { return x.section === "Taxes"; }) + finRow("Net income", is.net_income, "grand")) + '<p class="hint">' + esc(is.note) + "</p>";
+    } else if (t === "bs") {
+      var bs = d.balance_sheet, grp = function (ty) { return bs.lines.filter(function (x) { return x.type === ty && x.cents; }).map(function (x) { return finRow(x.code + " · " + x.name, x.cents, "ind"); }).join(""); };
+      h = "<h3>Balance sheet</h3><p class=\"hint\">As of " + esc(d.to) + "</p>" + finTable(["", "Amount"],
+        '<tr class="sec"><td colspan="2">Assets</td></tr>' + grp("asset") + finRow("Total assets", bs.assets, "tot") +
+        '<tr class="sec"><td colspan="2">Liabilities</td></tr>' + grp("liability") + finRow("Total liabilities", bs.liabilities, "tot") +
+        '<tr class="sec"><td colspan="2">Shareholders\' equity</td></tr>' + grp("equity") + finRow("Current earnings (not yet closed)", bs.current_earnings, "ind") + finRow("Total equity", bs.equity, "tot") +
+        finRow("Liabilities and equity", bs.liabilities + bs.equity, "grand")) + (bs.assets === bs.liabilities + bs.equity ? '<p class="hint ok">✓ Assets equal liabilities plus equity.</p>' : '<p class="err">Assets don\'t equal liabilities plus equity. Check the journal.</p>');
+    } else if (t === "eq") {
+      var e = d.equity_statement;
+      h = "<h3>Statement of shareholders' equity</h3>" + per + finTable(["", "Amount"], finRow("Beginning equity", e.beginning) + finRow("Shareholder contributions", e.contributions, "ind") + finRow("Net income", e.net_income, "ind") + finRow("Shareholder distributions", -e.distributions, "ind") + finRow("Ending equity", e.ending, "grand")) +
+        '<p class="hint">S corporation: distributions reduce equity and are tracked against each shareholder\'s basis and the Accumulated Adjustments Account at year end.</p>';
+    } else if (t === "cf") {
+      var c = d.cash_flow;
+      h = "<h3>Statement of cash flows (indirect method)</h3>" + per + finTable(["", "Amount"],
+        '<tr class="sec"><td colspan="2">Operating activities</td></tr>' + finRow("Net income", c.net_income, "ind") + (c.changes || []).map(function (x) { return finRow("Change in " + x.name, x.cents, "ind"); }).join("") + finRow("Net cash from operating activities", c.operating, "tot") +
+        '<tr class="sec"><td colspan="2">Investing activities</td></tr>' + finRow("Net cash from investing activities", c.investing, "tot") +
+        '<tr class="sec"><td colspan="2">Financing activities</td></tr>' + finRow("Contributions less distributions", c.financing, "tot") +
+        finRow("Net change in cash", c.net_change, "tot") + finRow("Cash at beginning", c.cash_begin, "ind") + finRow("Cash at end", c.cash_end, "grand"));
+    } else if (t === "tb") {
+      var dt = 0, ct = 0;
+      h = "<h3>Trial balance</h3><p class=\"hint\">As of " + esc(d.to) + "</p>" + finTable(["Account", "Debit", "Credit"], (d.trial_balance || []).map(function (x) { dt += +x.debit; ct += +x.credit; return "<tr><td>" + esc(x.code + " · " + x.name) + '</td><td class="num">' + usd(x.debit) + '</td><td class="num">' + usd(x.credit) + "</td></tr>"; }).join("") +
+        '<tr class="grand"><td>Totals</td><td class="num">' + usd(dt) + '</td><td class="num">' + usd(ct) + "</td></tr>");
+    }
+    pane.innerHTML = h;
+  }
+  function finTool(t) {
+    var pane = $("#finPane"), rg = finRange();
+    if (t === "je") {
+      pane.innerHTML = "<p class=\"hint\">Loading…</p>";
+      lrpc("finance_journal", { p_from: rg[0], p_to: rg[1] }).then(function (rows) {
+        var last = null;
+        pane.innerHTML = "<h3>Journal entries</h3><p class=\"hint\">" + rg[0] + " to " + rg[1] + " · " + (rows || []).length + " lines. Estimates are marked and get trued up at month end.</p>" +
+          finTable(["Date · Entry · Account", "Debit", "Credit"], (rows || []).map(function (r) { var head = r.entry_id !== last; last = r.entry_id;
+            return (head ? '<tr class="sec"><td colspan="3">' + esc(r.entry_date) + " · #" + r.entry_id + " · " + esc(r.memo) + (r.estimate ? " · estimate" : "") + "</td></tr>" : "") +
+              '<tr><td class="' + (r.credit_cents ? "cr" : "") + '">' + esc(r.account + " · " + r.account_name) + '</td><td class="num">' + (r.debit_cents ? usd(r.debit_cents) : "") + '</td><td class="num">' + (r.credit_cents ? usd(r.credit_cents) : "") + "</td></tr>"; }).join("") || '<tr><td colspan="3" class="hint">No entries in this period.</td></tr>');
+      }, function (x) { pane.innerHTML = '<p class="err">' + esc(x.message) + "</p>"; });
+    } else if (t === "adj") {
+      var go = function (accts) {
+        var opts = accts.map(function (a) { return '<option value="' + a.code + '">' + esc(a.code + " · " + a.name) + "</option>"; }).join("");
+        var line = function () { return '<div class="adjl"><select class="adja">' + opts + '</select><input class="adjd" inputmode="decimal" placeholder="Debit"><input class="adjc" inputmode="decimal" placeholder="Credit"></div>'; };
+        pane.innerHTML = "<h3>Adjusting entry</h3><p class=\"hint\">For accruals, true-ups and corrections. Debits must equal credits. Every entry keeps your name and memo.</p>" +
+          '<form id="adjForm" class="adjform"><div class="adjtop"><label>Date<input type="date" id="adjDate" value="' + rg[1] + '"></label><label class="grow">Memo<input id="adjMemo" maxlength="200" placeholder="e.g., True up October Stripe fees to the fee report"></label></div>' +
+          '<div id="adjLines">' + line() + line() + '</div><div class="row"><button class="btn ghost sm" type="button" id="adjAdd">Add line</button><span class="hint" id="adjSum"></span></div><button class="btn gold" type="submit">Post entry</button><p class="err" id="adjErr"></p></form>';
+        $("#adjAdd").onclick = function () { $("#adjLines").insertAdjacentHTML("beforeend", line()); };
+        var sum = function () { var dr = 0, cr = 0; $$(".adjl").forEach(function (l) { dr += +($(".adjd", l).value || 0); cr += +($(".adjc", l).value || 0); }); $("#adjSum").textContent = "Debits " + dr.toFixed(2) + " · Credits " + cr.toFixed(2) + (Math.abs(dr - cr) < 0.005 ? " ✓" : ""); return [dr, cr]; };
+        $("#adjLines").addEventListener("input", sum);
+        $("#adjForm").onsubmit = function (e) { e.preventDefault(); var s2 = sum(); if (Math.abs(s2[0] - s2[1]) > 0.004 || !s2[0]) { $("#adjErr").textContent = "Debits must equal credits."; return; }
+          var lines = $$(".adjl").map(function (l) { return { a: $(".adja", l).value, dr: +($(".adjd", l).value || 0), cr: +($(".adjc", l).value || 0) }; }).filter(function (x) { return x.dr || x.cr; });
+          lrpc("finance_manual_entry", { p_date: $("#adjDate").value, p_memo: $("#adjMemo").value, p_lines: lines }).then(function (id) { toast("Posted entry #" + id + "."); FIN.data = null; finLoad(); }, function (x) { $("#adjErr").textContent = x.message; }); };
+      };
+      if (FIN.accounts) go(FIN.accounts); else lrpc("finance_accounts").then(function (a) { FIN.accounts = a || []; go(FIN.accounts); }, function (x) { pane.innerHTML = '<p class="err">' + esc(x.message) + "</p>"; });
+    } else if (t === "pay") {
+      Promise.all([lrpc("finance_staff"), lrpc("finance_payouts")]).then(function (r) {
+        var staff = (r[0] || []).filter(function (x) { return x.role === "dealer" || x.role === "pitboss"; }), pays = r[1] || [];
+        pane.innerHTML = "<h3>Staff payouts</h3><p class=\"hint\">Dealers and Pit Bosses are paid as 1099 contractors. Add a payout, a second finance user approves it (the pay is accrued), then mark it paid once the money is sent. Keep a W-9 on file before paying.</p>" +
+          (staff.length ? '<form id="payForm" class="adjform"><div class="adjtop"><label>Payee<select id="payWho">' + staff.map(function (s) { return '<option value="' + s.id + '" data-kind="' + s.role + '">' + esc(s.name) + " · " + (s.role === "pitboss" ? "Pit Boss" : "Dealer") + (s.w9 ? "" : " · no W-9") + "</option>"; }).join("") + '</select></label><label>Period<input id="payPer" placeholder="2026-10"></label><label>Amount ($)<input id="payAmt" inputmode="decimal"></label><label class="grow">Memo<input id="payMemo" maxlength="160" placeholder="Hours or tasks"></label></div><button class="btn gold sm" type="submit">Add payout</button></form>'
+            : '<p class="hint">No Dealers or Pit Bosses yet. Add staff from the Owner console first.</p>') +
+          finTable(["Payee · period · status", "Amount", ""], pays.map(function (p) {
+            var act = p.status === "pending" ? '<button class="btn ghost sm" data-papprove="' + p.id + '">Approve</button> <button class="linkish" data-pvoid="' + p.id + '">Void</button>' : p.status === "approved" ? '<button class="btn gold sm" data-ppaid="' + p.id + '">Mark paid</button> <button class="linkish" data-pvoid="' + p.id + '">Void</button>' : p.status === "paid" ? esc((p.method || "") + (p.reference ? " · " + p.reference : "")) : "";
+            return "<tr><td>" + esc(p.payee) + " · " + esc(p.period) + ' · <span class="st-' + p.status + '">' + p.status + "</span>" + (p.memo ? '<br><small class="hint">' + esc(p.memo) + "</small>" : "") + '</td><td class="num">' + usd(p.cents) + '</td><td class="num">' + act + "</td></tr>"; }).join("") || '<tr><td colspan="3" class="hint">No payouts yet.</td></tr>') +
+          "<h4>Staff tax info</h4>" + finTable(["Staff", "Paid this year", ""], staff.map(function (s) { return "<tr><td>" + esc(s.name) + (s.legal_name ? '<br><small class="hint">' + esc(s.legal_name) + (s.tin_last4 ? " · TIN ••" + esc(s.tin_last4) : "") + "</small>" : "") + '</td><td class="num">' + usd(s.paid_ytd) + '</td><td class="num"><button class="linkish" data-ptax="' + s.id + '">' + (s.w9 ? "W-9 on file ✓" : "Record W-9") + "</button></td></tr>"; }).join("") || '<tr><td colspan="3" class="hint">No staff.</td></tr>') +
+          '<p class="hint">Sending money: pay by your bank (ACH) or Stripe, then mark it paid with the reference. Turning on Stripe Connect payouts later lets this button send the payment directly.</p>';
+        var f = $("#payForm"); if (f) f.onsubmit = function (e) { e.preventDefault(); var w = $("#payWho"); lrpc("finance_payout_add", { p_payee: w.value, p_kind: w.selectedOptions[0].getAttribute("data-kind"), p_period: $("#payPer").value, p_dollars: +$("#payAmt").value, p_memo: $("#payMemo").value }).then(function () { toast("Payout added. It needs approval."); finTool("pay"); }, function (x) { toast(x.message); }); };
+      }, function (x) { pane.innerHTML = '<p class="err">' + esc(x.message) + "</p>"; });
+    } else if (t === "dist") {
+      lrpc("finance_distributions").then(function (rows) {
+        pane.innerHTML = "<h3>Shareholder distributions</h3><p class=\"hint\">S corporation distributions are paid in proportion to ownership and reduce equity. They aren't salary; a shareholder who works in the business also needs reasonable W-2 compensation. Ask your CPA before the first distribution.</p>" +
+          '<form id="distForm" class="adjform"><div class="adjtop"><label class="grow">Shareholder<input id="dName" maxlength="80"></label><label>Amount ($)<input id="dAmt" inputmode="decimal"></label><label>Paid on<input type="date" id="dDate" value="' + rg[1] + '"></label><label>Method<select id="dMeth"><option>ACH</option><option>Wire</option><option>Check</option></select></label><label>Reference<input id="dRef" maxlength="60"></label></div><button class="btn gold sm" type="submit">Record distribution</button></form>' +
+          finTable(["Shareholder · date", "Amount"], (rows || []).map(function (r) { return "<tr><td>" + esc(r.shareholder) + " · " + esc(r.paid_on) + (r.method ? " · " + esc(r.method) : "") + (r.reference ? " · " + esc(r.reference) : "") + '</td><td class="num">' + usd(r.cents) + "</td></tr>"; }).join("") || '<tr><td colspan="2" class="hint">No distributions yet.</td></tr>');
+        $("#distForm").onsubmit = function (e) { e.preventDefault(); if (!confirm("Record a distribution of $" + (+$("#dAmt").value).toFixed(2) + " to " + $("#dName").value + "? This posts to the books.")) return;
+          lrpc("finance_distribution_add", { p_shareholder: $("#dName").value, p_dollars: +$("#dAmt").value, p_paid_on: $("#dDate").value, p_method: $("#dMeth").value, p_reference: $("#dRef").value, p_memo: "" }).then(function () { toast("Distribution recorded."); FIN.data = null; finTool("dist"); }, function (x) { toast(x.message); }); };
+      }, function (x) { pane.innerHTML = '<p class="err">' + esc(x.message) + "</p>"; });
+    } else if (t === "t99") {
+      var yr = new Date().getFullYear();
+      lrpc("finance_1099", { p_year: yr }).then(function (rows) {
+        pane.innerHTML = "<h3>1099-NEC summary · " + yr + "</h3><p class=\"hint\">Contractors paid $600 or more in the year need a 1099-NEC by January 31. Full tax IDs stay with your filing service; SuiteFace keeps only the last four digits.</p>" +
+          finTable(["Payee", "Paid", "1099?"], (rows || []).map(function (r) { return "<tr><td>" + esc(r.legal_name || r.payee) + (r.tin_last4 ? " · ••" + esc(r.tin_last4) : "") + (r.w9 ? "" : ' · <span class="err">W-9 missing</span>') + '</td><td class="num">' + usd(r.total_cents) + '</td><td class="num">' + (r.needs_1099 ? "Yes" : "No") + "</td></tr>"; }).join("") || '<tr><td colspan="3" class="hint">No contractor payments this year.</td></tr>');
+      }, function (x) { pane.innerHTML = '<p class="err">' + esc(x.message) + "</p>"; });
+    }
+  }
+  function finAccess() {
+    var el = $("#finAccess"); if (!el) return; if (ROLE !== "owner") { el.innerHTML = ""; return; }
+    el.innerHTML = '<h3>Accounting access</h3><p class="hint">Give your CFO or accountant the Accounting role. They see these books, post adjusting entries and handle payouts, but never member safety tools.</p><form class="row" id="accForm"><label class="sr" for="accTag">Their @tag</label><input id="accTag" placeholder="@tag" maxlength="30"><button class="btn gold sm" type="submit">Grant Accounting</button><button class="btn ghost sm" type="button" id="accOff">Remove</button></form>';
+    var send = function (on) { lrpc("owner_set_accounting", { p_handle: $("#accTag").value, p_on: on }).then(function (r) { toast(r === "accounting" ? "Accounting access granted." : "Accounting access removed."); }, function (x) { toast(x.message); }); };
+    $("#accForm").onsubmit = function (e) { e.preventDefault(); send(true); }; $("#accOff").onclick = function () { send(false); };
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target; if (!t.closest) return; var b;
+    if ((b = t.closest("[data-fintab]"))) { FIN.tab = b.getAttribute("data-fintab"); finRender(); return; }
+    if (t.closest("#finRefresh")) { FIN.data = null; finLoad(); return; }
+    if ((b = t.closest("[data-papprove]"))) { lrpc("finance_payout_approve", { p_id: +b.getAttribute("data-papprove") }).then(function () { toast("Approved. The pay is accrued."); finTool("pay"); }, function (x) { toast(x.message); }); return; }
+    if ((b = t.closest("[data-ppaid]"))) { var meth = prompt("How was it paid? (ACH, Stripe, check)", "ACH"); if (!meth) return; var ref = prompt("Reference (confirmation or check number)", "") || "";
+      lrpc("finance_payout_paid", { p_id: +b.getAttribute("data-ppaid"), p_method: meth, p_reference: ref }).then(function () { toast("Marked paid."); finTool("pay"); }, function (x) { toast(x.message); }); return; }
+    if ((b = t.closest("[data-pvoid]"))) { if (!confirm("Void this payout?")) return; lrpc("finance_payout_void", { p_id: +b.getAttribute("data-pvoid") }).then(function () { finTool("pay"); }, function (x) { toast(x.message); }); return; }
+    if ((b = t.closest("[data-ptax]"))) { var ln = prompt("Legal name on the W-9"); if (ln === null) return; var l4 = prompt("Last 4 digits of their SSN or EIN (only these are kept)") || null;
+      lrpc("finance_set_staff_tax", { p_member: b.getAttribute("data-ptax"), p_legal_name: ln, p_w9: true, p_tin_last4: l4 }).then(function () { toast("W-9 recorded."); finTool("pay"); }, function (x) { toast(x.message); }); return; }
+    if (t.closest("#finCsv")) { var rg = finRange(); lrpc("finance_journal", { p_from: rg[0], p_to: rg[1] }).then(function (rows) {
+        var csv = "entry_id,date,memo,source,estimate,account,account_name,debit,credit\n" + (rows || []).map(function (r) { return [r.entry_id, r.entry_date, r.memo, r.source, r.estimate, r.account, r.account_name, (r.debit_cents / 100).toFixed(2), (r.credit_cents / 100).toFixed(2)].map(function (v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(","); }).join("\n");
+        var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "suiteface-journal-" + rg[0] + "-to-" + rg[1] + ".csv"; document.body.appendChild(a); a.click(); a.remove(); }, function (x) { toast(x.message); }); return; }
+  });
+  document.addEventListener("change", function (e) { if (e.target.id === "finRange") { var c = e.target.value === "custom"; $("#finFrom").hidden = !c; $("#finTo").hidden = !c; if (!c) { FIN.data = null; finLoad(); } } else if (e.target.id === "finFrom" || e.target.id === "finTo") { FIN.data = null; finLoad(); } });
+  document.addEventListener("sf:live", function () { setTimeout(function () { if (ROLE === "owner" || ROLE === "accounting") { finLoad(); finAccess(); } }, 900); });
+  /* Dealers and Pit Bosses see their own pay in their console. */
+  function myPay() {
+    if (ROLE !== "dealer" && ROLE !== "pitboss") return;
+    lrpc("my_payouts").then(function (rows) {
+      $$("[data-mypay]").forEach(function (el) {
+        el.hidden = false;
+        el.innerHTML = '<h3 style="font-size:1.2rem">My pay</h3><p class="hint">You\'re paid as a 1099 contractor. Approved pay is sent by ACH or Stripe, and a 1099-NEC arrives by January 31 if you\'re paid $600 or more in a year. Questions: help@suiteface.com.</p>' +
+          finTable(["Period", "Amount", "Status"], (rows || []).map(function (r) { return "<tr><td>" + esc(r.period) + (r.paid_at ? '<br><small class="hint">Paid ' + dateCT(r.paid_at) + "</small>" : "") + '</td><td class="num">' + usd(r.cents) + '</td><td class="num"><span class="st-' + r.status + '">' + ({ pending: "Waiting for approval", approved: "Approved, sending soon", paid: "Paid" }[r.status] || r.status) + "</span></td></tr>"; }).join("") || '<tr><td colspan="3" class="hint">No pay recorded yet.</td></tr>');
+      });
+    }, function () { });
+  }
+  document.addEventListener("sf:live", function () { setTimeout(myPay, 900); });
   /* ---------- Next free for an in-person date (Oct 19) ---------- */
   var AV_DAYS = [["mon", "Mon"], ["tue", "Tue"], ["wed", "Wed"], ["thu", "Thu"], ["fri", "Fri"], ["sat", "Sat"], ["sun", "Sun"]], AV_PARTS = [["morning", "Morning", 9], ["afternoon", "Afternoon", 13], ["evening", "Evening", 18]];
   function nextFree(av) {
@@ -5189,12 +5356,14 @@
     var m = modal('<h3 style="font-size:1.6rem;margin:0">Get chips</h3><p class="lede" style="margin:6px 0 14px">' + (why || "Buy a stack once. Every deck after that is one tap.") + (c != null ? " You have " + money(c) + "." : "") + "</p>" +
       '<div class="cp-stacks">' + [["210", "2.10", "$2.10", "1 deck", ""], ["2100", "21", "$21", "11 decks", "+10% bonus"], ["21000", "210", "$210", "120 decks", "+20% bonus"]].map(function (x) {
         return '<button type="button" class="cp-stack' + (x[0] === "2100" ? " best" : "") + '" data-stack-buy="' + x[0] + '"><span class="sfchip" data-chip="' + x[1] + '" data-size="64"></span><b>' + x[2] + "</b><span>" + x[3] + "</span>" + (x[4] ? '<i class="cp-bonus">' + x[4] + "</i>" : "") + "</button>"; }).join("") + "</div>" +
+      (houseCode() ? '<p class="hint cp-compon">Comp code on: these stacks are free for your account.</p>' : '<form class="cp-comp" data-chipcomp><label for="cpCompM">Comp code</label><input id="cpCompM" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Have a comp code?"><button class="btn ghost sm" type="submit">Apply</button><p class="hint" data-compmsg aria-live="polite"></p></form>') +
       '<p class="hint" style="margin-top:12px">Chips have no cash value, never expire and are non-refundable except where the law requires.</p>');
     if (window.SFChips) SFChips.paint(m);
   }
   function buyStack(cents) {
     var link = CFG.stripeChips && CFG.stripeChips[cents];
     if (!window.SF_LIVE) { loginModal("create"); return; }
+    if (houseCode()) { houseComp("chips_" + cents).then(function (ok) { if (ok) { closeModal(); loadChips(); if (window.SFChips && SFChips.play) try { SFChips.play(); } catch (x) { } } }); return; }
     if (!link || !window.SF_AUTH) { toast("Chips open soon."); return; }
     try { sessionStorage.setItem("sf.after", "chips"); } catch (e) { }
     window.SF_AUTH.checkout(link, "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
@@ -5224,11 +5393,22 @@
       chipBalance(w.cents);
       (w.items || []).forEach(function (it) { var id = /^pack_/.test(it) ? it : it; if (!owns(id)) P.owned.push(id); }); saveP();
       var hi = $("#cpHistory"); if (hi && (w.recent || []).length) { hi.hidden = false;
-        hi.innerHTML = "<h3>Recent</h3><ul>" + w.recent.map(function (r) { var lab = /^bought:/.test(r.reason) ? "Bought chips" : /^bonus:/.test(r.reason) ? "Bonus chips" : r.reason === "spent:deck" ? "Played a deck" : /^spent:pack_/.test(r.reason) ? "Sticker pack" : r.reason === "spent:raise" ? "The Raise" : /^spent:/.test(r.reason) ? "Card theme" : r.reason;
+        hi.innerHTML = "<h3>Recent</h3><ul>" + w.recent.map(function (r) { var lab = /^bought:/.test(r.reason) ? "Bought chips" : /^bonus:/.test(r.reason) ? "Bonus chips" : /^comp:/.test(r.reason) ? "Comped chips" : r.reason === "spent:deck" ? "Played a deck" : /^spent:pack_/.test(r.reason) ? "Sticker pack" : r.reason === "spent:raise" ? "The Raise" : /^spent:/.test(r.reason) ? "Card theme" : r.reason;
           return "<li><span>" + esc(lab) + "<small>" + dateCT(r.at) + "</small></span><b class=\"" + (r.cents > 0 ? "plus" : "") + "\">" + (r.cents > 0 ? "+" : "−") + money(Math.abs(r.cents)) + "</b></li>"; }).join("") + "</ul>"; }
     }, function () { });
   }
   document.addEventListener("sf:live", function () { setTimeout(loadChips, 120); });
+  document.addEventListener("submit", function (e) {
+    var f = e.target.closest && e.target.closest("[data-chipcomp]"); if (!f) return; e.preventDefault();
+    var v = ($("input", f).value || "").trim(), out = $("[data-compmsg]", f);
+    if (!window.SF_LIVE) { loginModal("signin"); return; }
+    if (!v) { out.textContent = "Type your comp code."; return; }
+    window.SF_LIVE.rpc("house_comp_check", { p_code: v }).then(function (r) {
+      if (r.error || !r.data) { out.textContent = (r.error && r.error.message) || "That comp code isn't valid for this account."; return; }
+      window.SF_HOUSE = v; try { sessionStorage.setItem("sf.house", v); } catch (x) { } $("input", f).value = "";
+      out.textContent = "Comp code on. Tap any stack: it's free for your account."; burstAt(f, 30);
+    });
+  });
   document.addEventListener("click", function (e) {
     var t = e.target; if (!t.closest) return;
     var sb = t.closest("[data-stack-buy]"); if (sb) { e.preventDefault(); buyStack(sb.getAttribute("data-stack-buy")); return; }

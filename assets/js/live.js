@@ -71,7 +71,7 @@
     newPassword: function (pass) { return client.auth.updateUser({ password: pass }).then(function (r) { if (r.error) throw r.error; }); },
     signOut: function () { return client.auth.signOut().then(function () { session = null; return loadMe(); }); },
     refresh: loadMe,
-    /* Buy-In: makes sure the Sign-up Agreement, Release and Buy-In Agreement are signed on the account,
+    /* Checkout: the first time, the member signs every agreement still missing (Sign-up, Release, Seat, Deck and Chips) in one step,
        then sends the member to Stripe tagged with their member id so the webhook seats them. */
     checkout: function (link, extra) {
       function go() {
@@ -81,8 +81,8 @@
             location.href = u; return;
           }
           var msg = r.error.message || "";
-          if (/Sign-up Agreement/i.test(msg)) return sign("signup").then(function () { return sign("release"); }).then(function () { return sign("buyin"); }).then(go);
-          if (/Buy-In Agreement/i.test(msg)) return sign("buyin").then(go);
+          if (/Sign-up Agreement|Buy-In Agreement/i.test(msg)) return client.rpc("my_unsigned", { p_keys: ["signup", "release", "buyin"] }).then(function (u) {
+            var keys = (!u.error && u.data && u.data.length) ? u.data : ["signup", "release", "buyin"]; return sign(keys); }).then(go);
           throw r.error;
         });
       }
