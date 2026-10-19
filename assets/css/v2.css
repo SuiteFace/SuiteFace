@@ -1139,30 +1139,56 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
   radial-gradient(120% 90% at 50% 40%,color-mix(in srgb,var(--felt) 88%,#fff),var(--felt) 60%,color-mix(in srgb,var(--felt) 70%,#0C120F))}
 .pcard .cover .cv-in.jkback{background:image-set(url(/assets/art/back_joker.webp) type("image/webp"),url(/assets/art/back_joker.jpg) type("image/jpeg")) center/cover no-repeat;box-shadow:inset 0 0 0 2px #8E2230,inset 0 0 0 4px #E8C46A}
 
-/* Rendered card face (Oct 19): the photo sits in the window of the ivory card art; the gold court frame is for ID-verified Aces, Kings, Queens and Jacks. */
-.pcard .face.framed{padding:0;display:block;background:#F7F0E2;border-radius:4%/2.67%;color:#2B2730}
-.pcard .face.framed::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:image-set(url(/assets/art/card_face_base.webp) type("image/webp"),url(/assets/art/card_face_base.png) type("image/png")) center/100% 100% no-repeat}
-.pcard .face.framed.court::after{background-image:image-set(url(/assets/art/card_face_court.webp) type("image/webp"),url(/assets/art/card_face_court.png) type("image/png"))}
-.pcard .face.framed .fwin{position:absolute;z-index:1;left:10.3%;right:10.1%;top:12.6%;bottom:28.1%;container-type:inline-size;background:#33473a}
-.pcard .face.framed.court .fwin{left:12.6%;right:9.7%;top:12.9%}
-.pcard .face.framed .avatar{position:absolute;inset:0;width:auto;aspect-ratio:auto;border:0;border-radius:0;margin:0;font-size:28cqi}
-.pcard .face.framed .idx{position:absolute;z-index:3;top:5cqi;left:5cqi;width:auto;padding:4cqi 4.5cqi 3.5cqi;border-radius:7cqi;background:rgba(250,247,240,.94);box-shadow:0 1px 4px rgba(43,39,48,.3);font-size:clamp(.7rem,13cqi,1.2rem);color:#2B2730}
-.pcard.red .face.framed .idx{color:#B3172F}
-.pcard .face.framed .idx .pip{width:clamp(9px,11cqi,17px);height:clamp(9px,11cqi,17px)}
-.pcard .face.framed .fwin>.jm{position:absolute;z-index:3;top:5cqi;right:5cqi;margin:0;padding:3cqi 4.5cqi;border-radius:999px;background:rgba(250,247,240,.94);box-shadow:0 1px 4px rgba(43,39,48,.3);font-size:clamp(.5rem,7.5cqi,.64rem);letter-spacing:.03em}
-.pcard .face.framed .fbtns{position:absolute;z-index:3;left:0;right:0;bottom:5cqi;margin:0;gap:4cqi}
-.pcard .face.framed .fb{background:rgba(250,247,240,.94);box-shadow:0 1px 4px rgba(43,39,48,.3);font-size:clamp(.52rem,8cqi,.66rem);padding:3.5cqi 5.5cqi}
-.pcard .face.framed .fb.gold{background:linear-gradient(180deg,#FFF3C4,#E8C46A)}
-.pcard .face.framed .fband{position:absolute;z-index:3;left:11%;right:11%;top:75.5%;bottom:7.5%;container-type:inline-size;display:grid;align-content:center;justify-items:center;gap:3%;text-align:center}
-.pcard .face.framed.court .fband{top:75%;bottom:10%}
-.pcard .face.framed .title{margin:0;font:800 clamp(.68rem,11.5cqi,1.12rem)/1.05 var(--display);color:#2B2730;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pcard .face.framed .style{display:inline-flex;align-items:center;gap:.3em;font-size:clamp(.5rem,7.6cqi,.7rem);letter-spacing:.06em;color:#4A4552;white-space:nowrap}
-.pcard.red .face.framed .style{color:#8E2230}
-.pcard .face.framed .style .pip{width:1.1em;height:1.1em}
-.pcard .face.framed .style .dist{font-size:inherit;letter-spacing:.02em;color:#4A4552;font-weight:700}
-.pcard.kept .face.framed,.pcard.played .face.framed{border-radius:4%/2.67%}
 /* Joker face: keep the corner J clear of the date line. */
 .pcard.jokercard .face .center{padding-bottom:30px;margin-top:-30px}
 .pcard.jokercard .face .dist{font-size:.66rem}
 .pcard.jokercard .face .style{font-size:.62rem;letter-spacing:.06em}
 .pcard.jokercard .face .jhat{width:66%}
+
+/* Rendered card face (Oct 19). Layout is measured against the art (1024 × 1536):
+   photo window, a top strip for the corner index, and a nameplate with the name on the left and the turned index on the right.
+   Gold court frame = ID-verified Aces, Kings, Queens and Jacks. All sizes scale with the card (cqw = 1% of card width). */
+@font-face{font-family:"SF Card";src:url(/assets/art/Gloock-Regular.woff) format("woff");font-display:swap}
+@font-face{font-family:"SF Card SC";src:url(/assets/art/ArsenalSC-Regular.woff) format("woff");font-display:swap}
+.pcard .face.framed{padding:0;display:block;background:#F7F0E2;border-radius:4%/2.8%;color:#2B2730;container-type:inline-size}
+.pcard .face.framed::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:image-set(url(/assets/art/card_face_base.webp) type("image/webp"),url(/assets/art/card_face_base.png) type("image/png")) center/100% 100% no-repeat}
+.pcard .face.framed.court::after{background-image:image-set(url(/assets/art/card_face_court.webp) type("image/webp"),url(/assets/art/card_face_court.png) type("image/png"))}
+/* Photo window */
+.pcard .face.framed .fwin{position:absolute;z-index:1;left:10.4%;right:10.2%;top:12.7%;bottom:28.2%;background:#33473a}
+.pcard .face.framed.court .fwin{left:12.7%;right:9.8%;top:13%;bottom:28.2%}
+.pcard .face.framed .avatar{position:absolute;inset:0;width:auto;aspect-ratio:auto;border:0;border-radius:0;margin:0;font:400 22cqw/1 "SF Card",Georgia,serif}
+/* Corner index: classic serif rank with its suit */
+.pcard .face.framed .fidx{position:absolute;z-index:4;display:inline-flex;align-items:center;gap:.06em;font:400 9.6cqw/1 "SF Card",Georgia,serif;color:#23202A;pointer-events:none;white-space:nowrap}
+.pcard.red .face.framed .fidx{color:#A3192E}
+.pcard .face.framed .fidx .pip{width:.74em;height:.74em;margin:0 0 .04em}
+.pcard .face.framed .fidx.tl{left:11.2%;top:5.1%}
+.pcard .face.framed .fband .fidx{position:static;transform:rotate(180deg);align-self:end;margin-bottom:.1em}
+.pcard .face.framed.court .fidx{padding:.12em .3em .1em;border-radius:.22em;background:#FBF5E6;box-shadow:0 0 0 1px #C49A45,inset 0 0 0 2px #FBF5E6,inset 0 0 0 2.6px rgba(196,154,69,.55)}
+.pcard .face.framed.court .fidx.tl{left:13.6%;top:4.6%}
+.pcard .face.framed.court .fband .fidx{align-self:center;margin:0}
+/* Nameplate */
+.pcard .face.framed .fband{position:absolute;z-index:3;left:12%;right:12%;top:77%;bottom:7.6%;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:3cqw}
+.pcard .face.framed.court .fband{left:13.5%;right:13.5%;top:75.6%;bottom:15.8%}
+.pcard .face.framed .fname{min-width:0;display:grid;gap:1.4cqw;text-align:left}
+.pcard .face.framed .title{margin:0;font:400 10.4cqw/1 "SF Card",Georgia,serif;letter-spacing:0;text-transform:none;color:#23202A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard .face.framed .style{display:block;margin:0;font:400 6.6cqw/1 "SF Card SC",Georgia,serif;letter-spacing:.06em;text-transform:none;color:#6A6070;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard .face.framed .style b{font-weight:400;color:#23202A}
+.pcard.red .face.framed .style b{color:#A3192E}
+/* Overlays on the photo: engraved ivory tags, not app pills */
+.pcard .face.framed .fwin>.jm{position:absolute;z-index:3;top:3.4cqw;right:3.4cqw;margin:0;padding:1.4cqw 2.6cqw 1.2cqw;border-radius:1.6cqw;background:rgba(251,245,230,.94);box-shadow:0 0 0 1px rgba(196,154,69,.7);font:400 5.6cqw/1 "SF Card SC",Georgia,serif;letter-spacing:.06em;text-transform:none;color:#4A4552}
+.pcard .face.framed .fwin>.jm.warm{color:#8A5A1C}.pcard .face.framed .fwin>.jm.hot{color:#A3192E}
+.pcard .face.framed .fbtns{position:absolute;z-index:3;left:0;right:0;bottom:3.4cqw;margin:0;display:flex;justify-content:center;gap:2.4cqw}
+.pcard .face.framed .fb{padding:1.8cqw 3.6cqw 1.5cqw;border-radius:1.6cqw;background:rgba(251,245,230,.94);box-shadow:0 0 0 1px rgba(196,154,69,.7);font:400 6.2cqw/1 "SF Card SC",Georgia,serif;letter-spacing:.06em;color:#23202A}
+.pcard .face.framed .fb.gold{background:linear-gradient(180deg,#FBEFC8,#E6C574);box-shadow:0 0 0 1px #B8862F;color:#4A3410}
+.pcard .face.framed .fb:focus-visible{outline:2px solid #B8862F;outline-offset:1px}
+.pcard .face.framed .fidx.tl{top:5.9%}
+.pcard .face.framed.court .fband{left:16.5%;right:14%}
+/* Joker card: same card typography as every other face */
+.pcard.jokercard .face .idx{font:400 1.45rem/1 "SF Card",Georgia,serif}
+.pcard.jokercard .face .title{font:400 1.18rem/1.05 "SF Card",Georgia,serif;text-transform:none;letter-spacing:0}
+.pcard.jokercard .face .dist{font:400 .72rem/1.2 "SF Card SC",Georgia,serif;letter-spacing:.05em;color:#1E5A3E}
+.pcard.jokercard .face .style{font:400 .7rem/1.2 "SF Card SC",Georgia,serif;letter-spacing:.06em;text-transform:none}
+.pcard .face.framed .fidx.tl{top:5.3%;font-size:9.2cqw}
+.pcard .face.framed.court .fband{right:13%;column-gap:2cqw}
+.pcard .face.framed.court .style{font-size:6cqw;letter-spacing:.03em}
+.pcard .face.framed.court .title{font-size:9.8cqw}
