@@ -1138,3 +1138,31 @@ html[data-play="day"] .wildband .wb.red b{color:#A11C30}
 .pcard .cover .cv-in.houseback{background:image-set(url(/assets/art/back_lattice.webp) type("image/webp"),url(/assets/art/back_lattice.png) type("image/png")) center/100% 100% no-repeat,
   radial-gradient(120% 90% at 50% 40%,color-mix(in srgb,var(--felt) 88%,#fff),var(--felt) 60%,color-mix(in srgb,var(--felt) 70%,#0C120F))}
 .pcard .cover .cv-in.jkback{background:image-set(url(/assets/art/back_joker.webp) type("image/webp"),url(/assets/art/back_joker.jpg) type("image/jpeg")) center/cover no-repeat;box-shadow:inset 0 0 0 2px #8E2230,inset 0 0 0 4px #E8C46A}
+
+/* Rendered card face (Oct 19): the photo sits in the window of the ivory card art; the gold court frame is for ID-verified Aces, Kings, Queens and Jacks. */
+.pcard .face.framed{padding:0;display:block;background:#F7F0E2;border-radius:4%/2.67%;color:#2B2730}
+.pcard .face.framed::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:image-set(url(/assets/art/card_face_base.webp) type("image/webp"),url(/assets/art/card_face_base.png) type("image/png")) center/100% 100% no-repeat}
+.pcard .face.framed.court::after{background-image:image-set(url(/assets/art/card_face_court.webp) type("image/webp"),url(/assets/art/card_face_court.png) type("image/png"))}
+.pcard .face.framed .fwin{position:absolute;z-index:1;left:10.3%;right:10.1%;top:12.6%;bottom:28.1%;container-type:inline-size;background:#33473a}
+.pcard .face.framed.court .fwin{left:12.6%;right:9.7%;top:12.9%}
+.pcard .face.framed .avatar{position:absolute;inset:0;width:auto;aspect-ratio:auto;border:0;border-radius:0;margin:0;font-size:28cqi}
+.pcard .face.framed .idx{position:absolute;z-index:3;top:5cqi;left:5cqi;width:auto;padding:4cqi 4.5cqi 3.5cqi;border-radius:7cqi;background:rgba(250,247,240,.94);box-shadow:0 1px 4px rgba(43,39,48,.3);font-size:clamp(.7rem,13cqi,1.2rem);color:#2B2730}
+.pcard.red .face.framed .idx{color:#B3172F}
+.pcard .face.framed .idx .pip{width:clamp(9px,11cqi,17px);height:clamp(9px,11cqi,17px)}
+.pcard .face.framed .fwin>.jm{position:absolute;z-index:3;top:5cqi;right:5cqi;margin:0;padding:3cqi 4.5cqi;border-radius:999px;background:rgba(250,247,240,.94);box-shadow:0 1px 4px rgba(43,39,48,.3);font-size:clamp(.5rem,7.5cqi,.64rem);letter-spacing:.03em}
+.pcard .face.framed .fbtns{position:absolute;z-index:3;left:0;right:0;bottom:5cqi;margin:0;gap:4cqi}
+.pcard .face.framed .fb{background:rgba(250,247,240,.94);box-shadow:0 1px 4px rgba(43,39,48,.3);font-size:clamp(.52rem,8cqi,.66rem);padding:3.5cqi 5.5cqi}
+.pcard .face.framed .fb.gold{background:linear-gradient(180deg,#FFF3C4,#E8C46A)}
+.pcard .face.framed .fband{position:absolute;z-index:3;left:11%;right:11%;top:75.5%;bottom:7.5%;container-type:inline-size;display:grid;align-content:center;justify-items:center;gap:3%;text-align:center}
+.pcard .face.framed.court .fband{top:75%;bottom:10%}
+.pcard .face.framed .title{margin:0;font:800 clamp(.68rem,11.5cqi,1.12rem)/1.05 var(--display);color:#2B2730;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard .face.framed .style{display:inline-flex;align-items:center;gap:.3em;font-size:clamp(.5rem,7.6cqi,.7rem);letter-spacing:.06em;color:#4A4552;white-space:nowrap}
+.pcard.red .face.framed .style{color:#8E2230}
+.pcard .face.framed .style .pip{width:1.1em;height:1.1em}
+.pcard .face.framed .style .dist{font-size:inherit;letter-spacing:.02em;color:#4A4552;font-weight:700}
+.pcard.kept .face.framed,.pcard.played .face.framed{border-radius:4%/2.67%}
+/* Joker face: keep the corner J clear of the date line. */
+.pcard.jokercard .face .center{padding-bottom:30px;margin-top:-30px}
+.pcard.jokercard .face .dist{font-size:.66rem}
+.pcard.jokercard .face .style{font-size:.62rem;letter-spacing:.06em}
+.pcard.jokercard .face .jhat{width:66%}
