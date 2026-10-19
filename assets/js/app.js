@@ -1570,7 +1570,9 @@
     else if (/bio/i.test(m)) { el = F.bio; msg = "Your Face Value is too long (500 characters max)."; }
     else if (/Pick up to 3 answers for (\w+)/.test(m)) { var k = m.match(/for (\w+)/)[1]; el = $('.idf[data-k="' + k + '"]'); msg = "Pick up to 3."; }
     else if (/top3|cardinality/i.test(m)) { el = $('[data-tab="look"]'); msg = "Pick your top 3 at most for each Looking for question."; }
-    if (el) faceProblems([{ el: el, label: fieldLabel(el), msg: msg }]); else toast("Couldn't save: " + m);
+    else if (/member_identity|member_preferences|question/i.test(m)) { var tab = /preferences/i.test(m) ? "look" : "about"; var tb = $('.ftabs [data-ft="' + tab + '"]'); if (tb) tb.click(); el = $('[data-tab="' + tab + '"]'); msg = "One of your answers here didn't save. Check it and tap Save my Face again."; }
+    try { console.error("Face save:", m); } catch (e) { }
+    if (el) faceProblems([{ el: el, label: fieldLabel(el), msg: msg }]); else toast("Your Face didn't save. Tap Save my Face again. If it keeps happening, tap Help and we'll fix it.");
   }
   $("#faceForm").addEventListener("submit", function (e) {
     e.preventDefault();
