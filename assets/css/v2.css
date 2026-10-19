@@ -1644,3 +1644,26 @@ body.sfplain .pcard .fidx,body.sfplain .pcard .idx,body.sfplain .pcard .fname .s
 .cbo b{font-size:.9rem}.cbo small{font-size:.75rem;color:var(--muted)}
 .cbo.live{border-color:#C9A24E}
 .cbh .free{display:inline-block;vertical-align:middle;font:700 .75rem var(--body);letter-spacing:0;padding:3px 10px;border-radius:999px;background:#E2C47E;color:#12382B;margin-left:6px}
+
+/* ===== High Roller Room (Oct 19): obsidian felt, champagne rail, platinum deck ===== */
+body.hr-mode{background:radial-gradient(70% 45% at 50% -8%,rgba(226,196,126,.28),transparent 60%),linear-gradient(180deg,#F7F3EA,#EFE8DA)!important}
+body.hr-mode #table .feltbox{position:relative;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 0%,rgba(226,196,126,.16),transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M14 6l4 8-4 8-4-8z' fill='%23E2C47E' opacity='.07'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 30%,#14302A,#0B1A16 72%)!important;
+  border:0!important;border-radius:26px!important;
+  box-shadow:inset 0 0 0 1px rgba(255,236,190,.55),inset 0 0 0 6px #0B1A16,inset 0 0 0 7px rgba(226,196,126,.6),0 30px 60px -30px rgba(11,26,22,.8)!important}
+body.hr-mode #table .feltbox::before{content:"";position:absolute;inset:-30%;pointer-events:none;background:linear-gradient(115deg,transparent 44%,rgba(255,240,200,.10) 50%,transparent 56%);animation:hrfelt 9s ease-in-out infinite}
+@keyframes hrfelt{0%,40%{transform:translateX(-45%)}100%{transform:translateX(45%)}}
+body.hr-mode #table .feltbox>*{position:relative}
+body.hr-mode #table .pile-info .stacklbl{color:#F3DFA6}
+body.hr-mode #table .pile-info .stacklbl::after{content:" · High Roller";font-weight:600;font-size:.8em;color:#C9CCD3}
+/* the Stack in platinum: moiré, diamond pips, slow light sweep */
+body.hr-mode #pile .cb{overflow:hidden;border:5px solid #F4F4F1;
+  background:radial-gradient(circle,#fff 0 1px,transparent 1.6px) 0 0/10px 10px,
+    linear-gradient(135deg,#F7F7F5 0%,#D6D8DE 20%,#FFFFFF 36%,#C3C6CE 54%,#EEF0F2 70%,#B4B7BF 88%,#E9EAEC 100%);
+  box-shadow:inset 0 0 0 2px #E2C47E,inset 0 0 0 4px #FFF3C4,0 10px 22px -10px rgba(0,0,0,.6),0 0 18px rgba(226,196,126,.35)}
+body.hr-mode #pile .cb:last-child::before{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%);animation:hrsweep 5.5s ease-in-out infinite}
+body.hr-mode #pile .cb:last-child::after{inset:30%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2l7 10-7 10-7-10z' fill='%2312382B'/%3E%3Cpath d='M12 5l5 7-5 7-5-7z' fill='none' stroke='%23E2C47E' stroke-width='1'/%3E%3C/svg%3E") center/contain no-repeat;filter:drop-shadow(0 1px 0 rgba(255,255,255,.8))}
+body.hr-mode #table .deck-bar .btn.gold{background:linear-gradient(180deg,#F3DFA6,#C9A24E);color:#12382B}
+@media (prefers-reduced-motion:reduce){body.hr-mode #table .feltbox::before,body.hr-mode #pile .cb:last-child::before{animation:none;opacity:0}}
