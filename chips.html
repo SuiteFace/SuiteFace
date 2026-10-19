@@ -79,10 +79,10 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792430566">
-<script src="/assets/js/transit.js?v=1792430566"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792430566">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792430566">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792431413">
+<script src="/assets/js/transit.js?v=1792431413"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792431413">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792431413">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 </head>
 <body data-page="chips">
@@ -176,15 +176,14 @@
         <a href="joker-lobby.html" data-need="member" class="clubnav"><b>Joker Lobby</b><small>Make or challenge a Joker</small></a>
       </div></div>
       <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-club">Lounge</button><div class="ngp" id="ngp-club">
-        <a href="my-table.html" data-pgnav="club" data-need="member"><b>My Lounge</b><small>Your card, settings and invites</small></a>
-        <a href="my-table.html#pairs" data-need="member" class="clubnav"><b>Your Pairs</b><small>Chat, video and Play Hand</small></a>
+        <a href="my-table.html#face" data-need="member" class="clubnav"><b>My profile</b><small>Your photo, answers and who you want to meet</small></a>
+        <a href="my-table.html#lobby" data-need="member" class="clubnav"><b>Style my card</b><small>Themes, stickers and card backs</small></a>
+        <a href="my-table.html#pairs" data-need="member" class="clubnav"><b>Matches and chat</b><small>Your Pairs: chat, video, plan a date</small></a>
         <a href="my-table.html#crews" data-need="member" class="clubnav"><b>Double dates</b><small>Team up with a friend</small></a>
         <a href="my-table.html#friends" data-need="member" class="clubnav"><b>Friends</b><small>Who's online</small></a>
-        <a href="my-table.html#lobby" data-need="member" class="clubnav"><b>Your Lobby</b><small>Decorate your card</small></a>
-        <a href="card-backs.html" data-pgnav="backs" data-need="member" class="clubnav"><b>Card Backs</b><small>Wear what you love</small></a>
         <a href="membership.html#highroller" data-need="member" class="clubnav"><b>💎 High Roller Room</b><small>Verified high-limit room</small></a>
         <a href="winners.html" data-pgnav="winners"><b>Winners' Row</b><small>Couples who met here</small></a>
-        <a href="membership.html" data-pgnav="membership"><b>Your seat</b><small>$21 a year · free through Dec 31</small></a>
+        <a href="membership.html" data-pgnav="membership"><b>Account and seat</b><small>Your $21 seat, billing and settings</small></a>
       </div></div>
       <div class="ng ngstaff"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-staff">Staff</button><div class="ngp" id="ngp-staff">
         <a href="my-table.html#dealer" data-need="dealer"><b>Dealer</b><small>Dealer console</small></a>
@@ -772,7 +771,7 @@
   <!-- ============ JOIN / CONTACT ============ -->
   <section data-pg="backs" id="backs" aria-labelledby="backsTitle">
     <div class="wrap">
-      <a class="btn ghost sm backlobby" href="my-table.html#lobby" hidden>‹ Back to Your Lobby</a>
+      <a class="btn ghost sm backlobby" href="my-table.html#lobby" hidden>‹ Back to Style my card</a>
       <div class="sec-head">
         <p class="eyebrow">Card Backs</p>
         <h1 id="backsTitle">Wear what you love on the back of your card.</h1>
@@ -781,6 +780,8 @@
       <h2 class="cbh">Special releases <span class="free">Free</span></h2>
       <p class="hint">Limited designs from the house. Free to every player while they're out.</p>
       <div class="cbgal" id="cbGallery"></div>
+      <div id="cbPictures" hidden><h2 class="cbh">Places and passions <span class="free">Free</span></h2><p class="hint">Beaches, cities, getaways and the arts. Pick the one that says something about you.</p><div id="cbPicGal"></div></div>
+      <div id="cbOwner" class="cbowner" hidden><h2 class="cbh">Owner review: picture backs</h2><p class="hint" id="cbOwnerSum"></p><div class="cbogal" id="cbOwnerGal"></div></div>
       <h2 class="cbh">Coming to the table</h2>
       <div class="cbkinds">
         <div><b>🎬 Studios and entertainment</b><span>Official designs from the films, parks and shows you grew up on, made with the companies that own them.</span></div>
@@ -1008,15 +1009,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792430566"></script>
-<script src="/assets/js/sign.js?v=1792430566"></script>
-<script src="/assets/js/live.js?v=1792430566"></script>
-<script src="/assets/js/gate.js?v=1792430566"></script>
-<script src="/assets/js/fx.js?v=1792430566"></script>
-<script src="/assets/js/casino-scene.js?v=1792430566"></script>
-<script src="/assets/js/chips.js?v=1792430566"></script>
-<script src="/assets/js/bumpers.js?v=1792430566"></script>
-<script src="/assets/js/slots.js?v=1792430566"></script>
-<script src="/assets/js/app.js?v=1792430566"></script>
+<script src="/assets/js/config.js?v=1792431413"></script>
+<script src="/assets/js/sign.js?v=1792431413"></script>
+<script src="/assets/js/live.js?v=1792431413"></script>
+<script src="/assets/js/gate.js?v=1792431413"></script>
+<script src="/assets/js/fx.js?v=1792431413"></script>
+<script src="/assets/js/casino-scene.js?v=1792431413"></script>
+<script src="/assets/js/chips.js?v=1792431413"></script>
+<script src="/assets/js/bumpers.js?v=1792431413"></script>
+<script src="/assets/js/slots.js?v=1792431413"></script>
+<script src="/assets/js/app.js?v=1792431413"></script>
 </body>
 </html>

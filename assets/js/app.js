@@ -1583,7 +1583,7 @@
   }
   function serverProblem(x) {
     var m = String((x && x.message) || x || ""), el = null, msg = m;
-    if (/handle|duplicate key.*handle|members_handle/i.test(m)) { el = F.handle; msg = "That Calling Card is taken or not allowed. Try another."; }
+    if (/handle|duplicate key.*handle|members_handle/i.test(m)) { el = F.handle; msg = m.replace(/^handle: /, "") || "That username is taken or not allowed. Try another."; }
     else if (/birth|dob|18/i.test(m)) { el = $("#dobM") || $("#fAgeErr"); msg = "Check your birthday. SuiteFace is for adults 18 and over."; }
     else if (/zip/i.test(m)) { el = F.zip; msg = "Check your ZIP code."; }
     else if (/face_name|name/i.test(m)) { el = F.name; msg = "Check your name (1–40 characters)."; }
@@ -1764,15 +1764,39 @@
     "midnight-neon": ["Midnight Neon", "Pink and gold neon on a dark sign board."],
     "sunday-best": ["Sunday Best", "Ivory linen with a classic double topstitch. For the ones who never miss Sunday."]
   };
-  function cbPreview(id, size) { return '<div class="pcard cbmini" style="--w:' + (size || 120) + 'px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in cb-' + id + '">' + medalFor(null) + "</div></div></div></div>"; }
+  /* Picture card backs (destinations, getaways, arts): loaded from the server; only approved ones are live. */
+  var PICB = {};
+  function picBackStyle(id) { var b = PICB[id]; return b ? ' style="background:#1d2a25 url(\'' + esc(b.image) + '\') center/cover no-repeat"' : ""; }
+  function cbInClass(id) { return CB[id] ? " cb-" + id : PICB[id] ? " picback" : " houseback"; }
+  function cbPreview(id, size) { return '<div class="pcard cbmini" style="--w:' + (size || 120) + 'px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in' + cbInClass(id) + '"' + picBackStyle(id) + ">" + medalFor(null) + "</div></div></div></div>"; }
+  function cbTile(id, name, line) { var on = P.cardBack === id; return '<div class="cbitem' + (on ? " on" : "") + '">' + cbPreview(id, 132) + "<b>" + esc(name) + "</b><span>" + esc(line) + '</span><button type="button" class="btn ' + (on ? "ghost" : "gold") + ' sm" data-cbuse="' + id + '">' + (on ? "On your card ✓" : "Use this back") + "</button></div>"; }
   function renderCardBacks() {
     var g = $("#cbGallery"); if (!g) return;
-    g.innerHTML = Object.keys(CB).map(function (id) { var on = P.cardBack === id; return '<div class="cbitem' + (on ? " on" : "") + '">' + cbPreview(id, 132) + "<b>" + esc(CB[id][0]) + "</b><span>" + esc(CB[id][1]) + '</span><button type="button" class="btn ' + (on ? "ghost" : "gold") + ' sm" data-cbuse="' + id + '">' + (on ? "On your card ✓" : "Use this back") + "</button></div>"; }).join("");
+    g.innerHTML = Object.keys(CB).map(function (id) { return cbTile(id, CB[id][0], CB[id][1]); }).join("");
+    var pg = $("#cbPictures"), ids = Object.keys(PICB);
+    if (pg) { pg.hidden = !ids.length; var groups = {};
+      ids.forEach(function (id) { var g2 = (PICB[id].tagline || "").split(" · ")[0] || "More"; (groups[g2] = groups[g2] || []).push(id); });
+      $("#cbPicGal").innerHTML = Object.keys(groups).map(function (g2) { return '<h3 class="cbgrp">' + esc(g2) + '</h3><div class="cbgal">' + groups[g2].map(function (id) { return cbTile(id, PICB[id].name, (PICB[id].tagline || "").split(" · ")[1] || ""); }).join("") + "</div>"; }).join(""); }
   }
+  function loadPicBacks() { (window.SF_LIVE ? lrpc("card_backs_live") : window.SF_rpc ? window.SF_rpc("card_backs_live", {}) : Promise.reject()).then(function (rows) { PICB = {}; (rows || []).forEach(function (r) { PICB[r.id] = r; }); renderCardBacks(); if (typeof renderCard === "function") try { renderCard(); } catch (e) { } }, function () { }); }
+  setTimeout(loadPicBacks, 50);
+  /* Owner review: approve each picture back before members can choose it. */
+  function ownerBacks() {
+    var el = $("#cbOwner"); if (!el) return; if (ROLE !== "owner" || !liveOn()) { el.hidden = true; return; }
+    el.hidden = false; $("#cbOwnerGal").innerHTML = '<p class="hint">Loading…</p>';
+    lrpc("owner_card_backs").then(function (rows) {
+      var live = rows.filter(function (r) { return r.status === "live"; }).length;
+      $("#cbOwnerSum").textContent = live + " of " + rows.length + " are live. Members only see live backs.";
+      $("#cbOwnerGal").innerHTML = rows.map(function (r) { return '<div class="cbo ' + r.status + '"><img src="' + esc(r.image) + '" alt="" loading="lazy" width="120" height="180"><b>' + esc(r.name) + "</b><small>" + esc(r.tagline || "") + (r.using ? " · " + r.using + " using" : "") + '</small><button type="button" class="btn ' + (r.status === "live" ? "ghost" : "gold") + ' sm" data-cbo="' + esc(r.id) + '" data-to="' + (r.status === "live" ? "draft" : "live") + '">' + (r.status === "live" ? "Live ✓ · Pull" : "Approve") + "</button></div>"; }).join("");
+    }, function (x) { $("#cbOwnerGal").innerHTML = '<p class="err">' + esc(x.message) + "</p>"; });
+  }
+  document.addEventListener("sf:live", function () { setTimeout(ownerBacks, 800); loadPicBacks(); });
+  document.addEventListener("click", function (e) { var b = e.target.closest && e.target.closest("[data-cbo]"); if (!b) return;
+    b.disabled = true; lrpc("owner_set_card_back_status", { p_id: b.getAttribute("data-cbo"), p_status: b.getAttribute("data-to") }).then(function () { ownerBacks(); loadPicBacks(); }, function (x) { b.disabled = false; toast(x.message); }); });
   document.addEventListener("click", function (e) {
     var b = e.target.closest("[data-cbuse]"); if (!b) return; var id = b.getAttribute("data-cbuse");
     if (P.cardBack === id) { id = null; }
-    var done = function () { P.cardBack = id; saveP(); renderCardBacks(); renderCard(); toast(id ? CB[id][0] + " is on the back of your card." : "Back to the house design."); if (id) jackpot(1500); };
+    var done = function () { P.cardBack = id; saveP(); renderCardBacks(); renderCard(); toast(id ? (CB[id] ? CB[id][0] : PICB[id] ? PICB[id].name : "That back") + " is on the back of your card." : "Back to the house design."); if (id) jackpot(1500); };
     if (liveOn()) lrpc("set_my_card_back", { p_back: id }).then(done, function (er) { toast(er.message); }); else done();
   });
   (function () {
@@ -1784,7 +1808,7 @@
       out.textContent = "Sending…";
       fetch(CFG.supabaseUrl + "/rest/v1/rpc/submit_card_back_application", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + CFG.supabaseKey }, body: JSON.stringify(a) })
         .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.message || "Couldn't send."); return j; }); })
-        .then(function () { out.textContent = ""; f.innerHTML = '<h3>Thank you.</h3><p class="lede">We\'ll review your application and email you within a few business days about rights, design and launch.</p>' + (liveOn() ? '<div class="row"><a class="btn gold" href="my-table.html#lobby">‹ Back to Your Lobby</a></div>' : ""); }, function (er) { out.textContent = er.message; });
+        .then(function () { out.textContent = ""; f.innerHTML = '<h3>Thank you.</h3><p class="lede">We\'ll review your application and email you within a few business days about rights, design and launch.</p>' + (liveOn() ? '<div class="row"><a class="btn gold" href="my-table.html#lobby">‹ Back to Style my card</a></div>' : ""); }, function (er) { out.textContent = er.message; });
     });
   })();
   setTimeout(renderCardBacks, 0);
@@ -1903,7 +1927,7 @@
     extra += Math.max(0, items.length - room);
     var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 3, size: 14 }) : "";
     if (extra) stick += '<span class="cv-more" title="' + extra + ' more under More">+' + extra + "</span>";
-    return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.joker ? " jkback" : p.cardBack && CB[p.cardBack] ? " cb-" + p.cardBack : " houseback") + '">' +
+    return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.joker ? " jkback" : p.cardBack ? cbInClass(p.cardBack) : " houseback") + '"' + (!p.joker && p.cardBack ? picBackStyle(p.cardBack) : "") + ">" +
       medalFor(p) +
       (p.couple ? '<div class="cv-couple">🍍 Couple' + (p.couple.name ? " · with " + esc(p.couple.name) : "") + "</div>" : "") + (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
       '<div class="cv-tap">Tap to flip</div></div>' + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>";
@@ -4419,13 +4443,14 @@
     var L = window.SF_LIVE, db = L.client, mid = L.memberId(), by = (/^\d{4}/.exec(P.dob || "") || [])[0];
     var row = { face_name: (P.name || "").trim().slice(0, 40) || null, bio: (P.bio || "").slice(0, 500) || null, home_zip: /^\d{5}$/.test(P.zip || "") ? P.zip : null,
       style_suit: SUIT[P.mySuit] ? P.mySuit : null, looking_for: TABLE[P.looking] ? P.looking : "longterm", interests: P.interests || [], gender: genderCode(), birth_year: by ? +by : null };
-    if (/^[a-z0-9._]{3,24}$/.test(P.handle || "")) row.handle = P.handle;
+    var wantHandle = /^[a-z0-9._]{3,24}$/.test(P.handle || "") ? P.handle : null; // saved through set_my_handle (safety checks)
     var ids = IDF.map(function (f) { return { member_id: mid, question: f[0], answers: asList(P.id[f[0]]).filter(Boolean), face_up: P.vis[f[0]] === undefined ? !f[5] : !!P.vis[f[0]] }; }).filter(function (r) { return r.answers.length; });
     var prefs = Object.keys(P.prefs || {}).map(function (k) { var pr = P.prefs[k] || {}; return { member_id: mid, question: k, wanted: (pr.sel || []).filter(function (x) { return x !== OPEN; }), dealbreaker: !!pr.deal }; }).filter(function (r) { return r.wanted.length; });
     function uniq(list) { var seen = {}; return list.filter(function (r) { if (seen[r.question]) return false; seen[r.question] = 1; return true; }); }
     ids = uniq(ids); prefs = uniq(prefs);
     function chk(r) { if (r && r.error) throw r.error; return r; }
     return db.from("members").update(row).eq("id", mid).then(chk)
+      .then(function () { return wantHandle ? lrpc("set_my_handle", { p_handle: wantHandle, p_name: null }).catch(function (e) { throw new Error("handle: " + e.message); }) : null; })
       .then(function () { return db.from("strategies").upsert({ member_id: mid, trump_order: P.trumps, show_me: P.show || "everyone", age_min: P.ageMin, age_max: P.ageMax, radius_miles: P.dist, verified_only: P.verifiedOnly || "any" }).then(chk); })
       .then(function () { return ids.length ? db.from("member_identity").upsert(ids).then(chk) : null; })
       .then(function () { return db.from("member_preferences").delete().eq("member_id", mid).then(chk); })
@@ -4788,7 +4813,7 @@
         : '<div class="lb-spot" data-spot="' + i + '"><span class="lb-n">' + (i + 1) + '</span><div class="lb-art lb-empty">+</div><small>Drag a sticker here</small></div>'; }).join("") +
       (more.length ? '<p class="hint lb-more">Under <b>More</b>: ' + more.map(function (s) { return '<span class="lb-mini">' + s[1] + "</span>"; }).join(" ") + "</p>" : "");
     lobbyPane();
-    var cb = P.cardBack && CB[P.cardBack];
+    var cb = P.cardBack && (CB[P.cardBack] || (PICB[P.cardBack] ? [PICB[P.cardBack].name] : null));
     $("#lbBack").innerHTML = '<div class="lb-backrow">' + (typeof cbPreview === "function" ? cbPreview(P.cardBack || null, 74) : "") + '<div><h3>Card back</h3><p class="hint">' + (cb ? "<b>" + esc(cb[0]) + "</b> is on the back of your card." : "You're using the house design.") + '</p><a class="btn ghost sm" href="card-backs.html">Choose a card back</a></div></div>';
   }
   /* Passport: stamps earned by checking in on dates. Places outside the U.S. are named once by the player. */
@@ -5455,6 +5480,21 @@
     }, function () { });
   }
   document.addEventListener("sf:live", function () { setTimeout(loadChips, 120); });
+  /* Safety: every account picks its own username. Nothing is ever taken from the email address. */
+  function askHandle(st) {
+    var m = modal('<h3 style="font-size:1.6rem;margin:0">Pick your username</h3><p class="lede" style="margin:6px 0 14px">This is how people find and know you here. For your safety, don\'t use your email, last name or phone number.</p>' +
+      '<form id="hdForm" class="form-grid"><div class="field"><label for="hdTag">Username</label><div class="hdwrap"><span>@</span><input id="hdTag" maxlength="24" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="jordan.plays"></div><span class="hint" id="hdHint">3 to 24 letters, numbers, dots or underscores.</span></div>' +
+      '<div class="field"><label for="hdName">First name on your card</label><input id="hdName" maxlength="40" autocomplete="given-name" value="' + esc(st && st.name && st.name !== "Player" ? st.name : "") + '" placeholder="Jordan"></div>' +
+      '<button class="btn gold" type="submit">Save my username</button><p class="err" id="hdErr"></p></form>', { focus: "#hdTag" });
+    var t = $("#hdTag", m), hint = $("#hdHint", m), timer;
+    t.addEventListener("input", function () { var v = t.value.toLowerCase().replace(/^@+/, "").replace(/[^a-z0-9._]/g, ""); if (v !== t.value) t.value = v; clearTimeout(timer);
+      if (v.length < 3) { hint.textContent = "3 to 24 letters, numbers, dots or underscores."; return; }
+      timer = setTimeout(function () { window.SF_rpc("handle_available", { wanted: v }).then(function (ok) { hint.textContent = ok ? "@" + v + " is available." : "@" + v + " is taken."; }, function () { }); }, 300); });
+    $("#hdForm", m).addEventListener("submit", function (e) { e.preventDefault(); var n = $("#hdName", m).value.trim();
+      if (!n) { $("#hdErr", m).textContent = "Add the first name you go by."; return; }
+      lrpc("set_my_handle", { p_handle: t.value, p_name: n }).then(function (h) { P.handle = h; P.name = n; saveP(); if (F.handle) F.handle.value = h; if (F.name) F.name.value = n; closeModal(); renderCard(); toast("You're @" + h + "."); jackpot(1500); }, function (x) { $("#hdErr", m).textContent = x.message; }); });
+  }
+  document.addEventListener("sf:live", function () { setTimeout(function () { if (!window.SF_LIVE) return; lrpc("my_handle_status").then(function (st) { if (st && st.chosen === false) askHandle(st); }, function () { }); }, 700); });
   document.addEventListener("submit", function (e) {
     var f = e.target.closest && e.target.closest("[data-chipcomp]"); if (!f) return; e.preventDefault();
     var v = ($("input", f).value || "").trim(), out = $("[data-compmsg]", f);

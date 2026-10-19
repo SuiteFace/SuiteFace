@@ -1632,3 +1632,15 @@ body.sfplain .pcard .fidx,body.sfplain .pcard .idx,body.sfplain .pcard .fname .s
 @media (max-width:520px){.cagebtn{padding:.36rem .6rem;font-size:.78rem}}
 @media (max-width:520px){.who:has(#chipBal:not([hidden])) .cagebtn{display:none}}
 @media (max-width:520px){.who .rolechip{display:none}}
+.hdwrap{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--ink-2);padding-left:12px}.hdwrap span{color:var(--muted);font-weight:700}.hdwrap input{border:0!important;background:transparent!important;flex:1;box-shadow:none!important}
+/* Picture card backs */
+.pcard .cover .cv-in.picback{box-shadow:none}
+.pcard .cover .cv-in.picback .cv-tap{color:rgba(255,255,255,.75);text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.cbgrp{font-size:1rem;margin:18px 0 8px}
+.cbowner{margin-top:28px;padding-top:18px;border-top:1px solid var(--line)}
+.cbogal{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
+.cbo{display:grid;gap:4px;justify-items:center;text-align:center;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--ink)}
+.cbo img{width:100%;max-width:120px;height:auto;border-radius:8px}
+.cbo b{font-size:.9rem}.cbo small{font-size:.75rem;color:var(--muted)}
+.cbo.live{border-color:#C9A24E}
+.cbh .free{display:inline-block;vertical-align:middle;font:700 .75rem var(--body);letter-spacing:0;padding:3px 10px;border-radius:999px;background:#E2C47E;color:#12382B;margin-left:6px}
