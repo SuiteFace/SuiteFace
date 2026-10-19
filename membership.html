@@ -79,10 +79,10 @@
 <link rel="apple-touch-icon" href="/assets/brand/suiteface-joker-icon-cream-180.png">
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=1792430196">
-<script src="/assets/js/transit.js?v=1792430196"></script>
-<link rel="stylesheet" href="/assets/css/day.css?v=1792430196">
-<link rel="stylesheet" href="/assets/css/v2.css?v=1792430196">
+<link rel="stylesheet" href="/assets/css/site.css?v=1792430552">
+<script src="/assets/js/transit.js?v=1792430552"></script>
+<link rel="stylesheet" href="/assets/css/day.css?v=1792430552">
+<link rel="stylesheet" href="/assets/css/v2.css?v=1792430552">
 <script>try{localStorage.removeItem('sf.v3');localStorage.removeItem('sf.v4');localStorage.removeItem('sf.v4after')}catch(e){}</script>
 </head>
 <body data-page="membership">
@@ -152,6 +152,7 @@
     <div class="who">
       <button class="rolechip" type="button" id="roleBtn" aria-haspopup="dialog"><span class="dot"></span><span id="roleName">Guest</span></button>
       <a class="btn gold sm mydeckbtn" id="myDeckBtn" href="my-table.html#table" hidden>My deck</a>
+      <a class="cagebtn" href="chips.html" aria-label="The Cage: buy and spend chips">The Cage</a>
       <a class="chipbal" id="chipBal" href="chips.html" hidden aria-label="Your chips"><span class="sfchip" data-chip="2.10" data-size="22"></span><b>$0.00</b></a>
       <button class="btn gold sm" type="button" id="loginBtn">Log in</button>
     </div>
@@ -171,7 +172,7 @@
       </div></div>
       <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-play">Play</button><div class="ngp" id="ngp-play">
         <a href="my-table.html#table" data-need="member" class="clubnav"><b>Play a deck</b><small>Every card in your area for 7 days</small></a>
-        <a href="chips.html" data-pgnav="chips"><b>Chips</b><small>$2.10 plays a deck</small></a>
+        <a href="chips.html" data-pgnav="chips"><b>The Cage</b><small>Buy and spend chips</small></a>
         <a href="joker-lobby.html" data-need="member" class="clubnav"><b>Joker Lobby</b><small>Make or challenge a Joker</small></a>
       </div></div>
       <div class="ng"><button type="button" class="ngb" aria-expanded="false" aria-controls="ngp-club">Lounge</button><div class="ngp" id="ngp-club">
@@ -699,32 +700,36 @@
   </section>
 
   <section data-pg="chips" id="chips" aria-labelledby="chipsTitle">
-    <div class="wrap m2 chipspage">
-      <div class="cp-hero">
+    <div class="wrap cage">
+      <header class="cage-head">
         <div>
-          <h2 id="chipsTitle">Chips</h2>
-          <p class="lede">Buy a stack once. Every deck is one tap after that.</p>
-          <p class="cp-bal" id="cpBal" hidden></p>
+          <h2 id="chipsTitle">The Cage</h2>
+          <p class="lede">Buy chips once. Spend them on decks and extras with one tap.</p>
         </div>
-        <div class="chipplay" data-chipplay="2.10" data-stack="7"></div>
-      </div>
-      <div class="cp-stacks" role="list">
-        <button type="button" class="cp-stack" data-stack-buy="210" role="listitem"><span class="sfchip" data-chip="2.10" data-size="72"></span><b>$2.10</b><span>1 deck</span></button>
-        <button type="button" class="cp-stack best" data-stack-buy="2100" role="listitem"><span class="sfchip" data-chip="21" data-size="72"></span><b>$21</b><span>11 decks</span><i class="cp-bonus">+10% bonus · $23.10 in chips</i><em>Most players</em></button>
-        <button type="button" class="cp-stack" data-stack-buy="21000" role="listitem"><span class="sfchip" data-chip="210" data-size="72"></span><b>$210</b><span>120 decks</span><i class="cp-bonus">+20% bonus · $252 in chips</i></button>
+        <p class="cage-bal" id="cpBal" hidden></p>
+      </header>
+
+      <h3 class="cage-h">Buy chips</h3>
+      <div class="cage-stacks" role="list">
+        <button type="button" class="cage-stack" data-stack-buy="210" role="listitem"><span class="sfchip" data-chip="2.10" data-size="56"></span><span class="cs-price">$2.10</span><span class="cs-get">1 deck</span><span class="cs-note">&nbsp;</span></button>
+        <button type="button" class="cage-stack best" data-stack-buy="2100" role="listitem"><em>Most players</em><span class="sfchip" data-chip="21" data-size="56"></span><span class="cs-price">$21</span><span class="cs-get">11 decks</span><span class="cs-note">+10% bonus · $23.10 in chips</span></button>
+        <button type="button" class="cage-stack" data-stack-buy="21000" role="listitem"><span class="sfchip" data-chip="210" data-size="56"></span><span class="cs-price">$210</span><span class="cs-get">120 decks</span><span class="cs-note">+20% bonus · $252 in chips</span></button>
       </div>
       <form class="cp-comp" data-chipcomp><label for="cpComp">Comp code</label><input id="cpComp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Have a comp code?"><button class="btn ghost sm" type="submit">Apply</button><p class="hint" data-compmsg aria-live="polite"></p></form>
-      <div class="cp-uses">
-        <h3>What chips play</h3>
-        <ul>
-          <li><b>$2.10</b><span>A deck: every card in your area for 7 days</span></li>
-          <li><b>$2.10</b><span>A sticker pack, or a premium card theme</span></li>
-          <li><b>$4.20</b><span>The Vegas Neon theme</span></li>
-          <li><b>$2.10</b><span>The Raise: the Dealer preps your date</span></li>
-        </ul>
+
+      <h3 class="cage-h">Spend chips</h3>
+      <div class="cage-menu">
+        <a class="cage-item" href="my-table.html#table" data-playdeck><span class="ci-art"><img src="/assets/art/stk/b_flush.webp" alt="" width="44" height="44" loading="lazy"></span><span class="ci-txt"><b>Play a deck</b><small>Every card in your area for 7 days</small></span><span class="ci-price">$2.10</span></a>
+        <a class="cage-item" href="my-table.html#lobby"><span class="ci-art"><img src="/assets/art/stk/crown.webp" alt="" width="44" height="44" loading="lazy"></span><span class="ci-txt"><b>High Roller stickers</b><small>Nine collectible stickers for your card</small></span><span class="ci-price">$2.10</span></a>
+        <a class="cage-item" href="my-table.html#lobby"><span class="ci-art"><img src="/assets/art/stk/clap.webp" alt="" width="44" height="44" loading="lazy"></span><span class="ci-txt"><b>Showtime stickers</b><small>Nine more, for the spotlight</small></span><span class="ci-price">$2.10</span></a>
+        <a class="cage-item" href="my-table.html#lobby"><span class="ci-art ci-theme"></span><span class="ci-txt"><b>Premium card theme</b><small>Gold, midnight, velvet and more</small></span><span class="ci-price">$2.10</span></a>
+        <a class="cage-item" href="my-table.html#lobby"><span class="ci-art ci-theme neon"></span><span class="ci-txt"><b>Vegas Neon theme</b><small>The brightest card on the floor</small></span><span class="ci-price">$4.20</span></a>
+        <a class="cage-item" href="my-table.html#pairs"><span class="ci-art"><img src="/assets/art/stk/b_cheers.webp" alt="" width="44" height="44" loading="lazy"></span><span class="ci-txt"><b>The Raise</b><small>The Dealer preps your date with a Pair</small></span><span class="ci-price">$2.10</span></a>
       </div>
+      <p class="cage-free">Free with every seat: passport stamps from the cities where you meet, your earned coins, and the free sticker pack.</p>
+
       <div class="cp-history" id="cpHistory" hidden></div>
-      <p class="hint m2-fine">Bonus chips are added the moment your payment clears. Chips have no cash value, never expire, can't be cashed out or transferred, and are non-refundable except where the law requires. Payments by Stripe.</p>
+      <p class="hint cage-fine">Bonus chips are added the moment your payment clears. Chips have no cash value, never expire, can't be cashed out or transferred, and are non-refundable except where the law requires. Payments by Stripe.</p>
     </div>
   </section>
 
@@ -989,7 +994,7 @@
       <div class="sf-badges"><span class="sf-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.5 3.2 8.3 7.5 9.5 4.3-1.2 7.5-5 7.5-9.5V6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>U.S. patent pending (USPTO)</span><span class="sf-badge">Powered by <a href="https://gofirehorsego.com" target="_blank" rel="noopener">GoFirehorseGo</a></span></div>
       <p class="hint copyright">© <span id="cpYear">2026</span> SuiteFace Inc., a Florida corporation. All rights reserved. SuiteFace™, the SuiteFace Joker logo™, No Jokers Needed™, Your Hand™, Play Hand™, Joker Lobby™, Ask the Dealer™, The Raise™, High Roller Room™ and SuiteFace Private Tables™ are trademarks of SuiteFace Inc. Patent pending.</p>
     </div>
-    <div><h4>Play</h4><ul><li><a href="how-it-works.html">How it works</a></li><li><a href="find-your-suit.html">Find your suit</a></li><li><a href="membership.html">Your seat</a></li><li><a href="winners.html">Winners' Row</a></li><li><a href="chips.html">Chips</a></li><li><a href="card-backs.html">Card Backs</a></li><li><a href="how-cards-work.html">How cards are dealt</a></li><li><a href="joker-lobby.html">Joker Lobby</a></li><li><a href="my-table.html">My Lounge (players)</a></li></ul></div>
+    <div><h4>Play</h4><ul><li><a href="how-it-works.html">How it works</a></li><li><a href="find-your-suit.html">Find your suit</a></li><li><a href="membership.html">Your seat</a></li><li><a href="winners.html">Winners' Row</a></li><li><a href="chips.html">The Cage</a></li><li><a href="card-backs.html">Card Backs</a></li><li><a href="how-cards-work.html">How cards are dealt</a></li><li><a href="joker-lobby.html">Joker Lobby</a></li><li><a href="my-table.html">My Lounge (players)</a></li></ul></div>
     <div><h4>SuiteFace Inc.</h4><ul><li><a href="membership.html">Membership and prices</a></li><li><a href="guides.html">Dating guides</a></li><li><a href="christian-dating-app.html">Christian dating</a></li><li><a href="online-dating-safety.html">Dating safety tips</a></li><li><a href="legal.html">Legal center</a></li><li><a href="terms.html">Terms of Service</a></li><li><a href="privacy.html">Privacy Policy</a></li><li><a href="safety.html">Safety Guide</a></li><li><a href="fit.html">House Fit Rules</a></li><li><a href="contact.html">Contact</a></li><li><a href="redeem.html">Venues: check a date code</a></li><li><a href="my-table.html#invite">Invite a friend</a></li><li><a href="mailto:help@suiteface.com">help@suiteface.com</a></li><li>© 2026 SuiteFace Inc.</li></ul></div>
   </div>
 </footer>
@@ -1003,15 +1008,15 @@
 </div>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
 
-<script src="/assets/js/config.js?v=1792430196"></script>
-<script src="/assets/js/sign.js?v=1792430196"></script>
-<script src="/assets/js/live.js?v=1792430196"></script>
-<script src="/assets/js/gate.js?v=1792430196"></script>
-<script src="/assets/js/fx.js?v=1792430196"></script>
-<script src="/assets/js/casino-scene.js?v=1792430196"></script>
-<script src="/assets/js/chips.js?v=1792430196"></script>
-<script src="/assets/js/bumpers.js?v=1792430196"></script>
-<script src="/assets/js/slots.js?v=1792430196"></script>
-<script src="/assets/js/app.js?v=1792430196"></script>
+<script src="/assets/js/config.js?v=1792430552"></script>
+<script src="/assets/js/sign.js?v=1792430552"></script>
+<script src="/assets/js/live.js?v=1792430552"></script>
+<script src="/assets/js/gate.js?v=1792430552"></script>
+<script src="/assets/js/fx.js?v=1792430552"></script>
+<script src="/assets/js/casino-scene.js?v=1792430552"></script>
+<script src="/assets/js/chips.js?v=1792430552"></script>
+<script src="/assets/js/bumpers.js?v=1792430552"></script>
+<script src="/assets/js/slots.js?v=1792430552"></script>
+<script src="/assets/js/app.js?v=1792430552"></script>
 </body>
 </html>

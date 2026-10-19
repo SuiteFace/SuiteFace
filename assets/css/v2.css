@@ -1596,3 +1596,39 @@ body.sfplain .pcard .fidx,body.sfplain .pcard .idx,body.sfplain .pcard .fname .s
 @media (max-width:360px){.secnav .ngb{font-size:.8rem!important;padding:.4rem .3rem!important}}
 .pcard.hrcard .flip>.cover{position:absolute!important;inset:0!important;height:auto!important}
 .pcard.flipped .flip>.cover{pointer-events:none}.pcard:not(.flipped) .flip>.face{pointer-events:none}
+
+/* ===== The Cage (Oct 19): crisp white, champagne hairlines ===== */
+.cage{max-width:880px}
+.cage-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px;padding-bottom:18px;border-bottom:1px solid rgba(169,130,58,.35);margin-bottom:22px}
+.cage-head h2{font-family:Gloock,Georgia,serif;font-weight:400;font-size:clamp(2.2rem,5vw,3rem);letter-spacing:-.01em;margin:0}
+.cage-head .lede{margin:4px 0 0}
+.cage-bal{margin:0;font-size:.95rem;padding:.5rem 1rem;border:1px solid rgba(169,130,58,.45);border-radius:999px;background:#fff}
+.cage-h{font-size:.95rem;font-weight:700;margin:26px 0 10px;color:var(--cream)}
+.cage-stacks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cage-stack{position:relative;display:grid;justify-items:center;gap:2px;padding:22px 12px 18px;background:#fff;border:1px solid rgba(18,56,43,.12);border-radius:18px;cursor:pointer;font:inherit;color:#12382B;transition:border-color .15s,transform .15s,box-shadow .15s}
+.cage-stack:hover{border-color:#C9A24E;box-shadow:0 14px 30px -22px rgba(18,56,43,.5);transform:translateY(-2px)}
+.cage-stack:focus-visible{outline:2px solid #A9823A;outline-offset:3px}
+.cage-stack.best{border-color:#C9A24E;box-shadow:0 0 0 1px #C9A24E inset}
+.cage-stack em{position:absolute;top:-10px;font-style:normal;font-size:.72rem;font-weight:700;background:#12382B;color:#F2ECDD;padding:2px 10px;border-radius:999px}
+.cage-stack .sfchip{margin-bottom:8px}
+.cs-price{font-family:Gloock,Georgia,serif;font-size:1.7rem;line-height:1}
+.cs-get{font-weight:600;font-size:.95rem}
+.cs-note{font-size:.78rem;color:#8A6420;min-height:1.1em;text-align:center}
+.cage-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cage-item{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid rgba(18,56,43,.1);border-radius:14px;color:#12382B;text-decoration:none}
+.cage-item:hover{border-color:#C9A24E}
+.ci-art{width:44px;height:44px;display:grid;place-items:center}.ci-art img{width:44px;height:44px;object-fit:contain}
+.ci-theme{border-radius:8px;background:linear-gradient(135deg,#F7E7B4,#C9A24E 55%,#8A6420);box-shadow:inset 0 0 0 2px #fff}
+.ci-theme.neon{background:linear-gradient(135deg,#FF4FA3,#7A3AF0 50%,#21D4FD)}
+.ci-txt b{display:block;font-size:.95rem}.ci-txt small{color:#5B6E64;font-size:.8rem}
+.ci-price{font-family:Gloock,Georgia,serif;font-size:1.1rem}
+.cage-free{margin:14px 0 0;font-size:.88rem;color:var(--cream-dim)}
+.cage-fine{margin-top:20px}
+.cage .cp-comp{margin-top:12px}
+@media (max-width:620px){.cage-stacks{grid-template-columns:1fr}.cage-stack{grid-template-columns:auto 1fr auto;justify-items:start;align-items:center;column-gap:14px;padding:14px 16px}.cage-stack .sfchip{grid-row:1/span 3;margin:0}.cage-stack .cs-price{grid-column:3;grid-row:1/span 3;align-self:center}.cage-stack em{top:-9px;right:14px}.cage-menu{grid-template-columns:1fr}}
+/* header: The Cage */
+.cagebtn{display:inline-flex;align-items:center;font:700 .85rem var(--body);color:#12382B;background:#fff;border:1px solid #C9A24E;border-radius:999px;padding:.42rem .85rem;text-decoration:none;white-space:nowrap}
+.cagebtn:hover{background:#FBF5E6}
+@media (max-width:520px){.cagebtn{padding:.36rem .6rem;font-size:.78rem}}
+@media (max-width:520px){.who:has(#chipBal:not([hidden])) .cagebtn{display:none}}
+@media (max-width:520px){.who .rolechip{display:none}}
