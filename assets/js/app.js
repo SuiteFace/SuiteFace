@@ -461,6 +461,15 @@
     });
   }
   window.SF_houseComp = houseComp;
+  window.SF_houseCode = houseCode;
+  /* Comp code typed into a signing pop-up: checked on the server, then kept for this tab. Rejects (and the pop-up shows why) if it isn't valid. */
+  window.SF_setHouse = function (v) {
+    if (!window.SF_LIVE) return Promise.reject(new Error("Log in first, then use your comp code."));
+    return window.SF_LIVE.rpc("house_comp_check", { p_code: v }).then(function (r) {
+      if (r.error || !r.data) throw new Error((r.error && r.error.message) || "That comp code isn't valid for this account.");
+      window.SF_HOUSE = v; try { sessionStorage.setItem("sf.house", v); } catch (e) { }
+    });
+  };
   /* Staff accounts are asked for the house comp code right at checkout (blank = pay normally). */
   function staffEmail() { return !!(window.SF_LIVE && /(@suiteface\.com|@gofirehorsego\.com|^thesuiteface@gmail\.com)$/i.test(window.SF_LIVE.email() || "")); }
   function askHouse() {
@@ -566,17 +575,17 @@
       '<div class="notice bad" style="margin-top:12px"><b>High Rollers are targets for romance scams.</b> Never send money, gift cards, crypto or account details to anyone you meet here, no matter the story.</div>' +
       '<p class="hint" id="hrOut" role="status" style="margin-top:8px"></p>');
     var out = $("#hrOut", m), live = window.SF_LIVE && window.SF_LIVE.session && window.SF_LIVE.session();
-    function signed(next) { closeModal(); window.SFSign.require("highroller", next, { about: "High Roller Room" }); }
+    function signed(next, comp) { closeModal(); window.SFSign.require("highroller", next, { about: "High Roller Room", comp: !!comp }); }
     function demo(kind) { P.highRoller = kind; if (P.rooms.indexOf("highroller") < 0) P.rooms.push("highroller"); P.room = "highroller"; saveP(); renderRooms(); deckDirty = true; buildDeck(); renderTable(false); onChange(); jackpot(3000);
       toast("💎 Welcome to the High Roller Room (preview). " + DECK.length + " High Roller cards dealt."); location.hash = "table"; }
     $$("[data-hr]", m).forEach(function (b) { b.addEventListener("click", function () { var kind = b.getAttribute("data-hr");
       signed(function () {
         if (!live) { demo(kind === "buyin" ? "buyin" : "verified"); return; }
-        if (kind === "buyin" && (houseCode() || staffEmail()) && !openHighRoller.__asked) { openHighRoller.__asked = true; var self = this; compOr("high_roller", null, function () { self.click(); }); setTimeout(function () { openHighRoller.__asked = false; }, 4000); return; }
+        if (kind === "buyin" && houseCode()) { houseComp("high_roller").then(function (ok) { if (ok) toast("💎 Welcome to the High Roller Room. Comped by the house."); }); return; }
         if (kind === "buyin") { location.href = CFG.stripeHighRollerLink + "?client_reference_id=" + encodeURIComponent(window.SF_LIVE.memberId()) + "&prefilled_email=" + encodeURIComponent(window.SF_LIVE.email() || ""); return; }
         fetch(CFG.supabaseUrl + "/functions/v1/high-roller", { method: "POST", headers: { "Content-Type": "application/json", apikey: CFG.supabaseKey, Authorization: "Bearer " + window.SF_LIVE.token() }, body: JSON.stringify({ action: "bank" }) })
           .then(function (r) { return r.json(); }).then(function (j) { if (j.url) location.href = j.url; else toast(j.error || "Couldn't open bank linking."); });
-      }); }); });
+      }, kind === "buyin"); }); });
     $("#hrFile", m).addEventListener("change", function () { var files = Array.prototype.slice.call(this.files || []);
       if (!files.length) return; if (files.some(function (f) { return f.size > 10485760; })) { out.textContent = "Each file must be under 10 MB."; return; }
       signed(function () {
@@ -3558,7 +3567,7 @@
         if (window.SF_AUTH && window.SF_AUTH.refresh) window.SF_AUTH.refresh().then(go, go); else go(); }, function (er) { toast(er.message); });
       return;
     }
-    window.SF_AUTH.checkout(CFG.stripeSeatYearLink || CFG.stripePaymentLink, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
+    window.SF_AUTH.checkout(CFG.stripeSeatYearLink || CFG.stripePaymentLink, comp ? "&prefilled_promo_code=" + encodeURIComponent(comp) : "", function () { houseComp("seat_year").then(function (ok) { if (ok) setTimeout(function () { location.href = "my-table.html#table"; }, 1200); }); }).catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
     }
   }
   if (!CAN_SWITCH && $("#roleBtn")) $("#roleBtn").hidden = true;
@@ -4290,7 +4299,7 @@
      ===================================================================== */
   var LIVE_ROWS = null, LIVE_HANDS = [], CITYZ = null;
   function liveOn() { return !!(window.SF_LIVE && ROLE !== "guest"); }
-  function lrpc(n, a) { return window.SF_LIVE.rpc(n, a || {}).then(function (r) { if (r.error) throw r.error; return r.data; }); }
+  function lrpc(n, a) { if (!window.SF_LIVE) return Promise.reject(new Error("Log in first.")); return window.SF_LIVE.rpc(n, a || {}).then(function (r) { if (r.error) throw r.error; return r.data; }); }
   function genderCode() { var g = (P.id || {}).gender; if (!g) return null; if (/^(Woman|Trans woman)$/.test(g)) return "woman"; if (/^(Man|Trans man)$/.test(g)) return "man"; return "nonbinary"; }
   function cityZip(city, st) {
     if (!zipReady) return null;
@@ -5383,7 +5392,7 @@
     if (houseCode()) { houseComp("chips_" + cents).then(function (ok) { if (ok) { closeModal(); loadChips(); if (window.SFChips && SFChips.play) try { SFChips.play(); } catch (x) { } } }); return; }
     if (!link || !window.SF_AUTH) { toast("Chips open soon."); return; }
     try { sessionStorage.setItem("sf.after", "chips"); } catch (e) { }
-    window.SF_AUTH.checkout(link, "").catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
+    window.SF_AUTH.checkout(link, "", function () { buyStack(cents); }).catch(function (e) { toast((e && e.message) || "Checkout couldn't start. Try again."); });
   }
   function playDeck(btn) {
     if (!window.SF_LIVE) { loginModal("create"); return; }

@@ -28,6 +28,7 @@
     ".sfs .sfs-foot{padding:14px 20px 18px;border-top:1px solid rgba(245,241,232,.1);background:#171a18;display:grid;gap:10px}" +
     ".sfs label{display:grid;gap:4px;font-weight:600;font-size:.9rem}.sfs .row{display:grid;grid-template-columns:1fr 170px;gap:10px}@media(max-width:520px){.sfs .row{grid-template-columns:1fr}}" +
     ".sfs-back .sfs input[type=text],.sfs-back .sfs input[type=date]{font:500 1rem Figtree,system-ui,sans-serif;color:#F5F1E8;background:#121513;border:1px solid rgba(245,241,232,.18);border-radius:10px;padding:.6rem .7rem;color-scheme:dark;box-shadow:none;width:100%;box-sizing:border-box}" +
+    ".sfs-back .sfs input[type=text],.sfs-back .sfs input[type=date]{background:#121513!important;color:#F5F1E8!important;border:1px solid rgba(245,241,232,.18)!important;box-shadow:none!important}.sfs-back .sfs input.sig{font-family:'Brush Script MT','Segoe Script',cursive!important;font-size:1.35rem!important}" +
     ".sfs input:focus-visible{outline:2px solid #E2C47E;outline-offset:1px}.sfs input.sig{font-family:'Brush Script MT','Segoe Script',cursive;font-size:1.35rem}" +
     ".sfs .chk{display:flex;gap:10px;align-items:flex-start;font-weight:500}.sfs .chk input{width:20px;height:20px;margin-top:2px;accent-color:#C9A24E;flex:none}" +
     ".sfs .err{color:#E5736E;font-size:.88rem;min-height:1.2em}.sfs .btns{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}" +
@@ -57,6 +58,7 @@
         '<div class="sfs-foot">' + dob +
           '<div class="row"><label>Type your full legal name between slashes<input class="sig" type="text" id="sfsName" placeholder="/First Middle Last/" autocomplete="name"></label>' +
           '<label>Date<input type="date" id="sfsDate" value="' + todayISO() + '"></label></div>' +
+          (opts.comp ? '<label>Comp code <span style="font-weight:400;color:#A9A79E">(optional: a valid code makes this free, no card needed)</span><input type="text" id="sfsComp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Have a comp code?"></label>' : "") +
           '<label class="chk"><input type="checkbox" id="sfsOk"><span>I have read ' + (many ? "these " + list.length + " agreements" : "this agreement") + ", I am 18 or older, and I sign electronically.</span></label>" +
           '<div class="err" id="sfsErr" role="alert"></div>' +
           '<div class="btns"><button type="button" class="no" id="sfsNo">Cancel</button><button type="button" class="go" id="sfsGo" disabled>' + (many ? "Sign all and agree" : "I sign and agree") + "</button></div>" +
@@ -87,7 +89,8 @@
             signed_at: now, about: opts.about || null, dob: x[0] === "signup" ? $("sfsDob").value : undefined, device: navigator.userAgent };
         });
         try { var all = JSON.parse(localStorage.getItem("sf_signatures") || "[]"); localStorage.setItem("sf_signatures", JSON.stringify(all.concat(recs))); } catch (e) {}
-        var chain = Promise.resolve();
+        var code = $("sfsComp") ? $("sfsComp").value.trim() : "";
+        var chain = code && window.SF_setHouse ? window.SF_setHouse(code) : Promise.resolve();
         recs.forEach(function (rec) { chain = chain.then(function () { return window.SFSign.onRecord ? window.SFSign.onRecord(rec) : null; }); });
         chain.then(function () { close(); onSigned && onSigned(many ? recs : recs[0]); }, function (e) { $("sfsGo").disabled = false; $("sfsErr").textContent = (e && e.message) || "Couldn't save your signature. Try again."; });
       };

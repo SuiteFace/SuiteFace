@@ -73,8 +73,9 @@
     refresh: loadMe,
     /* Checkout: the first time, the member signs every agreement still missing (Sign-up, Release, Seat, Deck and Chips) in one step,
        then sends the member to Stripe tagged with their member id so the webhook seats them. */
-    checkout: function (link, extra) {
+    checkout: function (link, extra, onComp) {
       function go() {
+        if (onComp && window.SF_houseCode && window.SF_houseCode()) { onComp(); return Promise.resolve(); }
         return client.rpc("my_checkout_reference").then(function (r) {
           if (!r.error) {
             var u = link + (link.indexOf("?") < 0 ? "?" : "&") + "client_reference_id=" + encodeURIComponent(r.data) + "&prefilled_email=" + encodeURIComponent(session.user.email || "") + (extra || "");
@@ -82,14 +83,14 @@
           }
           var msg = r.error.message || "";
           if (/Sign-up Agreement|Buy-In Agreement/i.test(msg)) return client.rpc("my_unsigned", { p_keys: ["signup", "release", "buyin"] }).then(function (u) {
-            var keys = (!u.error && u.data && u.data.length) ? u.data : ["signup", "release", "buyin"]; return sign(keys); }).then(go);
+            var keys = (!u.error && u.data && u.data.length) ? u.data : ["signup", "release", "buyin"]; return sign(keys, onComp ? { comp: true } : null); }).then(go);
           throw r.error;
         });
       }
       return go();
     }
   };
-  function sign(key) { return new Promise(function (res) { window.SFSign.require(key, function () { res(); }); }); }
+  function sign(key, opts) { return new Promise(function (res) { window.SFSign.require(key, function () { res(); }, opts || undefined); }); }
 
   // Signatures go to the member's account when they're signed in.
   function hookSign() {
