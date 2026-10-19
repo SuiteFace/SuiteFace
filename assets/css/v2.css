@@ -1095,3 +1095,14 @@ html[data-play="day"] .btn.ghost.danger{color:#A11C30}
 .h-chapel{margin:0;position:relative;border-radius:20px;overflow:hidden;border:1px solid rgba(232,196,106,.45);box-shadow:0 24px 50px -28px rgba(20,14,22,.7)}
 .h-chapel img{display:block;width:100%;height:auto}
 .h-chapel figcaption{position:absolute;left:12px;bottom:12px;padding:6px 12px;border-radius:999px;background:rgba(20,14,22,.72);color:#FAF7F0;font:800 .85rem var(--body)}
+/* Final call to action on the home page sits on the rendered card table */
+html[data-play] .h-final{background:linear-gradient(180deg,rgba(12,26,19,.78),rgba(12,26,19,.9)),image-set(url(/assets/art/hero_table_1536.webp) type("image/webp"),url(/assets/art/hero_table_1536.jpg) type("image/jpeg")) center 40%/cover no-repeat}
+html[data-play] .h-final :is(h2,.lede){color:#FAF7F0}
+html[data-play] .h-final .lede{color:#E7ECE4}
+html[data-play] .h-final .btn.ghost,html[data-play] .h-final .textlink{color:#F2ECDD;border-color:rgba(242,236,221,.45)}
+@media (max-width:700px){html[data-play] .h-final{background:linear-gradient(180deg,rgba(12,26,19,.78),rgba(12,26,19,.9)),image-set(url(/assets/art/hero_table_900.webp) type("image/webp"),url(/assets/art/hero_table_900.jpg) type("image/jpeg")) 30% center/cover no-repeat}}
+html[data-play] .h-final .citycheck{background:rgba(12,26,19,.55);border-color:rgba(232,196,106,.45)}
+html[data-play] .h-final .citycheck :is(h3,b,li,span){color:#FAF7F0}
+html[data-play] .h-final .citycheck :is(.hint,small,p){color:#DCE5DA!important}
+html[data-play] .h-final .citycheck li.open span,html[data-play] .h-final .citycheck .open span{color:#9FE0B5}
+html[data-play] .h-final .citycheck input{background:#0F2A20!important;color:#F2ECDD!important;border:1px solid rgba(242,236,221,.35)!important}
