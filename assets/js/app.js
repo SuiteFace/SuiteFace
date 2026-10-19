@@ -1784,7 +1784,14 @@
   function cbInClass(id) { return CB[id] ? " cb-" + id : PICB[id] ? " picback" : " houseback"; }
   function cbPreview(id, size) { return '<div class="pcard cbmini" style="--w:' + (size || 120) + 'px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in' + cbInClass(id) + '"' + picBackStyle(id) + ">" + medalFor(null) + "</div></div></div></div>"; }
   function cbTile(id, name, line) { var on = P.cardBack === id; return '<div class="cbitem' + (on ? " on" : "") + '">' + cbPreview(id, 132) + "<b>" + esc(name) + "</b><span>" + esc(line) + '</span><button type="button" class="btn ' + (on ? "ghost" : "gold") + ' sm" data-cbuse="' + id + '">' + (on ? "On your card ✓" : "Use this back") + "</button></div>"; }
+  function hrBacksHTML() {
+    var hr = !!P.highRoller, mini = function (cls) { return '<div class="pcard cbmini ' + cls + '" style="--w:132px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in houseback">' + medalFor(null) + "</div></div></div></div>"; };
+    var items = [["hrcard", "Platinum", "For verified High Rollers. Everyone you're dealt to sees it."], ["hrcard hrgold", "Gold", "For High Roller Buy-In members. Everyone you're dealt to sees it."], ["hrobs", "Obsidian deck", "The house deck you see in the High Roller Room."]];
+    return '<h2 class="cbh">💎 High Roller backs <span class="free">' + (hr ? "Unlocked" : "High Rollers only") + '</span></h2><p class="hint">' + (hr ? "Yours for as long as you're a High Roller. Your status back shows automatically on your card." : "These unlock when you become a High Roller, by Buy-In or by verifying $1M+.") + '</p><div class="cbgal">' +
+      items.map(function (x) { return '<div class="cbitem' + (hr ? " on" : " locked") + '">' + (hr ? mini(x[0]) : '<div class="hrlockcard" aria-label="Locked"><svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="5" y="10" width="14" height="10" rx="2" fill="currentColor"/></svg><small>High Rollers only</small></div>') + "<b>" + x[1] + "</b><span>" + x[2] + "</span>" + (hr ? '<span class="pill hrok">Included ✓</span>' : '<button type="button" class="btn gold sm" data-highroller>Become a High Roller</button>') + "</div>"; }).join("") + "</div>";
+  }
   function renderCardBacks() {
+    var hb = $("#cbHigh"); if (hb) hb.innerHTML = hrBacksHTML();
     var g = $("#cbGallery"); if (!g) return;
     g.innerHTML = Object.keys(CB).map(function (id) { return cbTile(id, CB[id][0], CB[id][1]); }).join("");
     var pg = $("#cbPictures"), ids = Object.keys(PICB);
@@ -4514,7 +4521,7 @@
       lrpc("my_compliments").then(function (rs) { P.compRows = rs || []; P.myComps = null; (rs || []).forEach(function (x) { if (!x.hidden) { P.myComps = P.myComps || {}; P.myComps[x.kind] = x.n; } }); saveP(); renderCard(); renderCompPanel(); }, function () { });
       lrpc("my_suit_lock").then(function (L) { if (L) { P.suitLock = L; if (L.locked) { P.mySuit = L.suit; P.wild = !!L.wild; } saveP(); renderCard(); } }, function () { });
       lrpc("my_verification").then(function (v) { if (v) { P.ver = v; saveP(); renderVerPanel(); } }, function () { });
-      lrpc("my_high_roller").then(function (h) { P.highRoller = h && h.in_room ? h.status : null; P.hrUntil = h && h.in_room ? h.until : null; saveP(); renderCard(); if (P.highRoller) lrpc("my_hr_deck").then(function (d) { P.hrDeck = d || null; renderHrDeck(); }, function () { }); else renderHrDeck(); }, function () { });
+      lrpc("my_high_roller").then(function (h) { P.highRoller = h && h.in_room ? h.status : null; P.hrUntil = h && h.in_room ? h.until : null; try { renderCardBacks(); } catch (e) { } saveP(); renderCard(); if (P.highRoller) lrpc("my_hr_deck").then(function (d) { P.hrDeck = d || null; renderHrDeck(); }, function () { }); else renderHrDeck(); }, function () { });
       if (st) { P.trumps = st.trump_order && st.trump_order.length === 4 ? st.trump_order : P.trumps; P.show = st.show_me || P.show; P.ageMin = st.age_min || P.ageMin; P.ageMax = st.age_max || P.ageMax; P.dist = st.radius_miles || P.dist; }
       (res[2].data || []).forEach(function (r) { if (!IDX[r.question]) return; P.id[r.question] = IDX[r.question][2] === "one" ? r.answers[0] : r.answers; P.vis[r.question] = r.face_up; });
       (res[3].data || []).forEach(function (r) { P.prefs[r.question] = { sel: r.wanted, deal: r.dealbreaker }; });
