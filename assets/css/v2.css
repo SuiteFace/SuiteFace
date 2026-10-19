@@ -997,3 +997,42 @@ body.lb-dragmode{cursor:grabbing}
 html[data-play="day"] .secnav .ngp{background:#FFFDF8;box-shadow:0 24px 48px -24px rgba(60,48,30,.35)}
 /* audit fix: launch box notes stay readable on the green box in Day Play */
 .launchbox .hint,html[data-play="day"] .launchbox .hint{color:#F2ECDD}
+/* Card-back emblem (Oct 18): the Joker hat only on real Jokers; everyone else wears their suit */
+.pcard .cover .cv-medal .pip{width:30px;height:30px;color:#F2ECDD}
+.pcard .cover .cv-medal.red .pip{color:#E0344F}
+.pcard .cover .cv-medal .rosette{width:36px;height:36px}
+.pcard .cover .cv-medal.jk{box-shadow:0 0 0 2px #C8102E,0 0 0 5px rgba(200,16,46,.3)}
+.pcard.cbmini .cover .cv-medal .rosette{width:28px;height:28px}
+
+/* ---------- Visibility audit (Oct 18): every dark panel keeps light text in Day Play, every light panel keeps dark text in Night Play ---------- */
+/* Dark surfaces that stay dark in Day Play */
+html[data-play="day"] :is(.venue,.casbluff) :is(h2,h3,p,b,li,span:not(.btn)),html[data-play="day"] :is(.venue,.casbluff){color:#F2ECDD}
+html[data-play="day"] :is(.venue,.casbluff) .lede{color:#D9E0D6}
+html[data-play="day"] :is(.venue,.casbluff) .eyebrow{color:#E8C46A}
+/* Winners' Row rooms on the home page sit on a light panel in Day Play */
+html[data-play="day"] .h-venues li{color:#12382B;background:#FFFFFF;border-color:rgba(169,130,58,.45)}
+/* Felt panels: labels, notes and step text stay readable on green */
+:is(.feltbox,.caslist,.demo-cards,.cb-kind) label,.feltbox .field label,.casempty,.casempty b,.dmid{color:#DCE5DA}
+.demo-step,.qcheer,.qcount{color:#F0D48A}
+.exb{color:#FFB27A}
+html[data-play="day"] .cs-ex .csgo{color:#E8C46A;border-color:rgba(232,196,106,.6)}
+/* House comp box is a light card in both themes */
+.housecomp label,.housecomp .btn.ghost{color:#12382B!important}
+.housecomp .btn.ghost{border-color:rgba(18,56,43,.35)!important}
+.housecomp #compMsg,.housecomp .hint{color:#3F5A4E!important}
+/* City check */
+html[data-play="day"] .citycheck .ok{color:#1E6347}
+/* Gold buttons: dark ink on brass in both themes (white on brass was too faint) */
+.btn.gold,html[data-play="day"] .btn.gold{color:#1E1606}
+/* Muted small text a step darker in Day Play */
+html[data-play="day"]{--muted:#56695F}
+.c-stage .mc span,html[data-play="day"] .mc span,html[data-play="day"] .cbitem span,html[data-play="day"] .bluffrules span{color:#4F6358}
+
+html[data-play] .nav2 .btn.ghost{color:#F2ECDD!important;border-color:rgba(242,236,221,.35)!important}
+.citycheck .hint,.citycheck small{color:#C3CEC2}html[data-play="day"] .citycheck .hint,html[data-play="day"] .citycheck small{color:#3F5A4E}
+html[data-play="day"] .citycheck li.open span,html[data-play="day"] .citycheck .open span{color:#1E6347}
+.caslist .casempty,.caslist .casempty b{color:#DCE5DA!important}
+.caslist .exb{color:#FFB27A!important}
+.c-stage .mc span{color:#4F6358!important}html[data-play="night"] .c-stage .mc span{color:#A9B8AF!important}
+.citycheck small{color:inherit!important;opacity:.85}
+html[data-play="day"] .memchips small{color:#3F5A4E}

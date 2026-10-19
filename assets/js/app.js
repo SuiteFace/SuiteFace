@@ -1627,7 +1627,7 @@
     "midnight-neon": ["Midnight Neon", "Pink and gold neon on a dark sign board."],
     "sunday-best": ["Sunday Best", "Ivory linen, a gold border and a dove. For the ones who never miss Sunday."]
   };
-  function cbPreview(id, size) { return '<div class="pcard cbmini" style="--w:' + (size || 120) + 'px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in cb-' + id + '"><div class="cv-medal">' + (BRAND.hat || "") + "</div></div></div></div></div>"; }
+  function cbPreview(id, size) { return '<div class="pcard cbmini" style="--w:' + (size || 120) + 'px"><div class="flip"><div class="cover" style="--felt:#1E6347;--rim:#23202A"><div class="cv-in cb-' + id + '">' + medalFor(null) + "</div></div></div></div>"; }
   function renderCardBacks() {
     var g = $("#cbGallery"); if (!g) return;
     g.innerHTML = Object.keys(CB).map(function (id) { var on = P.cardBack === id; return '<div class="cbitem' + (on ? " on" : "") + '">' + cbPreview(id, 132) + "<b>" + esc(CB[id][0]) + "</b><span>" + esc(CB[id][1]) + '</span><button type="button" class="btn ' + (on ? "ghost" : "gold") + ' sm" data-cbuse="' + id + '">' + (on ? "On your card ✓" : "Use this back") + "</button></div>"; }).join("");
@@ -1740,6 +1740,15 @@
     return out;
   }
   function stickerChip(id) { var k = STICKERS.filter(function (x) { return x[0] === id; })[0]; return k ? '<span class="cvstk stk-' + k[2] + '" title="Sticker">' + k[1] + "</span>" : ""; }
+  /* Card-back emblem: only a real Joker carries the Joker hat. Everyone else shows their own suit;
+     house previews (no player) show all four suits. */
+  function rosette() { var q = [["heart", 0, 0, "#C8102E"], ["spade", 50, 0, "#F2ECDD"], ["club", 0, 50, "#F2ECDD"], ["diamond", 50, 50, "#C8102E"]];
+    return '<svg class="rosette" viewBox="0 0 100 100" aria-hidden="true">' + q.map(function (x) { return '<path fill="' + x[3] + '" transform="translate(' + (x[1] + 6) + ' ' + (x[2] + 6) + ') scale(.38)" d="' + BRAND.suit[x[0]] + '"/>'; }).join("") + "</svg>"; }
+  function medalFor(p) {
+    if (p && p.joker) return '<div class="cv-medal jk" title="Public Joker">' + (BRAND.hat || "") + "</div>";
+    if (p && SUIT[p.suit]) return '<div class="cv-medal suit' + (SUIT[p.suit].red ? " red" : "") + '" title="' + SUIT[p.suit].name + '">' + pip(p.suit) + "</div>";
+    return '<div class="cv-medal">' + rosette() + "</div>";
+  }
   function coverHTML(p) {
     var felt = (TABLE[p.looking] || TABLE.longterm)[2] || "#1E6347", red = SUIT[p.suit] && SUIT[p.suit].red;
     var badges = [];
@@ -1758,7 +1767,7 @@
     var comps = window.SFSlots && p.comps ? SFSlots.strip(p.comps, { max: 3, size: 14 }) : "";
     if (extra) stick += '<span class="cv-more" title="' + extra + ' more under More">+' + extra + "</span>";
     return '<div class="cover" style="--felt:' + felt + ";--rim:" + (red ? "#8E2230" : "#23202A") + '"><div class="cv-in' + (p.cardBack && CB[p.cardBack] ? " cb-" + p.cardBack : "") + '">' +
-      '<div class="cv-medal">' + (BRAND.hat || "") + "</div>" +
+      medalFor(p) +
       (p.couple ? '<div class="cv-couple">🍍 Couple' + (p.couple.name ? " · with " + esc(p.couple.name) : "") + "</div>" : "") + (badges.length ? '<div class="cv-badges">' + badges.join("") + "</div>" : "") + (stick ? '<div class="cv-stick">' + stick + "</div>" : "") + (comps ? '<div class="cv-comps">' + comps + "</div>" : "") +
       '<div class="cv-tap">Tap to flip</div></div>' + (G.played.indexOf(p.id) > -1 ? '<span class="stamp">Played</span>' : "") + "</div>";
   }
@@ -3405,7 +3414,7 @@
       if (!ok && !lock) {
         lock = document.createElement("div"); lock.className = "lockpanel wrap"; lock.setAttribute("data-s", String(SIGNED));
         var t = { face: "Build your Face", table: "Your Hand", map: "The Table Map", invite: "Invite friends to the table" }[sec.id] || "Members only";
-        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Members only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? (LAUNCH.open ? "You're signed in. Take your seat for $2.10 a month: the $21 Buy-In is waived through " + launchEndText() + "." : "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month.") : (LAUNCH.open ? "Take a seat to play: $2.10 a month, with the $21 Buy-In waived through " + launchEndText() + ". Already a player? Log in." : "Buy in to play: $21.00 once, then $2.10 a month. Already a member? Log in.")) + '</p><div class="row"><a class="btn gold sm" href="#membership">Buy in · $21</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
+        lock.innerHTML = '<div class="lockcard"><span class="lockicon" aria-hidden="true">' + pip("spade") + '</span><div><p class="eyebrow">Players only</p><h3>' + t + '</h3><p class="hint">' + (SIGNED ? (LAUNCH.open ? "You're signed in. Take your seat for $2.10 a month: the $21 Buy-In is waived through " + launchEndText() + "." : "You're signed in. Finish your Buy-In to take your seat: $21.00 once, then $2.10 a month.") : (LAUNCH.open ? "Take a seat to play: $2.10 a month, with the $21 Buy-In waived through " + launchEndText() + ". Already a player? Log in." : "Buy in to play: $21.00 once, then $2.10 a month. Already a player? Log in.")) + '</p><div class="row"><a class="btn gold sm" href="#membership">' + (LAUNCH.open ? "Take a seat · $2.10" : "Buy in · $21") + '</a>' + (SIGNED ? "" : '<button class="btn ghost sm" type="button" data-login>Log in</button>') + '<a class="btn ghost sm" href="#demo">Watch the demo</a></div></div></div>';
         sec.appendChild(lock);
       }
       if (lock) lock.hidden = ok; sec.classList.toggle("is-locked", !ok);
@@ -4865,5 +4874,5 @@
   wireIam(); renderIam(); renderRooms(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); renderMap();
   // The 1.5 MB ZIP table loads only where it's used: My table, or once someone types a ZIP code.
   (function () { var pg = document.body.getAttribute("data-page") || ""; if (pg === "club" || /#(map|face|table)/.test(location.hash)) loadZips(); var fz = $("#fZip"); if (fz) ["focus", "input"].forEach(function (ev) { fz.addEventListener(ev, loadZips); }); document.addEventListener("sf:live", function () { if ((document.body.getAttribute("data-page") || "") === "club") loadZips(); }); })();
-  $("#pile").style.setProperty("--hat", "url(\"data:image/svg+xml," + encodeURIComponent(BRAND.hat) + "\")");
+  $("#pile").style.setProperty("--hat", "url(\"data:image/svg+xml," + encodeURIComponent(rosette().replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')) + "\")");
 })();
