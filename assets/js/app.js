@@ -5410,7 +5410,7 @@
   }
   function chipsModal(why) {
     var c = DECKP ? DECKP.chips : null;
-    var m = modal('<h3 style="font-size:1.6rem;margin:0">Get chips</h3><p class="lede" style="margin:6px 0 14px">' + (why || "Buy a stack once. Every deck after that is one tap.") + (c != null ? " You have " + money(c) + "." : "") + "</p>" +
+    var m = modal('<h3 style="font-size:1.6rem;margin:0">The Cage</h3><p class="lede" style="margin:6px 0 14px">' + (why || "Buy a stack once. Every deck after that is one tap.") + (c != null ? " You have " + money(c) + "." : "") + "</p>" +
       '<div class="cp-stacks">' + [["210", "2.10", "$2.10", "1 deck", ""], ["2100", "21", "$21", "11 decks", "+10% bonus"], ["21000", "210", "$210", "120 decks", "+20% bonus"]].map(function (x) {
         return '<button type="button" class="cp-stack' + (x[0] === "2100" ? " best" : "") + '" data-stack-buy="' + x[0] + '"><span class="sfchip" data-chip="' + x[1] + '" data-size="64"></span><b>' + x[2] + "</b><span>" + x[3] + "</span>" + (x[4] ? '<i class="cp-bonus">' + x[4] + "</i>" : "") + "</button>"; }).join("") + "</div>" +
       (houseCode() ? '<p class="hint cp-compon">Comp code on: these stacks are free for your account.</p>' : '<form class="cp-comp" data-chipcomp><label for="cpCompM">Comp code</label><input id="cpCompM" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Have a comp code?"><button class="btn ghost sm" type="submit">Apply</button><p class="hint" data-compmsg aria-live="polite"></p></form>') +
