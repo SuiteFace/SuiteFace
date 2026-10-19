@@ -461,6 +461,14 @@
     });
   }
   window.SF_houseComp = houseComp;
+  /* Our Story → Play: plays the card straight from the reading. */
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-ruplay]"); if (!b) return;
+    var id = b.getAttribute("data-ruplay"); closeModal();
+    if (/^sample/.test(id)) { toast("That's an example card, so nothing is sent. On a real card, Play tells them you're interested, and if they play yours too, it's a Pair."); return; }
+    var btn = document.querySelector('#dealt .slot[data-id="' + id + '"] [data-playcard]');
+    if (btn) btn.click(); else toast("That card isn't in your hand right now. Pull it from the Stack, then play it.");
+  });
   window.SF_houseCode = houseCode;
   /* Comp code typed into a signing pop-up: checked on the server, then kept for this tab. Rejects (and the pop-up shows why) if it isn't valid. */
   window.SF_setHouse = function (v) {
@@ -1858,7 +1866,7 @@
       b.innerHTML = '<h3 class="ru-t">' + esc(R.title || "Your reading") + '</h3><p class="lede">' + esc(R.story || "") + "</p>" +
         '<div class="ru-cols"><div><h4>✦ Why it could work</h4><ul>' + (R.strengths || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + '</ul></div><div><h4>◆ Worth watching</h4><ul>' + (R.challenges || []).map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div></div>" +
         (R.zodiac ? '<p class="ru-z">✧ <b>In the stars:</b> ' + esc(R.zodiac) + "</p>" : "") + (R.first_date ? '<p class="ru-d">🍸 <b>First move:</b> ' + esc(R.first_date) + "</p>" : "") +
-        '<p class="hint">A reading is for fun and reflection, not a promise. Zodiac appears only when you both follow it.</p><div class="row"><button class="btn gold" type="button" data-close>Back to my hand</button></div>';
+        '<p class="hint">A reading is for fun and reflection, not a promise. Zodiac appears only when you both follow it.</p><div class="row"><button class="btn red" type="button" data-ruplay="' + esc(String(p.id)) + '">Play ' + esc(p.name.split(" ")[0]) + '\'s card</button><button class="btn ghost" type="button" data-close>Back to my hand</button></div>';
       jackpot(1500);
     }
     if (liveOn() && /^[0-9a-f-]{36}$/.test(String(p.id))) {
