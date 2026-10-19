@@ -291,7 +291,7 @@
       ["How do Jokers work?", "After a Loss on one of your first three dates together, you can make a Joker within 12 hours of Play Hand. Ten Jokers within 180 days shows JOKER on a card for 45 days. Every Joker can be challenged for free. See Joker Rules."],
       ["Someone made me feel unsafe.", "If you're in danger, call 911 now. Then use Report a safety concern on their card. Safety reports go straight to SuiteFace staff and are never handled as a Joker."],
       ["I can't use 'Use my location'.", "Your browser has to allow location for suiteface.com, and it only works on the secure site. You can always type your ZIP code or city instead."],
-      ["How do I change or delete my account?", "Open My table, then My Face. At the bottom, Your data lets you download everything SuiteFace keeps about you or delete your account. Cancel your membership under Manage billing first so you're never charged again."],
+      ["How do I change or delete my account?", "Open My Lounge, then My Face. At the bottom, Your data lets you download everything SuiteFace keeps about you or delete your account. Cancel your membership under Manage billing first so you're never charged again."],
       ["How do I contact SuiteFace?", "Email help@suiteface.com. SuiteFace doesn't take phone calls; every request is answered by email so there's a written record."]
     ];
     var DEALER = CFG.dealerUrl || "";
@@ -2035,7 +2035,7 @@
     });
     var q = location.search.match(/[?&](joined|buyin)=(1|success)/);
     if (q) setTimeout(function () { toast("Payment received. Welcome to the table! Your seat opens in a moment."); jackpot(4000); if (window.SF_AUTH) window.SF_AUTH.refresh(); seatThenDeal(0); }, 1200);
-    /* Straight from checkout to the deck: wait for the payment to seat the player, then deal their first hand on My table. */
+    /* Straight from checkout to the deck: wait for the payment to seat the player, then deal their first hand on My Lounge. */
     function seatThenDeal(n) {
       if (document.body.getAttribute("data-page") !== "club" || !window.SF_AUTH) return;
       if (window.SF_LIVE && window.SF_LIVE.seated && liveOn()) {
@@ -2451,7 +2451,7 @@
   }
   document.addEventListener("click", function (e) { var b = e.target.closest("[data-venue]"); if (!b) return; winVenue = b.getAttribute("data-venue"); try { history.replaceState(null, "", "#" + winVenue); } catch (er) { } renderWinners(); });
 
-  /* ---------- My table: winning hands, approvals and date check-ins ---------- */
+  /* ---------- My Lounge: winning hands, approvals and date check-ins ---------- */
   var KIND_OPTS = [["married", "💍 We got married"], ["engaged", "💍 We got engaged"], ["together", "♥ We're together (Royal Flush)"], ["friends", "🥂 We became friends"], ["great_date", "🎰 We had a great date"]];
   function renderWins() {
     var el = $("#winsPanel"); if (!el) return;
@@ -4481,7 +4481,7 @@
   }
   document.addEventListener("sf:live", function () {
     if (!liveOn()) { LIVE_ROWS = null; return; }
-    /* Your hand is only dealt on My table, never in the background on other pages. */
+    /* Your hand is only dealt on My Lounge, never in the background on other pages. */
     var onTable = document.body.getAttribute("data-page") === "club";
     pullFace().then(function () { if (onTable) return liveDeck(false); }, function () { if (onTable) return liveDeck(false); });
   });
@@ -4548,7 +4548,7 @@
     if ($("#btMult")) $("#btMult").addEventListener("change", function () { lrpc("bluff_team_set_mult", { p_mult: +this.value }).then(renderBluff, function (er) { toast(er.message); }); });
     $("#btDeal").addEventListener("click", function () { lrpc("bluff_team_deal").then(function (r) { toast(r && r.dealt ? "Dealt. " + r.deck + " cards on the table." : "Your deck is full. Call a few cards to make room."); renderBluff(); }, function (er) { toast(er.message); }); });
     $("#btLeave").addEventListener("click", function () { if (!confirm("Leave this table?" + (n > 1 ? " Your friends keep playing." : ""))) return; lrpc("bluff_team_leave").then(renderBluff); });
-    if ($("#btShare")) $("#btShare").addEventListener("click", function () { var msg = "Join my table at the SuiteFace Bluff Table. Code: " + t.code + " " + CFG.siteUrl + "bluff-table.html"; if (navigator.share) navigator.share({ text: msg }).catch(function () { }); else copy(msg, $("#btShare")); });
+    if ($("#btShare")) $("#btShare").addEventListener("click", function () { var msg = "Join My Lounge at the SuiteFace Bluff Table. Code: " + t.code + " " + CFG.siteUrl + "bluff-table.html"; if (navigator.share) navigator.share({ text: msg }).catch(function () { }); else copy(msg, $("#btShare")); });
     if ($("#btSay")) { BT.chatLast = 0; pullTeamChat(); $("#btSay").addEventListener("submit", function (e) { e.preventDefault(); var v = $("#btIn").value.trim(); if (!v) return; $("#btIn").value = ""; lrpc("bluff_team_say", { p_body: v }).then(pullTeamChat, function (er) { toast(er.message); }); }); }
     clearInterval(BT.poll); BT.poll = setInterval(function () { if (!document.body.contains(el)) { clearInterval(BT.poll); return; } if ($("#btSay")) pullTeamChat(); lrpc("my_bluff_team").then(function (x) { if (!x || !x.team) return; var sig = JSON.stringify([x.votes, x.score, x.calls, (x.players || []).length, x.cards.map(function (c) { return c.guess + (c.last_body || ""); })]); if (sig !== BT.sig) { BT.sig = sig; if (!$("#modal") && document.activeElement && document.activeElement.id !== "btIn") teamView(el, x, inbox); } }); }, 4000);
     BT.sig = JSON.stringify([t.votes, t.score, t.calls, (t.players || []).length, t.cards.map(function (c) { return c.guess + (c.last_body || ""); })]);
@@ -4589,7 +4589,7 @@
         '<div class="bact"><button class="btn ghost sm" type="button" data-bchat="' + h.hand_id + '" data-bname="' + esc(h.name || "") + '">💬 Chat</button><button class="btn sm bbluff" type="button" data-bcall="bluff" data-bh="' + h.hand_id + '">🎭 House Card</button><button class="btn sm breal" type="button" data-bcall="real" data-bh="' + h.hand_id + '">🂠 Player Card</button></div>') + "</div></div>";
   }
   function bluffChat(handId, name, asCard) {
-    var m = modal('<div class="bchead"><h3 style="font-size:1.5rem">' + esc(name || "Chat") + '</h3>' + (asCard || (((BT.state && BT.state.cards) || []).filter(function (x) { return x.hand_id === handId; })[0] || {}).revealed === "house" ? "" : '<button class="btn ghost sm" type="button" data-bvideo="' + handId + '" data-bname="' + esc(name || "") + '">📹 Video chat</button>') + '</div><p class="hint">' + (asCard ? "They're chatting with your card. Reply as yourself." : (function () { var cc = ((BT.state && BT.state.cards) || []).filter(function (x) { return x.hand_id === handId; })[0]; return cc && cc.revealed === "house" ? "🎭 You called it: a House Card, played by SuiteFace's AI dealer. Keep playing just for fun." : cc && cc.revealed === "real" ? "🂠 A real player. Say hi, video chat, or invite them to the Lounge." : "Player Card or House Card? Chat, then call it. Video unlocks once you call a Player Card."; })()) + '</p><div class="bthread" id="bThread"><p class="hint">Loading…</p></div><form id="bForm" class="bform"><input id="bIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' + (asCard ? "" : '<div class="row" style="margin-top:8px"><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + handId + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + handId + '">🂠 Player Card</button></div>') +
+    var m = modal('<div class="bchead"><h3 style="font-size:1.5rem">' + esc(name || "Chat") + '</h3>' + (asCard || (((BT.state && BT.state.cards) || []).filter(function (x) { return x.hand_id === handId; })[0] || {}).revealed === "house" ? "" : '<button class="btn ghost sm" type="button" data-bvideo="' + handId + '" data-bname="' + esc(name || "") + '">📹 Video chat</button>') + '</div><p class="hint">' + (asCard ? "They're chatting with your card. Reply as yourself." : (function () { var cc = ((BT.state && BT.state.cards) || []).filter(function (x) { return x.hand_id === handId; })[0]; return cc && cc.revealed === "house" ? "🎭 You called it: a House Card, played by SuiteFace's AI dealer. Keep playing just for fun." : cc && cc.revealed === "real" ? "🂠 A real player. Say hi, video chat, or invite them to the Booth." : "Player Card or House Card? Chat, then call it. Video unlocks once you call a Player Card."; })()) + '</p><div class="bthread" id="bThread"><p class="hint">Loading…</p></div><form id="bForm" class="bform"><input id="bIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' + (asCard ? "" : '<div class="row" style="margin-top:8px"><button class="btn sm bbluff" type="button" data-btcall="bluff" data-bh="' + handId + '">🎭 House Card</button><button class="btn sm breal" type="button" data-btcall="real" data-bh="' + handId + '">🂠 Player Card</button></div>') +
       '<div class="breport"><button class="linkish" type="button" id="bRepBtn">⚑ Report this chat</button><div id="bRep" hidden><label for="bRepWhy">What happened?</label><select id="bRepWhy"><option value="">Choose a reason</option><option>Sexual or explicit</option><option>Harassment or threats</option><option>Asked for money or gifts</option><option>May be under 18</option><option>Scam or moving off SuiteFace</option><option>Felt unsafe</option><option>Something else</option></select><textarea id="bRepNote" rows="2" maxlength="600" placeholder="Anything we should know? (optional)"></textarea><div class="row"><button class="btn red sm" type="button" id="bRepGo">End chat and report</button><button class="btn ghost sm" type="button" id="bRepNo">Cancel</button></div><p class="hint">Our safety team gets the reason and the last messages. The chat ends right away and the other person is flagged. In danger? Call 911.</p></div></div>');
     $("#bRepBtn", m).addEventListener("click", function () { $("#bRep", m).hidden = false; $("#bRepBtn", m).hidden = true; });
     $("#bRepNo", m).addEventListener("click", function () { $("#bRep", m).hidden = true; $("#bRepBtn", m).hidden = false; });
@@ -4704,7 +4704,7 @@
     if ((b = t.closest("#lbCard .pcard")) || t.closest("#lbFlip")) { e.preventDefault(); LOBBY.flipped = !LOBBY.flipped; var pc = $("#lbCard .pcard"); if (pc) pc.classList.toggle("flipped", LOBBY.flipped); return; }
     if ((b = t.closest("[data-lbtab]"))) { LOBBY.tab = b.getAttribute("data-lbtab"); lobbyPane(); return; }
     if ((b = t.closest("[data-lblock]"))) { var pk = b.getAttribute("data-lblock");
-      if (pk === "earned") toast(b.getAttribute("data-lbstk") === "first1000" ? "The First 1,000 stamp is for founding players." : "Unlocks when friends you invited join. Share your invite link from My table.");
+      if (pk === "earned") toast(b.getAttribute("data-lbstk") === "first1000" ? "The First 1,000 stamp is for founding players." : "Unlocks when friends you invited join. Share your invite link from My Lounge.");
       else buy("pack_" + pk, PACKS[pk][0] + " sticker pack", PACKS[pk][1], function () { renderLobby(); }); return; }
     if ((b = t.closest("[data-lbstk]"))) { toggleSticker(b.getAttribute("data-lbstk")); return; }
     if ((b = t.closest("[data-lbbump]"))) { toggleBumper(b.getAttribute("data-lbbump"), true); return; }
@@ -4798,7 +4798,7 @@
         var fs = ((FR.data && FR.data.friends) || []);
         h += '<div class="cr-new"><div class="cr-row"><label for="crSize">Play as</label><select id="crSize"><option value="2">Double date (you + 1 friend)</option><option value="3">Group date (you + 2 friends)</option><option value="4">Group date (you + 3 friends)</option></select></div>' +
           '<div class="cr-row"><label for="crName">Crew name</label><input id="crName" maxlength="40" placeholder="Brunch Bunch"></div>' +
-          (fs.length ? '<p class="hint" style="margin:6px 0">Bring friends:</p><div class="cr-pick">' + fs.map(function (f) { return '<label class="chk"><input type="checkbox" data-crpick="' + f.id + '"> ' + esc(f.name) + "</label>"; }).join("") + '</div><button class="btn gold sm" type="button" id="crGo">Start the crew</button>' : '<p class="hint">Add a friend first (from a Pair, the Lounge or a Private Table), then team up here.</p>') + "</div>";
+          (fs.length ? '<p class="hint" style="margin:6px 0">Bring friends:</p><div class="cr-pick">' + fs.map(function (f) { return '<label class="chk"><input type="checkbox" data-crpick="' + f.id + '"> ' + esc(f.name) + "</label>"; }).join("") + '</div><button class="btn gold sm" type="button" id="crGo">Start the crew</button>' : '<p class="hint">Add a friend first (from a Pair, the Booth or a Private Table), then team up here.</p>') + "</div>";
       } else {
         h += '<div class="cr-crew"><div class="cr-head"><b>' + esc(c.name || "Your crew") + '</b> <span class="hint">' + (c.size === 2 ? "Double date" : "Group date of " + c.size) + " · " + (c.status === "active" ? "ready to play" : "waiting on friends") + '</span><button class="linkish" type="button" id="crLeave">Leave crew</button></div><div class="cr-team">' + (c.members || []).map(function (p) { return '<span class="' + (p.status === "in" ? "" : "cr-wait") + '" title="' + (p.status === "in" ? "In" : "Invited") + '">' + crewCard(p, null, true) + "</span>"; }).join("") + "</div>" +
           (c.status === "active" ? '<button class="btn gold sm" type="button" id="crDeal">🃏 Deal our hand</button><div id="crHands"></div>' : '<p class="hint">Everyone has to join before you can play.</p>') + "</div>";
@@ -4837,10 +4837,10 @@
   });
   document.addEventListener("sf:live", function () { setTimeout(function () { renderCrews(); }, 1500); });
 
-  /* ---------- Friends: people you've played with (a Pair, the Lounge, a Private Table, a Player Card).
-     See who's online, message each other. Dating stays front and center; friends live on My table. ---------- */
+  /* ---------- Friends: people you've played with (a Pair, the Booth, a Private Table, a Player Card).
+     See who's online, message each other. Dating stays front and center; friends live on My Lounge. ---------- */
   var FR = { data: null, dm: null };
-  var HOW = { pair: "Your Pair", lounge: "Met in the Lounge", table: "From a Private Table", bluff: "Met at the Bluff Table", team: "Bluff Table teammate" };
+  var HOW = { pair: "Your Pair", lounge: "Met in the Booth", table: "From a Private Table", bluff: "Met at the Bluff Table", team: "Bluff Table teammate" };
   function friendBtn(id, kind) { return '<button class="btn ghost sm" type="button" data-addfriend="' + esc(id) + '"' + (kind ? ' data-fkind="' + kind + '"' : "") + '>👥 Add friend</button>'; }
   function ago(t) { if (!t) return ""; var s = (Date.now() - Date.parse(t)) / 1000; return s < 3600 ? Math.max(1, Math.round(s / 60)) + " min ago" : s < 86400 ? Math.round(s / 3600) + " hr ago" : Math.round(s / 86400) + " days ago"; }
   function renderFriends() {
@@ -4852,7 +4852,7 @@
       el.innerHTML = '<div class="fr-head"><h3 style="font-size:1.2rem;margin:0">👥 Friends <span class="hint">' + (fs.length ? on + " online · " + fs.length + " friend" + (fs.length === 1 ? "" : "s") : "") + '</span></h3><label class="chk fr-vis"><input type="checkbox" id="frShow"' + (d.show_online !== false ? " checked" : "") + "> Show friends when I'm online</label></div>" +
         (inc.length ? '<div class="fr-inc">' + inc.map(function (r) { return '<div class="fr-row ask"><span class="fr-av"' + (r.photo ? ' style="background-image:url(' + esc(r.photo) + ')"' : "") + ">" + (r.photo ? "" : esc((r.name || "?").charAt(0))) + '</span><span class="fr-who"><b>' + esc(r.name) + '</b> wants to be friends<small>@' + esc(r.handle || "") + " · " + esc(HOW[r.how] || "") + '</small></span><span class="fr-act"><button class="btn gold sm" type="button" data-fyes="' + r.id + '">Accept</button><button class="btn ghost sm" type="button" data-fno="' + r.id + '">Not now</button></span></div>'; }).join("") + "</div>" : "") +
         (fs.length ? '<div class="fr-list">' + fs.map(function (f) { return '<div class="fr-row"><span class="fr-av"' + (f.photo ? ' style="background-image:url(' + esc(f.photo) + ')"' : "") + ">" + (f.photo ? "" : esc((f.name || "?").charAt(0))) + '<i class="fr-dot' + (f.online ? " on" : "") + '" title="' + (f.online ? "Online" : "Offline") + '"></i></span><span class="fr-who"><b>' + esc(f.name) + "</b><small>" + (f.online ? '<span class="fr-on">Online now</span>' : f.last_seen ? "Seen " + ago(f.last_seen) : "Offline") + " · " + esc(HOW[f.how] || "Friend") + '</small></span><span class="fr-act"><button class="btn ' + (f.unread ? "gold" : "ghost") + ' sm" type="button" data-fdm="' + f.id + '" data-fname="' + esc(f.name) + '">💬 Message' + (f.unread ? ' <b class="fr-badge">' + f.unread + "</b>" : "") + '</button><button class="linkish fr-x" type="button" data-funf="' + f.id + '" data-fname="' + esc(f.name) + '" aria-label="Remove ' + esc(f.name) + '">⋯</button></span></div>'; }).join("") + "</div>"
-          : '<p class="hint">No friends yet. After you play with someone, at a Private Table, in the Lounge, or as a Pair, tap <b>👥 Add friend</b>.</p>');
+          : '<p class="hint">No friends yet. After you play with someone, at a Private Table, in the Booth, or as a Pair, tap <b>👥 Add friend</b>.</p>');
     }, function () { });
   }
   function friendDm(id, name) {
@@ -4876,35 +4876,35 @@
   document.addEventListener("sf:live", function () { beatPresence(); clearInterval(FR.beat); FR.beat = setInterval(beatPresence, 60000); setTimeout(renderFriends, 900); clearInterval(FR.poll); FR.poll = setInterval(function () { if ($("#friends") && !document.hidden && !$("#modal")) renderFriends(); }, 45000); });
   document.addEventListener("visibilitychange", beatPresence);
 
-  /* ---------- The Lounge: a private 21-minute room for two ID-verified players. $2.10 a seat, all to SuiteFace.
+  /* ---------- The Booth: a private 21-minute room for two ID-verified players. $2.10 a seat, all to SuiteFace.
      The inviter can comp the other seat. Comps inside are free gifts. Invites go only to Pairs or to Bluff cards already
-     revealed as Player Cards, so a Lounge invite never gives a House Card away. ---------- */
+     revealed as Player Cards, so a Booth invite never gives a House Card away. ---------- */
   var LG = { open: null, seen: {}, poll: null, verified: false };
   var COMPS = { rose: ["🌹", "Rose"], coffee: ["☕", "Coffee"], cheers: ["🥂", "Cheers"], cherries: ["🍒", "Cherries"], bouquet: ["💐", "Bouquet"], star: ["⭐", "Star"] };
   function loungeBtn(origin, ref, other, name) {
-    return '<button class="btn ghost sm lgbtn" type="button" data-lounge="' + origin + '" data-lref="' + esc(ref) + '" data-lother="' + esc(other || "") + '" data-lname="' + esc(name || "") + '">🛋 Invite to the Lounge</button>';
+    return '<button class="btn ghost sm lgbtn" type="button" data-lounge="' + origin + '" data-lref="' + esc(ref) + '" data-lother="' + esc(other || "") + '" data-lname="' + esc(name || "") + '">🛋 Invite to the Booth</button>';
   }
   function loungeInvite(origin, ref, other, name) {
     var nm = esc((name || "them").split(" ")[0]);
     if (!LG.verified) {
-      modal('<h3>🛋 The Lounge</h3><p class="lede">A private 21-minute room for two. To keep it adults-only and safe, both players must be <b>ID-verified</b>.</p><p class="hint">Verify your ID in My Face, then come back to invite ' + nm + '.</p><div class="row"><a class="btn gold" href="my-table.html#face">Verify my ID</a><button class="btn ghost" type="button" data-close>Not now</button></div>');
+      modal('<h3>🛋 The Booth</h3><p class="lede">A private 21-minute room for two. To keep it adults-only and safe, both players must be <b>ID-verified</b>.</p><p class="hint">Verify your ID in My Face, then come back to invite ' + nm + '.</p><div class="row"><a class="btn gold" href="my-table.html#face">Verify my ID</a><button class="btn ghost" type="button" data-close>Not now</button></div>');
       return;
     }
-    var m = modal('<h3>🛋 Invite ' + nm + ' to the Lounge</h3><p class="lede">A private room for 21 minutes. Just the two of you, away from the table.</p>' +
-      '<ul class="lgfacts"><li>$2.10 per seat, charged when the Lounge opens</li><li>ID-verified players only</li><li>Send free comps: 🌹 ☕ 🥂 🍒 💐 ⭐</li><li>Leave or report any time</li></ul>' +
+    var m = modal('<h3>🛋 Invite ' + nm + ' to the Booth</h3><p class="lede">A private room for 21 minutes. Just the two of you, away from the table.</p>' +
+      '<ul class="lgfacts"><li>$2.10 per seat, charged when the Booth opens</li><li>ID-verified players only</li><li>Send free comps: 🌹 ☕ 🥂 🍒 💐 ⭐</li><li>Leave or report any time</li></ul>' +
       '<label class="check"><input type="checkbox" id="lgComp"> <span>Comp ' + nm + '\'s seat. You pay for both: <b>$4.20</b>.</span></label>' +
       '<div class="row" style="margin-top:12px"><button class="btn gold" type="button" id="lgSend">Send invite · <span id="lgCost">$2.10</span></button><button class="btn ghost" type="button" data-close>Cancel</button></div><p class="hint">Never send money or gifts outside SuiteFace. Comps are free.</p>');
     $("#lgComp", m).addEventListener("change", function () { $("#lgCost", m).textContent = this.checked ? "$4.20" : "$2.10"; });
     $("#lgSend", m).addEventListener("click", function () {
       var btn = this; btn.disabled = true;
       lrpc("lounge_invite", { p_other: other || null, p_origin: origin, p_ref: ref, p_comp: $("#lgComp", m).checked }).then(function () {
-        closeModal(); toast("Invite sent. The Lounge opens when " + (name || "they").split(" ")[0] + " says yes."); loungeTick();
+        closeModal(); toast("Invite sent. The Booth opens when " + (name || "they").split(" ")[0] + " says yes."); loungeTick();
       }, function (er) { btn.disabled = false; toast(er.message); });
     });
   }
   function loungeBanner(inv) {
     if (LG.seen[inv.id] || $("#lgInv")) return; LG.seen[inv.id] = 1;
-    document.body.insertAdjacentHTML("beforeend", '<div class="lginv" id="lgInv" role="dialog" aria-label="Lounge invite"><span class="lgav"' + (inv.photo ? ' style="background-image:url(' + esc(inv.photo) + ')"' : "") + '></span><div><b>' + esc(inv.from) + ' invited you to the Lounge</b><small>21 private minutes · ' + (inv.comped ? "they comped your seat 🎁" : "$2.10 for your seat") + '</small></div><span class="row"><button class="btn gold sm" type="button" id="lgYes">Join</button><button class="btn ghost sm" type="button" id="lgNo">No thanks</button></span></div>');
+    document.body.insertAdjacentHTML("beforeend", '<div class="lginv" id="lgInv" role="dialog" aria-label="Booth invite"><span class="lgav"' + (inv.photo ? ' style="background-image:url(' + esc(inv.photo) + ')"' : "") + '></span><div><b>' + esc(inv.from) + ' invited you to the Booth</b><small>21 private minutes · ' + (inv.comped ? "they comped your seat 🎁" : "$2.10 for your seat") + '</small></div><span class="row"><button class="btn gold sm" type="button" id="lgYes">Join</button><button class="btn ghost sm" type="button" id="lgNo">No thanks</button></span></div>');
     var b = $("#lgInv");
     $("#lgYes", b).addEventListener("click", function () { lrpc("lounge_answer", { p_session: inv.id, p_yes: true }).then(function (r) { b.remove(); if (r === "active") loungeRoom(inv.id); else toast("That invite has expired."); }, function (er) { toast(er.message); }); });
     $("#lgNo", b).addEventListener("click", function () { lrpc("lounge_answer", { p_session: inv.id, p_yes: false }).catch(function () { }); b.remove(); });
@@ -4915,12 +4915,12 @@
   }
   function loungeRoom(id) {
     if (LG.open === id && $("#modal")) return; LG.open = id; closeModal();
-    var m = modal('<div class="lounge"><div class="lghead"><h3>🛋 The Lounge</h3><span class="lgclock" id="lgClock" aria-live="off">21:00</span></div><p class="hint" id="lgWith">Private room</p>' +
+    var m = modal('<div class="lounge"><div class="lghead"><h3>🛋 The Booth</h3><span class="lgclock" id="lgClock" aria-live="off">21:00</span></div><p class="hint" id="lgWith">Private room</p>' +
       '<div class="bthread lgthread" id="lgThread"><p class="hint">You\'re in. Just the two of you.</p></div>' +
       '<div class="lgcomps" role="group" aria-label="Send a comp">' + Object.keys(COMPS).map(function (k) { return '<button type="button" data-lgcomp="' + k + '" title="' + COMPS[k][1] + '">' + COMPS[k][0] + "</button>"; }).join("") + '<span class="hint">Comps are free</span></div>' +
       '<form id="lgForm" class="bform"><label class="sr" for="lgIn">Message</label><input id="lgIn" maxlength="600" placeholder="Say something…" autocomplete="off"><button class="btn gold sm" type="submit">Send</button></form>' +
-      '<div class="row lgfoot"><button class="btn ghost sm" type="button" id="lgLeave">Leave the Lounge</button><button class="linkish" type="button" id="lgRepBtn">⚑ Report</button></div>' +
-      '<div id="lgRep" hidden><label for="lgRepWhy">What happened?</label><select id="lgRepWhy"><option value="">Choose a reason</option><option>Sexual or explicit</option><option>Harassment or threats</option><option>Asked for money or gifts</option><option>May be under 18</option><option>Scam or moving off SuiteFace</option><option>Felt unsafe</option><option>Something else</option></select><textarea id="lgRepNote" rows="2" maxlength="600" placeholder="Anything we should know? (optional)"></textarea><div class="row"><button class="btn red sm" type="button" id="lgRepGo">End and report</button><button class="btn ghost sm" type="button" id="lgRepNo">Cancel</button></div><p class="hint">Our safety team gets the reason and the last messages. The Lounge closes right away and the other player is flagged. In danger? Call 911.</p></div></div>');
+      '<div class="row lgfoot"><button class="btn ghost sm" type="button" id="lgLeave">Leave the Booth</button><button class="linkish" type="button" id="lgRepBtn">⚑ Report</button></div>' +
+      '<div id="lgRep" hidden><label for="lgRepWhy">What happened?</label><select id="lgRepWhy"><option value="">Choose a reason</option><option>Sexual or explicit</option><option>Harassment or threats</option><option>Asked for money or gifts</option><option>May be under 18</option><option>Scam or moving off SuiteFace</option><option>Felt unsafe</option><option>Something else</option></select><textarea id="lgRepNote" rows="2" maxlength="600" placeholder="Anything we should know? (optional)"></textarea><div class="row"><button class="btn red sm" type="button" id="lgRepGo">End and report</button><button class="btn ghost sm" type="button" id="lgRepNo">Cancel</button></div><p class="hint">Our safety team gets the reason and the last messages. The Booth closes right away and the other player is flagged. In danger? Call 911.</p></div></div>');
     loungeCharge();
     var last = 0, endsAt = 0, skew = 0, closed = false, lastPing = 0;
     function line(x) { return x.comp ? '<div class="msg ' + (x.mine ? "me" : "them") + ' lgcomp"><span>' + (COMPS[x.comp] || ["🎁"])[0] + "</span>" + (x.mine ? "You sent a " : "Sent you a ") + esc((COMPS[x.comp] || ["", "comp"])[1].toLowerCase()) + "</div>" : '<div class="msg ' + (x.mine ? "me" : "them") + '">' + esc(x.body) + "</div>"; }
@@ -4939,18 +4939,18 @@
         var t = $("#lgThread", m), d = $("#lgTyping", m);
         if ((s.msgs || []).length) { if (d) d.remove(); var h = t.querySelector(".hint:not(.lgend)"); if (h && !last) h.remove(); s.msgs.forEach(function (x) { last = Math.max(last, x.id); t.insertAdjacentHTML("beforeend", line(x)); if (!x.mine && x.comp) jackpot(900); }); t.scrollTop = t.scrollHeight; }
         d = $("#lgTyping", m); if (s.typing && !d && !closed) { t.insertAdjacentHTML("beforeend", '<div class="msg them typing" id="lgTyping" aria-label="typing"><i></i><i></i><i></i></div>'); t.scrollTop = t.scrollHeight; } else if (!s.typing && d) d.remove();
-        if (s.status !== "active") finish(s.closed_reason === "reported" ? "This Lounge was closed after a report." : "The Lounge has closed. Thanks for stopping by.");
-      }, function (er) { finish(er.message || "The Lounge has closed."); });
+        if (s.status !== "active") finish(s.closed_reason === "reported" ? "This Booth was closed after a report." : "The Booth has closed. Thanks for stopping by.");
+      }, function (er) { finish(er.message || "The Booth has closed."); });
     }
     function clock() { if (!endsAt || closed) return; var left = Math.max(0, Math.round((endsAt - (Date.now() + skew)) / 1000)); var el = $("#lgClock", m); if (!el) return; el.textContent = Math.floor(left / 60) + ":" + ("0" + (left % 60)).slice(-2); el.classList.toggle("low", left <= 120); if (left === 0) pull(); }
     pull(); clearInterval(LG.poll); var n = 0; LG.poll = setInterval(function () { clock(); if (++n % 2 === 0) pull(); }, 1000);
     $("#lgForm", m).addEventListener("submit", function (e) { e.preventDefault(); var v = $("#lgIn", m).value.trim(); if (!v) return; $("#lgIn", m).value = ""; lrpc("lounge_send", { p_session: id, p_body: v, p_comp: null }).then(pull, function (er) { toast(er.message); }); });
     $("#lgIn", m).addEventListener("input", function () { if (Date.now() - lastPing > 3000) { lastPing = Date.now(); lrpc("lounge_typing", { p_session: id }).catch(function () { }); } });
     m.addEventListener("click", function (e) { var b = e.target.closest("[data-lgcomp]"); if (!b || closed) return; lrpc("lounge_send", { p_session: id, p_body: null, p_comp: b.getAttribute("data-lgcomp") }).then(function () { b.classList.add("sent"); pull(); }, function (er) { toast(er.message); }); });
-    $("#lgLeave", m).addEventListener("click", function () { if (closed) return; if (!confirm("Leave the Lounge? It closes for both of you.")) return; lrpc("lounge_leave", { p_session: id }).then(function () { finish("You left the Lounge."); }); });
+    $("#lgLeave", m).addEventListener("click", function () { if (closed) return; if (!confirm("Leave the Booth? It closes for both of you.")) return; lrpc("lounge_leave", { p_session: id }).then(function () { finish("You left the Booth."); }); });
     $("#lgRepBtn", m).addEventListener("click", function () { $("#lgRep", m).hidden = false; });
     $("#lgRepNo", m).addEventListener("click", function () { $("#lgRep", m).hidden = true; });
-    $("#lgRepGo", m).addEventListener("click", function () { var why = $("#lgRepWhy", m).value; if (!why) { toast("Pick a reason."); return; } lrpc("lounge_report", { p_session: id, p_reason: why, p_note: $("#lgRepNote", m).value }).then(function () { $("#lgRep", m).hidden = true; finish("You reported this Lounge and it's closed. Thank you for telling us."); }, function (er) { toast(er.message); }); });
+    $("#lgRepGo", m).addEventListener("click", function () { var why = $("#lgRepWhy", m).value; if (!why) { toast("Pick a reason."); return; } lrpc("lounge_report", { p_session: id, p_reason: why, p_note: $("#lgRepNote", m).value }).then(function () { $("#lgRep", m).hidden = true; finish("You reported this Booth and it's closed. Thank you for telling us."); }, function (er) { toast(er.message); }); });
   }
   function loungeTick() {
     if (!liveOn() || !window.SF_LIVE || !window.SF_LIVE.seated) return;
@@ -5146,7 +5146,7 @@
   /* ---------- boot ---------- */
   renderStyles(); renderQ(); renderInterests(); renderRank(); renderCard(); updateMeter(); syncRanges();
   wireIam(); renderIam(); renderRooms(); renderIdentity(); renderDemo(); applyRole(); buildDeck(); renderTable(false); renderSeats(); renderJokerStatus(); zipHint(); renderMap();
-  // The 1.5 MB ZIP table loads only where it's used: My table, or once someone types a ZIP code.
+  // The 1.5 MB ZIP table loads only where it's used: My Lounge, or once someone types a ZIP code.
   (function () { var pg = document.body.getAttribute("data-page") || ""; if (pg === "club" || /#(map|face|table)/.test(location.hash)) loadZips(); var fz = $("#fZip"); if (fz) ["focus", "input"].forEach(function (ev) { fz.addEventListener(ev, loadZips); }); document.addEventListener("sf:live", function () { if ((document.body.getAttribute("data-page") || "") === "club") loadZips(); }); })();
   $("#pile").style.setProperty("--hat", "url(\"data:image/svg+xml," + encodeURIComponent(rosette().replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ')) + "\")");
 })();
