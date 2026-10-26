@@ -1,0 +1,62 @@
+/* SuiteFace door: the locked front of the site. Canal Street at night, warm light, no blue. */
+:root{
+  --night:#1C1714; --night2:#241D19; --brick:#3A2622; --cream:#F6EBD7; --muted:#BFAE98;
+  --gold:#E2C47E; --brass:#C9A55A; --red:#C8342A; --field:#2A221E; --line:#4A3E36;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:Figtree,"Helvetica Neue",Arial,sans-serif;
+  --neon:"Tilt Neon","Figtree","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+html,body{background:var(--night);color:var(--cream);margin:0}
+body.door-wait{min-height:100vh}
+body.door{font:400 15px/1.5 var(--body);min-height:100vh;-webkit-font-smoothing:antialiased}
+body.door::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--night);z-index:10}
+.d-wrap{display:flex;flex-direction:column;min-height:100vh}
+.d-street{position:relative;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:#120E0C}
+.d-street::-webkit-scrollbar{display:none}
+.d-scene{position:relative;width:max(1100px,min(100%,calc(72vh * 1.9355)));margin:0 auto;aspect-ratio:1200/620}
+.d-scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.d-plinko{position:absolute;left:34.1667%;top:48.3871%;width:20%;height:33.0645%;cursor:pointer;border-radius:2px}
+.d-hint{position:absolute;bottom:10px;right:max(12px,env(safe-area-inset-right,0px));font:600 11px/1 var(--body);letter-spacing:.08em;color:var(--muted);background:rgba(28,23,20,.72);padding:7px 10px;border-radius:99px;pointer-events:none;transition:opacity .4s}
+@media (min-width:1100px){.d-hint{display:none}}
+
+.d-panel{flex:1;display:flex;justify-content:center;padding-block:28px 36px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:linear-gradient(#2A2420,var(--night) 70%)}
+.d-card{width:100%;max-width:400px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.d-eyebrow{font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0}
+.d-title{font:800 clamp(30px,8vw,40px)/1 var(--display);text-transform:uppercase;letter-spacing:.01em;margin:0;text-wrap:balance}
+.d-sub{margin:0;color:var(--muted)}
+.d-form{display:grid;gap:10px;margin-top:4px}
+.d-form label{font:600 13px/1 var(--body);color:var(--muted)}
+.d-row{display:flex;gap:8px}
+.d-input{flex:1;min-width:0;width:100%;height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--cream);font:500 16px var(--body)}
+.d-input::selection{background:#E2C47E;color:#2A1D12}
+.d-input:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+.d-btn{height:48px;padding:0 18px;border:0;border-radius:12px;background:var(--gold);color:#2A1D12;font:700 15px var(--body);cursor:pointer;white-space:nowrap}
+.d-btn:hover{background:#EBD192}
+.d-btn:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
+.d-btn[disabled]{opacity:.6;cursor:default}
+.d-msg{min-height:22px;margin:0;font-weight:600;color:var(--gold)}
+.d-msg.no{color:#F08A7E}
+.d-foot{margin:6px 0 0;font-size:13px;color:#8F806F}
+.d-foot b{color:var(--muted);font-weight:600;user-select:all}
+.d-shake{animation:dShake .4s}
+@keyframes dShake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+
+/* Scene motion: quiet neon, drifting steam, lanterns. */
+.d-flick{animation:dFlick 7s infinite}
+.d-flick2{animation:dFlick 11s 2s infinite}
+@keyframes dFlick{0%,100%{opacity:1}46%{opacity:1}47%{opacity:.35}48%{opacity:1}50%{opacity:.5}51%{opacity:1}}
+.d-steam path{animation:dSteam 6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.d-steam path:nth-child(2){animation-delay:2s}.d-steam path:nth-child(3){animation-delay:4s}
+@keyframes dSteam{0%{opacity:0;transform:translateY(10px) scaleY(.6)}30%{opacity:.5}100%{opacity:0;transform:translateY(-60px) scaleY(1.3)}}
+.d-lantern{animation:dSway 5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 0}
+.d-lantern.b{animation-delay:-2.5s}
+@keyframes dSway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+.d-shutter{transition:transform 1s cubic-bezier(.6,0,.2,1)}
+.d-open .d-shutter{transform:translateY(-212px)}
+.d-doorlight{opacity:0;transition:opacity 1s .2s}
+.d-open .d-doorlight{opacity:1}
+.d-fade{position:fixed;inset:0;background:var(--night);opacity:0;pointer-events:none;transition:opacity .5s;z-index:20}
+.d-open .d-fade{opacity:1;transition-delay:.9s}
+@media (prefers-reduced-motion:reduce){.d-flick,.d-flick2,.d-steam path,.d-lantern{animation:none}.d-shutter,.d-doorlight,.d-fade{transition:none}}
