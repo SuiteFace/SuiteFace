@@ -1,11 +1,11 @@
-// SuiteFace member email: sends queued messages through Bird from messenger@gofirehorsego.com.
+// SuiteFace member email: sends queued messages through Bird from messenger@suiteface.com.
 // Called every minute by the database (pg_cron) with a token kept in the Vault. The Bird key lives only in
 // the BIRD_API_KEY secret, set by the owner in Supabase. Until it's set, nothing is sent and the queue waits.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
 const json = (b: unknown, s = 200) => new Response(JSON.stringify(b), { status: s, headers: { "Content-Type": "application/json" } });
-const FROM = { email: "messenger@gofirehorsego.com", name: "SuiteFace" };
+const FROM = { email: "messenger@suiteface.com", name: "SuiteFace" };
 
 Deno.serve(async (req) => {
   const { data: ok } = await db.rpc("check_notify_token", { p: req.headers.get("x-notify-token") ?? "" });
@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
       const r = await fetch(`https://${region}.platform.bird.com/v1/email/messages`, {
         method: "POST",
         headers: { Authorization: "Bearer " + key, "Content-Type": "application/json", "Idempotency-Key": "sf-outbox-" + m.id },
-        body: JSON.stringify({ from: FROM, to: [m.to_email], reply_to: ["messenger@gofirehorsego.com"], subject: m.subject, html: m.html, text: m.text_body,
+        body: JSON.stringify({ from: FROM, to: [m.to_email], reply_to: ["messenger@suiteface.com"], subject: m.subject, html: m.html, text: m.text_body,
           category: "transactional", track_opens: false, track_clicks: false, tags: [{ name: "brand", value: "suiteface" }, { name: "kind", value: String(m.kind).replace(/[^A-Za-z0-9_-]/g, "") }] }),
       });
       if (r.ok) { await db.rpc("outbox_mark", { p_id: m.id, p_status: "sent" }); sent++; }
