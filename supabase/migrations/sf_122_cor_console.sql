@@ -79,11 +79,11 @@ insert into public.cor_rules(rule, label, section, perm, base_severity, horizon,
   ('payout_approval',  'Staff payout waiting for approval',   'operations', 'finance',    'info', '48 hours', '7 days', '#operations/payments'),
   ('hr_check',         'High Roller balance check to decide', 'compliance', 'compliance', 'info', '24 hours', '72 hours', '#operations/customers'),
   ('card_back_draft',  'Card backs waiting for owner approval','operations','platform_admin', 'info', '7 days', '30 days', '#operations/marketing'),
-  ('bank_unmatched',   'Bank line needs a match',             'reporting',  'finance',    'info', '3 days', '7 days', '#operations/ledger'),
   ('vault_review',     'Governance document review due',      'compliance', 'compliance', 'info', '30 days', '0 days', '#compliance/vault'),
   ('policy_ack',       'Policy not yet acknowledged',         'compliance', 'staff_admin','info', '7 days', '14 days', '#compliance/policies'),
   ('obligation',       'Obligation coming due',               'compliance', 'compliance', 'info', '30 days', '0 days', '#compliance/obligations'),
-  ('ledger_unbalanced','Ledger does not balance',             'reporting',  'finance',    'immediate', '1 hour', '1 hour', '#reporting/trial-balance')
+  ('ledger_unbalanced','Ledger does not balance',             'reporting',  'finance',    'immediate', '1 hour', '1 hour', '#reporting/trial-balance'),
+  ('manual',           'Staff task',                          'operations', 'support',    'info', '24 hours', '0 days', '#operations/alerts')
 on conflict (rule) do nothing;
 
 create table if not exists public.cor_alerts (
@@ -194,9 +194,6 @@ begin
     perform private.cor_raise('card_back_draft', 'card_backs:drafts', (select count(*) from public.card_backs where status = 'draft') || ' card backs waiting for approval', 'Approve or retire them in Card Backs → Owner review.', 'card_backs', 'drafts',
       (select min(created_at) from public.card_backs where status = 'draft'));
     keys := keys || 'card_backs:drafts'::text; end if;
-  for x in select id, posted_on, description, amount_cents from public.cor_bank_lines where status = 'unmatched' loop
-    perform private.cor_raise('bank_unmatched', 'bank:' || x.id, 'Bank line ' || to_char(x.posted_on, 'Mon DD') || ' $' || to_char(x.amount_cents / 100.0, 'FM999,990.00') || ' needs a match', x.description, 'bank_line', x.id::text, x.posted_on::timestamptz);
-    keys := keys || ('bank:' || x.id); end loop;
   for x in select id, title, review_on from public.cor_vault_docs where status = 'approved' and review_on is not null and review_on < current_date + 30 loop
     perform private.cor_raise('vault_review', 'vault:' || x.id || ':' || x.review_on, 'Review "' || x.title || '"', 'Review date ' || to_char(x.review_on, 'Mon DD, YYYY'), 'vault_doc', x.id::text, x.review_on::timestamptz);
     keys := keys || ('vault:' || x.id || ':' || x.review_on); end loop;
@@ -295,24 +292,6 @@ select * from (values
   ('Patent: nonprovisional deadline check', 'ip', (now() + interval '60 days')::date, 'none', 'Confirm the 12-month date from the provisional filing with the patent attorney.')
 ) v(title, category, due_on, recurrence, notes)
 where not exists (select 1 from public.cor_obligations);
-
--- ---------- bank statement lines ----------
-create table if not exists public.cor_bank_lines (
-  id bigint generated always as identity primary key,
-  account text not null default '1000',
-  posted_on date not null,
-  description text not null default '',
-  amount_cents bigint not null,
-  ref text,
-  batch text,
-  fingerprint text not null unique,
-  status text not null default 'unmatched' check (status in ('unmatched','matched','posted','ignored')),
-  entry_id bigint references public.gl_entries(id) on delete set null,
-  note text,
-  imported_by uuid,
-  imported_at timestamptz not null default now()
-);
-alter table public.cor_bank_lines enable row level security;
 
 -- ---------- campaigns (marketing and social) ----------
 create table if not exists public.cor_campaigns (
@@ -416,7 +395,6 @@ create or replace function public.cor_alert_create(p_title text, p_detail text, 
 returns jsonb language plpgsql security definer set search_path = '' as $$
 declare me uuid := private.cor_require(null); nid bigint;
 begin
-  insert into public.cor_rules(rule, label, section, perm, base_severity, horizon, due_after) values ('manual', 'Staff task', 'operations', 'support', 'info', '24 hours', '0 days') on conflict do nothing;
   insert into public.cor_alerts(rule, title, detail, severity, due_at, origin_tz, dedupe_key, owner_id, link)
   values ('manual', left(p_title, 160), left(p_detail, 2000), case when p_due < now() + interval '24 hours' then 'due_soon' else 'info' end, p_due, coalesce(p_tz, 'America/Chicago'), 'manual:' || gen_random_uuid(), me, '#operations/alerts')
   returning id into nid;
@@ -482,37 +460,39 @@ end $$;
 
 create or replace function public.cor_members(p_q text default null, p_filter text default null, p_sort text default 'new', p_page int default 1, p_size int default 25)
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
-declare me uuid := private.cor_require('support'); owner boolean := 'staff_admin' = any(private.cor_perms());
-  sz int := least(greatest(coalesce(p_size, 25), 5), 100); pg int := greatest(coalesce(p_page, 1), 1); q text := nullif(trim(coalesce(p_q, '')), '');
+declare me uuid := private.cor_require('support'); is_owner boolean := 'staff_admin' = any(private.cor_perms());
+  sz int := least(greatest(coalesce(p_size, 25), 5), 100); pg int := greatest(coalesce(p_page, 1), 1); q text := nullif(trim(coalesce(p_q, '')), ''); res jsonb;
 begin
-  return (with base as (
+  with base as (
       select m.*, (select email::text from auth.users u where u.id = m.user_id) email from public.members m
       where m.deleted_at is null
-        and (q is null or m.handle ilike '%' || q || '%' or m.face_name ilike '%' || q || '%' or (owner and exists (select 1 from auth.users u where u.id = m.user_id and u.email ilike '%' || q || '%')))
+        and (q is null or m.handle ilike '%' || q || '%' or m.face_name ilike '%' || q || '%' or (is_owner and exists (select 1 from auth.users u where u.id = m.user_id and u.email ilike '%' || q || '%')))
         and case coalesce(p_filter, '') when 'active' then m.seat_until > now() when 'lapsed' then m.seat_until < now()
              when 'staff' then m.role <> 'player' when 'fictional' then m.fictional when 'flagged' then m.review_hold or m.banned_at is not null
              when 'hr' then private.is_high_roller(m.id) when 'real' then not m.fictional else true end)
     select jsonb_build_object('total', (select count(*) from base), 'page', pg, 'size', sz,
-      'rows', coalesce((select jsonb_agg(r) from (select jsonb_build_object('id', b.id, 'handle', b.handle, 'name', b.face_name, 'email', case when owner then b.email end,
+      'rows', coalesce((select jsonb_agg(r) from (select jsonb_build_object('id', b.id, 'handle', b.handle, 'name', b.face_name, 'email', case when is_owner then b.email end,
           'role', b.role, 'membership', b.membership, 'seat_until', b.seat_until, 'deck_until', b.deck_until, 'created_at', b.created_at, 'last_seen_at', b.last_seen_at,
           'fictional', b.fictional, 'id_verified', b.id_verified, 'photo_verified', b.photo_verified, 'hold', b.review_hold, 'banned', b.banned_at is not null,
           'hr', b.high_roller, 'zip', b.home_zip, 'suit', b.style_suit, 'photo', b.photo_url) r
         from base b order by case when p_sort = 'name' then b.handle end, case when p_sort = 'seen' then b.last_seen_at end desc nulls last, b.created_at desc
-        offset (pg - 1) * sz limit sz) x), '[]'::jsonb));
+        offset (pg - 1) * sz limit sz) x), '[]'::jsonb) into res;
+  return res;
 end $$;
 
 create or replace function public.cor_payments(p_page int default 1, p_size int default 25, p_q text default null)
 returns jsonb language plpgsql stable security definer set search_path = '' as $$
-declare me uuid := private.cor_require('finance'); sz int := least(greatest(coalesce(p_size, 25), 5), 100); pg int := greatest(coalesce(p_page, 1), 1);
+declare me uuid := private.cor_require('finance'); sz int := least(greatest(coalesce(p_size, 25), 5), 100); pg int := greatest(coalesce(p_page, 1), 1); res jsonb;
 begin
-  return (with base as (select b.*, m.handle from public.billing_events b left join public.members m on m.id = b.member_id
+  with base as (select b.*, m.handle from public.billing_events b left join public.members m on m.id = b.member_id
                         where p_q is null or b.type ilike '%' || p_q || '%' or b.outcome ilike '%' || p_q || '%' or m.handle ilike '%' || p_q || '%')
     select jsonb_build_object('total', (select count(*) from base), 'page', pg, 'size', sz,
       'rows', coalesce((select jsonb_agg(jsonb_build_object('id', b.stripe_event_id, 'type', b.type, 'outcome', b.outcome, 'handle', b.handle, 'at', b.received_at,
           'comp', b.stripe_event_id like 'evt_comp%', 'amount', coalesce((b.payload->'data'->'object'->>'amount_total')::bigint, (b.payload->'data'->'object'->>'amount')::bigint),
           'livemode', b.payload->'data'->'object'->'livemode') order by b.received_at desc) from (select * from base order by received_at desc offset (pg - 1) * sz limit sz) b), '[]'::jsonb),
       'payouts', (select coalesce(jsonb_agg(jsonb_build_object('id', p.id, 'payee', (select handle from public.members where id = p.payee_id), 'kind', p.kind, 'period', p.period,
-          'cents', p.amount_cents, 'status', p.status, 'created_at', p.created_at) order by p.created_at desc), '[]'::jsonb) from public.staff_payouts p));
+          'cents', p.amount_cents, 'status', p.status, 'created_at', p.created_at) order by p.created_at desc), '[]'::jsonb) from public.staff_payouts p) into res;
+  return res;
 end $$;
 
 create or replace function public.cor_cases() returns jsonb
@@ -686,91 +666,9 @@ begin
     jsonb_build_object('key', 'jobs', 'name', 'Scheduled jobs', 'last', (select max(end_time) from cron.job_run_details),
       'detail', (select count(*) || ' jobs · ' || coalesce((select count(*) from cron.job_run_details where status = 'failed' and end_time > now() - interval '24 hours'), 0) || ' failures in 24 h' from cron.job),
       'ok', not exists (select 1 from cron.job_run_details where status = 'failed' and end_time > now() - interval '24 hours')),
-    jsonb_build_object('key', 'bank', 'name', 'Bank statements', 'last', (select max(imported_at) from public.cor_bank_lines),
-      'detail', (select count(*) || ' lines · ' || count(*) filter (where status = 'unmatched') || ' unmatched' from public.cor_bank_lines),
-      'ok', not exists (select 1 from public.cor_bank_lines where status = 'unmatched'), 'note', 'CSV import now. A live read-only feed (Plaid) needs an account and approval.'),
+    jsonb_build_object('key', 'bank', 'name', 'Banking and reconciliation', 'last', null, 'detail', 'Moves to Ledger Technology', 'ok', true, 'note', 'Bank import and matching live in the Ledger Technology books.'),
     jsonb_build_object('key', 'ledger', 'name', 'General ledger', 'last', (select max(created_at) from public.gl_entries),
       'detail', (select count(*) || ' journal entries' from public.gl_entries), 'ok', (select coalesce(sum(debit_cents), 0) = coalesce(sum(credit_cents), 0) from public.gl_lines)));
-end $$;
-
--- Bank lines: import, list, auto-match, match, post, ignore
-create or replace function public.cor_bank_import(p_rows jsonb, p_account text default '1000') returns jsonb
-language plpgsql security definer set search_path = '' as $$
-declare me uuid := private.cor_require('finance'); r jsonb; added int := 0; dup int := 0; bad int := 0; b text := to_char(now(), 'YYYYMMDD-HH24MISS'); fp text; d date; amt bigint;
-begin
-  if jsonb_typeof(p_rows) <> 'array' or jsonb_array_length(p_rows) > 5000 then raise exception 'Send up to 5,000 rows.'; end if;
-  if p_account not in ('1000','1010') then raise exception 'Pick the operating bank (1000) or Stripe balance (1010).'; end if;
-  for r in select * from jsonb_array_elements(p_rows) loop
-    begin
-      d := (r->>'date')::date; amt := round((r->>'amount')::numeric * 100);
-      fp := md5(p_account || '|' || d || '|' || amt || '|' || coalesce(r->>'description', '') || '|' || coalesce(r->>'ref', ''));
-      insert into public.cor_bank_lines(account, posted_on, description, amount_cents, ref, batch, fingerprint, imported_by)
-      values (p_account, d, left(coalesce(r->>'description', ''), 300), amt, left(r->>'ref', 120), b, fp, me);
-      added := added + 1;
-    exception when unique_violation then dup := dup + 1; when others then bad := bad + 1; end;
-  end loop;
-  perform private.cor_log(me, 'bank.import', 'bank_batch', b, jsonb_build_object('added', added, 'duplicates', dup, 'rejected', bad));
-  perform public.cor_bank_auto_match();
-  return jsonb_build_object('batch', b, 'added', added, 'duplicates', dup, 'rejected', bad);
-end $$;
-
-create or replace function public.cor_bank_auto_match() returns jsonb
-language plpgsql security definer set search_path = '' as $$
-declare me uuid := private.cor_require('finance'); x record; e bigint; n int := 0;
-begin
-  for x in select * from public.cor_bank_lines where status = 'unmatched' loop
-    select l.entry_id into e from public.gl_lines l join public.gl_entries g on g.id = l.entry_id
-     where l.account = x.account and (l.debit_cents - l.credit_cents) = x.amount_cents and g.entry_date between x.posted_on - 4 and x.posted_on + 4
-       and not exists (select 1 from public.cor_bank_lines b where b.entry_id = l.entry_id)
-     order by abs(g.entry_date - x.posted_on) limit 1;
-    if e is not null then update public.cor_bank_lines set status = 'matched', entry_id = e where id = x.id; n := n + 1; end if;
-  end loop;
-  perform private.cor_sweep();
-  return jsonb_build_object('matched', n);
-end $$;
-
-create or replace function public.cor_bank_list(p_status text default null) returns jsonb
-language plpgsql stable security definer set search_path = '' as $$
-declare me uuid := private.cor_require('finance');
-begin
-  return jsonb_build_object(
-    'rows', coalesce((select jsonb_agg(jsonb_build_object('id', b.id, 'account', b.account, 'date', b.posted_on, 'description', b.description, 'cents', b.amount_cents, 'ref', b.ref,
-        'status', b.status, 'entry_id', b.entry_id, 'entry_memo', (select memo from public.gl_entries where id = b.entry_id), 'note', b.note,
-        'candidates', case when b.status = 'unmatched' then (select coalesce(jsonb_agg(jsonb_build_object('entry_id', g.id, 'date', g.entry_date, 'memo', g.memo)), '[]'::jsonb) from (
-            select distinct g.id, g.entry_date, g.memo from public.gl_lines l join public.gl_entries g on g.id = l.entry_id
-            where l.account = b.account and abs((l.debit_cents - l.credit_cents) - b.amount_cents) <= greatest(abs(b.amount_cents) / 50, 100)
-              and g.entry_date between b.posted_on - 10 and b.posted_on + 10 limit 5) g) end) order by b.posted_on desc, b.id desc)
-      from public.cor_bank_lines b where p_status is null or b.status = p_status), '[]'::jsonb),
-    'book_balance', (select coalesce(sum(debit_cents - credit_cents), 0) from public.gl_lines where account = '1000'),
-    'statement_total', (select coalesce(sum(amount_cents), 0) from public.cor_bank_lines where account = '1000' and status <> 'ignored'));
-end $$;
-
-create or replace function public.cor_bank_resolve(p_id bigint, p_action text, p_entry bigint default null, p_account text default null, p_memo text default null)
-returns jsonb language plpgsql security definer set search_path = '' as $$
-declare me uuid := private.cor_require('finance'); b public.cor_bank_lines; res jsonb; eid bigint;
-begin
-  select * into b from public.cor_bank_lines where id = p_id;
-  if not found then raise exception 'That bank line no longer exists.'; end if;
-  if p_action = 'match' then
-    if not exists (select 1 from public.gl_lines where entry_id = p_entry and account = b.account) then raise exception 'That journal does not touch account %.', b.account; end if;
-    update public.cor_bank_lines set status = 'matched', entry_id = p_entry where id = p_id;
-  elsif p_action = 'post' then
-    if p_account is null or not exists (select 1 from public.gl_accounts where code = p_account) then raise exception 'Pick an account to post against.'; end if;
-    res := public.finance_manual_entry(b.posted_on, coalesce(nullif(p_memo, ''), b.description),
-      case when b.amount_cents >= 0
-        then jsonb_build_array(jsonb_build_object('account', b.account, 'debit', b.amount_cents / 100.0), jsonb_build_object('account', p_account, 'credit', b.amount_cents / 100.0))
-        else jsonb_build_array(jsonb_build_object('account', p_account, 'debit', -b.amount_cents / 100.0), jsonb_build_object('account', b.account, 'credit', -b.amount_cents / 100.0)) end);
-    eid := coalesce((res->>'entry_id')::bigint, (res->>'id')::bigint, (select max(id) from public.gl_entries where created_by = me));
-    update public.cor_bank_lines set status = 'posted', entry_id = eid, note = p_memo where id = p_id;
-  elsif p_action = 'ignore' then
-    if coalesce(trim(p_memo), '') = '' then raise exception 'Say why this line is ignored.'; end if;
-    update public.cor_bank_lines set status = 'ignored', note = p_memo where id = p_id;
-  elsif p_action = 'unmatch' then
-    update public.cor_bank_lines set status = 'unmatched', entry_id = null where id = p_id and status = 'matched';
-  else raise exception 'Unknown action.'; end if;
-  perform private.cor_log(me, 'bank.' || p_action, 'bank_line', p_id::text, jsonb_build_object('entry', p_entry, 'account', p_account, 'memo', p_memo));
-  perform private.cor_sweep();
-  return jsonb_build_object('ok', true);
 end $$;
 
 -- Campaigns
@@ -821,7 +719,7 @@ end $$;
 
 -- Lock down: tables only through RPCs; RPCs only for signed-in users.
 revoke all on public.cor_audit, public.cor_prefs, public.cor_rules, public.cor_alerts, public.cor_alert_events, public.cor_vault_docs, public.cor_vault_acks,
-  public.cor_obligations, public.cor_bank_lines, public.cor_campaigns from anon, authenticated;
+  public.cor_obligations, public.cor_campaigns from anon, authenticated;
 do $$ declare f text; begin
   for f in select p.oid::regprocedure::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname like 'cor\_%' loop
     execute format('revoke all on function %s from public, anon', f);
